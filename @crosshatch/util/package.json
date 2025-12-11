@@ -18,12 +18,11 @@
   "exports": {
     ".": {
       "types": "./index.ts",
-      "default": "./dist/index.js"
+      "import": "./dist/index.js"
     },
     "./package.json": "./package.json"
   },
   "peerDependencies": {
-    "effect": "catalog:",
-    "@effect-atom/atom-react": "catalog:"
+    "effect": "catalog:"
   }
 }

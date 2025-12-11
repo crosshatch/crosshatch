@@ -1,4 +1,3 @@
-import { u8a } from "@crosshatch/util"
 import { Prompt } from "@effect/ai"
 import { customType, integer, numeric, type ReferenceConfig, text, timestamp, uuid } from "drizzle-orm/pg-core"
 import { identity, Schema as S } from "effect"
@@ -46,5 +45,5 @@ export const bytea = customType<{
 }>({
   dataType: () => "bytea",
   toDriver: identity,
-  fromDriver: u8a.normalize,
+  fromDriver: (v) => v.slice(),
 })

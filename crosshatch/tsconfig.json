@@ -7,6 +7,6 @@
   "include": ["."],
   "exclude": ["dist"],
   "references": [
-    { "path": "../util" }
+    { "path": "../@crosshatch/util" }
   ]
 }

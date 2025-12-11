@@ -1,6 +1,7 @@
 .env*
 
 node_modules/
+routeTree.gen.ts
 
 repomix-output.xml
 .DS_Store
@@ -8,4 +9,5 @@ repomix-output.xml
 .direnv/
 dist/
 *.tsbuildinfo
+.turbo
 

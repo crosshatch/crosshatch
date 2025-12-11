@@ -20,7 +20,7 @@ export const make = ({ origin, port, url, allow, envDir }: {
   url: string
 }): {
   root: UserConfig
-  pluginsCommon: Array<PluginOption>
+  plugins: Array<PluginOption>
 } => ({
   root: {
     envDir,
@@ -43,7 +43,7 @@ export const make = ({ origin, port, url, allow, envDir }: {
     worker: { format: "es" },
     optimizeDeps: { exclude: ["@effect/platform"] },
   },
-  pluginsCommon: [
+  plugins: [
     ...origin ? [mkcert({ hosts: [origin] })] : [],
     react({
       babel: {

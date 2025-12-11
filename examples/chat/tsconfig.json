@@ -1,10 +1,14 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../tsconfig.base",
   "compilerOptions": {
     "composite": false,
     "declaration": false
   },
   "include": ["."],
   "exclude": ["dist"],
-  "references": []
+  "references": [
+    { "path": "../../@crosshatch/react" },
+    { "path": "../../@crosshatch/ui" },
+    { "path": "../../@crosshatch/util" }
+  ]
 }

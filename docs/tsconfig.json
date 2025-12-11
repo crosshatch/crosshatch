@@ -1,0 +1,18 @@
+{
+  "extends": "../tsconfig.base",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": { "@/*": ["./*"] },
+    "composite": false,
+    "declaration": false
+  },
+  "include": [".", ".source/index.ts", "source.config.ts"],
+  "exclude": ["dist"],
+  "references": [
+    { "path": "../crosshatch" },
+    { "path": "../@crosshatch/config" },
+    { "path": "../@crosshatch/react" },
+    { "path": "../@crosshatch/ui" },
+    { "path": "../@crosshatch/util" }
+  ]
+}

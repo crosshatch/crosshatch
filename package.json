@@ -1,16 +1,24 @@
 {
   "name": "crosshatch",
   "type": "module",
+  "packageManager": "pnpm@10.25.0",
   "scripts": {
     "prepare": "ts-patch install -s",
     "build": "tsc -b",
-    "watch": "tsc -b -w"
+    "watch": "tsc -b -w",
+    "dev": "turbo run //#watch dev"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.8",
     "@effect/language-service": "catalog:",
     "@effect/platform-node": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@types/react": "catalog:",
     "dprint": "catalog:",
     "ts-patch": "catalog:",
-    "typescript": "catalog"
+    "turbo": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

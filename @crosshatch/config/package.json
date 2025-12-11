@@ -18,7 +18,8 @@
     "@tanstack/router-plugin": "catalog:",
     "@vitejs/plugin-react": "catalog:",
     "drizzle-orm": "catalog:",
-    "vite-plugin-mkcert": "catalog:",
+    "effect": "catalog:",
+    "vite-plugin-mkcert": "^1.17.9",
     "vite": "catalog:"
   },
   "devDependencies": {
