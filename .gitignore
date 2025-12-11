@@ -1,7 +1,6 @@
 .env*
 
 node_modules/
-routeTree.gen.ts
 
 repomix-output.xml
 .DS_Store

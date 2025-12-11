@@ -13,7 +13,7 @@ import { DocsLayout } from "fumadocs-ui/layouts/docs"
 import { DocsBody, DocsDescription, DocsPage, DocsTitle } from "fumadocs-ui/page"
 import { useMemo } from "react"
 
-export const Route = createFileRoute("/docs/$")({
+export const Route = createFileRoute("/$")({
   loader: async ({ params }) => {
     const slugs = params._splat?.split("/") ?? []
     const data = await loader({ data: slugs })

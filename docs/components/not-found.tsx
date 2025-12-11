@@ -14,7 +14,7 @@ export const NotFound = () => (
       <p className="text-fd-muted-foreground max-w-md">
         The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
       </p>
-      <Link to="/docs/$">
+      <Link to="/$" params={{ _splat: "" }}>
         Back to Documentation
       </Link>
     </div>

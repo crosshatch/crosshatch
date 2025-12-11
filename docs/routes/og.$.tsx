@@ -5,7 +5,7 @@ import { readFile } from "node:fs/promises"
 import { join } from "node:path"
 import { cwd } from "node:process"
 
-export const Route = createFileRoute("/og/docs/$")({
+export const Route = createFileRoute("/og/$")({
   server: {
     handlers: {
       GET: async ({ params }) => {
