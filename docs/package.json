@@ -32,7 +32,7 @@
     "next-themes": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "shiki": "^3.15.0",
+    "shiki": "catalog:",
     "zod": "^4.1.12"
   },
   "devDependencies": {
