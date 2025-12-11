@@ -1,0 +1,16 @@
+{
+  "name": "crosshatch",
+  "type": "module",
+  "scripts": {
+    "prepare": "ts-patch install -s",
+    "build": "tsc -b",
+    "watch": "tsc -b -w"
+  },
+  "devDependencies": {
+    "@effect/language-service": "catalog:",
+    "@effect/platform-node": "catalog:",
+    "dprint": "catalog:",
+    "ts-patch": "catalog:",
+    "typescript": "catalog"
+  }
+}

@@ -1,0 +1,14 @@
+packages:
+  - "@crosshatch/*"
+  - crosshatch
+  - docs
+  - examples/*
+catalog:
+  "@effect/language-service": ^0.62.0
+  "@effect/platform": ^0.93.6
+  dprint: ^0.50.2
+  effect: ^3.19.10
+  ts-patch: ^3.3.0
+  typescript: ^5.9.3
+  vite: ^7.2.7
+  vitest: ^4.0.15

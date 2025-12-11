@@ -1,0 +1,27 @@
+{
+  "name": "@crosshatch/config",
+  "version": "0.1.0-beta.1",
+  "type": "module",
+  "private": true,
+  "exports": {
+    "./vite": {
+      "import": "./vite.ts"
+    },
+    "./database": {
+      "default": "./database.ts"
+    }
+  },
+  "peerDependencies": {
+    "@crosshatch/util": "workspace:*",
+    "@effect/ai": "catalog:",
+    "@tailwindcss/vite": "catalog:",
+    "@tanstack/router-plugin": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "drizzle-orm": "catalog:",
+    "vite-plugin-mkcert": "catalog:",
+    "vite": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:"
+  }
+}
