@@ -23,6 +23,7 @@
     "./package.json": "./package.json"
   },
   "peerDependencies": {
+    "date-fns": "catalog:",
     "effect": "catalog:"
   }
 }
