@@ -29,7 +29,7 @@ export const layoutPropsCommon: BaseLayoutProps = {
     title: (
       <>
         <CrosshatchIcon className="stroke-[0.5]" />
-        <span className="uppercase font-light">Crosshatch</span>
+        <span className="uppercase">Crosshatch</span>
       </>
     ),
   },

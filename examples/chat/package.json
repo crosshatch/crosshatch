@@ -6,8 +6,25 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && tsc",
-    "serve": "vite preview",
-    "test": "vitest run"
+    "serve": "vite preview"
+  },
+  "dependencies": {
+    "crosshatch": "workspace:*",
+    "@crosshatch/react": "workspace:*",
+    "@crosshatch/ui": "workspace:*",
+    "@crosshatch/util": "workspace:*",
+    "@effect/ai": "catalog:",
+    "@effect/platform": "catalog:",
+    "@effect/platform-browser": "catalog:",
+    "@effect-atom/atom-react": "catalog:",
+    "@tanstack/react-router": "catalog:",
+    "babel-plugin-react-compiler": "catalog:",
+    "drizzle-orm": "catalog:",
+    "effect": "catalog:",
+    "lucide-react": "catalog:",
+    "next-themes": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "devDependencies": {
     "@crosshatch/config": "workspace:*",

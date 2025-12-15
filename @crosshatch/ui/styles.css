@@ -1,5 +1,6 @@
 @source "./components";
 
+/* TODO: use local copies. */
 @import url("https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Baskervville:ital,wght@0,400..700;1,400..700&family=Boldonse&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Inconsolata:wght@200..900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Questrial&display=swap");
 
 @import "tailwindcss";
@@ -120,7 +121,7 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring/50 font-light;
   }
   body {
     @apply bg-background text-foreground;

@@ -1,5 +1,16 @@
 import { Prompt } from "@effect/ai"
-import { customType, integer, numeric, type ReferenceConfig, text, timestamp, uuid } from "drizzle-orm/pg-core"
+import {
+  customType,
+  index as index_,
+  integer,
+  numeric,
+  pgTable,
+  type ReferenceConfig,
+  text,
+  timestamp,
+  uuid,
+  vector,
+} from "drizzle-orm/pg-core"
 import { identity, Schema as S } from "effect"
 
 export const id = uuid("id").primaryKey().notNull().defaultRandom()
@@ -47,3 +58,12 @@ export const bytea = customType<{
   toDriver: identity,
   fromDriver: (v) => v.slice(),
 })
+
+export const Embeddings = <K extends string, F extends ReferenceConfig["ref"]>(key: K, f: F) =>
+  pgTable(key, {
+    id,
+    embedding: vector("embedding", { dimensions: 384 }),
+    sourceId: ref("source", f, { onDelete: "cascade" }).notNull(),
+  }, (_) => [
+    index_(`${key}_embeddings`).using("hnsw", _.embedding.op("vector_cosine_ops")),
+  ])

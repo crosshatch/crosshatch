@@ -2,13 +2,19 @@
   "extends": "../../tsconfig.base",
   "compilerOptions": {
     "composite": false,
-    "declaration": false
+    "declaration": false,
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "baseUrl": ".",
+    "paths": { "@/*": ["./*"] }
   },
   "include": ["."],
   "exclude": ["dist"],
   "references": [
+    { "path": "../../@crosshatch/config" },
     { "path": "../../@crosshatch/react" },
     { "path": "../../@crosshatch/ui" },
-    { "path": "../../@crosshatch/util" }
+    { "path": "../../@crosshatch/util" },
+    { "path": "../../crosshatch" }
   ]
 }
