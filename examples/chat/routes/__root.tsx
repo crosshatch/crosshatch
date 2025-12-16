@@ -19,6 +19,10 @@ export const Route = createRootRoute({
 
 const initAtom = runtime.atom(Effect.gen(function*() {
   const client = yield* EnclaveClient
+  const result = yield* client("greet", {
+    name: "Crosshatch",
+  })
+  console.log(result)
 })).pipe(
   Atom.keepAlive,
 )

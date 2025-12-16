@@ -4,6 +4,12 @@ import type { PaymentRequirements } from "@x402/core/types"
 import { Schema as S } from "effect"
 
 export class Enclave extends RpcGroup.make(
+  Rpc.make("greet", {
+    payload: {
+      name: S.String.pipe(S.optional),
+    },
+    success: S.String,
+  }),
   Rpc.make("payment", {
     payload: {
       requirements: S.Unknown as S.Schema<PaymentRequirements>,
