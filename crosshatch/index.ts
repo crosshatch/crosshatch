@@ -1,1 +1,5 @@
 export * from "./CrosshatchEvent.ts"
+export * from "./Enclave.ts"
+export * from "./EnclaveClient.ts"
+export * from "./EnclaveWorkerLive.ts"
+export * from "./messages.ts"

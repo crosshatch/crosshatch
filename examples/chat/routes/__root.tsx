@@ -1,10 +1,13 @@
+import { runtime } from "@/atoms"
+import { EnclaveClient } from "@crosshatch/react"
 import { chatAtom } from "@crosshatch/ui/atoms"
 import { Button } from "@crosshatch/ui/components/button"
 import { ChatControls } from "@crosshatch/ui/components/chat-controls"
 import { LoaderView } from "@crosshatch/ui/components/loader-view"
 import { Sidebar, SidebarInset, SidebarProvider, useSidebar } from "@crosshatch/ui/components/sidebar"
-import { useAtom } from "@effect-atom/atom-react"
+import { Atom, useAtom, useAtomMount } from "@effect-atom/atom-react"
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router"
+import { Effect } from "effect"
 import { PanelLeftIcon, Plus } from "lucide-react"
 import { ThemeProvider } from "next-themes"
 import { Suspense } from "react"
@@ -14,7 +17,14 @@ export const Route = createRootRoute({
   component: RouteComponent,
 })
 
+const initAtom = runtime.atom(Effect.gen(function*() {
+  const client = yield* EnclaveClient
+})).pipe(
+  Atom.keepAlive,
+)
+
 function RouteComponent() {
+  useAtomMount(initAtom)
   const { chatId } = ChatRoute.useParams()
   const [chat, setChat] = useAtom(chatAtom(chatId))
   return (

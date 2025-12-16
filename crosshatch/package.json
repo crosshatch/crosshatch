@@ -28,6 +28,7 @@
     "@effect/platform": "catalog:",
     "@effect/platform-browser": "catalog:",
     "@effect/rpc": "catalog:",
+    "@x402/core": "catalog:",
     "effect": "catalog:"
   }
 }
