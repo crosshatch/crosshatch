@@ -12,6 +12,9 @@ catalog:
   "@effect/platform-browser": ^0.73.0
   "@effect/platform-node": ^0.103.0
   "@effect/rpc": ^0.72.2
+  "@noble/curves": ^2.0.1
+  "@noble/hashes": ^2.0.1
+  "@noble/ciphers": ^2.1.1
   "@icons-pack/react-simple-icons": ^13.8.0
   "@radix-ui/react-alert-dialog": ^1.1.15
   "@radix-ui/react-avatar": ^1.1.11
@@ -29,6 +32,8 @@ catalog:
   "@radix-ui/react-switch": 1.2.6
   "@radix-ui/react-tabs": ^1.1.13
   "@radix-ui/react-tooltip": ^1.2.8
+  "@scure/base": ^2.0.0
+  "@solana/kit": ^5.1.0
   "@standard-schema/spec": ^1.0.0
   "@tailwindcss/vite": ^4.1.17
   "@tanstack/react-router": ^1.140.5
@@ -40,6 +45,8 @@ catalog:
   "@types/react-dom": ^19.2.3
   "@vitejs/plugin-react": ^5.1.2
   "@x402/core": ^2.0.0
+  "@x402/evm": ^2.0.0
+  "@x402/svm": ^2.0.0
   babel-plugin-react-compiler: ^1.0.0
   class-variance-authority: ^0.7.1
   date-fns: ^4.1.0
@@ -49,6 +56,7 @@ catalog:
   effect: ^3.19.10
   lucide-react: ^0.553.0
   next-themes: ^0.4.6
+  ox: ^0.10.5
   react: ^19.2.3
   react-dom: ^19.2.3
   shiki: ^3.19.0
@@ -57,6 +65,7 @@ catalog:
   turbo: ^2.6.3
   typescript: ^5.9.3
   use-stick-to-bottom: ^1.1.1
+  viem: ^2.43.1
   vite: ^7.2.7
   vitest: 4.0.15
   zod: ^4.1.13

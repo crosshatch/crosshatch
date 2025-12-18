@@ -1,5 +1,4 @@
 import { runtime } from "@/atoms"
-import { EnclaveClient } from "@crosshatch/react"
 import { chatAtom } from "@crosshatch/ui/atoms"
 import { Button } from "@crosshatch/ui/components/button"
 import { ChatControls } from "@crosshatch/ui/components/chat-controls"
@@ -17,13 +16,7 @@ export const Route = createRootRoute({
   component: RouteComponent,
 })
 
-const initAtom = runtime.atom(Effect.gen(function*() {
-  const client = yield* EnclaveClient
-  const result = yield* client("greet", {
-    name: "Crosshatch",
-  })
-  console.log(result)
-})).pipe(
+const initAtom = runtime.atom(Effect.gen(function*() {})).pipe(
   Atom.keepAlive,
 )
 

@@ -23,10 +23,11 @@
     "./package.json": "./package.json"
   },
   "peerDependencies": {
-    "@effect/rpc": "catalog:",
     "@crosshatch/ui": "workspace:*",
     "@crosshatch/util": "workspace:*",
     "@effect-atom/atom-react": "catalog:",
+    "@effect/platform": "catalog:",
+    "@effect/rpc": "catalog:",
     "crosshatch": "workspace:*",
     "effect": "catalog:",
     "lucide-react": "catalog:",

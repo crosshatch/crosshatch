@@ -14,6 +14,7 @@
     "@crosshatch/ui": "workspace:*",
     "@crosshatch/util": "workspace:*",
     "@effect/ai": "catalog:",
+    "@effect/ai-openai": "catalog:",
     "@effect/platform": "catalog:",
     "@effect/platform-browser": "catalog:",
     "@effect-atom/atom-react": "catalog:",
