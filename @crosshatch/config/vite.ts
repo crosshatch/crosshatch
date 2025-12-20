@@ -36,12 +36,25 @@ export const make = ({ origin, port, url, allow, envDir }: {
           secure: false,
         },
       },
+      fs: { strict: false },
     },
     resolve: {
       alias: { "@": fileURLToPath(new URL(".", url)) },
     },
     worker: { format: "es" },
-    optimizeDeps: { exclude: ["@effect/platform"] },
+    optimizeDeps: {
+      exclude: [
+        "@effect/platform",
+        "@electric-sql/pglite",
+        "@electric-sql/pglite/contrib/uuid_ossp",
+        "@electric-sql/pglite/contrib/fuzzystrmatch",
+        "@electric-sql/pglite/contrib/lo",
+        "@electric-sql/pglite/contrib/vector",
+        "@electric-sql/pglite/live",
+        "@electric-sql/pglite/worker",
+        "tiktoken/lite",
+      ],
+    },
   },
   plugins: [
     ...origin ? [mkcert({ hosts: [origin] })] : [],

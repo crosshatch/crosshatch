@@ -1,15 +1,35 @@
+import { MessageList } from "@/components/message-list"
+import { router } from "@/router"
 import { LoaderView } from "@crosshatch/ui/components/loader-view"
+import { registerCommand } from "@crosshatch/util"
 import { createFileRoute } from "@tanstack/react-router"
-import { Suspense } from "react"
+import { Suspense, useEffect } from "react"
 
 export const Route = createFileRoute("/{-$chatId}")({
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const { chatId } = Route.useParams()
+
+  useEffect(() => {
+    if (chatId) {
+      const unsubscribe = registerCommand(
+        (e) => e.metaKey && e.shiftKey && e.key === "o",
+        () =>
+          router.navigate({
+            to: "/{-$chatId}",
+            params: { chatId: undefined },
+          }),
+      )
+      return unsubscribe
+    }
+    return
+  }, [chatId])
+
   return (
     <Suspense fallback={<LoaderView />}>
-      <div className="flex w-full h-full" />
+      <MessageList />
     </Suspense>
   )
 }

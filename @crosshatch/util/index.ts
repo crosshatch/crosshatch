@@ -1,3 +1,5 @@
 export * from "./effect.ts"
+export * from "./embed.ts"
 export * from "./fmt.ts"
+export * from "./registerCommand.ts"
 export * from "./u8a.ts"

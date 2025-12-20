@@ -4,13 +4,22 @@ import { Textarea } from "@crosshatch/ui/components/textarea"
 import { ArrowUp } from "lucide-react"
 import { useEffect, useRef } from "react"
 
-export const ChatControls = ({ chatId, text, onTextChange, submit, inflight, actions }: {
+export const ChatControls = ({
+  chatId,
+  text,
+  onTextChange,
+  submit,
+  inflight,
+  actions,
+  additionalDisabled,
+}: {
   chatId: string | undefined
   text: string
   onTextChange: (text: string) => void
   submit: () => void
   inflight: AbortController | undefined
   actions?: React.ReactNode | undefined
+  additionalDisabled?: boolean | undefined
 }) => {
   const ref = useRef<HTMLTextAreaElement>(null)
   useEffect(() => ref?.current?.focus(), [chatId])
@@ -22,7 +31,7 @@ export const ChatControls = ({ chatId, text, onTextChange, submit, inflight, act
           value={text}
           onChange={({ target: { value } }) => onTextChange(value)}
           placeholder="Your message..."
-          className="text-primary min-h-30 rounded-2xl w-full resize-none border shadow-none outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+          className="text-primary p-4 min-h-30 rounded-2xl w-full resize-none border shadow-none outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
           onKeyDown={(e) => {
             if (!e.shiftKey && e.key === "Enter") {
               e.preventDefault()
@@ -39,7 +48,7 @@ export const ChatControls = ({ chatId, text, onTextChange, submit, inflight, act
             size="icon"
             className="size-9 rounded-full cursor-pointer"
             variant="outline"
-            disabled={!(inflight || text)}
+            disabled={!(inflight || text) || additionalDisabled}
           >
             {inflight ? <span className="size-3 rounded-xs bg-secondary" /> : <ArrowUp size={18} />}
           </Button>

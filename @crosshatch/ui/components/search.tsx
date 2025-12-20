@@ -1,0 +1,60 @@
+import { registerCommand } from "@crosshatch/util"
+import { Atom, useAtom, useAtomMount } from "@effect-atom/atom-react"
+import { Search as SearchIcon } from "lucide-react"
+import { Suspense } from "react"
+import { Button } from "./button"
+import { CommandDialog, CommandGroup, CommandInput, CommandList } from "./command"
+import { LoaderView } from "./loader-view"
+import { Separator } from "./separator"
+
+export const searchInputAtom = Atom.make("").pipe(Atom.keepAlive)
+
+export const searchOpenAtom = Atom.make(false).pipe(Atom.keepAlive)
+
+const searchInitAtom = Atom.make((get) => {
+  get.addFinalizer(registerCommand(
+    (e) => e.metaKey && e.key === "k",
+    () => get.set(searchOpenAtom, !get(searchOpenAtom)),
+  ))
+})
+
+export const Search = ({ results }: { results: React.ReactNode }) => {
+  const [input, setInput] = useAtom(searchInputAtom)
+  const [open, setOpen] = useAtom(searchOpenAtom)
+  useAtomMount(searchInitAtom)
+
+  return (
+    <>
+      <Button
+        variant="outline"
+        className="relative bg-background/25! py-2.75 border flex flex-1 justify-start rounded-md text-sm shadow-none"
+        onClick={() => setOpen(true)}
+      >
+        <SearchIcon />
+        <span className="inline-flex group-data-[collapsible=icon]:hidden">Search...</span>
+        <kbd className="pointer-events-none absolute right-[0.7rem] top-[0.7rem] hidden h-5 select-none group-data-[collapsible=icon]:hidden items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+          <span className="text-xs mt-[1px]">⌘</span>K
+        </kbd>
+      </Button>
+      <CommandDialog open={open} onOpenChange={setOpen}>
+        <CommandInput
+          placeholder="Search messages..."
+          onValueChange={setInput}
+          value={input}
+        />
+        {input.trim() && (
+          <>
+            <Separator />
+            <CommandList>
+              <CommandGroup>
+                <Suspense fallback={<LoaderView className="p-8" />}>
+                  {results}
+                </Suspense>
+              </CommandGroup>
+            </CommandList>
+          </>
+        )}
+      </CommandDialog>
+    </>
+  )
+}

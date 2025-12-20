@@ -21,8 +21,5 @@
     "effect": "catalog:",
     "vite-plugin-mkcert": "^1.17.9",
     "vite": "catalog:"
-  },
-  "devDependencies": {
-    "@types/node": "catalog:"
   }
 }

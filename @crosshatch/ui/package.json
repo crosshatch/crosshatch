@@ -26,6 +26,8 @@
     "./package.json": "./package.json"
   },
   "peerDependencies": {
+    "@crosshatch/util": "workspace:*",
+    "@effect/ai": "catalog:",
     "@effect-atom/atom-react": "catalog:",
     "@effect/platform-browser": "catalog:",
     "@icons-pack/react-simple-icons": "catalog:",

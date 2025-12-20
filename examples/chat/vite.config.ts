@@ -1,4 +1,5 @@
 import { make, router } from "@crosshatch/config/vite"
+import store from "@crosshatch/store/plugin"
 import { defineConfig } from "vite"
 
 const { root, plugins } = make({
@@ -6,10 +7,10 @@ const { root, plugins } = make({
   allow: ["app.crosshatch.local"],
   port: 7779,
   url: import.meta.url,
-  envDir: "..",
+  envDir: "../../..",
 })
 
 export default defineConfig({
   ...root,
-  plugins: [router, ...plugins],
+  plugins: [router, store(), ...plugins],
 })

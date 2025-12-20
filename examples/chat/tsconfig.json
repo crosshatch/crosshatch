@@ -13,6 +13,7 @@
   "references": [
     { "path": "../../@crosshatch/config" },
     { "path": "../../@crosshatch/react" },
+    { "path": "../../@crosshatch/store" },
     { "path": "../../@crosshatch/ui" },
     { "path": "../../@crosshatch/util" },
     { "path": "../../crosshatch" }

@@ -6,20 +6,24 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && tsc",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "migrate": "drizzle-kit generate"
   },
   "dependencies": {
     "crosshatch": "workspace:*",
     "@crosshatch/react": "workspace:*",
+    "@crosshatch/store": "workspace:*",
     "@crosshatch/ui": "workspace:*",
     "@crosshatch/util": "workspace:*",
     "@effect/ai": "catalog:",
     "@effect/ai-openai": "catalog:",
+    "@effect/ai-openrouter": "catalog:",
     "@effect/platform": "catalog:",
     "@effect/platform-browser": "catalog:",
     "@effect-atom/atom-react": "catalog:",
     "@tanstack/react-router": "catalog:",
     "babel-plugin-react-compiler": "catalog:",
+    "drizzle-kit": "catalog:",
     "drizzle-orm": "catalog:",
     "effect": "catalog:",
     "lucide-react": "catalog:",

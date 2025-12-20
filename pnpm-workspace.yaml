@@ -7,14 +7,17 @@ packages:
 catalog:
   "@effect-atom/atom-react": ^0.4.3
   "@effect/ai": ^0.32.1
+  "@effect/ai-openrouter": ^0.8.0
   "@effect/language-service": 0.62.0
   "@effect/platform": ^0.93.6
   "@effect/platform-browser": ^0.73.0
   "@effect/platform-node": ^0.103.0
   "@effect/rpc": ^0.72.2
+  "@electric-sql/pglite": ^0.3.14
   "@noble/curves": ^2.0.1
   "@noble/hashes": ^2.0.1
   "@noble/ciphers": ^2.1.1
+  "@huggingface/transformers": ^3.8.1
   "@icons-pack/react-simple-icons": ^13.8.0
   "@radix-ui/react-alert-dialog": ^1.1.15
   "@radix-ui/react-avatar": ^1.1.11
@@ -33,6 +36,7 @@ catalog:
   "@radix-ui/react-tabs": ^1.1.13
   "@radix-ui/react-tooltip": ^1.2.8
   "@scure/base": ^2.0.0
+  "@scure/bip39": ^2.0.1
   "@solana/kit": ^5.1.0
   "@standard-schema/spec": ^1.0.0
   "@tailwindcss/vite": ^4.1.17
@@ -53,6 +57,7 @@ catalog:
   dedent: ^1.7.0
   dprint: ^0.50.2
   drizzle-orm: ^0.45.1
+  micro-key-producer: ^0.8.2
   effect: ^3.19.10
   lucide-react: ^0.553.0
   next-themes: ^0.4.6
@@ -64,7 +69,6 @@ catalog:
   ts-patch: ^3.3.0
   turbo: ^2.6.3
   typescript: ^5.9.3
-  use-stick-to-bottom: ^1.1.1
   viem: ^2.43.1
   vite: ^7.2.7
   vitest: 4.0.15

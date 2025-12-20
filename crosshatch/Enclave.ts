@@ -9,6 +9,12 @@ export class Enclave extends RpcGroup.make(
     },
     success: S.String,
   }),
+  Rpc.make("session", {
+    success: S.Struct({
+      publicKey: S.String,
+      linked: S.Boolean,
+    }),
+  }),
   Rpc.make("payment", {
     payload: {
       requirement: S.Unknown as S.Schema<PaymentRequired>,

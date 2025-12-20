@@ -1,43 +1,59 @@
 import type { PaymentRequired } from "@x402/core/types"
-import { EnclaveClient } from "crosshatch"
 import { Effect } from "effect"
+import { CrosshatchRuntime } from "./CrosshatchRuntime.ts"
+import { EnclaveClient } from "./EnclaveClient.ts"
 
 export { fetch_ as fetch }
-
-const fetch_: typeof fetch = (input, init) =>
+const fetch_: typeof fetch = async (input, init) =>
   Effect.gen(function*() {
     const response = yield* Effect.promise(() => fetch(input, init))
 
-    if (response.status !== 402) return response
-
-    const paymentRequiredHeader = response.headers.get("PAYMENT-REQUIRED")
-    console.log(paymentRequiredHeader)
-    if (!paymentRequiredHeader) {
-      throw 0
+    if (response.status !== 402) {
+      return response
     }
-    if (!/^[A-Za-z0-9+/]*={0,2}$/.test(paymentRequiredHeader)) {
-      throw new Error("Invalid payment required header")
+
+    let requirement: PaymentRequired
+    const requirementHeader = response.headers.get("PAYMENT-REQUIRED")
+    if (requirementHeader) {
+      requirement = JSON.parse(atob(requirementHeader))
+    } else {
+      const body = yield* Effect.tryPromise({
+        try: () => response.json() as Promise<PaymentRequired>,
+        catch: () => undefined,
+      })
+      if (typeof body === "object" && body !== null && "x402Version" in body && body.x402Version === 1) {
+        requirement = body as PaymentRequired
+      } else throw 0
     }
 
     const enclave = yield* EnclaveClient
-    const requirement = JSON.parse(atob(paymentRequiredHeader)) as PaymentRequired
     const { payload } = yield* enclave.payment({ requirement })
 
-    if (init && "__is402Retry" in init) {
-      throw new Error("Payment already attempted")
+    // TODO: remove
+    if (true as boolean) {
+      return new Response()
     }
 
-    return yield* Effect.promise(() =>
-      fetch(input, {
-        ...init,
-        headers: {
-          ...init?.headers,
-          "PAYMENT-SIGNATURE": btoa(JSON.stringify(payload)),
-          "Access-Control-Expose-Headers": "PAYMENT-RESPONSE,X-PAYMENT-RESPONSE",
-        },
-      })
+    const value = btoa(JSON.stringify(payload))
+    const paymentHeaders = yield* Effect.fromNullable(
+      {
+        1: { "X-PAYMENT": value },
+        2: { "PAYMENT-SIGNATURE": value },
+      }[payload.x402Version],
     )
-  }).pipe(
-    Effect.provide(EnclaveClient.Default),
-    Effect.runPromise,
+
+    const newInit = {
+      ...init,
+      headers: {
+        ...init?.headers,
+        ...paymentHeaders,
+        "Access-Control-Expose-Headers": "PAYMENT-RESPONSE,X-PAYMENT-RESPONSE",
+      },
+    }
+
+    return yield* Effect.promise(() => fetch(input, newInit))
+  }).pipe((x) =>
+    CrosshatchRuntime.runPromise(x, {
+      signal: init?.signal ?? undefined,
+    })
   )
