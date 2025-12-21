@@ -58,6 +58,7 @@ catalog:
   dprint: ^0.50.2
   drizzle-orm: ^0.45.1
   micro-key-producer: ^0.8.2
+  postgres: ^3.4.7
   effect: ^3.19.10
   lucide-react: ^0.553.0
   next-themes: ^0.4.6

@@ -15,8 +15,6 @@ import { identity, Schema as S } from "effect"
 
 export const id = uuid("id").primaryKey().notNull().defaultRandom()
 
-export const publicKey = text("public_key").notNull()
-
 export const ref = <K extends string, F extends ReferenceConfig["ref"]>(
   id: K,
   f: F,
