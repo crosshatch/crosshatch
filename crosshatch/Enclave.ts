@@ -2,18 +2,17 @@ import { Rpc, RpcGroup } from "@effect/rpc"
 import type { PaymentPayload, PaymentRequired } from "@x402/core/types"
 import { Schema as S } from "effect"
 
-export class Enclave extends RpcGroup.make(
-  Rpc.make("greet", {
-    payload: {
-      name: S.String.pipe(S.optional),
-    },
-    success: S.String,
+export type Session = typeof Session["Type"]
+export const Session = S.Union(
+  S.TaggedStruct("linked", {}),
+  S.TaggedStruct("unverified", {
+    sessionId: S.UUID,
   }),
+)
+
+export class Enclave extends RpcGroup.make(
   Rpc.make("session", {
-    success: S.Struct({
-      publicKey: S.String,
-      linked: S.Boolean,
-    }),
+    success: Session,
   }),
   Rpc.make("payment", {
     payload: {
