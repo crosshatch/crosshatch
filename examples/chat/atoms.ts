@@ -7,21 +7,9 @@ import { Atom } from "@effect-atom/atom-react"
 import { OpenRouterClient } from "@effect/ai-openrouter"
 import { FetchHttpClient } from "@effect/platform"
 import { BrowserKeyValueStore } from "@effect/platform-browser"
+import { fetch } from "crosshatch"
 import { desc, eq, sql } from "drizzle-orm"
 import { Config, ConfigProvider, Effect, Layer, Schema as S } from "effect"
-
-// TODO: use Crosshatch fetch
-const fetch_: typeof fetch = (input, init) => {
-  const headers = new Headers(init?.headers)
-  headers.delete("traceparent")
-  headers.delete("tracestate")
-  headers.delete("b3")
-  headers.delete("x-b3-traceid")
-  headers.delete("x-b3-spanid")
-  headers.delete("x-b3-sampled")
-  headers.delete("http-referrer")
-  return fetch(input, { ...init, headers })
-}
 
 export const runtime = Atom.runtime(
   Layer.mergeAll(
@@ -35,7 +23,7 @@ export const runtime = Atom.runtime(
       Layer.provide(
         FetchHttpClient.layer.pipe(
           Layer.provide(
-            Layer.succeed(FetchHttpClient.Fetch, fetch_),
+            Layer.succeed(FetchHttpClient.Fetch, fetch),
           ),
         ),
       ),

@@ -4,6 +4,7 @@ import { SidebarInner } from "@/components/sidebar-inner"
 import { router } from "@/router"
 import { chatItems, chatItemsEmbeddings, chats } from "@/schema"
 import { Store } from "@/Store"
+import { sessionDetailsAtom } from "@crosshatch/react"
 import { Database } from "@crosshatch/store"
 import * as AtomUtil from "@crosshatch/ui/AtomUtil"
 import { Button } from "@crosshatch/ui/components/button"
@@ -31,6 +32,8 @@ function RouteComponent() {
   const [chat, setChat] = useAtom(chatAtom(chatId))
   const submit = useAtomSet(submitAtom)
   const modelIdsResult = useAtomValue(modelIdsAtom)
+  const sessionDetails = useAtomValue(sessionDetailsAtom)
+  console.log(sessionDetails)
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <SidebarProvider>
