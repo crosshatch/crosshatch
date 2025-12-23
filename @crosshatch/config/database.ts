@@ -26,6 +26,11 @@ export const added = timestamp("added", {
   withTimezone: true,
 }).notNull().defaultNow()
 
+export const used = timestamp("used", {
+  mode: "date",
+  withTimezone: true,
+}).notNull().defaultNow()
+
 export const updated = timestamp("updated", {
   mode: "date",
   withTimezone: true,

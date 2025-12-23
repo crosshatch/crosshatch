@@ -4,16 +4,20 @@ import { Schema as S } from "effect"
 
 export type SessionDetails = typeof SessionDetails["Type"]
 export const SessionDetails = S.Union(
-  S.TaggedStruct("linked", {}),
-  S.TaggedStruct("unverified", {
-    sessionId: S.UUID,
+  S.TaggedStruct("Unverified", { identityId: S.UUID }),
+  S.TaggedStruct("Linked", {
+    addresses: S.Struct({
+      evm: S.String,
+      svm: S.String,
+    }),
   }),
 )
 
 export class Enclave extends RpcGroup.make(
-  Rpc.make("session", {
+  Rpc.make("sessionDetails", {
     success: SessionDetails,
   }),
+  Rpc.make("revoke", {}),
   Rpc.make("payment", {
     payload: {
       requirement: S.Unknown as S.Schema<PaymentRequired>,

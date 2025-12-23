@@ -14,7 +14,7 @@ import {
 } from "@crosshatch/ui/components/dropdown-menu"
 import { Input } from "@crosshatch/ui/components/input"
 import { Message } from "@crosshatch/ui/components/message"
-import { Search, searchOpenAtom } from "@crosshatch/ui/components/search"
+import { Search, searchInputAtom, searchOpenAtom } from "@crosshatch/ui/components/search"
 import {
   SidebarContent,
   SidebarGroup,
@@ -26,7 +26,7 @@ import {
 } from "@crosshatch/ui/components/sidebar"
 import { Skeleton } from "@crosshatch/ui/components/skeleton"
 import { embed, registerCommand } from "@crosshatch/util"
-import { useAtom, useAtomSet, useAtomSuspense } from "@effect-atom/atom-react"
+import { useAtomSet, useAtomSuspense } from "@effect-atom/atom-react"
 import { Atom } from "@effect-atom/atom-react"
 import { Link } from "@tanstack/react-router"
 import { cosineDistance, eq } from "drizzle-orm"
@@ -34,15 +34,12 @@ import { Effect } from "effect"
 import { MoreHorizontal, PencilLine, Trash2 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 
-const queryAtom = Atom.make("").pipe(Atom.keepAlive)
-
 export const SidebarInner = () => {
   const { value: chats } = useAtomSuspense(chatsAtom)
-  const [query, setQuery] = useAtom(queryAtom)
   return (
     <div className="absolute top-0 right-0 bottom-0 left-0 overflow-y-scroll">
       <SidebarHeader className="sticky top-0 right-0 left-0 border-b bg-secondary/75 z-50 backdrop-blur-sm">
-        <Search {...{ query, setQuery }} results={<SearchResults />} />
+        <Search results={<SearchResults />} />
       </SidebarHeader>
       <SidebarContent className="flex [&::-webkit-scrollbar]:hidden max-h-screen p-[0.5]">
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -56,7 +53,7 @@ export const SidebarInner = () => {
 }
 
 const searchResultsAtom = runtime.atom(Effect.fn(function*(get) {
-  const text = get(queryAtom)
+  const text = get(searchInputAtom)
   if (!text) return []
   const embedding = yield* embed(text)
   const _ = yield* Store._

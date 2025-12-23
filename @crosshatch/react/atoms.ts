@@ -1,7 +1,9 @@
+import { LoggerLive } from "@crosshatch/util"
 import { Atom, Result } from "@effect-atom/atom-react"
 import { WorkerError } from "@effect/platform"
 import type { SessionDetails } from "crosshatch"
 import { Cause } from "effect"
+import { Effect, Layer } from "effect"
 import { EnclaveClient } from "./EnclaveClient.ts"
 
 export const sessionDetailsAtom: Atom.Atom<
@@ -9,4 +11,15 @@ export const sessionDetailsAtom: Atom.Atom<
     SessionDetails,
     WorkerError.WorkerError | Cause.NoSuchElementException
   >
-> = EnclaveClient.query("session", void 0)
+> = EnclaveClient.query("sessionDetails", void 0)
+
+export const unlinkAtom = EnclaveClient.mutation("revoke")
+
+const runtime = Atom.runtime(Layer.mergeAll(
+  LoggerLive,
+  EnclaveClient.layer,
+))
+
+export const initAtom = runtime.atom(Effect.void).pipe(
+  Atom.keepAlive,
+)

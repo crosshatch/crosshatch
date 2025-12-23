@@ -1,7 +1,7 @@
 import { BrowserWorker } from "@effect/platform-browser"
 import { Deferred, Effect, Layer, Option, Schema as S } from "effect"
 import { url } from "./env.ts"
-import { ClientPortReady, EnclaveProxyReady } from "./messages.ts"
+import { EnclaveProxyReady, ParentPortReady } from "./messages.ts"
 
 const style = Object
   .entries({
@@ -41,7 +41,7 @@ export const EnclaveWorkerLive = Effect.gen(function*() {
   yield* Deferred.await(enclaveReady)
   const context = yield* Effect.fromNullable(iframe.contentWindow)
   const channel = new MessageChannel()
-  context.postMessage(new ClientPortReady(), "*", [channel.port2])
+  context.postMessage(new ParentPortReady(), "*", [channel.port2])
   return BrowserWorker.layerPlatform(() => channel.port1)
 }).pipe(
   Layer.unwrapEffect,

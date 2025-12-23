@@ -4,7 +4,7 @@ import { SidebarInner } from "@/components/sidebar-inner"
 import { router } from "@/router"
 import { chatItems, chatItemsEmbeddings, chats } from "@/schema"
 import { Store } from "@/Store"
-import { sessionDetailsAtom } from "@crosshatch/react"
+import { sessionDetailsAtom, SessionDialog, sessionDialogOpenAtom } from "@crosshatch/react"
 import { Database } from "@crosshatch/store"
 import * as AtomUtil from "@crosshatch/ui/AtomUtil"
 import { Button } from "@crosshatch/ui/components/button"
@@ -16,6 +16,7 @@ import { useAtom, useAtomSet, useAtomValue } from "@effect-atom/atom-react"
 import { AiError, LanguageModel, Prompt } from "@effect/ai"
 import { OpenRouterLanguageModel } from "@effect/ai-openrouter"
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router"
+import { linkUrl } from "crosshatch"
 import { eq } from "drizzle-orm"
 import { ConfigError, Effect, Fiber } from "effect"
 import { HandCoins, PanelLeftIcon, Plus } from "lucide-react"
@@ -32,8 +33,7 @@ function RouteComponent() {
   const [chat, setChat] = useAtom(chatAtom(chatId))
   const submit = useAtomSet(submitAtom)
   const modelIdsResult = useAtomValue(modelIdsAtom)
-  const sessionDetails = useAtomValue(sessionDetailsAtom)
-  console.log(sessionDetails)
+  const sessionButtonOnClick = useAtomSet(sessionButtonOnClickAtom)
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <SidebarProvider>
@@ -43,30 +43,32 @@ function RouteComponent() {
         <SidebarInset>
           <Header />
           <Suspense fallback={<LoaderView />}>
-            <div className="relative flex flex-1 w-full h-full flex-col">
-              <Outlet />
-              <ChatControls
-                {...{ chatId }}
-                {...chat}
-                submit={() => submit(chatId)}
-                onTextChange={(text) => setChat({ ...chat, text })}
-                inflight={chat.inflight}
-                additionalDisabled={modelIdsResult._tag !== "Success"}
-                actions={
-                  <div className="flex items-center gap-2">
-                    <Button
-                      size="icon"
-                      className="rounded-full"
-                      variant="outline"
-                      onClick={() => {}}
-                    >
-                      <HandCoins />
-                    </Button>
-                    <ModelSelect />
-                  </div>
-                }
-              />
-            </div>
+            <SessionDialog>
+              <div className="relative flex flex-1 w-full h-full flex-col">
+                <Outlet />
+                <ChatControls
+                  {...{ chatId }}
+                  {...chat}
+                  submit={() => submit(chatId)}
+                  onTextChange={(text) => setChat({ ...chat, text })}
+                  inflight={chat.inflight}
+                  additionalDisabled={modelIdsResult._tag !== "Success"}
+                  actions={
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="icon"
+                        className="rounded-full"
+                        variant="outline"
+                        onClick={() => sessionButtonOnClick()}
+                      >
+                        <HandCoins />
+                      </Button>
+                      <ModelSelect />
+                    </div>
+                  }
+                />
+              </div>
+            </SessionDialog>
           </Suspense>
         </SidebarInset>
       </SidebarProvider>
@@ -100,6 +102,21 @@ const Header = () => {
     </header>
   )
 }
+
+const sessionButtonOnClickAtom = runtime.fn<void>()(Effect.fn(function*(_, get) {
+  const open = get(sessionDialogOpenAtom)
+  if (open) {
+    get.set(sessionDialogOpenAtom, false)
+  } else {
+    const session = yield* get.result(sessionDetailsAtom)
+    if (session._tag === "Linked") {
+      get.set(sessionDialogOpenAtom, true)
+    } else {
+      const { identityId } = session
+      location.href = linkUrl({ identityId })
+    }
+  }
+}))
 
 export const submitAtom = runtime.fn<string | undefined>()(Effect.fn(function*(chatId, get) {
   // const session = yield* get.result(sessionDetailsAtom)
