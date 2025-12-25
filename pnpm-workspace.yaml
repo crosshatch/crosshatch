@@ -13,6 +13,7 @@ catalog:
   "@effect/platform-browser": ^0.73.0
   "@effect/platform-node": ^0.103.0
   "@effect/rpc": ^0.72.2
+  "@effect/vitest": ^0.27.0
   "@electric-sql/pglite": ^0.3.14
   "@noble/curves": ^2.0.1
   "@noble/hashes": ^2.0.1
@@ -47,6 +48,10 @@ catalog:
   "@types/node": ^25.0.0
   "@types/react": ^19.2.7
   "@types/react-dom": ^19.2.3
+  "@vitest/browser": "^3.2.4"
+  "@vitest/coverage-v8": "^3.2.4"
+  "@vitest/expect": "^3.2.4"
+  "@vitest/web-worker": "^3.2.4"
   "@vitejs/plugin-react": ^5.1.2
   "@x402/core": ^2.0.0
   "@x402/evm": ^2.0.0
@@ -63,6 +68,7 @@ catalog:
   lucide-react: ^0.553.0
   next-themes: ^0.4.6
   ox: ^0.10.5
+  oxlint: ^1.35.0
   react: ^19.2.3
   react-dom: ^19.2.3
   shiki: ^3.19.0

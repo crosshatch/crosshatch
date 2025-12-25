@@ -19,7 +19,7 @@ export const MessageList = () => {
       top: document.body.scrollHeight,
       behavior: "smooth",
     })
-  }, [items.length, inflight])
+  }, [items.length, inflight, chatId])
 
   return (
     <Section className="h-full p-2">

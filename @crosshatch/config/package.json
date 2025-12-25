@@ -7,6 +7,9 @@
     "./vite": {
       "import": "./vite.ts"
     },
+    "./vitest": {
+      "import": "./vitest.ts"
+    },
     "./database": {
       "default": "./database.ts"
     }
