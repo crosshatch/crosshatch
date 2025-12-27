@@ -62,7 +62,7 @@ export const bytea = customType<{
 }>({
   dataType: () => "bytea",
   toDriver: identity,
-  fromDriver: (v) => v.slice(),
+  fromDriver: identity,
 })
 
 export const Embeddings = <K extends string, F extends ReferenceConfig["ref"]>(key: K, f: F) =>

@@ -25,3 +25,5 @@ export const LoggerLive = config.dev.pipe(
   ),
   Layer.unwrapEffect,
 )
+
+export const prefixTypeId = <K extends string>(key: K) => `~@crosshatch/${key}` as const
