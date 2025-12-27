@@ -1,7 +1,6 @@
 {
   "include": [],
   "references": [
-    { "path": "./@crosshatch/9421" },
     { "path": "./@crosshatch/ui" },
     { "path": "./@crosshatch/util" },
     { "path": "./@crosshatch/config" },

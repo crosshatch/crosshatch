@@ -1,3 +1,4 @@
+import { u8a } from "@crosshatch/util"
 import { Prompt } from "@effect/ai"
 import {
   customType,
@@ -56,8 +57,8 @@ export const message = customType<{
 })
 
 export const bytea = customType<{
-  data: Uint8Array<ArrayBuffer>
-  driverData: Uint8Array<ArrayBuffer>
+  data: u8a
+  driverData: u8a
 }>({
   dataType: () => "bytea",
   toDriver: identity,
