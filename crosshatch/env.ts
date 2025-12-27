@@ -1,6 +1,9 @@
-import { Schema as S } from "effect"
+import { Config, Effect, Schema as S } from "effect"
 
-export const dev = true
+export const dev = Config.boolean("DEV").pipe(
+  Config.withDefault(true),
+  Effect.runSync,
+)
 export const domain = `crosshatch.${dev ? "local" : "dev"}`
 export const url = `https://${domain}`
 export const apiUrl = dev ? "http://localhost:7776" : "https://api.crosshatch.dev"
