@@ -16,9 +16,9 @@ import { useAtom, useAtomSet, useAtomValue } from "@effect-atom/atom-react"
 import { AiError, LanguageModel, Prompt } from "@effect/ai"
 import { OpenRouterLanguageModel } from "@effect/ai-openrouter"
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router"
-import { linkUrl } from "crosshatch"
+import { CrosshatchConfig } from "crosshatch"
 import { eq } from "drizzle-orm"
-import { ConfigError, Effect, Fiber } from "effect"
+import { ConfigError, Effect, Fiber, Match } from "effect"
 import { HandCoins, PanelLeftIcon, Plus } from "lucide-react"
 import { ThemeProvider } from "next-themes"
 import { Suspense } from "react"
@@ -109,12 +109,18 @@ const sessionButtonOnClickAtom = runtime.fn<void>()(Effect.fn(function*(_, get) 
     get.set(sessionDialogOpenAtom, false)
   } else {
     const session = yield* get.result(sessionDetailsAtom)
-    if (session._tag === "Linked") {
-      get.set(sessionDialogOpenAtom, true)
-    } else {
-      const { identityId } = session
-      location.href = linkUrl({ identityId })
-    }
+    Match.value(session).pipe(
+      Match.tags({
+        Revoked: () => {}, // TODO
+        Linked: () => get.set(sessionDialogOpenAtom, true),
+        Unverified: ({ identityId }) => {
+          location.href = CrosshatchConfig.toHref(
+            CrosshatchConfig.make({ identityId }),
+          )
+        },
+      }),
+      Match.exhaustive,
+    )
   }
 }))
 

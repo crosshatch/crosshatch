@@ -1,6 +1,6 @@
 import { BrowserWorker } from "@effect/platform-browser"
 import { Deferred, Effect, Layer, Option, Schema as S } from "effect"
-import { url } from "./env.ts"
+import { appUrl } from "./env.ts"
 import { EnclaveProxyReady, ParentPortReady } from "./messages.ts"
 
 const style = Object
@@ -24,7 +24,7 @@ const style = Object
 export const EnclaveWorkerLive = Effect.gen(function*() {
   const enclaveReady = yield* Deferred.make<void>()
   addEventListener("message", function f({ data, origin }: MessageEvent) {
-    if (origin === url && Option.isSome(S.decodeUnknownOption(EnclaveProxyReady)(data))) {
+    if (origin === appUrl && Option.isSome(S.decodeUnknownOption(EnclaveProxyReady)(data))) {
       Deferred.unsafeDone(enclaveReady, Effect.succeed(undefined))
       removeEventListener("message", f)
     }
@@ -32,7 +32,7 @@ export const EnclaveWorkerLive = Effect.gen(function*() {
   const iframe = document.createElement("iframe")
   Object.assign(iframe, {
     sandbox: "allow-scripts allow-same-origin",
-    src: `${url}/enclave`,
+    src: `${appUrl}/enclave`,
     width: 1,
     height: 1,
     style,

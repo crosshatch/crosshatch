@@ -1,3 +1,4 @@
+export * as CrosshatchConfig from "./CrosshatchConfig.ts"
 export * from "./CrosshatchEvent.ts"
 export * from "./CrosshatchRuntime.ts"
 export * from "./Enclave.ts"

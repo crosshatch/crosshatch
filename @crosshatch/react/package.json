@@ -20,6 +20,11 @@
       "types": "./index.ts",
       "import": "./dist/index.js"
     },
+    ".": {
+      "types": "./index.ts",
+      "import": "./dist/index.js"
+    },
+
     "./package.json": "./package.json"
   },
   "peerDependencies": {
