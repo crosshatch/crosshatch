@@ -17,8 +17,12 @@
   "private": true,
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./index.ts"
+      "types": "./index.ts",
+      "import": "./dist/index.js"
+    },
+    "./*": {
+      "types": "./*.ts",
+      "import": "./dist/*.js"
     },
     "./package.json": "./package.json"
   },

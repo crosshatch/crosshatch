@@ -4,7 +4,7 @@ import { Schema as S } from "effect"
 
 export type SessionDetails = typeof SessionDetails["Type"]
 export const SessionDetails = S.Union(
-  S.TaggedStruct("Unverified", { identityId: S.String }),
+  S.TaggedStruct("Blank", { identityId: S.String }),
   S.TaggedStruct("Linked", {
     addresses: S.Struct({
       evm: S.String,
