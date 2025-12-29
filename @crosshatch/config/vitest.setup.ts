@@ -1,4 +1,3 @@
-// Copied from Effect repo.
 import { addEqualityTesters } from "@effect/vitest"
 
 addEqualityTesters()

@@ -5,9 +5,13 @@ export default {
   esbuild: { target: "es2020" },
   optimizeDeps: { exclude: [] },
   test: {
-    setupFiles: [Path.join(import.meta.dirname, "vitest.setup.ts")],
+    environment: "happy-dom",
+    setupFiles: [
+      Path.join(import.meta.dirname, "vitest.setup.ts"),
+      "fake-indexeddb/auto",
+    ],
     fakeTimers: { toFake: undefined },
     sequence: { concurrent: true },
-    exclude: ["**/.git/**", "**/dist/**", "**/node_modules/**"],
+    exclude: ["**/dist/**", "**/node_modules/**"],
   },
 } satisfies ViteUserConfig

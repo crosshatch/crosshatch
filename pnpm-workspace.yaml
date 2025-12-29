@@ -56,6 +56,7 @@ catalog:
   "@x402/core": ^2.0.0
   "@x402/evm": ^2.0.0
   "@x402/svm": ^2.0.0
+  happy-dom: ^20.0.11
   babel-plugin-react-compiler: ^1.0.0
   class-variance-authority: ^0.7.1
   date-fns: ^4.1.0
