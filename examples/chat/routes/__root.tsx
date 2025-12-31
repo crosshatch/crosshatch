@@ -112,9 +112,9 @@ const sessionButtonOnClickAtom = runtime.fn<void>()(Effect.fn(function*(_, get) 
     Match.value(session).pipe(
       Match.tags({
         Linked: () => get.set(sessionDialogOpenAtom, true),
-        Blank: ({ identityId }) => {
+        Blank: ({ signer }) => {
           location.href = CrosshatchConfig.toHref(
-            CrosshatchConfig.make({ identityId }),
+            CrosshatchConfig.make({ signer }),
           )
         },
         Revoked: () => {}, // TODO

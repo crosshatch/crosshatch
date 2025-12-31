@@ -7,10 +7,7 @@ import { Layer } from "effect"
 import { EnclaveClient } from "./EnclaveClient.ts"
 
 export const sessionDetailsAtom: Atom.Atom<
-  Result.Result<
-    SessionDetails,
-    WorkerError.WorkerError | Cause.NoSuchElementException
-  >
+  Result.Result<SessionDetails, WorkerError.WorkerError | Cause.NoSuchElementException>
 > = EnclaveClient.query("sessionDetails", void 0)
 
 export const unlinkAtom = EnclaveClient.mutation("revoke")
