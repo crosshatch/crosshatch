@@ -8,5 +8,6 @@ repomix-output.xml
 .direnv/
 dist/
 *.tsbuildinfo
+.tanstack
 .turbo
 
