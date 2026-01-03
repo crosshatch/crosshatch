@@ -23,6 +23,7 @@ export const ChatControls = ({
 }) => {
   const ref = useRef<HTMLTextAreaElement>(null)
   useEffect(() => ref?.current?.focus(), [chatId])
+  console.log(inflight)
   return (
     <Section className="p-4 sticky border-t bottom-0 right-0 left-0 bg-background/90 backdrop-blur-lg">
       <SectionInner className="space-y-2">
@@ -48,9 +49,9 @@ export const ChatControls = ({
             size="icon"
             className="size-9 rounded-full cursor-pointer"
             variant="outline"
-            disabled={!(inflight || text) || additionalDisabled}
+            disabled={!(text || inflight) || additionalDisabled}
           >
-            {inflight ? <span className="size-3 rounded-xs bg-secondary" /> : <ArrowUp size={18} />}
+            {inflight ? <span className="size-3 rounded-xs bg-primary" /> : <ArrowUp size={18} />}
           </Button>
         </div>
       </SectionInner>

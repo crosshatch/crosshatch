@@ -18,7 +18,7 @@ import { OpenRouterLanguageModel } from "@effect/ai-openrouter"
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router"
 import { CrosshatchConfig } from "crosshatch"
 import { eq } from "drizzle-orm"
-import { ConfigError, Effect, Fiber, Match } from "effect"
+import { ConfigError, Effect, Fiber, Layer, Match } from "effect"
 import { HandCoins, PanelLeftIcon, Plus } from "lucide-react"
 import { ThemeProvider } from "next-themes"
 import { Suspense } from "react"
@@ -225,4 +225,11 @@ export const submitAtom = runtime.fn<string | undefined>()(Effect.fn(function*(c
   })
   inflight.abort()
   if (titleFiber) yield* titleFiber
-}, (x, _1, get) => Effect.provide(x, OpenRouterLanguageModel.model(get(currentModelIdAtom)))))
+}, (x, _1, get) =>
+  Effect.provide(
+    x,
+    get.result(currentModelIdAtom).pipe(
+      Effect.map((modelId) => OpenRouterLanguageModel.model(modelId)),
+      Layer.unwrapEffect,
+    ),
+  )))

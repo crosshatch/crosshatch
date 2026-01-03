@@ -74,19 +74,29 @@ export const chatItemsAtom = Atom.family((chatId?: string | undefined) =>
   )
 )
 
-export const currentModelIdAtom = Atom.kvs({
-  runtime: Atom.runtime(BrowserKeyValueStore.layerLocalStorage),
-  key: "current-model",
-  schema: S.String,
-  defaultValue: () => "gpt-3.5-turbo",
-}).pipe(
-  Atom.keepAlive,
-)
-
 export const modelIdsAtom = runtime.atom(
   Effect.gen(function*() {
     const { client } = yield* OpenRouterClient.OpenRouterClient
     const { data } = yield* client.getModels()
     return data.map(({ id }) => id)
   }),
+)
+
+const currentModelIdState = Atom.kvs({
+  runtime: Atom.runtime(BrowserKeyValueStore.layerLocalStorage),
+  key: "current-model",
+  schema: S.String.pipe(S.NullOr),
+  defaultValue: () => null,
+}).pipe(
+  Atom.keepAlive,
+)
+export const currentModelIdAtom = Atom.writable(
+  runtime.atom(Effect.fn(function*(get) {
+    const models = yield* get.result(modelIdsAtom)
+    const currentModel = get(currentModelIdState)
+    return currentModel ?? (yield* Effect.fromNullable(models[0]))
+  })).read,
+  (get, modelId: string) => {
+    get.set(currentModelIdState, modelId)
+  },
 )

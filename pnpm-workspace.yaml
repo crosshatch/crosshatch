@@ -6,13 +6,13 @@ packages:
 
 catalog:
   "@effect-atom/atom-react": ^0.4.3
-  "@effect/ai": ^0.32.1
-  "@effect/ai-openrouter": ^0.8.0
-  "@effect/language-service": 0.62.0
-  "@effect/platform": ^0.93.6
-  "@effect/platform-browser": ^0.73.0
-  "@effect/platform-node": ^0.103.0
-  "@effect/rpc": ^0.72.2
+  "@effect/ai": ^0.33.2
+  "@effect/ai-openrouter": ^0.8.1
+  "@effect/language-service": 0.63.2
+  "@effect/platform": ^0.94.1
+  "@effect/platform-browser": ^0.74.0
+  "@effect/platform-node": ^0.104.0
+  "@effect/rpc": ^0.73.0
   "@effect/vitest": ^0.27.0
   "@electric-sql/pglite": ^0.3.14
   "@noble/curves": ^2.0.1
@@ -63,6 +63,7 @@ catalog:
   dedent: ^1.7.0
   dprint: ^0.50.2
   drizzle-orm: ^0.45.1
+  drizzle-kit: ^0.31.8
   micro-key-producer: ^0.8.2
   postgres: ^3.4.7
   effect: ^3.19.10
