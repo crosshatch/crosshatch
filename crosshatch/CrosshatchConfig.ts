@@ -3,20 +3,20 @@ import { appUrl } from "./env.ts"
 
 export type CrosshatchConfig = typeof CrosshatchConfig["Type"]
 export const CrosshatchConfig = S.Struct({
-  signer: S.String,
+  identityId: S.UUID,
   redirect: S.String,
   nonce: S.String,
   budget: S.Number,
   icon: S.String.pipe(S.optional),
 })
 
-export const make = ({ signer, redirect, nonce, budget }: {
-  readonly signer: string
+export const make = ({ identityId, redirect, nonce, budget }: {
+  readonly identityId: string
   readonly redirect?: string | undefined
   readonly nonce?: string | undefined
   readonly budget?: number | undefined
 }): CrosshatchConfig => ({
-  signer,
+  identityId,
   redirect: redirect ?? location.href,
   nonce: nonce ?? crypto.randomUUID(),
   budget: budget ?? 10,
