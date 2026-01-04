@@ -1,7 +1,7 @@
 import { Cause, Effect, Layer, Logger, LogLevel, Types } from "effect"
 import { config } from "./config.ts"
 
-export const unwrapE0 = <A, E, R>(
+export const ensureE0 = <A, E, R>(
   x: Effect.Effect<Array<A>, E, R>,
 ): Effect.Effect<A, E | Cause.NoSuchElementException, R> => Effect.flatMap(x, ([e0]) => Effect.fromNullable(e0))
 

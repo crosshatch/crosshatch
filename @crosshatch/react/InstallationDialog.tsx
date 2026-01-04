@@ -1,41 +1,31 @@
-import { sessionDetailsAtom, unlinkAtom } from "@crosshatch/react"
-import { AddressButton } from "@crosshatch/ui/components/address-button"
+import { installationAtom, rotateAtom } from "@crosshatch/react"
 import { Button } from "@crosshatch/ui/components/button"
 import { Dialog, DialogContent } from "@crosshatch/ui/components/dialog"
 import { Separator } from "@crosshatch/ui/components/separator"
 import { Atom, useAtom, useAtomSet, useAtomSuspense } from "@effect-atom/atom-react"
 import { Activity, Coins, LogOut, Settings2 } from "lucide-react"
 
-export const sessionDialogOpenAtom = Atom.make(false).pipe(
+export const installationDialogOpenAtom = Atom.make(false).pipe(
   Atom.keepAlive,
 )
 
-export const SessionDialog = ({ children }: { children: React.ReactNode }) => {
-  const endSession = useAtomSet(unlinkAtom)
-  const [sessionDialogOpen, setSessionDialogOpen] = useAtom(sessionDialogOpenAtom)
-  const { value } = useAtomSuspense(sessionDetailsAtom)
-
+export const InstallationDialog = ({ children }: { children: React.ReactNode }) => {
+  const rotate = useAtomSet(rotateAtom)
+  const [open, onOpenChange] = useAtom(installationDialogOpenAtom)
+  const { value } = useAtomSuspense(installationAtom)
   return (
-    <Dialog open={sessionDialogOpen} onOpenChange={setSessionDialogOpen}>
+    <Dialog {...{ open, onOpenChange }}>
       {children}
       <DialogContent>
-        {value._tag === "Linked" && (
+        {value.linked && (
           <div className="flex flex-col">
             <div className="flex flex-col gap-2 p-4">
-              <div>
-                <div>EVM</div>
-                <AddressButton address={value.addresses.evm} />
-              </div>
-              <div>
-                <div>SVM</div>
-                <AddressButton address={value.addresses.svm} />
-              </div>
               <Separator className="my-2" />
               <div className="flex flex-row flex-1 gap-2">
                 <Button
                   onClick={() => {
-                    setSessionDialogOpen(false)
-                    endSession({ payload: void 0 })
+                    onOpenChange(false)
+                    rotate({ payload: void 0 })
                   }}
                   className="flex flex-1 text-red-400"
                   variant="outline"

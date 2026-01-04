@@ -2,25 +2,16 @@ import { Rpc, RpcGroup } from "@effect/rpc"
 import type { PaymentPayload, PaymentRequired } from "@x402/core/types"
 import { Schema as S } from "effect"
 
-export type SessionDetails = typeof SessionDetails["Type"]
-export const SessionDetails = S.Union(
-  S.TaggedStruct("Untouched", {
-    identityId: S.UUID,
-  }),
-  S.TaggedStruct("Linked", {
-    addresses: S.Struct({
-      evm: S.String,
-      svm: S.String,
-    }),
-  }),
-  S.TaggedStruct("Revoked", {}),
-)
+export class PaymentError extends S.TaggedError<PaymentError>("PaymentError")("PaymentError", {}) {}
 
 export class Enclave extends RpcGroup.make(
-  Rpc.make("sessionDetails", {
-    success: SessionDetails,
+  Rpc.make("installationInfo", {
+    success: S.Struct({
+      id: S.UUID,
+      linked: S.Boolean,
+    }),
   }),
-  Rpc.make("revoke", {}),
+  Rpc.make("rotate", {}),
   Rpc.make("payment", {
     payload: {
       requirement: S.Unknown as S.Schema<PaymentRequired>,
@@ -28,5 +19,6 @@ export class Enclave extends RpcGroup.make(
     success: S.Struct({
       payload: S.Unknown as S.Schema<PaymentPayload>,
     }),
+    error: PaymentError,
   }),
 ) {}

@@ -1,24 +1,25 @@
-import { chatAtom, chatItemsAtom, currentModelIdAtom, modelIdsAtom, runtime } from "@/atoms"
+import { chatItemsAtom, currentModelIdAtom, modelIdsAtom, runtime } from "@/atoms"
 import { ModelSelect } from "@/components/model-select"
 import { SidebarInner } from "@/components/sidebar-inner"
 import { router } from "@/router"
 import { chatItems, chatItemsEmbeddings, chats } from "@/schema"
 import { Store } from "@/Store"
-import { sessionDetailsAtom, SessionDialog, sessionDialogOpenAtom } from "@crosshatch/react"
+import { installationAtom, InstallationDialog, installationDialogOpenAtom } from "@crosshatch/react"
 import { Database } from "@crosshatch/store"
+import { chatAtom } from "@crosshatch/ui/atoms"
 import * as AtomUtil from "@crosshatch/ui/AtomUtil"
 import { Button } from "@crosshatch/ui/components/button"
 import { ChatControls } from "@crosshatch/ui/components/chat-controls"
 import { LoaderView } from "@crosshatch/ui/components/loader-view"
 import { Sidebar, SidebarInset, SidebarProvider, useSidebar } from "@crosshatch/ui/components/sidebar"
-import { embed, unwrapE0 } from "@crosshatch/util"
+import { embed, ensureE0 } from "@crosshatch/util"
 import { useAtom, useAtomSet, useAtomValue } from "@effect-atom/atom-react"
 import { AiError, LanguageModel, Prompt } from "@effect/ai"
 import { OpenRouterLanguageModel } from "@effect/ai-openrouter"
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router"
 import { CrosshatchConfig } from "crosshatch"
 import { eq } from "drizzle-orm"
-import { ConfigError, Effect, Fiber, Layer, Match } from "effect"
+import { ConfigError, Effect, Fiber, Layer } from "effect"
 import { HandCoins, PanelLeftIcon, Plus } from "lucide-react"
 import { ThemeProvider } from "next-themes"
 import { Suspense } from "react"
@@ -43,7 +44,7 @@ function RouteComponent() {
         <SidebarInset>
           <Header />
           <Suspense fallback={<LoaderView />}>
-            <SessionDialog>
+            <InstallationDialog>
               <div className="relative flex flex-1 w-full h-full flex-col">
                 <Outlet />
                 <ChatControls
@@ -68,7 +69,7 @@ function RouteComponent() {
                   }
                 />
               </div>
-            </SessionDialog>
+            </InstallationDialog>
           </Suspense>
         </SidebarInset>
       </SidebarProvider>
@@ -104,23 +105,18 @@ const Header = () => {
 }
 
 const sessionButtonOnClickAtom = runtime.fn<void>()(Effect.fn(function*(_, get) {
-  const open = get(sessionDialogOpenAtom)
+  const open = get(installationDialogOpenAtom)
   if (open) {
-    get.set(sessionDialogOpenAtom, false)
+    get.set(installationDialogOpenAtom, false)
   } else {
-    const session = yield* get.result(sessionDetailsAtom)
-    Match.value(session).pipe(
-      Match.tags({
-        Linked: () => get.set(sessionDialogOpenAtom, true),
-        Untouched: ({ identityId }) => {
-          location.href = CrosshatchConfig.toHref(
-            CrosshatchConfig.make({ identityId }),
-          )
-        },
-        Revoked: () => {}, // TODO
-      }),
-      Match.exhaustive,
-    )
+    const installation = yield* get.result(installationAtom)
+    if (installation.linked) {
+      get.set(installationDialogOpenAtom, true)
+    } else {
+      location.href = CrosshatchConfig.toHref(
+        CrosshatchConfig.make({ installationId: installation.id }),
+      )
+    }
   }
 }))
 
@@ -182,14 +178,14 @@ export const submitAtom = runtime.fn<string | undefined>()(Effect.fn(function*(c
             message: userMessage,
           })
           .returning(),
-      ).pipe(unwrapE0),
+      ).pipe(ensureE0),
       Store.f(_.update(chats).set({ updated: new Date() }).where(eq(chats.id, chatId))),
     )
     const embedding = yield* embed(text)
     yield* Store.f(
       _.insert(chatItemsEmbeddings).values({ sourceId, embedding }).returning(),
     ).pipe(
-      unwrapE0,
+      ensureE0,
     )
   }))
 
@@ -210,14 +206,14 @@ export const submitAtom = runtime.fn<string | undefined>()(Effect.fn(function*(c
             content: [Prompt.makePart("text", { text: incoming })],
           }),
         }).returning(),
-      ).pipe(unwrapE0),
+      ).pipe(ensureE0),
       Store.f(_.update(chats).set({ updated: new Date() }).where(eq(chats.id, chatId))),
     )
     const embedding = yield* embed(incoming)
     yield* Store.f(
       _.insert(chatItemsEmbeddings).values({ sourceId, embedding }).returning(),
     ).pipe(
-      unwrapE0,
+      ensureE0,
     )
   }))
   AtomUtil.assign(get)(chatAtom(chatId), {

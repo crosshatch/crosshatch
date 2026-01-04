@@ -41,18 +41,6 @@ export const chatsAtom = runtime.atom(
   Atom.keepAlive,
 )
 
-export const chatAtom = Atom.family((_chatId?: string | undefined) =>
-  Atom.make({
-    text: "",
-    inflight: undefined,
-  } as {
-    text: string
-    inflight: AbortController | undefined
-  }).pipe(
-    Atom.keepAlive,
-  )
-)
-
 export const deleteChatAtom = runtime.fn(
   (id: string) => Store.f((_) => _.delete(chats).where(eq(chats.id, id))),
 )
