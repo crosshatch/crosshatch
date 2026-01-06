@@ -15,7 +15,7 @@ import {
   uuid,
   vector,
 } from "drizzle-orm/pg-core"
-import { identity, Schema as S } from "effect"
+import { Brand, identity, Schema as S } from "effect"
 
 export const uniqueIndices =
   <const I extends ReadonlyArray<ReadonlyArray<string>>>(prefix: string, indices: I) =>
@@ -28,6 +28,10 @@ export const uniqueIndices =
     })
 
 export const id = uuid("id").primaryKey().notNull().defaultRandom()
+
+export const brandedId = <K extends symbol>(_branded: S.brand<typeof S.UUID, K>) => ({
+  id: uuid("id").primaryKey().notNull().defaultRandom().$type<Brand.Branded<string, K>>(),
+})
 
 export const ref = <K extends string, F extends ReferenceConfig["ref"]>(
   id: K,

@@ -6,7 +6,7 @@ import { EnclaveClient } from "./EnclaveClient.ts"
 
 export const installationAtom: Atom.Atom<
   Result.Result<{
-    readonly id: string
+    readonly installationId: string
     readonly linked: boolean
   }, WorkerError.WorkerError | Cause.NoSuchElementException>
 > = EnclaveClient.query("installationInfo", void 0)

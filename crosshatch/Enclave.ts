@@ -7,7 +7,7 @@ export class PaymentError extends S.TaggedError<PaymentError>("PaymentError")("P
 export class Enclave extends RpcGroup.make(
   Rpc.make("installationInfo", {
     success: S.Struct({
-      id: S.UUID,
+      installationId: S.UUID,
       linked: S.Boolean,
     }),
   }),

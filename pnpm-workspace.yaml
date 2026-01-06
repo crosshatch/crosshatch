@@ -78,7 +78,7 @@ catalog:
   shiki: ^3.19.0
   tailwind-merge: ^3.4.0
   ts-patch: ^3.3.0
-  turbo: ^2.7.2
+  turbo: ^2.7.3
   typescript: ^5.9.3
   viem: ^2.43.1
   vite: ^7.2.7
