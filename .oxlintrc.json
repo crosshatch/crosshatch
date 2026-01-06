@@ -1,6 +1,7 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "rules": {
-    "require-yield": "off"
+    "require-yield": "off",
+    "import/extensions": ["error", "always", { "ignorePackages": true }]
   }
 }
