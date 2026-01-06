@@ -1,5 +1,5 @@
 import * as Path from "node:path"
-import type { ViteUserConfig } from "vitest/config"
+import { defaultExclude, type ViteUserConfig } from "vitest/config"
 
 export default {
   esbuild: { target: "es2020" },
@@ -12,6 +12,6 @@ export default {
     ],
     fakeTimers: { toFake: undefined },
     sequence: { concurrent: true },
-    exclude: ["**/dist/**", "**/node_modules/**"],
+    exclude: defaultExclude,
   },
 } satisfies ViteUserConfig
