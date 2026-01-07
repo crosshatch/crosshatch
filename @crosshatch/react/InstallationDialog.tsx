@@ -17,7 +17,7 @@ export const InstallationDialog = ({ children }: { children: React.ReactNode }) 
     <Dialog {...{ open, onOpenChange }}>
       {children}
       <DialogContent>
-        {value.linked && (
+        {value._tag === "Linked" && (
           <div className="flex flex-col">
             <div className="flex flex-col gap-2 p-4">
               <Separator className="my-2" />

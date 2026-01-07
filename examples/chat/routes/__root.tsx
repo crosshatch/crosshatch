@@ -110,12 +110,12 @@ const sessionButtonOnClickAtom = runtime.fn<void>()(Effect.fn(function*(_, get) 
     get.set(installationDialogOpenAtom, false)
   } else {
     const installation = yield* get.result(installationAtom)
-    if (installation.linked) {
+    if (installation._tag === "Linked") {
       get.set(installationDialogOpenAtom, true)
     } else {
-      const { installationId } = installation
+      const { challengeId } = installation
       location.href = CrosshatchConfig.toHref(
-        CrosshatchConfig.make({ installationId }),
+        CrosshatchConfig.make({ challengeId }),
       )
     }
   }
