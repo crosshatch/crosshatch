@@ -90,3 +90,8 @@ export const Embeddings = <K extends string, F extends ReferenceConfig["ref"]>(k
   }, (_) => [
     index_(`${key}_embeddings`).using("hnsw", _.embedding.op("vector_cosine_ops")),
   ])
+
+export const cvsCommon = {
+  cv: bytea("cv").notNull(),
+  iv: bytea("iv").notNull(),
+}
