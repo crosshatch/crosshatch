@@ -1,2 +1,2 @@
-export * from "./InstallationInfo.ts"
+export * from "./Link.ts"
 export * from "./PaymentError.ts"

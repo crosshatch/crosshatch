@@ -1,7 +1,7 @@
 import { Schema as S } from "effect"
 
-export type InstallationInfo = typeof InstallationInfo["Type"]
-export const InstallationInfo = S.Union(
+export type Link = typeof Link["Type"]
+export const Link = S.Union(
   S.TaggedStruct("Untouched", {
     challengeId: S.UUID,
   }),

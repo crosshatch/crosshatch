@@ -7,12 +7,12 @@ import { EnclaveClient } from "./EnclaveClient.ts"
 
 export const installationAtom: Atom.Atom<
   Result.Result<
-    models.InstallationInfo,
+    models.Link,
     WorkerError.WorkerError | Cause.NoSuchElementException
   >
-> = EnclaveClient.query("installationInfo", void 0)
+> = EnclaveClient.query("link", void 0)
 
-export const rotateAtom = EnclaveClient.mutation("rotate")
+export const unlinkAtom = EnclaveClient.mutation("unlink")
 
 export const runtime = Atom.runtime(Layer.mergeAll(
   LoggerLive,

@@ -1,13 +1,13 @@
 import { PaymentPayload, PaymentRequired } from "@crosshatch/x402"
 import { Rpc, RpcGroup } from "@effect/rpc"
 import { Schema as S } from "effect"
-import { InstallationInfo, PaymentError } from "./models/models.ts"
+import { Link, PaymentError } from "./models/models.ts"
 
 export class Enclave extends RpcGroup.make(
-  Rpc.make("installationInfo", {
-    success: InstallationInfo,
+  Rpc.make("link", {
+    success: Link,
   }),
-  Rpc.make("rotate", {}),
+  Rpc.make("unlink", {}),
   Rpc.make("payment", {
     payload: {
       requirement: PaymentRequired,
