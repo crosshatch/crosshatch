@@ -7,6 +7,7 @@
   "include": ["."],
   "exclude": ["dist"],
   "references": [
-    { "path": "../@crosshatch/util" }
+    { "path": "../@crosshatch/util" },
+    { "path": "../@crosshatch/x402" }
   ]
 }

@@ -1,15 +1,15 @@
 {
-  "name": "crosshatch",
+  "name": "@crosshatch/x402",
   "version": "0.1.0-beta.1",
   "type": "module",
   "sideEffects": false,
   "license": "Apache-2.0",
-  "description": "An embeddable browser wallet that intercepts and retries 402s.",
+  "description": "Various x402 utilities for Crosshatch.",
   "homepage": "https://crosshatch.dev",
   "repository": {
     "type": "git",
     "url": "https://github.com/crosshatch/crosshatch.git",
-    "directory": "packages/crosshatch"
+    "directory": "@crosshatch/x402"
   },
   "bugs": {
     "url": "https://github.com/crosshatch/crosshatch/issues"
@@ -25,15 +25,5 @@
       "import": "./dist/*.js"
     },
     "./package.json": "./package.json"
-  },
-  "peerDependencies": {
-    "@crosshatch/util": "workspace:*",
-    "@crosshatch/x402": "workspace:*",
-    "@effect/ai": "catalog:",
-    "@effect/platform": "catalog:",
-    "@effect/platform-browser": "catalog:",
-    "@effect/rpc": "catalog:",
-    "@x402/core": "catalog:",
-    "effect": "catalog:"
   }
 }
