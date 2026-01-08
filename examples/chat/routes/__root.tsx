@@ -12,7 +12,7 @@ import { Button } from "@crosshatch/ui/components/button"
 import { ChatControls } from "@crosshatch/ui/components/chat-controls"
 import { LoaderView } from "@crosshatch/ui/components/loader-view"
 import { Sidebar, SidebarInset, SidebarProvider, useSidebar } from "@crosshatch/ui/components/sidebar"
-import { embed, ensureE0 } from "@crosshatch/util"
+import { embed, unwrapE0 } from "@crosshatch/util"
 import { useAtom, useAtomSet, useAtomValue } from "@effect-atom/atom-react"
 import { AiError, LanguageModel, Prompt } from "@effect/ai"
 import { OpenRouterLanguageModel } from "@effect/ai-openrouter"
@@ -179,14 +179,14 @@ export const submitAtom = runtime.fn<string | undefined>()(Effect.fn(function*(c
             message: userMessage,
           })
           .returning(),
-      ).pipe(ensureE0),
+      ).pipe(unwrapE0),
       Store.f(_.update(chats).set({ updated: new Date() }).where(eq(chats.id, chatId))),
     )
     const embedding = yield* embed(text)
     yield* Store.f(
       _.insert(chatItemsEmbeddings).values({ sourceId, embedding }).returning(),
     ).pipe(
-      ensureE0,
+      unwrapE0,
     )
   }))
 
@@ -207,14 +207,14 @@ export const submitAtom = runtime.fn<string | undefined>()(Effect.fn(function*(c
             content: [Prompt.makePart("text", { text: incoming })],
           }),
         }).returning(),
-      ).pipe(ensureE0),
+      ).pipe(unwrapE0),
       Store.f(_.update(chats).set({ updated: new Date() }).where(eq(chats.id, chatId))),
     )
     const embedding = yield* embed(incoming)
     yield* Store.f(
       _.insert(chatItemsEmbeddings).values({ sourceId, embedding }).returning(),
     ).pipe(
-      ensureE0,
+      unwrapE0,
     )
   }))
   AtomUtil.assign(get)(chatAtom(chatId), {
