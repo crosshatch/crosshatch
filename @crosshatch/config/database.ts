@@ -37,7 +37,7 @@ export const ref = <K extends string, F extends ReferenceConfig["ref"]>(
   id: K,
   f: F,
   a?: ReferenceConfig["actions"] | undefined,
-) => uuid(id).references(f, a)
+) => uuid(id).$type<ReturnType<F>["_"]["data"]>().references(f, a)
 
 export const added = timestamp("added", {
   mode: "date",
