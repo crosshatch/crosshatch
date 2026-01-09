@@ -6,11 +6,13 @@ export const ResourceInfo = S.Struct({
   mimeType: S.String,
 })
 
-export const Network = S.TemplateLiteral(
+export const NetworkIdTypeId: unique symbol = Symbol()
+export type NetworkId = typeof NetworkId["Type"]
+export const NetworkId = S.TemplateLiteral(
   S.String,
   S.Literal(":"),
   S.String,
-)
+).pipe(S.brand(NetworkIdTypeId))
 
 const UnknownRecord = S.Record({
   key: S.String,
@@ -19,7 +21,7 @@ const UnknownRecord = S.Record({
 
 export const PaymentRequirements = S.Struct({
   scheme: S.String,
-  network: Network,
+  network: NetworkId,
   asset: S.String,
   amount: S.String,
   payTo: S.String,
