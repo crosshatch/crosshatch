@@ -1,5 +1,6 @@
 import { u8a } from "@crosshatch/util"
 import { Prompt } from "@effect/ai"
+import type { NotNull } from "drizzle-orm"
 import {
   customType,
   ExtraConfigColumn,
@@ -7,6 +8,9 @@ import {
   IndexBuilder,
   integer,
   numeric,
+  type PgColumnBuilderBase,
+  pgEnum,
+  type PgEnumColumnBuilderInitial,
   pgTable,
   type ReferenceConfig,
   text,
@@ -94,4 +98,44 @@ export const Embeddings = <K extends string, F extends ReferenceConfig["ref"]>(k
 export const cvsCommon = {
   cv: bytea("cv").notNull(),
   iv: bytea("iv").notNull(),
+}
+
+export const taggedUnion = <
+  const S_ extends S.Union<ReadonlyArray<S.TaggedStruct<any, any>>>,
+  V extends taggedUnion.Columns<Extract<S_["Type"], { _tag: string }>>,
+>(schema: S_, members: V): {
+  _tag: NotNull<
+    PgEnumColumnBuilderInitial<"_tag", Extract<taggedUnion.EnumKeys<S_["members"]>, [string, ...Array<string>]>>
+  >
+} & V => {
+  const enumValues: ReadonlyArray<string> = schema.members.map(({ fields }) => {
+    const { _tag } = fields
+    return _tag.ast.type.literal
+  })
+  return {
+    _tag: pgEnum("_tag", enumValues as never)("_tag").notNull(),
+    ...members,
+  } as never
+}
+export declare namespace taggedUnion {
+  export type MemberKey<U extends { _tag: string }> = Exclude<
+    {
+      [K in U["_tag"]]: keyof Extract<U, { _tag: K }>
+    }[U["_tag"]],
+    "_tag"
+  >
+  export type AnyTaggedStruct = S.TaggedStruct<any, any>
+  export type EnumKeys<Tail extends ReadonlyArray<AnyTaggedStruct>> = Tail extends
+    readonly [infer E0 extends AnyTaggedStruct, ...infer ERest extends ReadonlyArray<AnyTaggedStruct>]
+    ? [E0["fields"]["_tag"] extends S.tag<infer K> ? K : never, ...EnumKeys<ERest>]
+    : []
+
+  export type Columns<U extends { _tag: string }> = {
+    [K in taggedUnion.MemberKey<U>]: {
+      [K2 in U["_tag"]]: Extract<U, { _tag: K2 }> extends Record<K, infer V> ? PgColumnBuilderBase & {
+          _: { data: V } | { $type: V }
+        }
+        : never
+    }[U["_tag"]]
+  }
 }
