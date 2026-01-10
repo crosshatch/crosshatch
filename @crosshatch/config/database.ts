@@ -34,14 +34,19 @@ export const uniqueIndices =
       )
     })
 
-export const uuid = uuid_("id").primaryKey().notNull().defaultRandom()
-export const textId = text("id").primaryKey().notNull()
+export const uuid = <T extends string = string>() => uuid_("id").primaryKey().notNull().defaultRandom().$type<T>()
+export const textId = <T extends string = string>() => text("id").primaryKey().notNull().$type<T>()
 
-export const ref = <K extends string, F extends ReferenceConfig["ref"]>(
+// TODO: combine?
+export const uuidRef = <K extends string, F extends ReferenceConfig["ref"]>(
   id: K,
   f: F,
   a?: ReferenceConfig["actions"] | undefined,
-  // TODO: should this be narrowed for the case of uuid? Or does it not matter?
+) => uuid_(id).$type<ReturnType<F>["_"]["data"]>().references(f, a)
+export const textRef = <K extends string, F extends ReferenceConfig["ref"]>(
+  id: K,
+  f: F,
+  a?: ReferenceConfig["actions"] | undefined,
 ) => text(id).$type<ReturnType<F>["_"]["data"]>().references(f, a)
 
 export const added = timestamp("added", {
@@ -89,9 +94,9 @@ export const bytea = customType<{
 
 export const Embeddings = <K extends string, F extends ReferenceConfig["ref"]>(key: K, f: F) =>
   pgTable(key, {
-    id: uuid,
+    id: uuid(),
     embedding: vector("embedding", { dimensions: 384 }),
-    sourceId: ref("source", f, { onDelete: "cascade" }).notNull(),
+    sourceId: uuidRef("source", f, { onDelete: "cascade" }).notNull(),
   }, (_) => [
     index_(`${key}_embeddings`).using("hnsw", _.embedding.op("vector_cosine_ops")),
   ])
@@ -101,11 +106,15 @@ export const cvsCommon = {
   iv: bytea("iv").notNull(),
 }
 
-export const tag = <const S_ extends S.Union<ReadonlyArray<S.TaggedStruct<any, any>>>>(
+export const tag = <
+  K extends string,
+  const S_ extends S.Union<ReadonlyArray<S.TaggedStruct<any, any>>>,
+>(
+  key: K,
   schema: S_,
 ): PgEnum<Extract<tagged.EnumKeys<S_["members"]>, [string, ...Array<string>]>> =>
   pgEnum(
-    "_tag",
+    `${key}_tag`,
     schema.members.map(
       ({ fields: { _tag: { ast: { type: { literal } } } } }) => literal,
     ) as never,
@@ -132,7 +141,7 @@ export const tagged = <
   & R =>
 {
   return {
-    _tag,
+    _tag: _tag("_tag"),
     ...members,
     ...memberRefs,
   } as never
