@@ -11,7 +11,7 @@ export class DatabaseWorker extends Context.Tag(prefix("store/DatabaseWorker"))<
   new(options?: { name?: string }) => Worker
 >() {}
 
-export class Database extends Context.Tag("@crosshatch/store/Database")<Database, PGliteWithLive>() {
+export class Database extends Context.Tag(prefix("store/Database"))<Database, PGliteWithLive>() {
   static layer = Layer.scoped(
     Database,
     Effect.gen(function*() {

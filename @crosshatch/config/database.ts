@@ -1,6 +1,6 @@
 import { u8a } from "@crosshatch/util"
 import { Prompt } from "@effect/ai"
-import type { $Type, NotNull } from "drizzle-orm"
+import type { $Type } from "drizzle-orm"
 import {
   customType,
   ExtraConfigColumn,
@@ -9,18 +9,20 @@ import {
   integer,
   numeric,
   type PgColumnBuilderBase,
+  type PgEnum,
   pgEnum,
   type PgEnumColumnBuilderInitial,
   pgTable,
+  type PgTextBuilderInitial,
   type PgUUIDBuilderInitial,
   type ReferenceConfig,
   text,
   timestamp,
   uniqueIndex,
-  uuid,
+  uuid as uuid_,
   vector,
 } from "drizzle-orm/pg-core"
-import { Brand, identity, Schema as S } from "effect"
+import { identity, Schema as S } from "effect"
 
 export const uniqueIndices =
   <const I extends ReadonlyArray<ReadonlyArray<string>>>(prefix: string, indices: I) =>
@@ -32,17 +34,15 @@ export const uniqueIndices =
       )
     })
 
-export const id = uuid("id").primaryKey().notNull().defaultRandom()
-
-export const brandedId = <K extends symbol>(_branded: S.brand<typeof S.UUID, K>) => ({
-  id: uuid("id").primaryKey().notNull().defaultRandom().$type<Brand.Branded<string, K>>(),
-})
+export const uuid = uuid_("id").primaryKey().notNull().defaultRandom()
+export const textId = text("id").primaryKey().notNull()
 
 export const ref = <K extends string, F extends ReferenceConfig["ref"]>(
   id: K,
   f: F,
   a?: ReferenceConfig["actions"] | undefined,
-) => uuid(id).$type<ReturnType<F>["_"]["data"]>().references(f, a)
+  // TODO: should this be narrowed for the case of uuid? Or does it not matter?
+) => text(id).$type<ReturnType<F>["_"]["data"]>().references(f, a)
 
 export const added = timestamp("added", {
   mode: "date",
@@ -89,7 +89,7 @@ export const bytea = customType<{
 
 export const Embeddings = <K extends string, F extends ReferenceConfig["ref"]>(key: K, f: F) =>
   pgTable(key, {
-    id,
+    id: uuid,
     embedding: vector("embedding", { dimensions: 384 }),
     sourceId: ref("source", f, { onDelete: "cascade" }).notNull(),
   }, (_) => [
@@ -101,30 +101,38 @@ export const cvsCommon = {
   iv: bytea("iv").notNull(),
 }
 
+export const tag = <const S_ extends S.Union<ReadonlyArray<S.TaggedStruct<any, any>>>>(
+  schema: S_,
+): PgEnum<Extract<tagged.EnumKeys<S_["members"]>, [string, ...Array<string>]>> =>
+  pgEnum(
+    "_tag",
+    schema.members.map(
+      ({ fields: { _tag: { ast: { type: { literal } } } } }) => literal,
+    ) as never,
+  ) as never
+
 export const tagged = <
   const S_ extends S.Union<ReadonlyArray<S.TaggedStruct<any, any>>>,
   T extends tagged.ColumnTypes<Extract<S_["Type"], { _tag: string }>>,
   C extends Partial<tagged.Columns<T>>,
   R extends tagged.RefColumns<T, C>,
 >(
-  schema: S_,
+  _schema: S_,
+  _tag: PgEnum<Extract<tagged.EnumKeys<S_["members"]>, [string, ...Array<string>]>>,
   members: C,
   memberRefs: R,
 ):
   & {
-    _tag: NotNull<
-      PgEnumColumnBuilderInitial<"_tag", Extract<tagged.EnumKeys<S_["members"]>, [string, ...Array<string>]>>
+    _tag: PgEnumColumnBuilderInitial<
+      "_tag",
+      Extract<tagged.EnumKeys<S_["members"]>, [string, ...Array<string>]>
     >
   }
   & C
   & R =>
 {
-  const enumValues: ReadonlyArray<string> = schema.members.map(({ fields }) => {
-    const { _tag } = fields
-    return _tag.ast.type.literal
-  })
   return {
-    _tag: pgEnum("_tag", enumValues as never)("_tag").notNull(),
+    _tag,
     ...members,
     ...memberRefs,
   } as never
@@ -153,6 +161,9 @@ export declare namespace tagged {
     }
   }
   export type RefColumns<V, W> = {
-    [K in Exclude<keyof V, keyof W> as `${Extract<K, string>}Id`]: $Type<PgUUIDBuilderInitial<string>, any>
+    [K in Exclude<keyof V, keyof W> as `${Extract<K, string>}Id`]: $Type<
+      PgUUIDBuilderInitial<string> | PgTextBuilderInitial<string, [string, ...Array<string>]>,
+      any
+    >
   }
 }

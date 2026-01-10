@@ -18,11 +18,11 @@
   "exports": {
     ".": {
       "types": "./index.ts",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./*": {
       "types": "./*.ts",
-      "import": "./dist/*.js"
+      "default": "./dist/*.js"
     },
     "./package.json": "./package.json"
   },

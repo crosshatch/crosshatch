@@ -1,16 +1,16 @@
-import { added, Embeddings, id, index, message, ref, updated } from "@crosshatch/config/database"
+import { added, Embeddings, index, message, ref, updated, uuid } from "@crosshatch/config/database"
 import { relations } from "drizzle-orm"
 import { pgTable, text } from "drizzle-orm/pg-core"
 
 export const chats = pgTable("chats", {
-  id,
+  id: uuid,
   index,
   title: text("title"),
   updated,
 })
 
 export const chatItems = pgTable("chat_items", {
-  id,
+  id: uuid,
   index,
   chatId: ref("chat_id", () => chats.id, { onDelete: "cascade" }).notNull(),
   message: message("message").notNull(),
