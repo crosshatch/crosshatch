@@ -1,6 +1,6 @@
 import { u8a } from "@crosshatch/util"
 import { Prompt } from "@effect/ai"
-import type { NotNull } from "drizzle-orm"
+import type { $Type, NotNull } from "drizzle-orm"
 import {
   customType,
   ExtraConfigColumn,
@@ -12,6 +12,7 @@ import {
   pgEnum,
   type PgEnumColumnBuilderInitial,
   pgTable,
+  type PgUUIDBuilderInitial,
   type ReferenceConfig,
   text,
   timestamp,
@@ -100,14 +101,24 @@ export const cvsCommon = {
   iv: bytea("iv").notNull(),
 }
 
-export const taggedUnion = <
+export const tagged = <
   const S_ extends S.Union<ReadonlyArray<S.TaggedStruct<any, any>>>,
-  V extends taggedUnion.Columns<Extract<S_["Type"], { _tag: string }>>,
->(schema: S_, members: V): {
-  _tag: NotNull<
-    PgEnumColumnBuilderInitial<"_tag", Extract<taggedUnion.EnumKeys<S_["members"]>, [string, ...Array<string>]>>
-  >
-} & V => {
+  T extends tagged.ColumnTypes<Extract<S_["Type"], { _tag: string }>>,
+  C extends Partial<tagged.Columns<T>>,
+  R extends tagged.RefColumns<T, C>,
+>(
+  schema: S_,
+  members: C,
+  memberRefs: R,
+):
+  & {
+    _tag: NotNull<
+      PgEnumColumnBuilderInitial<"_tag", Extract<tagged.EnumKeys<S_["members"]>, [string, ...Array<string>]>>
+    >
+  }
+  & C
+  & R =>
+{
   const enumValues: ReadonlyArray<string> = schema.members.map(({ fields }) => {
     const { _tag } = fields
     return _tag.ast.type.literal
@@ -115,9 +126,10 @@ export const taggedUnion = <
   return {
     _tag: pgEnum("_tag", enumValues as never)("_tag").notNull(),
     ...members,
+    ...memberRefs,
   } as never
 }
-export declare namespace taggedUnion {
+export declare namespace tagged {
   export type MemberKey<U extends { _tag: string }> = Exclude<
     {
       [K in U["_tag"]]: keyof Extract<U, { _tag: K }>
@@ -129,13 +141,18 @@ export declare namespace taggedUnion {
     readonly [infer E0 extends AnyTaggedStruct, ...infer ERest extends ReadonlyArray<AnyTaggedStruct>]
     ? [E0["fields"]["_tag"] extends S.tag<infer K> ? K : never, ...EnumKeys<ERest>]
     : []
-
-  export type Columns<U extends { _tag: string }> = {
-    [K in taggedUnion.MemberKey<U>]: {
-      [K2 in U["_tag"]]: Extract<U, { _tag: K2 }> extends Record<K, infer V> ? PgColumnBuilderBase & {
-          _: { data: V } | { $type: V }
-        }
+  export type ColumnTypes<U extends { _tag: string }> = {
+    [K in tagged.MemberKey<U>]: {
+      [K2 in U["_tag"]]: Extract<U, { _tag: K2 }> extends Record<K, infer V> ? V
         : never
     }[U["_tag"]]
+  }
+  export type Columns<T> = {
+    [K in keyof T]: PgColumnBuilderBase & {
+      _: { data: T[K] } | { $type: T[K] }
+    }
+  }
+  export type RefColumns<V, W> = {
+    [K in Exclude<keyof V, keyof W> as `${Extract<K, string>}Id`]: $Type<PgUUIDBuilderInitial<string>, any>
   }
 }

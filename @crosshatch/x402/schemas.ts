@@ -29,6 +29,7 @@ export const PaymentRequirements = S.Struct({
   extra: UnknownRecord,
 })
 
+export type PaymentRequired = typeof PaymentRequired["Type"]
 export const PaymentRequired = S.Struct({
   x402Version: S.Number,
   error: S.String.pipe(S.optional),
