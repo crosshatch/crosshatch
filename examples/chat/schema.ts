@@ -1,4 +1,4 @@
-import { added, Embeddings, index, message, updated, uuid, uuidRef } from "@crosshatch/config/database"
+import { added, Embeddings, index, message, updated, uuid, uuidRef } from "@crosshatch/config/drizzle"
 import { relations } from "drizzle-orm"
 import { pgTable, text } from "drizzle-orm/pg-core"
 

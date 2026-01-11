@@ -1,6 +1,5 @@
 import { u8a } from "@crosshatch/util"
 import { Prompt } from "@effect/ai"
-import type { $Type } from "drizzle-orm"
 import {
   customType,
   ExtraConfigColumn,
@@ -8,13 +7,7 @@ import {
   IndexBuilder,
   integer,
   numeric,
-  type PgColumnBuilderBase,
-  type PgEnum,
-  pgEnum,
-  type PgEnumColumnBuilderInitial,
   pgTable,
-  type PgTextBuilderInitial,
-  type PgUUIDBuilderInitial,
   type ReferenceConfig,
   text,
   timestamp,
@@ -104,75 +97,4 @@ export const Embeddings = <K extends string, F extends ReferenceConfig["ref"]>(k
 export const cvsCommon = {
   cv: bytea("cv").notNull(),
   iv: bytea("iv").notNull(),
-}
-
-export const tag = <
-  K extends string,
-  const S_ extends S.Union<ReadonlyArray<S.TaggedStruct<any, any>>>,
->(
-  key: K,
-  schema: S_,
-): PgEnum<Extract<tagged.EnumKeys<S_["members"]>, [string, ...Array<string>]>> =>
-  pgEnum(
-    `${key}_tag`,
-    schema.members.map(
-      ({ fields: { _tag: { ast: { type: { literal } } } } }) => literal,
-    ) as never,
-  ) as never
-
-export const tagged = <
-  const S_ extends S.Union<ReadonlyArray<S.TaggedStruct<any, any>>>,
-  T extends tagged.ColumnTypes<Extract<S_["Type"], { _tag: string }>>,
-  C extends Partial<tagged.Columns<T>>,
-  R extends tagged.RefColumns<T, C>,
->(
-  _schema: S_,
-  _tag: PgEnum<Extract<tagged.EnumKeys<S_["members"]>, [string, ...Array<string>]>>,
-  members: C,
-  memberRefs: R,
-):
-  & {
-    _tag: PgEnumColumnBuilderInitial<
-      "_tag",
-      Extract<tagged.EnumKeys<S_["members"]>, [string, ...Array<string>]>
-    >
-  }
-  & C
-  & R =>
-{
-  return {
-    _tag: _tag("_tag"),
-    ...members,
-    ...memberRefs,
-  } as never
-}
-export declare namespace tagged {
-  export type MemberKey<U extends { _tag: string }> = Exclude<
-    {
-      [K in U["_tag"]]: keyof Extract<U, { _tag: K }>
-    }[U["_tag"]],
-    "_tag"
-  >
-  export type AnyTaggedStruct = S.TaggedStruct<any, any>
-  export type EnumKeys<Tail extends ReadonlyArray<AnyTaggedStruct>> = Tail extends
-    readonly [infer E0 extends AnyTaggedStruct, ...infer ERest extends ReadonlyArray<AnyTaggedStruct>]
-    ? [E0["fields"]["_tag"] extends S.tag<infer K> ? K : never, ...EnumKeys<ERest>]
-    : []
-  export type ColumnTypes<U extends { _tag: string }> = {
-    [K in tagged.MemberKey<U>]: {
-      [K2 in U["_tag"]]: Extract<U, { _tag: K2 }> extends Record<K, infer V> ? V
-        : never
-    }[U["_tag"]]
-  }
-  export type Columns<T> = {
-    [K in keyof T]: PgColumnBuilderBase & {
-      _: { data: T[K] } | { $type: T[K] }
-    }
-  }
-  export type RefColumns<V, W> = {
-    [K in Exclude<keyof V, keyof W> as `${Extract<K, string>}Id`]: $Type<
-      PgUUIDBuilderInitial<string> | PgTextBuilderInitial<string, [string, ...Array<string>]>,
-      any
-    >
-  }
 }

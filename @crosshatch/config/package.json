@@ -10,8 +10,8 @@
     "./vitest": {
       "import": "./vitest.ts"
     },
-    "./database": {
-      "default": "./database.ts"
+    "./drizzle": {
+      "default": "./drizzle/drizzle.ts"
     }
   },
   "peerDependencies": {
