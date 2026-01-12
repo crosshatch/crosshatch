@@ -1,11 +1,5 @@
-import { type $Type } from "drizzle-orm"
-import {
-  type PgEnum,
-  pgEnum,
-  type PgEnumColumnBuilderInitial,
-  type PgTextBuilderInitial,
-  type PgUUIDBuilderInitial,
-} from "drizzle-orm/pg-core"
+import type { NotNull } from "drizzle-orm"
+import { type PgColumnBuilderBase, type PgEnum, pgEnum, type PgEnumColumnBuilderInitial } from "drizzle-orm/pg-core"
 import { absurd, Schema as S } from "effect"
 
 type SupersetKey<U extends { _tag: string }> = Exclude<
@@ -19,13 +13,8 @@ type Superset<U extends { _tag: string }> = {
   }[U["_tag"]]
 }
 
-type Columns<T> = { [K in keyof T]: { _: { data: T[K] } | { $type: T[K] } } }
-
-type RefColumns<V, W> = {
-  [K in Exclude<keyof V, keyof W> as `${Extract<K, string>}Id`]: $Type<
-    PgUUIDBuilderInitial<string> | PgTextBuilderInitial<string, [string, ...Array<string>]>,
-    any
-  >
+type Columns<T> = {
+  [K in keyof T]: PgColumnBuilderBase
 }
 
 export const taggedUnion = <
@@ -34,19 +23,20 @@ export const taggedUnion = <
   E,
   R,
   T extends Superset<A>,
-  F extends Partial<Columns<T>>,
-  R2 extends RefColumns<T, F>,
+  F extends Columns<T>,
 >(
   key: K,
   schema: S.Schema<A, E, R>,
-  supersetColumns: F,
-  supersetReferences: R2,
+  cols: F,
 ): {
   tag: PgEnum<[A["_tag"]]>
   superset:
-    & { _tag: PgEnumColumnBuilderInitial<"_tag", Extract<[A["_tag"]], [string, ...Array<string>]>> }
+    & {
+      _tag: NotNull<
+        PgEnumColumnBuilderInitial<"_tag", Extract<[A["_tag"]], [string, ...Array<string>]>>
+      >
+    }
     & F
-    & R2
 } => {
   const { ast } = S.encodedBoundSchema(schema)
   if (ast._tag !== "Union") {
@@ -68,9 +58,8 @@ export const taggedUnion = <
   return {
     tag,
     superset: {
-      _tag: tag(`${key}_tag`),
-      ...supersetColumns,
-      ...supersetReferences,
+      _tag: tag(`${key}_tag`).notNull(),
+      ...cols,
     },
   } as never
 }

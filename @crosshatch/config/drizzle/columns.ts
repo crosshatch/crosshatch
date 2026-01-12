@@ -3,19 +3,16 @@ import { Prompt } from "@effect/ai"
 import {
   customType,
   ExtraConfigColumn,
-  index as index_,
   IndexBuilder,
   integer,
   numeric,
-  pgTable,
   type ReferenceConfig,
   text,
   timestamp,
   uniqueIndex,
-  uuid as uuid_,
-  vector,
+  uuid,
 } from "drizzle-orm/pg-core"
-import { identity, Schema as S } from "effect"
+import { Brand, identity, Schema as S } from "effect"
 
 export const uniqueIndices =
   <const I extends ReadonlyArray<ReadonlyArray<string>>>(prefix: string, indices: I) =>
@@ -27,32 +24,13 @@ export const uniqueIndices =
       )
     })
 
-export const uuid = <T extends string = string>() => uuid_("id").primaryKey().notNull().defaultRandom().$type<T>()
-export const textId = <T extends string = string>() => text("id").primaryKey().notNull().$type<T>()
-
-// TODO: combine?
-export const uuidRef = <K extends string, F extends ReferenceConfig["ref"]>(
+export const ref = <K extends string, F extends ReferenceConfig["ref"]>(
   id: K,
   f: F,
   a?: ReferenceConfig["actions"] | undefined,
-) => uuid_(id).$type<ReturnType<F>["_"]["data"]>().references(f, a)
-export const textRef = <K extends string, F extends ReferenceConfig["ref"]>(
-  id: K,
-  f: F,
-  a?: ReferenceConfig["actions"] | undefined,
-) => text(id).$type<ReturnType<F>["_"]["data"]>().references(f, a)
-
-export const added = timestamp("added", {
-  mode: "date",
-  withTimezone: true,
-}).notNull().defaultNow()
+) => uuid(id).$type<ReturnType<F>["_"]["data"]>().references(f, a)
 
 export const lastUsed = timestamp("last_used", {
-  mode: "date",
-  withTimezone: true,
-}).notNull().defaultNow()
-
-export const updated = timestamp("updated", {
   mode: "date",
   withTimezone: true,
 }).notNull().defaultNow()
@@ -63,9 +41,19 @@ export const amount = numeric("amount", {
   mode: "string",
 }).notNull()
 
-export const index = integer("index").generatedAlwaysAsIdentity()
+export const added = timestamp("added", {
+  mode: "date",
+  withTimezone: true,
+}).notNull().defaultNow()
+
+export const updated = timestamp("updated", {
+  mode: "date",
+  withTimezone: true,
+}).notNull().defaultNow().$onUpdateFn(() => new Date())
 
 export const label = text("label").notNull()
+
+export const ordinal = integer("ordinal").generatedByDefaultAsIdentity().notNull()
 
 export const message = customType<{
   data: Prompt.Message
@@ -85,16 +73,13 @@ export const bytea = customType<{
   fromDriver: identity,
 })
 
-export const Embeddings = <K extends string, F extends ReferenceConfig["ref"]>(key: K, f: F) =>
-  pgTable(key, {
-    id: uuid(),
-    embedding: vector("embedding", { dimensions: 384 }),
-    sourceId: uuidRef("source", f, { onDelete: "cascade" }).notNull(),
-  }, (_) => [
-    index_(`${key}_embeddings`).using("hnsw", _.embedding.op("vector_cosine_ops")),
-  ])
-
-export const cvsCommon = {
+export const envelopeCommon = {
   cv: bytea("cv").notNull(),
   iv: bytea("iv").notNull(),
 }
+
+export const columns = <S_ extends S.Schema.Any, B extends symbol>(_id: S.brand<S_, B>) => ({
+  id: uuid("id").primaryKey().notNull().defaultRandom().$type<string & Brand.Brand<B>>(),
+  added,
+  updated,
+})

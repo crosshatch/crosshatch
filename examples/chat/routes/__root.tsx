@@ -2,7 +2,7 @@ import { chatItemsAtom, currentModelIdAtom, modelIdsAtom, runtime } from "@/atom
 import { ModelSelect } from "@/components/model-select"
 import { SidebarInner } from "@/components/sidebar-inner"
 import { router } from "@/router"
-import { chatItems, chatItemsEmbeddings, chats } from "@/schema"
+import { ChatId, chatItems, chats, embeddings } from "@/schema"
 import { Store } from "@/Store"
 import { installationAtom, InstallationDialog, installationDialogOpenAtom } from "@crosshatch/react"
 import { Database } from "@crosshatch/store"
@@ -119,7 +119,7 @@ const sessionButtonOnClickAtom = runtime.fn<void>()(Effect.fn(function*(_, get) 
   }
 }))
 
-export const submitAtom = runtime.fn<string | undefined>()(Effect.fn(function*(chatId, get) {
+export const submitAtom = runtime.fn<typeof ChatId["Type"] | undefined>()(Effect.fn(function*(chatId, get) {
   // const session = yield* get.result(sessionDetailsAtom)
   // if (Option.isNone(session)) {
   //   get.set(sessionDialogOpenAtom, true)
@@ -135,7 +135,7 @@ export const submitAtom = runtime.fn<string | undefined>()(Effect.fn(function*(c
     | Fiber.RuntimeFiber<void, Database.DatabaseError | AiError.AiError | ConfigError.ConfigError>
     | undefined
   if (!chatId) {
-    const id = crypto.randomUUID()
+    const id = ChatId.make(crypto.randomUUID())
     chatId = id
     AtomUtil.assign(get)(chatAtom(undefined), { text: "" })
     yield* Effect.tryPromise(() =>
@@ -145,7 +145,9 @@ export const submitAtom = runtime.fn<string | undefined>()(Effect.fn(function*(c
       })
     )
     const _ = yield* Store._
-    yield* Store.f(_.insert(chats).values({ id }))
+    yield* Store.f(
+      _.insert(chats).values({ id }),
+    )
     titleFiber = yield* Effect.gen(function*() {
       const { text: title } = yield* LanguageModel.generateText({
         prompt: `
@@ -169,7 +171,7 @@ export const submitAtom = runtime.fn<string | undefined>()(Effect.fn(function*(c
   })
 
   yield* Store.tx(Effect.fn(function*(_) {
-    const { id: sourceId } = yield* Effect.zipLeft(
+    const { id: chatItemId } = yield* Effect.zipLeft(
       Store.f(
         _
           .insert(chatItems).values({
@@ -182,7 +184,7 @@ export const submitAtom = runtime.fn<string | undefined>()(Effect.fn(function*(c
     )
     const embedding = yield* embed(text)
     yield* Store.f(
-      _.insert(chatItemsEmbeddings).values({ sourceId, embedding }).returning(),
+      _.insert(embeddings).values({ chatItemId, embedding }).returning(),
     ).pipe(
       unwrapE0,
     )
@@ -197,7 +199,7 @@ export const submitAtom = runtime.fn<string | undefined>()(Effect.fn(function*(c
     prompt: [...items.map((v) => v.message), userMessage],
   })
   yield* Store.tx(Effect.fn(function*(_) {
-    const { id: sourceId } = yield* Effect.zipLeft(
+    const { id: chatItemId } = yield* Effect.zipLeft(
       Store.f(
         _.insert(chatItems).values({
           chatId,
@@ -210,7 +212,7 @@ export const submitAtom = runtime.fn<string | undefined>()(Effect.fn(function*(c
     )
     const embedding = yield* embed(incoming)
     yield* Store.f(
-      _.insert(chatItemsEmbeddings).values({ sourceId, embedding }).returning(),
+      _.insert(embeddings).values({ chatItemId, embedding }).returning(),
     ).pipe(
       unwrapE0,
     )

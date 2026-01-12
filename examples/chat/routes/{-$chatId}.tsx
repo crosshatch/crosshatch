@@ -1,12 +1,19 @@
 import { MessageList } from "@/components/message-list"
 import { router } from "@/router"
+import { ChatId } from "@/schema"
 import { LoaderView } from "@crosshatch/ui/components/loader-view"
 import { registerCommand } from "@crosshatch/util"
 import { createFileRoute } from "@tanstack/react-router"
+import { Struct } from "effect"
 import { Suspense, useEffect } from "react"
 
 export const Route = createFileRoute("/{-$chatId}")({
   component: RouteComponent,
+  params: {
+    parse: Struct.evolve({
+      chatId: (v) => v ? ChatId.make(v) : undefined,
+    }),
+  },
 })
 
 function RouteComponent() {

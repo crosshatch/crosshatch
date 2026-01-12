@@ -1,6 +1,6 @@
 import { chatsAtom, deleteChatAtom, renameChatAtom, runtime } from "@/atoms"
 import { router } from "@/router"
-import { chatItems, chatItemsEmbeddings, chats } from "@/schema"
+import { chatItems, chats, embeddings } from "@/schema"
 import { Store } from "@/Store"
 import { Button } from "@crosshatch/ui/components/button"
 import { CommandItem } from "@crosshatch/ui/components/command"
@@ -63,11 +63,11 @@ const searchResultsAtom = runtime.atom(Effect.fn(function*(get) {
         id: chatItems.id,
         chatId: chatItems.chatId,
         message: chatItems.message,
-        similarity: cosineDistance(chatItemsEmbeddings.embedding, embedding),
+        similarity: cosineDistance(embeddings.embedding, embedding),
         title: chats.title,
       })
       .from(chatItems)
-      .innerJoin(chatItemsEmbeddings, eq(chatItemsEmbeddings.sourceId, chatItems.id))
+      .innerJoin(embeddings, eq(embeddings.chatItemId, chatItems.id))
       .leftJoin(chats, eq(chatItems.chatId, chats.id))
       .orderBy((fields) => fields.similarity)
       .limit(5),

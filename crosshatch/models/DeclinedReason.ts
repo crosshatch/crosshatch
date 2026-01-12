@@ -1,8 +1,6 @@
 import { Schema as S } from "effect"
 
-// TODO: escalation
-export type DeclinedReason = typeof DeclinedReason["Type"]
-export const DeclinedReason = S.Union(
+export const DeclinedDecision = S.Union(
   S.TaggedStruct("InsufficientFunds", {}),
-  S.TaggedStruct("Todo", {}),
+  S.TaggedStruct("Escalate", {}),
 )

@@ -1,5 +1,6 @@
 import { chatItemsAtom } from "@/atoms"
 import { Route } from "@/routes/{-$chatId}"
+import { ChatId } from "@/schema"
 import { chatAtom } from "@crosshatch/ui/atoms"
 import { cn } from "@crosshatch/ui/cn"
 import { ChatEventCard } from "@crosshatch/ui/components/chat-event-card"
@@ -13,7 +14,9 @@ import { useEffect } from "react"
 export const MessageList = () => {
   const { chatId } = Route.useParams()
   const { inflight } = useAtomValue(chatAtom(chatId))
-  const { value: items } = useAtomSuspense(chatItemsAtom(chatId))
+  const { value: items } = useAtomSuspense(chatItemsAtom(
+    chatId ? ChatId.make(chatId) : undefined,
+  ))
 
   useEffect(() => {
     scrollTo({

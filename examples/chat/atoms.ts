@@ -1,4 +1,4 @@
-import { chatItems, chats } from "@/schema"
+import { ChatId, chatItems, chats } from "@/schema"
 import { Store } from "@/Store"
 import StoreWorker from "@/StoreWorker.ts?worker"
 import { EnclaveClient } from "@crosshatch/react"
@@ -42,15 +42,15 @@ export const chatsAtom = runtime.atom(
 )
 
 export const deleteChatAtom = runtime.fn(
-  (id: string) => Store.f((_) => _.delete(chats).where(eq(chats.id, id))),
+  (id: typeof ChatId["Type"]) => Store.f((_) => _.delete(chats).where(eq(chats.id, id))),
 )
 
 export const renameChatAtom = runtime.fn(({ id, title }: {
-  id: string
+  id: typeof ChatId["Type"]
   title: string
 }) => Store.f((_) => _.update(chats).set({ title }).where(eq(chats.id, id))))
 
-export const chatItemsAtom = Atom.family((chatId?: string | undefined) =>
+export const chatItemsAtom = Atom.family((chatId?: typeof ChatId["Type"] | undefined) =>
   runtime.atom(
     Store.latest((_) =>
       _.select().from(chatItems).where(
