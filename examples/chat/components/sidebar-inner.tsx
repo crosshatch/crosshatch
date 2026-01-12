@@ -80,7 +80,7 @@ const searchResultsAtom = runtime.atom(Effect.fn(function*(get) {
 const SearchResults = () => {
   const { value: items } = useAtomSuspense(searchResultsAtom)
   const setSearchOpen = useAtomSet(searchOpenAtom)
-  return items.map(({ id, title, message }) => {
+  return items.map(({ id, title, message, chatId }) => {
     return (
       <CommandItem
         key={id}
@@ -89,7 +89,7 @@ const SearchResults = () => {
           setSearchOpen(false)
           router.navigate({
             to: "/{-$chatId}",
-            params: { chatId: id },
+            params: { chatId },
           })
         }}
       >
