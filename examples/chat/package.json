@@ -23,7 +23,6 @@
     "@effect-atom/atom-react": "catalog:",
     "@tanstack/react-router": "catalog:",
     "babel-plugin-react-compiler": "catalog:",
-    "drizzle-kit": "catalog:",
     "drizzle-orm": "catalog:",
     "effect": "catalog:",
     "lucide-react": "catalog:",
@@ -33,6 +32,7 @@
   },
   "devDependencies": {
     "@crosshatch/config": "workspace:*",
+    "drizzle-kit": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"
   }

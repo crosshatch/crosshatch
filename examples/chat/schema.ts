@@ -3,16 +3,16 @@ import { makeId } from "@crosshatch/util"
 import { relations } from "drizzle-orm"
 import { index, pgTable, text, vector } from "drizzle-orm/pg-core"
 
-export const ChatTypeId = Symbol()
-export const ChatId = makeId(ChatTypeId)
+export const ChatIdTypeId = Symbol()
+export const ChatId = makeId(ChatIdTypeId, "ChatId")
 export const chats = pgTable("chats", {
   ...columns(ChatId),
   ordinal,
   title: text("title"),
 })
 
-export const ChatItemTypeId = Symbol()
-export const ChatItemId = makeId(ChatItemTypeId)
+export const ChatItemIdTypeId = Symbol()
+export const ChatItemId = makeId(ChatItemIdTypeId, "ChatItemId")
 export const chatItems = pgTable("chat_items", {
   ...columns(ChatItemId),
   ordinal,
@@ -21,8 +21,8 @@ export const chatItems = pgTable("chat_items", {
   added,
 })
 
-export const EmbeddingTypeId = Symbol()
-export const EmbeddingId = makeId(EmbeddingTypeId)
+export const EmbeddingIdTypeId = Symbol()
+export const EmbeddingId = makeId(EmbeddingIdTypeId, "EmbeddingId")
 export const embeddings = pgTable("embeddings", {
   ...columns(EmbeddingId),
   embedding: vector("embedding", { dimensions: 384 }),

@@ -39,7 +39,6 @@
     "@effect/platform": "catalog:",
     "@effect/platform-browser": "catalog:",
     "@electric-sql/pglite": "catalog:",
-    "drizzle-kit": "catalog:",
     "drizzle-orm": "catalog:",
     "effect": "catalog:",
     "vite": "catalog:"

@@ -22,7 +22,7 @@ export default (): Plugin => {
 
   const VIRTUAL_ID = "virtual:@crosshatch/store/migrations"
 
-  const contents: Array<Migration> = []
+  const contents: Array<typeof Migration["Type"]> = []
 
   return {
     name: "@crosshatch/local",
