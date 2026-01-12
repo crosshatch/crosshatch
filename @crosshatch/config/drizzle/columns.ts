@@ -6,6 +6,7 @@ import {
   IndexBuilder,
   integer,
   numeric,
+  type PgColumnBuilderBase,
   type ReferenceConfig,
   text,
   timestamp,
@@ -13,6 +14,12 @@ import {
   uuid,
 } from "drizzle-orm/pg-core"
 import { Brand, identity, Schema as S } from "effect"
+
+export type Columns<S extends S.Schema.Any> = {
+  [K in Exclude<keyof S["Type"], "id">]: PgColumnBuilderBase & {
+    _: { data: S["Type"][K] } | { $type: S["Type"][K] }
+  }
+}
 
 export const uniqueIndices =
   <const I extends ReadonlyArray<ReadonlyArray<string>>>(prefix: string, indices: I) =>

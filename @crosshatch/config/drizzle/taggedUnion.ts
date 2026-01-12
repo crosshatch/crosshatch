@@ -13,7 +13,7 @@ type Superset<U extends { _tag: string }> = {
   }[U["_tag"]]
 }
 
-type Columns<T> = {
+type TaggedUnionColumns<T> = {
   [K in keyof T]: PgColumnBuilderBase
 }
 
@@ -23,7 +23,7 @@ export const taggedUnion = <
   E,
   R,
   T extends Superset<A>,
-  F extends Columns<T>,
+  F extends TaggedUnionColumns<T>,
 >(
   key: K,
   schema: S.Schema<A, E, R>,
