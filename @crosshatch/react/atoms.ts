@@ -1,9 +1,13 @@
 import { LoggerLive } from "@crosshatch/util"
-import { Atom } from "@effect-atom/atom-react"
-import { Layer } from "effect"
+import { Atom, Result } from "@effect-atom/atom-react"
+import { WorkerError } from "@effect/platform"
+import { EnclaveLinkSuccess } from "crosshatch"
+import { Cause, Layer } from "effect"
 import { EnclaveClient } from "./EnclaveClient.ts"
 
-export const installationAtom = EnclaveClient.query("link", void 0)
+export const installationAtom: Atom.Atom<
+  Result.Result<typeof EnclaveLinkSuccess["Type"], WorkerError.WorkerError | Cause.NoSuchElementException>
+> = EnclaveClient.query("link", void 0)
 
 export const unlinkAtom = EnclaveClient.mutation("unlink")
 

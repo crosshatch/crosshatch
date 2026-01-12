@@ -3,6 +3,13 @@ import type { PaymentPayload, PaymentRequired } from "@x402/core/types"
 import { Schema as S } from "effect"
 import { DeclinedDecision } from "./models/models.ts"
 
+export const EnclaveLinkSuccess = S.Union(
+  S.TaggedStruct("Untouched", {
+    challengeId: S.UUID,
+  }),
+  S.TaggedStruct("Linked", {}),
+)
+
 export const EnclavePaymentSuccess = S.Union(
   S.TaggedStruct("Approved", {
     payload: S.Unknown as S.Schema<PaymentPayload>,
@@ -12,12 +19,7 @@ export const EnclavePaymentSuccess = S.Union(
 
 export class Enclave extends RpcGroup.make(
   Rpc.make("link", {
-    success: S.Union(
-      S.TaggedStruct("Untouched", {
-        challengeId: S.UUID,
-      }),
-      S.TaggedStruct("Linked", {}),
-    ),
+    success: EnclaveLinkSuccess,
   }),
   Rpc.make("unlink", {}),
   Rpc.make("payment", {
