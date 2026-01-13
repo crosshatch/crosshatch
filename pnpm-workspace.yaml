@@ -44,6 +44,7 @@ catalog:
   "@solana/kit": ^5.1.0
   "@standard-schema/spec": ^1.0.0
   "@tailwindcss/vite": ^4.1.17
+  "@tanstack/router-core": ^1.141.1
   "@tanstack/react-router": ^1.140.5
   "@tanstack/react-router-devtools": ^1.140.5
   "@tanstack/react-start": ^1.134.14
