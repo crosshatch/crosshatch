@@ -1,10 +1,17 @@
-import type { NotNull } from "drizzle-orm"
-import { type PgColumnBuilderBase, type PgEnum, pgEnum, type PgEnumColumnBuilderInitial } from "drizzle-orm/pg-core"
+import type { $Type, HasDefault, IsPrimaryKey, NotNull } from "drizzle-orm"
+import {
+  type PgColumnBuilderBase,
+  type PgEnum,
+  pgEnum,
+  type PgEnumColumnBuilderInitial,
+  type PgUUIDBuilderInitial,
+} from "drizzle-orm/pg-core"
 import { absurd, Schema as S } from "effect"
+import { added, id, updated } from "./columns.ts"
 
 type SupersetKey<U extends { _tag: string }> = Exclude<
   { [K in U["_tag"]]: keyof Extract<U, { _tag: K }> }[U["_tag"]],
-  "_tag"
+  "_tag" | "id" | "added" | "updated"
 >
 
 type Superset<U extends { _tag: string }> = {
@@ -19,7 +26,10 @@ type TaggedUnionColumns<T> = {
 
 export const taggedUnion = <
   K extends string,
-  A extends { _tag: string },
+  A extends {
+    _tag: string
+    id: string
+  },
   E,
   R,
   T extends Superset<A>,
@@ -35,6 +45,9 @@ export const taggedUnion = <
       _tag: NotNull<
         PgEnumColumnBuilderInitial<"_tag", Extract<[A["_tag"]], [string, ...Array<string>]>>
       >
+      id: $Type<HasDefault<NotNull<IsPrimaryKey<NotNull<PgUUIDBuilderInitial<"id">>>>>, boolean>
+      added: typeof added
+      updated: typeof updated
     }
     & F
 } => {
@@ -59,6 +72,9 @@ export const taggedUnion = <
     tag,
     superset: {
       _tag: tag(`${key}_tag`).notNull(),
+      id: id<A["id"]>(),
+      added,
+      updated,
       ...cols,
     },
   } as never
