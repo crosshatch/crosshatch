@@ -29,7 +29,7 @@ export const embeddings = pgTable("embeddings", {
   embedding: vector("embedding", { dimensions: 384 }),
   chatItemId: ref("chat_item_id", () => chatItems.id, { onDelete: "cascade" }).notNull(),
 }, (_) => [
-  index("embeddings").using("hnsw", _.embedding.op("vector_cosine_ops")),
+  index("embeddings_embedding_index").using("hnsw", _.embedding.op("vector_cosine_ops")),
 ])
 
 export const embeddingsRelations = relations(embeddings, ({ one }) => ({

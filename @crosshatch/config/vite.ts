@@ -52,6 +52,7 @@ export const make = ({ origin, port, url, allow, envDir }: {
         "@electric-sql/pglite/contrib/vector",
         "@electric-sql/pglite/live",
         "@electric-sql/pglite/worker",
+        "@huggingface/transformers",
         "tiktoken/lite",
       ],
     },

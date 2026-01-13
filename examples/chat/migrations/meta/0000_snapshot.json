@@ -1,5 +1,5 @@
 {
-  "id": "aaf59e88-c9dd-4627-85f2-82a222558997",
+  "id": "9f52ac9f-dcb7-4d97-8729-f43efc5db26e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -15,14 +15,14 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "index": {
-          "name": "index",
+        "ordinal": {
+          "name": "ordinal",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "identity": {
-            "type": "always",
-            "name": "chat_items_index_seq",
+            "type": "byDefault",
+            "name": "chat_items_ordinal_seq",
             "schema": "public",
             "increment": "1",
             "startWith": "1",
@@ -74,69 +74,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.chat_items_embeddings": {
-      "name": "chat_items_embeddings",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "embedding": {
-          "name": "embedding",
-          "type": "vector(384)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "source": {
-          "name": "source",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {
-        "chat_items_embeddings_embeddings": {
-          "name": "chat_items_embeddings_embeddings",
-          "columns": [
-            {
-              "expression": "embedding",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last",
-              "opclass": "vector_cosine_ops"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "hnsw",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "chat_items_embeddings_source_chat_items_id_fk": {
-          "name": "chat_items_embeddings_source_chat_items_id_fk",
-          "tableFrom": "chat_items_embeddings",
-          "tableTo": "chat_items",
-          "columnsFrom": [
-            "source"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.chats": {
       "name": "chats",
       "schema": "",
@@ -148,14 +85,14 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "index": {
-          "name": "index",
+        "ordinal": {
+          "name": "ordinal",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "identity": {
-            "type": "always",
-            "name": "chats_index_seq",
+            "type": "byDefault",
+            "name": "chats_ordinal_seq",
             "schema": "public",
             "increment": "1",
             "startWith": "1",
@@ -181,6 +118,69 @@
       },
       "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.embeddings": {
+      "name": "embeddings",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "embedding": {
+          "name": "embedding",
+          "type": "vector(384)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "chat_item_id": {
+          "name": "chat_item_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "embeddings_embedding_index": {
+          "name": "embeddings_embedding_index",
+          "columns": [
+            {
+              "expression": "embedding",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "vector_cosine_ops"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "hnsw",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "embeddings_chat_item_id_chat_items_id_fk": {
+          "name": "embeddings_chat_item_id_chat_items_id_fk",
+          "tableFrom": "embeddings",
+          "tableTo": "chat_items",
+          "columnsFrom": [
+            "chat_item_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},

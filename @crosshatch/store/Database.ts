@@ -2,9 +2,7 @@ import { prefix } from "@crosshatch/util"
 import { live, type PGliteWithLive } from "@electric-sql/pglite/live"
 import { PGliteWorker } from "@electric-sql/pglite/worker"
 import { drizzle } from "drizzle-orm/pglite"
-import { Context, Data, Effect, Layer } from "effect"
-
-export class DatabaseError extends Data.TaggedError("DatabaseError")<{ cause: unknown }> {}
+import { Context, Effect, Layer } from "effect"
 
 export class DatabaseWorker extends Context.Tag(prefix("store/DatabaseWorker"))<
   DatabaseWorker,
@@ -17,10 +15,7 @@ export class Database extends Context.Tag(prefix("store/Database"))<Database, PG
     Effect.gen(function*() {
       const client = new PGliteWorker(new (yield* DatabaseWorker)(), { extensions: { live } })
       yield* Effect.addFinalizer(() => Effect.promise(() => client.close()))
-      yield* Effect.tryPromise({
-        try: () => client.waitReady,
-        catch: (cause) => new DatabaseError({ cause }),
-      })
+      yield* Effect.tryPromise(() => client.waitReady)
       return client as never as PGliteWithLive
     }),
   )

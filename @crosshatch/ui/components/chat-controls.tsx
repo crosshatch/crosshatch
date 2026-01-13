@@ -23,7 +23,6 @@ export const ChatControls = ({
 }) => {
   const ref = useRef<HTMLTextAreaElement>(null)
   useEffect(() => ref?.current?.focus(), [chatId])
-  console.log(inflight)
   return (
     <Section className="p-4 sticky border-t bottom-0 right-0 left-0 bg-background/90 backdrop-blur-lg">
       <SectionInner className="space-y-2">

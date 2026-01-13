@@ -1,11 +1,10 @@
 import type { PGlite } from "@electric-sql/pglite"
-import type { PgQueryResultHKT, PgTransaction } from "drizzle-orm/pg-core"
 import type { AnyPgSelectQueryBuilder } from "drizzle-orm/pg-core"
 import { PgRelationalQuery } from "drizzle-orm/pg-core/query-builders/query"
 import { drizzle } from "drizzle-orm/pglite"
 import type { PgliteDatabase } from "drizzle-orm/pglite"
-import { Effect, Fiber, Layer, Record, Stream } from "effect"
-import { Database, DatabaseError, DatabaseWorker, Drizzle } from "./Database.ts"
+import { Cause, Effect, Layer, Record, Stream } from "effect"
+import { Database, DatabaseWorker, Drizzle } from "./Database.ts"
 
 export const make = <S extends Record<string, unknown>>(schema: S) =>
   class {
@@ -13,12 +12,9 @@ export const make = <S extends Record<string, unknown>>(schema: S) =>
 
     static f = Effect.fn("f")(function*<T extends PromiseLike<any>>(
       x: T | ((_: Drizzle["Type"]) => T),
-    ): Effect.fn.Return<Awaited<T>, DatabaseError, Drizzle> {
+    ): Effect.fn.Return<Awaited<T>, Cause.UnknownException, Drizzle> {
       const _ = yield* Drizzle
-      return yield* Effect.tryPromise({
-        try: () => (typeof x === "function" ? x(_) : x).then(),
-        catch: (cause) => new DatabaseError({ cause }),
-      })
+      return yield* Effect.tryPromise(() => (typeof x === "function" ? x(_) : x).then())
     })
 
     static layer = (Worker: DatabaseWorker["Type"]) =>
@@ -39,37 +35,11 @@ export const make = <S extends Record<string, unknown>>(schema: S) =>
         )),
       )
 
-    // TODO: clean this up!
-    static tx = Effect.fn("tx")(
-      function*<A, E, R>(f: (tx: PgTransaction<PgQueryResultHKT, S>) => Effect.Effect<A, E, R>) {
-        const _ = yield* Drizzle
-        let tx: PgTransaction<PgQueryResultHKT, S, Record<string, never>> = null!
-        const latch = yield* Effect.makeLatch(false)
-        const { promise, resolve } = Promise.withResolvers<void>()
-        const fiber = yield* Effect.tryPromise({
-          try: () =>
-            _.transaction(async (tx_) => {
-              tx = tx_ as never
-              latch.unsafeOpen()
-              await promise
-            }),
-          catch: (cause) => new DatabaseError({ cause }),
-        }).pipe(
-          Effect.fork,
-        )
-        yield* latch.await
-        const result = yield* f(tx)
-        resolve()
-        yield* Fiber.join(fiber)
-        return result
-      },
-    )
-
     static latest = <
       A extends (Partial<AnyPgSelectQueryBuilder> & Pick<AnyPgSelectQueryBuilder, "_">) | PgRelationalQuery<any>,
     >(
       f: (_: PgliteDatabase<S>) => A,
-    ): Stream.Stream<A["_"]["result"], DatabaseError, Drizzle | Database> => {
+    ): Stream.Stream<A["_"]["result"], Cause.UnknownException, Drizzle | Database> => {
       const self = this
       return Stream.asyncScoped(
         Effect.fn(function*(emit) {
@@ -91,10 +61,9 @@ export const make = <S extends Record<string, unknown>>(schema: S) =>
                   }) => col.mapFromDriverValue(row[col.name]),
                 )
               )
-          const query = yield* Effect.tryPromise({
-            try: () => client.live.query(sql, params, ({ rows }) => emit.single(mapper(rows))),
-            catch: (cause) => new DatabaseError({ cause }),
-          })
+          const query = yield* Effect.tryPromise(() =>
+            client.live.query(sql, params, ({ rows }) => emit.single(mapper(rows)))
+          )
           yield* Effect.addFinalizer(() => Effect.promise(() => query.unsubscribe()))
         }),
       ).pipe(

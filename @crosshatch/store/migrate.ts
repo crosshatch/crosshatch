@@ -1,8 +1,6 @@
 import type { PGlite } from "@electric-sql/pglite"
-import { Data, Effect } from "effect"
+import { Effect } from "effect"
 import { Migration } from "./Migration.ts"
-
-export class MigrationError extends Data.TaggedError("MigrationError")<{ cause: unknown }> {}
 
 const MIGRATIONS = "_migrations"
 
@@ -68,12 +66,8 @@ export const migrate = Effect.fn(function*({
         )
       }
     }
-
     yield* Effect.tryPromise(() => _.exec("COMMIT"))
   }).pipe(
-    Effect.catchTag("UnknownException", (cause) =>
-      Effect.tryPromise(() => _.exec("ROLLBACK")).pipe(
-        Effect.andThen(new MigrationError({ cause })),
-      )),
+    Effect.tapErrorTag("UnknownException", () => Effect.tryPromise(() => _.exec("ROLLBACK"))),
   )
 })
