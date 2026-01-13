@@ -1,4 +1,5 @@
 export * from "./columns.ts"
 export * from "./custom_types.ts"
-export * from "./taggedUnion.ts"
+export * as StructTable from "./StructTable.ts"
+export * as TaggedUnionTable from "./TaggedUnionTable.ts"
 export * from "./uniqueIndices.ts"
