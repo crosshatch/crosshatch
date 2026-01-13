@@ -70,13 +70,12 @@ export const make = <
   const base = extendBase(id)(schema)
   return {
     tag,
-    schema: {
-      ...base,
+    schema: Object.assign(base, {
       columns: (columns: Record<string, PgColumnBuilderBase>) => ({
         _tag: tag("_tag").notNull(),
         ...ColumnsCommon(id),
         ...columns,
       }),
-    } as never,
+    }) as never,
   }
 }

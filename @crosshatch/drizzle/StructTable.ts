@@ -1,3 +1,4 @@
+import type { PgColumnBuilderBase } from "drizzle-orm/pg-core"
 import { Brand, Schema as S } from "effect"
 import { ColumnsCommon, type ColumnsConfig, extendBase } from "./schema_table_common.ts"
 
@@ -21,10 +22,7 @@ export const make = <B extends symbol, A, I, R>(
     updated: string
   },
   R
-> => {
-  const base = extendBase(id)(schema)
-  return {
-    ...base,
-    columns: (columns) => ({ ...ColumnsCommon(id), ...columns }),
-  }
-}
+> =>
+  Object.assign(extendBase(id)(schema), {
+    columns: (columns: Record<string, PgColumnBuilderBase>) => ({ ...ColumnsCommon(id), ...columns }),
+  }) as never
