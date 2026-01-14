@@ -1,6 +1,6 @@
 import type { NotNull } from "drizzle-orm"
 import { type PgColumnBuilderBase, type PgEnum, pgEnum, type PgEnumColumnBuilderInitial } from "drizzle-orm/pg-core"
-import { absurd, Schema as S, Types } from "effect"
+import { absurd, Effect, Schema as S, Types } from "effect"
 import { Base, type BaseEncoded, type BaseType, ColumnsCommon, type ColumnsConfig } from "./schema_table_common.ts"
 
 type SupersetKey<U extends { _tag: string }> = Exclude<
@@ -24,6 +24,10 @@ export interface TaggedUnionTable<
   ) => C & ColumnsCommon<B> & {
     _tag: NotNull<PgEnumColumnBuilderInitial<"_tag", [A["_tag"]]>>
   }
+  readonly fromRow: <K extends Types.Tags<A> = Types.Tags<A>>(
+    _tag?: K | undefined,
+    // TODO: constrain row
+  ) => (row: unknown) => Effect.Effect<Types.ExtractTag<A, K> & BaseType<B>>
 }
 
 export const makeTagEnum = <
@@ -78,6 +82,8 @@ export const make = <
         ...ColumnsCommon(id),
         ...columns,
       }),
+      // TODO:
+      fromRow: (_tag: any) => (row: any) => row,
     }) as never,
   }
 }
