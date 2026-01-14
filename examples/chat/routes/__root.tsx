@@ -17,7 +17,7 @@ import { useAtom, useAtomSet, useAtomValue } from "@effect-atom/atom-react"
 import { AiError, LanguageModel, Prompt } from "@effect/ai"
 import { OpenRouterLanguageModel } from "@effect/ai-openrouter"
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router"
-import { LinkConfig } from "crosshatch"
+import { makeLinkHref } from "crosshatch"
 import { eq } from "drizzle-orm"
 import { Cause, ConfigError, Effect, Fiber, Layer } from "effect"
 import { HandCoins, PanelLeftIcon, Plus } from "lucide-react"
@@ -113,8 +113,14 @@ const sessionButtonOnClickAtom = runtime.fn<void>()(Effect.fn(function*(_, get) 
     if (installation._tag === "Linked") {
       get.set(installationDialogOpenAtom, true)
     } else {
-      const { challengeId } = installation
-      location.href = LinkConfig.toHref(LinkConfig.make({ challengeId }))
+      const { challengeId, nonce } = installation
+      location.href = makeLinkHref({
+        challengeId,
+        allowance: BigInt(10),
+        schedule: "Week",
+        redirectHref: location.href,
+        nonce,
+      })
     }
   }
 }))

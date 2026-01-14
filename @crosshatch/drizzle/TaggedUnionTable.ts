@@ -1,7 +1,7 @@
 import type { NotNull } from "drizzle-orm"
 import { type PgColumnBuilderBase, type PgEnum, pgEnum, type PgEnumColumnBuilderInitial } from "drizzle-orm/pg-core"
-import { absurd, Schema as S } from "effect"
-import { ColumnsCommon, type ColumnsConfig, extendBase } from "./schema_table_common.ts"
+import { absurd, Schema as S, Types } from "effect"
+import { Base, type BaseEncoded, type BaseType, ColumnsCommon, type ColumnsConfig } from "./schema_table_common.ts"
 
 type SupersetKey<U extends { _tag: string }> = Exclude<
   { [K in U["_tag"]]: keyof Extract<U, { _tag: K }> }[U["_tag"]],
@@ -14,17 +14,26 @@ type Superset<U extends { _tag: string }> = {
   }[U["_tag"]]
 }
 
+type PartialNull<T> = {
+  [K in keyof T]?: T[K] | null | undefined
+}
+
 export interface TaggedUnionTable<
   B extends symbol,
   A extends { _tag: string },
   I,
   R,
-> extends S.Schema<A, I, R> {
-  columns: <C extends ColumnsConfig<Superset<A>>>(
+> extends S.Schema<A & BaseType<B>, I & BaseEncoded, R> {
+  readonly columns: <C extends ColumnsConfig<Superset<A>>>(
     columns: C,
   ) => C & ColumnsCommon<B> & {
     _tag: NotNull<PgEnumColumnBuilderInitial<"_tag", [A["_tag"]]>>
   }
+  readonly unwrap: <K extends Types.Tags<A> = Types.Tags<A>>(
+    // TODO: improve how row type computed / make more precise –– `PartialNull<Superset` -> `RowSuperset`
+    row: PartialNull<Superset<A>> & BaseType<B> & { _tag: Types.Tags<A> },
+    _tag?: K | undefined,
+  ) => Types.ExtractTag<A, K>
 }
 
 export const makeTagEnum = <
@@ -67,7 +76,7 @@ export const make = <
   schema: TaggedUnionTable<B, A, I, R>
 } => {
   const tag = makeTagEnum(tagKey, schema)
-  const base = extendBase(id)(schema)
+  const base = Base(id).pipe(S.extend(schema))
   return {
     tag,
     schema: Object.assign(base, {

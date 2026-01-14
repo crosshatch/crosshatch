@@ -1,28 +1,19 @@
 import { Effect, Encoding, flow, pipe, Schema as S } from "effect"
+import { LinkChallengeId } from "./ChallengeId.ts"
 import { appUrl } from "./env.ts"
 
-export type LinkConfig = typeof LinkConfig["Type"]
+export const AllowanceSchedule = S.Literal("Day", "Week", "Month")
+
 export const LinkConfig = S.Struct({
-  challengeId: S.UUID,
-  redirect: S.String,
-  nonce: S.String,
-  budget: S.Number,
+  challengeId: LinkChallengeId,
+  redirectHref: S.String,
+  nonce: S.UUID,
+  allowance: S.BigInt,
+  schedule: AllowanceSchedule.pipe(S.optional),
   icon: S.String.pipe(S.optional),
 })
 
-export const make = ({ challengeId, redirect, nonce, budget }: {
-  readonly challengeId: string
-  readonly redirect?: string | undefined
-  readonly nonce?: string | undefined
-  readonly budget?: number | undefined
-}): LinkConfig => ({
-  challengeId,
-  redirect: redirect ?? location.href,
-  nonce: nonce ?? crypto.randomUUID(),
-  budget: budget ?? 10,
-})
-
-export const toHref = (config: LinkConfig) => {
+export const makeLinkHref = (config: typeof LinkConfig["Type"]) => {
   const result = new URL("link", appUrl)
   result.searchParams.set(
     "config",
@@ -35,7 +26,7 @@ export const toHref = (config: LinkConfig) => {
   return result.href
 }
 
-export const fromString = (v: string) =>
+export const parseLinkConfig = (v: string) =>
   pipe(
     v,
     Encoding.decodeBase64UrlString,

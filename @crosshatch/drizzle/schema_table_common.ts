@@ -1,5 +1,5 @@
 import type { PgColumnBuilderBase } from "drizzle-orm/pg-core"
-import { Schema as S } from "effect"
+import { Brand, Schema as S } from "effect"
 import { added, brandedId, updated } from "./columns.ts"
 
 export type ColumnsConfig<A> = {
@@ -11,16 +11,25 @@ export type ColumnsCommon<B extends symbol> = {
   added: typeof added
   updated: typeof updated
 }
-
 export const ColumnsCommon = <B extends symbol>(_id: S.brand<typeof S.UUID, B>): ColumnsCommon<B> => ({
   id: brandedId<B>(),
   added,
   updated,
 })
 
-export const extendBase = <B extends symbol>(id: S.brand<typeof S.UUID, B>) =>
-  S.extend(S.Struct({
+export type BaseType<B extends symbol> = {
+  id: string & Brand.Brand<B>
+  added: Date
+  updated: Date
+}
+export type BaseEncoded = {
+  id: string
+  added: string
+  updated: string
+}
+export const Base = <B extends symbol>(id: S.brand<typeof S.UUID, B>) =>
+  S.Struct({
     id,
     added: S.Date,
     updated: S.Date,
-  }))
+  })
