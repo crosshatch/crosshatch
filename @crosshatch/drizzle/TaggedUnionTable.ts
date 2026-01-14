@@ -4,18 +4,13 @@ import { absurd, Schema as S, Types } from "effect"
 import { Base, type BaseEncoded, type BaseType, ColumnsCommon, type ColumnsConfig } from "./schema_table_common.ts"
 
 type SupersetKey<U extends { _tag: string }> = Exclude<
-  { [K in U["_tag"]]: keyof Extract<U, { _tag: K }> }[U["_tag"]],
-  "_tag" | "id" | "added" | "updated"
+  { [K in Types.Tags<U>]: keyof Types.ExtractTag<U, K> }[Types.Tags<U>],
+  "_tag"
 >
-
 type Superset<U extends { _tag: string }> = {
   [K in SupersetKey<U>]: {
-    [K2 in U["_tag"]]: Extract<U, { _tag: K2 }> extends Record<K, infer V> ? V : never
-  }[U["_tag"]]
-}
-
-type PartialNull<T> = {
-  [K in keyof T]?: T[K] | null | undefined
+    [K2 in Types.Tags<U>]: Types.ExtractTag<U, K2> extends Record<K, infer V> ? V : never
+  }[Types.Tags<U>]
 }
 
 export interface TaggedUnionTable<
@@ -29,11 +24,6 @@ export interface TaggedUnionTable<
   ) => C & ColumnsCommon<B> & {
     _tag: NotNull<PgEnumColumnBuilderInitial<"_tag", [A["_tag"]]>>
   }
-  readonly unwrap: <K extends Types.Tags<A> = Types.Tags<A>>(
-    // TODO: improve how row type computed / make more precise –– `PartialNull<Superset` -> `RowSuperset`
-    row: PartialNull<Superset<A>> & BaseType<B> & { _tag: Types.Tags<A> },
-    _tag?: K | undefined,
-  ) => Types.ExtractTag<A, K>
 }
 
 export const makeTagEnum = <
@@ -41,7 +31,10 @@ export const makeTagEnum = <
   A extends { _tag: string },
   I,
   R,
->(key: K, schema: S.Schema<A, I, R>): PgEnum<[A["_tag"]]> => {
+>(
+  key: K,
+  schema: S.Schema<A, I, R>,
+): PgEnum<[A["_tag"]]> => {
   const { ast } = S.encodedBoundSchema(schema)
   if (ast._tag !== "Union") {
     return absurd<never>(null!)
