@@ -5,9 +5,9 @@ import { LinkChallengeId } from "./ChallengeId.ts"
 import { DeclinedDecision } from "./DeclinedDecision.ts"
 
 export const EnclaveLinkSuccess = S.Union(
-  S.TaggedStruct("Untouched", {
+  S.TaggedStruct("Anonymous", {
     challengeId: LinkChallengeId,
-    nonce: S.String,
+    nonce: S.UUID,
   }),
   S.TaggedStruct("Linked", {}),
 )

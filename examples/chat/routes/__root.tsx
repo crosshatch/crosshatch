@@ -19,7 +19,7 @@ import { OpenRouterLanguageModel } from "@effect/ai-openrouter"
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router"
 import { makeLinkHref } from "crosshatch"
 import { eq } from "drizzle-orm"
-import { Cause, ConfigError, Effect, Fiber, Layer } from "effect"
+import { Cause, ConfigError, Effect, Fiber, Layer, Match } from "effect"
 import { HandCoins, PanelLeftIcon, Plus } from "lucide-react"
 import { ThemeProvider } from "next-themes"
 import { Suspense } from "react"
@@ -110,18 +110,20 @@ const sessionButtonOnClickAtom = runtime.fn<void>()(Effect.fn(function*(_, get) 
     get.set(installationDialogOpenAtom, false)
   } else {
     const installation = yield* get.result(installationAtom)
-    if (installation._tag === "Linked") {
-      get.set(installationDialogOpenAtom, true)
-    } else {
-      const { challengeId, nonce } = installation
-      location.href = makeLinkHref({
-        challengeId,
-        allowance: BigInt(10),
-        schedule: "Week",
-        redirectHref: location.href,
-        nonce,
-      })
-    }
+    Match.value(installation).pipe(Match.tagsExhaustive({
+      Anonymous: ({ challengeId, nonce }) => {
+        location.href = makeLinkHref({
+          challengeId,
+          allowance: BigInt(10),
+          schedule: "Week",
+          redirectHref: location.href,
+          nonce,
+        })
+      },
+      Linked: () => {
+        get.set(installationDialogOpenAtom, true)
+      },
+    }))
   }
 }))
 
