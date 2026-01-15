@@ -114,8 +114,10 @@ const sessionButtonOnClickAtom = runtime.fn<void>()(Effect.fn(function*(_, get) 
       Anonymous: ({ challengeId, nonce }) => {
         location.href = makeLinkHref({
           challengeId,
-          allowance: BigInt(10),
-          schedule: "Week",
+          suggestedAllowance: {
+            window: "Week",
+            amount: BigInt(10),
+          },
           redirectHref: location.href,
           nonce,
         })

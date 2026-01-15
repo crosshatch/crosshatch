@@ -2,14 +2,18 @@ import { Effect, Encoding, flow, pipe, Schema as S } from "effect"
 import { LinkChallengeId } from "./ChallengeId.ts"
 import { appUrl } from "./env.ts"
 
-export const AllowanceSchedule = S.Literal("Day", "Week", "Month")
+export const AllowanceWindow = S.Literal("Day", "Week", "Month", "Year", "Ever")
+
+export const Allowance = S.Struct({
+  window: AllowanceWindow,
+  amount: S.BigInt,
+})
 
 export const LinkConfig = S.Struct({
   challengeId: LinkChallengeId,
   redirectHref: S.String,
   nonce: S.UUID,
-  allowance: S.BigInt,
-  schedule: AllowanceSchedule.pipe(S.optional),
+  suggestedAllowance: Allowance,
   icon: S.String.pipe(S.optional),
 })
 
