@@ -1,3 +1,4 @@
+import type { ExtractTablesWithRelations } from "drizzle-orm"
 import type { PgDatabase, PgQueryResultHKT, PgTransaction } from "drizzle-orm/pg-core"
 import { Effect, Fiber } from "effect"
 
@@ -10,9 +11,13 @@ export const txFactory = <
   drizzle: Effect.Effect<PgDatabase<PgQueryResultHKT, T>, E, R>,
 ) =>
   Effect.fn(
-    function*<A, E, R>(f: (tx: PgTransaction<PgQueryResultHKT, T>) => Effect.Effect<A, E, R>) {
+    function*<A, E, R>(
+      f: (
+        tx: PgTransaction<PgQueryResultHKT, T, ExtractTablesWithRelations<T>>,
+      ) => Effect.Effect<A, E, R>,
+    ) {
       const _ = yield* drizzle
-      let tx: PgTransaction<PgQueryResultHKT, T, Record<string, never>> = null!
+      let tx: PgTransaction<PgQueryResultHKT, T, ExtractTablesWithRelations<T>> = null!
       const latch = yield* Effect.makeLatch(false)
       const { promise, resolve } = Promise.withResolvers<void>()
       const fiber = yield* Effect.tryPromise(() =>
