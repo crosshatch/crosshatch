@@ -4,7 +4,7 @@ import { config } from "./config.ts"
 import { prefix } from "./prefix.ts"
 
 export class EnsureOriginMiddleware extends HttpApiMiddleware.Tag<EnsureOriginMiddleware>()(
-  prefix("@crosshatch/util/EnsureOriginMiddleware"),
+  prefix("util/EnsureOriginMiddleware"),
   { failure: HttpApiError.Unauthorized },
 ) {}
 

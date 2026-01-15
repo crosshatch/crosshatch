@@ -26,7 +26,7 @@ export interface TaggedUnionTable<
   }
   readonly fromRow: <K extends Types.Tags<A> = Types.Tags<A>>(
     _tag?: K | undefined,
-    // TODO: constrain row
+    // TODO: further-constrain row?
   ) => (row: unknown) => Effect.Effect<Types.ExtractTag<A, K> & BaseType<B>>
 }
 
@@ -82,8 +82,13 @@ export const make = <
         ...ColumnsCommon(id),
         ...columns,
       }),
-      // TODO:
-      fromRow: (_tag: any) => (row: any) => row,
+      fromRow: <K extends Types.Tags<A> = Types.Tags<A>>(
+        _tag?: K | undefined,
+      ) =>
+      (row: unknown) =>
+        S.encodeUnknown(base)(row).pipe(
+          Effect.flatMap(S.decode(base)),
+        ),
     }) as never,
   }
 }
