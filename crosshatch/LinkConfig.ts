@@ -13,7 +13,7 @@ export const LinkConfig = S.Struct({
   icon: S.String.pipe(S.optional),
 })
 
-export const makeLinkHref = (config: typeof LinkConfig["Type"]) => {
+export const makeLinkHref = (config: typeof LinkConfig.Type) => {
   const result = new URL("link", appUrl)
   result.searchParams.set(
     "config",

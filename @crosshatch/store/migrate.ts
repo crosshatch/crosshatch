@@ -10,7 +10,7 @@ export const migrate = Effect.fn(function*({
   enable,
 }: {
   client: PGlite
-  migrations: Array<typeof Migration["Type"]>
+  migrations: Array<typeof Migration.Type>
   enable: Array<string>
 }) {
   yield* Effect.tryPromise(() =>

@@ -10,7 +10,7 @@ import { Effect } from "effect"
 import { migrate } from "./migrate.ts"
 import type { Migration } from "./Migration.ts"
 
-export const worker = (key: string, migrations: Array<typeof Migration["Type"]>) =>
+export const worker = (key: string, migrations: Array<typeof Migration.Type>) =>
   worker_({
     init: () =>
       Effect.gen(function*() {

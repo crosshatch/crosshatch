@@ -127,7 +127,7 @@ const sessionButtonOnClickAtom = runtime.fn<void>()(Effect.fn(function*(_, get) 
   }
 }))
 
-export const submitAtom = runtime.fn<typeof ChatId["Type"] | undefined>()(Effect.fn(function*(chatId, get) {
+export const submitAtom = runtime.fn<typeof ChatId.Type | undefined>()(Effect.fn(function*(chatId, get) {
   // const session = yield* get.result(sessionDetailsAtom)
   // if (Option.isNone(session)) {
   //   get.set(sessionDialogOpenAtom, true)
