@@ -1,4 +1,4 @@
-import { installationAtom, unlinkAtom } from "@crosshatch/react"
+import { linkStatusAtom, unlinkAtom } from "@crosshatch/react"
 import { Button } from "@crosshatch/ui/components/button"
 import { Dialog, DialogContent } from "@crosshatch/ui/components/dialog"
 import { Separator } from "@crosshatch/ui/components/separator"
@@ -12,7 +12,7 @@ export const installationDialogOpenAtom = Atom.make(false).pipe(
 export const InstallationDialog = ({ children }: { children: React.ReactNode }) => {
   const rotate = useAtomSet(unlinkAtom)
   const [open, onOpenChange] = useAtom(installationDialogOpenAtom)
-  const { value } = useAtomSuspense(installationAtom)
+  const { value } = useAtomSuspense(linkStatusAtom)
   return (
     <Dialog {...{ open, onOpenChange }}>
       {children}

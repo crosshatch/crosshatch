@@ -5,7 +5,7 @@ import { router } from "@/router"
 import { ChatId, chatItems, chats, embeddings } from "@/schema"
 import { Store } from "@/Store"
 import { tx } from "@/tx"
-import { installationAtom, InstallationDialog, installationDialogOpenAtom } from "@crosshatch/react"
+import { InstallationDialog, installationDialogOpenAtom, linkStatusAtom } from "@crosshatch/react"
 import { chatAtom } from "@crosshatch/ui/atoms"
 import * as AtomUtil from "@crosshatch/ui/AtomUtil"
 import { Button } from "@crosshatch/ui/components/button"
@@ -17,7 +17,7 @@ import { useAtom, useAtomSet, useAtomValue } from "@effect-atom/atom-react"
 import { AiError, LanguageModel, Prompt } from "@effect/ai"
 import { OpenRouterLanguageModel } from "@effect/ai-openrouter"
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router"
-import { makeLinkHref } from "crosshatch"
+import { LinkConfig } from "crosshatch"
 import { eq } from "drizzle-orm"
 import { Cause, ConfigError, Effect, Fiber, Layer, Match } from "effect"
 import { HandCoins, PanelLeftIcon, Plus } from "lucide-react"
@@ -109,22 +109,26 @@ const sessionButtonOnClickAtom = runtime.fn<void>()(Effect.fn(function*(_, get) 
   if (open) {
     get.set(installationDialogOpenAtom, false)
   } else {
-    const installation = yield* get.result(installationAtom)
-    Match.value(installation).pipe(Match.tagsExhaustive({
-      Anonymous: ({ challengeId, nonce }) => {
-        location.href = makeLinkHref({
-          challengeId,
+    const linkStatus = yield* get.result(linkStatusAtom)
+    yield* Match.value(linkStatus).pipe(Match.tagsExhaustive({
+      Anonymous: ({ linkStatus }) =>
+        LinkConfig.toHref({
+          challenge: linkStatus,
           suggestedAllowance: {
             window: "Week",
             amount: BigInt(10),
           },
-          redirectHref: location.href,
-          nonce,
-        })
-      },
-      Linked: () => {
-        get.set(installationDialogOpenAtom, true)
-      },
+          referrer: location.href,
+          context: { _tag: "TopLevel" },
+        }).pipe(
+          Effect.andThen((v) => {
+            location.href = v
+          }),
+        ),
+      Linked: () =>
+        Effect.sync(() => {
+          get.set(installationDialogOpenAtom, true)
+        }),
     }))
   }
 }))
