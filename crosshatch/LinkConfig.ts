@@ -1,5 +1,5 @@
 import { makeId } from "@crosshatch/util"
-import { Effect, Encoding, flow, pipe, Schema as S } from "effect"
+import { Effect, Encoding, flow, Schema as S } from "effect"
 import { appUrl } from "./env.ts"
 
 export const ChallengeIdTypeId = Symbol()
@@ -35,20 +35,21 @@ export const encode = flow(
   )),
 )
 
-export const decode = (configEncoded: string) =>
-  pipe(
-    configEncoded,
-    Encoding.decodeHexString,
-    Effect.flatMap(flow(
-      JSON.parse,
-      S.decodeUnknown(LinkConfig),
-    )),
-  )
+export const decode = flow(
+  Encoding.decodeHexString,
+  Effect.flatMap(flow(
+    JSON.parse,
+    S.decodeUnknown(LinkConfig),
+  )),
+)
 
-export const toHref = Effect.fn(function*(config: typeof LinkConfig.Type) {
-  const result = new URL("id", appUrl)
-  result.searchParams.set("c", yield* encode(config))
-  return result.href
-})
+export const toHref = flow(
+  encode,
+  Effect.map((c) => {
+    const result = new URL("id", appUrl)
+    result.searchParams.set("c", c)
+    return result.href
+  }),
+)
 
 export const SearchParams = S.Struct({ c: S.String })
