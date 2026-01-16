@@ -2,11 +2,11 @@ import { Rpc, RpcGroup } from "@effect/rpc"
 import type { PaymentPayload, PaymentRequired } from "@x402/core/types"
 import { Schema as S } from "effect"
 import { DeclinedDecision } from "./DeclinedDecision.ts"
-import * as LinkConfig from "./LinkConfig.ts"
+import * as LinkConfig from "./IdConfig.ts"
 
 export const EnclaveLinkSuccess = S.Union(
   S.TaggedStruct("Anonymous", {
-    linkStatus: LinkConfig.LinkChallenge,
+    challenge: LinkConfig.LinkChallenge,
   }),
   S.TaggedStruct("Linked", {}),
 )

@@ -17,7 +17,7 @@ import { useAtom, useAtomSet, useAtomValue } from "@effect-atom/atom-react"
 import { AiError, LanguageModel, Prompt } from "@effect/ai"
 import { OpenRouterLanguageModel } from "@effect/ai-openrouter"
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router"
-import { LinkConfig } from "crosshatch"
+import { IdConfig } from "crosshatch"
 import { eq } from "drizzle-orm"
 import { Cause, ConfigError, Effect, Fiber, Layer, Match } from "effect"
 import { HandCoins, PanelLeftIcon, Plus } from "lucide-react"
@@ -111,15 +111,15 @@ const sessionButtonOnClickAtom = runtime.fn<void>()(Effect.fn(function*(_, get) 
   } else {
     const linkStatus = yield* get.result(linkStatusAtom)
     yield* Match.value(linkStatus).pipe(Match.tagsExhaustive({
-      Anonymous: ({ linkStatus }) =>
-        LinkConfig.toHref({
-          challenge: linkStatus,
+      Anonymous: ({ challenge }) =>
+        IdConfig.toHref({
+          challenge,
           suggestedAllowance: {
             window: "Week",
             amount: BigInt(10),
           },
           referrer: location.href,
-          context: { _tag: "TopLevel" },
+          originContext: { _tag: "TopLevel" },
         }).pipe(
           Effect.andThen((v) => {
             location.href = v

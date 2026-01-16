@@ -5,6 +5,11 @@ import { appUrl } from "./env.ts"
 export const ChallengeIdTypeId = Symbol()
 export const ChallengeId = makeId(ChallengeIdTypeId, "LinkChallengeId")
 
+export const LinkChallenge = S.Struct({
+  id: ChallengeId,
+  nonce: S.UUID,
+})
+
 export const AllowanceWindow = S.Literal("Day", "Week", "Month", "Year", "Ever")
 
 export const Allowance = S.Struct({
@@ -12,23 +17,18 @@ export const Allowance = S.Struct({
   amount: S.BigInt,
 })
 
-export const LinkChallenge = S.Struct({
-  id: ChallengeId,
-  nonce: S.UUID,
-})
-
-export const LinkConfig = S.Struct({
-  challenge: LinkChallenge,
-  context: S.Union(
+export const IdConfig = S.Struct({
+  originContext: S.Union(
     S.TaggedStruct("TopLevel", {}),
     S.TaggedStruct("Embedded", {}),
   ),
+  challenge: LinkChallenge.pipe(S.optional),
   referrer: S.String.pipe(S.optional),
   suggestedAllowance: Allowance.pipe(S.optional),
 })
 
 export const encode = flow(
-  S.encode(LinkConfig),
+  S.encode(IdConfig),
   Effect.map(flow(
     JSON.stringify,
     Encoding.encodeHex,
@@ -39,7 +39,7 @@ export const decode = flow(
   Encoding.decodeHexString,
   Effect.flatMap(flow(
     JSON.parse,
-    S.decodeUnknown(LinkConfig),
+    S.decodeUnknown(IdConfig),
   )),
 )
 
