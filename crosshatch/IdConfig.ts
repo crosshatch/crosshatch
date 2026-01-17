@@ -18,9 +18,12 @@ export const Allowance = S.Struct({
 })
 
 export const IdConfig = S.Struct({
-  originContext: S.Union(
-    S.TaggedStruct("TopLevel", {}),
+  presentation: S.Union(
+    S.TaggedStruct("TopLevel", {
+      referrer: S.String,
+    }),
     S.TaggedStruct("Embedded", {}),
+    S.TaggedStruct("Popup", {}),
   ),
   challenge: LinkChallenge.pipe(S.optional),
   referrer: S.String.pipe(S.optional),

@@ -118,8 +118,10 @@ const sessionButtonOnClickAtom = runtime.fn<void>()(Effect.fn(function*(_, get) 
             window: "Week",
             amount: BigInt(10),
           },
-          referrer: location.href,
-          originContext: { _tag: "TopLevel" },
+          presentation: {
+            _tag: "TopLevel",
+            referrer: location.href,
+          },
         }).pipe(
           Effect.andThen((v) => {
             location.href = v
