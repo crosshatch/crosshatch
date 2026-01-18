@@ -1,7 +1,7 @@
 import { BrowserWorker } from "@effect/platform-browser"
 import { Deferred, Effect, Layer, Option, Schema as S } from "effect"
 import { appUrl } from "./env.ts"
-import { EnclaveProxyReady, ParentPortReady } from "./messages.ts"
+import { EnclaveProxyReady, SatelliteReady } from "./messages.ts"
 
 const style = Object
   .entries({
@@ -21,7 +21,7 @@ const style = Object
   .map(([k, v]) => `${k}: ${v};`)
   .join(" ")
 
-export const EnclaveWorkerLive = Effect.gen(function*() {
+export const EnclaveProxyWorkerLive = Effect.gen(function*() {
   const enclaveReady = yield* Deferred.make<void>()
   addEventListener("message", function f({ data, origin }: MessageEvent) {
     if (origin === appUrl && Option.isSome(S.decodeUnknownOption(EnclaveProxyReady)(data))) {
@@ -32,7 +32,7 @@ export const EnclaveWorkerLive = Effect.gen(function*() {
   const iframe = document.createElement("iframe")
   Object.assign(iframe, {
     sandbox: "allow-scripts allow-same-origin",
-    src: `${appUrl}/enclave`,
+    src: `${appUrl}/proxy`,
     width: 1,
     height: 1,
     style,
@@ -41,7 +41,7 @@ export const EnclaveWorkerLive = Effect.gen(function*() {
   yield* Deferred.await(enclaveReady)
   const context = yield* Effect.fromNullable(iframe.contentWindow)
   const channel = new MessageChannel()
-  context.postMessage(new ParentPortReady(), "*", [channel.port2])
+  context.postMessage(new SatelliteReady(), "*", [channel.port2])
   return BrowserWorker.layerPlatform(() => channel.port1)
 }).pipe(
   Layer.unwrapEffect,

@@ -1,20 +1,9 @@
-import { LoggerLive } from "@crosshatch/util"
-import { Atom, Result } from "@effect-atom/atom-react"
-import type { WorkerError } from "@effect/platform"
-import type { EnclaveLinkSuccess } from "crosshatch"
-import { Cause, Layer } from "effect"
-import { EnclaveClient } from "./EnclaveClient.ts"
+// TODO: any way to circumvent?
+import type { Atom as _0, Result as _1 } from "@effect-atom/atom-react"
+import { EnclaveProxyClient } from "./EnclaveProxyClient.ts"
 
-export const linkStatusAtom: Atom.Atom<
-  Result.Result<
-    typeof EnclaveLinkSuccess.Type,
-    WorkerError.WorkerError | Cause.NoSuchElementException
-  >
-> = EnclaveClient.query("link", void 0)
+export const challengeAtom = EnclaveProxyClient.query("challenge", void 0)
 
-export const unlinkAtom = EnclaveClient.mutation("unlink")
+export const unlinkAtom = EnclaveProxyClient.mutation("unlink")
 
-export const runtime = Atom.runtime(Layer.mergeAll(
-  LoggerLive,
-  EnclaveClient.layer,
-))
+export const paymentAtom = EnclaveProxyClient.mutation("payment")

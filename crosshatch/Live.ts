@@ -1,6 +1,6 @@
 import { Layer } from "effect"
-import { EnclaveClient } from "./EnclaveClient.ts"
+import { EnclaveProxyClient } from "./EnclaveClient.ts"
 
 export const Live = Layer.mergeAll(
-  EnclaveClient.Default,
+  EnclaveProxyClient.Default,
 )

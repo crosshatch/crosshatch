@@ -1,5 +1,6 @@
 import { Effect, Schema as S, Struct } from "effect"
 
+// TODO: delete
 export const unwrap = Effect.fn(function*(cred: Credential | null) {
   const cred_ = yield* S.validate(S.instanceOf(PublicKeyCredential))(cred)
   const { id, response } = cred_

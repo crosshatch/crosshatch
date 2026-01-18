@@ -1,7 +1,7 @@
 import { ChatId, chatItems, chats } from "@/schema"
 import { Store } from "@/Store"
 import StoreWorker from "@/StoreWorker.ts?worker"
-import { EnclaveClient } from "@crosshatch/react"
+import { EnclaveProxyClient } from "@crosshatch/react"
 import { LoggerLive } from "@crosshatch/util"
 import { Atom } from "@effect-atom/atom-react"
 import { OpenRouterClient } from "@effect/ai-openrouter"
@@ -14,7 +14,7 @@ import { Config, ConfigProvider, Effect, Layer, Schema as S } from "effect"
 export const runtime = Atom.runtime(
   Layer.mergeAll(
     LoggerLive,
-    EnclaveClient.layer,
+    EnclaveProxyClient.layer,
     Store.layer(StoreWorker),
     OpenRouterClient.layerConfig({
       apiKey: Config.redacted("VITE_PUBLIC_OPEN_ROUTER_API_KEY"),

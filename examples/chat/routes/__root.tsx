@@ -5,7 +5,7 @@ import { router } from "@/router"
 import { ChatId, chatItems, chats, embeddings } from "@/schema"
 import { Store } from "@/Store"
 import { tx } from "@/tx"
-import { InstallationDialog, installationDialogOpenAtom, linkStatusAtom } from "@crosshatch/react"
+import { challengeAtom, InstallationDialog, installationDialogOpenAtom } from "@crosshatch/react"
 import { chatAtom } from "@crosshatch/ui/atoms"
 import * as AtomUtil from "@crosshatch/ui/AtomUtil"
 import { Button } from "@crosshatch/ui/components/button"
@@ -17,9 +17,9 @@ import { useAtom, useAtomSet, useAtomValue } from "@effect-atom/atom-react"
 import { AiError, LanguageModel, Prompt } from "@effect/ai"
 import { OpenRouterLanguageModel } from "@effect/ai-openrouter"
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router"
-import { IdConfig } from "crosshatch"
+import { linkHref } from "crosshatch"
 import { eq } from "drizzle-orm"
-import { Cause, ConfigError, Effect, Fiber, Layer, Match } from "effect"
+import { Cause, ConfigError, Effect, Fiber, Layer, Option } from "effect"
 import { HandCoins, PanelLeftIcon, Plus } from "lucide-react"
 import { ThemeProvider } from "next-themes"
 import { Suspense } from "react"
@@ -109,29 +109,23 @@ const sessionButtonOnClickAtom = runtime.fn<void>()(Effect.fn(function*(_, get) 
   if (open) {
     get.set(installationDialogOpenAtom, false)
   } else {
-    const linkStatus = yield* get.result(linkStatusAtom)
-    yield* Match.value(linkStatus).pipe(Match.tagsExhaustive({
-      Anonymous: ({ challenge }) =>
-        IdConfig.toHref({
-          challenge,
-          suggestedAllowance: {
-            window: "Week",
-            amount: BigInt(10),
-          },
-          presentation: {
-            _tag: "TopLevel",
-            referrer: location.href,
-          },
-        }).pipe(
-          Effect.andThen((v) => {
-            location.href = v
-          }),
-        ),
-      Linked: () =>
+    const challenge = yield* get.result(challengeAtom)
+    yield* Option.match(challenge, {
+      onSome: ({ id }) =>
+        linkHref({
+          id,
+          window: "Week",
+          amount: BigInt(10),
+          presentation: "Redirect",
+          referrer: location.href,
+        }).pipe(Effect.andThen((v) => {
+          location.href = v
+        })),
+      onNone: () =>
         Effect.sync(() => {
           get.set(installationDialogOpenAtom, true)
         }),
-    }))
+    })
   }
 }))
 

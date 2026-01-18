@@ -1,4 +1,4 @@
-import { linkStatusAtom, unlinkAtom } from "@crosshatch/react"
+import { challengeAtom, unlinkAtom } from "@crosshatch/react"
 import { Button } from "@crosshatch/ui/components/button"
 import { Dialog, DialogContent } from "@crosshatch/ui/components/dialog"
 import { Separator } from "@crosshatch/ui/components/separator"
@@ -12,12 +12,12 @@ export const installationDialogOpenAtom = Atom.make(false).pipe(
 export const InstallationDialog = ({ children }: { children: React.ReactNode }) => {
   const rotate = useAtomSet(unlinkAtom)
   const [open, onOpenChange] = useAtom(installationDialogOpenAtom)
-  const { value } = useAtomSuspense(linkStatusAtom)
+  const { value } = useAtomSuspense(challengeAtom)
   return (
     <Dialog {...{ open, onOpenChange }}>
       {children}
       <DialogContent>
-        {value._tag === "Linked" && (
+        {value._tag === "Some" && (
           <div className="flex flex-col">
             <div className="flex flex-col gap-2 p-4">
               <Separator className="my-2" />
