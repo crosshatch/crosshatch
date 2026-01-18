@@ -1,5 +1,5 @@
 import { Schema as S } from "effect"
 
-export class EnclaveProxyReady extends S.TaggedClass<EnclaveProxyReady>("EnclaveProxyReady")("EnclaveProxyReady", {}) {}
+export class BridgeReady extends S.TaggedClass<BridgeReady>("BridgeReady")("BridgeReady", {}) {}
 
-export class SatelliteReady extends S.TaggedClass<SatelliteReady>("SatelliteReady")("SatelliteReady", {}) {}
+export class AppReady extends S.TaggedClass<AppReady>("AppReady")("AppReady", {}) {}
