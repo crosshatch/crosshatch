@@ -14,7 +14,6 @@ export const worker = (key: string, migrations: Array<typeof Migration.Type>) =>
   worker_({
     init: () =>
       Effect.gen(function*() {
-        yield* Effect.log(`initialize ${key} worker`)
         const client = yield* Effect.tryPromise(() =>
           PGlite.create({
             extensions: { uuid_ossp, fuzzystrmatch, lo, vector },
@@ -27,6 +26,7 @@ export const worker = (key: string, migrations: Array<typeof Migration.Type>) =>
           migrations,
           enable: ["uuid-ossp", "vector", "fuzzystrmatch", "lo"],
         })
+        yield* Effect.log(`${key} worker initialized`)
         return client
       }).pipe(
         Effect.provide([
