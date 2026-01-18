@@ -1,14 +1,14 @@
 import { prefix } from "@crosshatch/util"
 import { RpcClient } from "@effect/rpc"
 import { Effect, Layer } from "effect"
-import { EnclaveProxy } from "./EnclaveProxy.ts"
-import { EnclaveProxyWorkerLive } from "./EnclaveWorkerLive.ts"
+import { Bridge } from "./Bridge.ts"
+import { BridgeWorkerLive } from "./BridgeWorkerLive.ts"
 
-export class EnclaveProxyClient extends Effect.Service<EnclaveProxyClient>()(prefix("kit/EnclaveClient"), {
-  scoped: RpcClient.make(EnclaveProxy),
+export class BridgeClient extends Effect.Service<BridgeClient>()(prefix("kit/BridgeClient"), {
+  scoped: RpcClient.make(Bridge),
   dependencies: [
     RpcClient.layerProtocolWorker({ size: 1 }).pipe(
-      Layer.provide(EnclaveProxyWorkerLive),
+      Layer.provide(BridgeWorkerLive),
     ),
   ],
 }) {}

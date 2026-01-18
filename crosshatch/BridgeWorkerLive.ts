@@ -21,7 +21,7 @@ const style = Object
   .map(([k, v]) => `${k}: ${v};`)
   .join(" ")
 
-export const EnclaveProxyWorkerLive = Effect.gen(function*() {
+export const BridgeWorkerLive = Effect.gen(function*() {
   const enclaveReady = yield* Deferred.make<void>()
   addEventListener("message", function f({ data, origin }: MessageEvent) {
     if (origin === appUrl && Option.isSome(S.decodeUnknownOption(EnclaveProxyReady)(data))) {
@@ -32,7 +32,7 @@ export const EnclaveProxyWorkerLive = Effect.gen(function*() {
   const iframe = document.createElement("iframe")
   Object.assign(iframe, {
     sandbox: "allow-scripts allow-same-origin",
-    src: `${appUrl}/proxy`,
+    src: `${appUrl}/bridge`,
     width: 1,
     height: 1,
     style,

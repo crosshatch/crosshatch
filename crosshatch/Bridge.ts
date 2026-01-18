@@ -4,7 +4,7 @@ import { Schema as S } from "effect"
 import { DeclinedDecision } from "./DeclinedDecision.ts"
 import { LinkChallenge } from "./LinkChallenge.ts"
 
-export class EnclaveProxy extends RpcGroup.make(
+export class Bridge extends RpcGroup.make(
   Rpc.make("challenge", {
     success: LinkChallenge.pipe(S.Option),
   }),
