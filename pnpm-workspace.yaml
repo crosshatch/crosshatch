@@ -68,8 +68,8 @@ catalog:
   date-fns: ^4.1.0
   dedent: ^1.7.0
   dprint: ^0.50.2
-  drizzle-orm: ^0.45.1
-  drizzle-kit: ^0.31.8
+  drizzle-orm: 1.0.0-beta.11-05230d9
+  drizzle-kit: 1.0.0-beta.11-05230d9
   micro-key-producer: ^0.8.2
   postgres: ^3.4.7
   effect: ^3.19.10

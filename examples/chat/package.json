@@ -12,6 +12,7 @@
   "dependencies": {
     "crosshatch": "workspace:*",
     "@crosshatch/drizzle": "workspace:*",
+    "@crosshatch/effect-pglite": "workspace:*",
     "@crosshatch/react": "workspace:*",
     "@crosshatch/store": "workspace:*",
     "@crosshatch/ui": "workspace:*",
@@ -21,6 +22,8 @@
     "@effect/ai-openrouter": "catalog:",
     "@effect/platform": "catalog:",
     "@effect/platform-browser": "catalog:",
+    "@effect/sql": "catalog:",
+    "@effect/sql-pg": "catalog:",
     "@effect-atom/atom-react": "catalog:",
     "@tanstack/react-router": "catalog:",
     "babel-plugin-react-compiler": "catalog:",

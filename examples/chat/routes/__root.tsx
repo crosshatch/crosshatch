@@ -1,10 +1,11 @@
 import { chatItemsAtom, currentModelIdAtom, modelIdsAtom, runtime } from "@/atoms"
 import { ModelSelect } from "@/components/model-select"
 import { SidebarInner } from "@/components/sidebar-inner"
+import { Drizzle } from "@/Drizzle"
+import { ChatId } from "@/ids"
 import { router } from "@/router"
-import { ChatId, chatItems, chats, embeddings } from "@/schema"
-import { Store } from "@/Store"
-import { tx } from "@/tx"
+import { chatItems, chats, embeddings } from "@/schema"
+import { txNonNullable } from "@crosshatch/drizzle"
 import { challengeAtom, InstallationDialog, installationDialogOpenAtom } from "@crosshatch/react"
 import { chatAtom } from "@crosshatch/ui/atoms"
 import * as AtomUtil from "@crosshatch/ui/AtomUtil"
@@ -12,14 +13,15 @@ import { Button } from "@crosshatch/ui/components/button"
 import { ChatControls } from "@crosshatch/ui/components/chat-controls"
 import { LoaderView } from "@crosshatch/ui/components/loader-view"
 import { Sidebar, SidebarInset, SidebarProvider, useSidebar } from "@crosshatch/ui/components/sidebar"
-import { embed, unwrapE0 } from "@crosshatch/util"
+import { e0, embed } from "@crosshatch/util"
 import { useAtom, useAtomSet, useAtomValue } from "@effect-atom/atom-react"
 import { AiError, LanguageModel, Prompt } from "@effect/ai"
 import { OpenRouterLanguageModel } from "@effect/ai-openrouter"
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router"
 import { linkHref } from "crosshatch"
 import { eq } from "drizzle-orm"
-import { Cause, ConfigError, Effect, Fiber, Layer, Option } from "effect"
+import { TaggedDrizzleQueryError } from "drizzle-orm/effect-core"
+import { Effect, Fiber, Layer, Option } from "effect"
 import { HandCoins, PanelLeftIcon, Plus } from "lucide-react"
 import { ThemeProvider } from "next-themes"
 import { Suspense } from "react"
@@ -140,9 +142,9 @@ export const submitAtom = runtime.fn<typeof ChatId.Type | undefined>()(Effect.fn
   const items = yield* get.result(chatItemsAtom(chatId))
   text = text.trim()
   if (!text) return
-
+  const _ = yield* Drizzle
   let titleFiber:
-    | Fiber.RuntimeFiber<void, Cause.UnknownException | AiError.AiError | ConfigError.ConfigError>
+    | Fiber.RuntimeFiber<void, TaggedDrizzleQueryError | AiError.AiError>
     | undefined
   if (!chatId) {
     const id = ChatId.make(crypto.randomUUID())
@@ -154,8 +156,7 @@ export const submitAtom = runtime.fn<typeof ChatId.Type | undefined>()(Effect.fn
         params: { chatId },
       })
     )
-    const _ = yield* Store._
-    yield* Store.f(_.insert(chats).values({ id }))
+    yield* _.insert(chats).values({ id })
     titleFiber = yield* Effect.gen(function*() {
       const { text: title } = yield* LanguageModel.generateText({
         prompt: `
@@ -169,7 +170,7 @@ export const submitAtom = runtime.fn<typeof ChatId.Type | undefined>()(Effect.fn
           ${text}
         `,
       })
-      yield* Store.f(_.update(chats).set({ title }).where(eq(chats.id, id)))
+      yield* _.update(chats).set({ title }).where(eq(chats.id, id))
     }).pipe(
       Effect.fork,
     )
@@ -177,20 +178,22 @@ export const submitAtom = runtime.fn<typeof ChatId.Type | undefined>()(Effect.fn
   const userMessage = Prompt.userMessage({
     content: [Prompt.makePart("text", { text })],
   })
-  yield* tx(Effect.fn(function*(_) {
-    const embedding = yield* embed(text)
+  const userMessageEmbedding = yield* embed(text)
+  yield* _.transaction(Effect.fn(function*(_) {
     const [{ id: chatItemId }] = yield* Effect.all([
-      Store.f(
-        _
-          .insert(chatItems).values({
-            chatId,
-            message: userMessage,
-          })
-          .returning(),
-      ).pipe(unwrapE0),
-      Store.f(_.update(chats).set({ updated: new Date() }).where(eq(chats.id, chatId))),
+      _
+        .insert(chatItems).values({
+          chatId,
+          message: userMessage,
+        })
+        .returning()
+        .pipe(e0, txNonNullable),
+      _.update(chats).set({ updated: new Date() }).where(eq(chats.id, chatId)),
     ], { concurrency: "unbounded" })
-    yield* Store.f(_.insert(embeddings).values({ chatItemId, embedding }))
+    yield* _.insert(embeddings).values({
+      chatItemId,
+      embedding: userMessageEmbedding,
+    })
   }))
 
   const inflight = new AbortController()
@@ -201,20 +204,27 @@ export const submitAtom = runtime.fn<typeof ChatId.Type | undefined>()(Effect.fn
   const { text: incoming } = yield* LanguageModel.generateText({
     prompt: [...items.map((v) => v.message), userMessage],
   })
-  yield* tx(Effect.fn(function*(_) {
-    const embedding = yield* embed(incoming)
+  const assistantMessageEmbedding = yield* embed(incoming)
+  yield* _.transaction(Effect.fn(function*(_) {
     const [{ id: chatItemId }] = yield* Effect.all([
-      Store.f(
-        _.insert(chatItems).values({
+      _
+        .insert(chatItems)
+        .values({
           chatId,
           message: Prompt.assistantMessage({
             content: [Prompt.makePart("text", { text: incoming })],
           }),
-        }).returning(),
-      ).pipe(unwrapE0),
-      Store.f(_.update(chats).set({ updated: new Date() }).where(eq(chats.id, chatId))),
+        })
+        .returning()
+        .pipe(e0, txNonNullable),
+      _
+        .update(chats)
+        .set({ updated: new Date() }).where(eq(chats.id, chatId)),
     ], { concurrency: "unbounded" })
-    yield* Store.f(_.insert(embeddings).values({ chatItemId, embedding }))
+    yield* _.insert(embeddings).values({
+      chatItemId,
+      embedding: assistantMessageEmbedding,
+    })
   }))
   AtomUtil.assign(get)(chatAtom(chatId), {
     inflight: undefined,

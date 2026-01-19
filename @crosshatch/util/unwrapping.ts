@@ -1,10 +1,25 @@
 import { Cause, Effect, Types } from "effect"
 
-export const unwrap = <A, E, R>(x: Effect.Effect<A, E, R>) => Effect.flatMap(x, Effect.fromNullable)
+export const e0 = <A, E, R>(x: Effect.Effect<Array<A>, E, R>): Effect.Effect<A | undefined, E, R> =>
+  Effect.map(x, ([v]) => v)
 
-export const unwrapE0 = <A, E, R>(x: Effect.Effect<Array<A>, E, R>) =>
-  Effect.flatMap(x, ([e0]) => Effect.fromNullable(e0))
+export const slice =
+  <N extends number>(n: N) =>
+  <A, E, R>(x: Effect.Effect<Array<A>, E, R>): Effect.Effect<Types.TupleOf<N, A> | undefined, E, R> =>
+    Effect.map(x, (v) => v.length > n ? v.slice(0, n) as never : undefined)
 
+export const nonNullable = <A, E, R>(x: Effect.Effect<A, E, R>) => Effect.flatMap(x, Effect.fromNullable)
+
+export const nullable = <A, E, R>(x: Effect.Effect<A, E, R>) =>
+  Effect.catchTags(x, {
+    NoSuchElementException: () => Effect.succeed(undefined),
+  })
+
+export const nullableError =
+  <C>(c: new() => C) => <A, E, R>(x: Effect.Effect<A, E | Cause.NoSuchElementException, R>) =>
+    x.pipe(Effect.catchTag("NoSuchElementException", () => Effect.fail(new c())))
+
+// TODO: tuple-compatible version
 export const unwrapSlice = <N extends number>(n: N) => <A, E, R>(x: Effect.Effect<Array<A>, E, R>) =>
   Effect.flatMap(
     x,

@@ -1,10 +1,7 @@
 import { added, brandedId, message, ordinal, ref, updated } from "@crosshatch/drizzle"
-import { makeId } from "@crosshatch/util"
-import { relations } from "drizzle-orm"
 import { index, pgTable, text, vector } from "drizzle-orm/pg-core"
+import type { ChatIdTypeId, ChatItemIdTypeId, EmbeddingIdTypeId } from "./ids"
 
-export const ChatIdTypeId = Symbol()
-export const ChatId = makeId(ChatIdTypeId, "ChatId")
 export const chats = pgTable("chats", {
   id: brandedId<typeof ChatIdTypeId>(),
   ordinal,
@@ -12,8 +9,6 @@ export const chats = pgTable("chats", {
   updated,
 })
 
-export const ChatItemIdTypeId = Symbol()
-export const ChatItemId = makeId(ChatItemIdTypeId, "ChatItemId")
 export const chatItems = pgTable("chat_items", {
   id: brandedId<typeof ChatItemIdTypeId>(),
   ordinal,
@@ -22,8 +17,6 @@ export const chatItems = pgTable("chat_items", {
   added,
 })
 
-export const EmbeddingIdTypeId = Symbol()
-export const EmbeddingId = makeId(EmbeddingIdTypeId, "EmbeddingId")
 export const embeddings = pgTable("embeddings", {
   id: brandedId<typeof EmbeddingIdTypeId>(),
   embedding: vector("embedding", { dimensions: 384 }),
@@ -31,10 +24,3 @@ export const embeddings = pgTable("embeddings", {
 }, (_) => [
   index("embeddings_embedding_index").using("hnsw", _.embedding.op("vector_cosine_ops")),
 ])
-
-export const embeddingsRelations = relations(embeddings, ({ one }) => ({
-  chatItem: one(chatItems, {
-    fields: [embeddings.chatItemId],
-    references: [chatItems.id],
-  }),
-}))

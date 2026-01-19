@@ -1,5 +1,4 @@
-import type { NotNull } from "drizzle-orm"
-import { type PgColumnBuilderBase, type PgEnum, pgEnum, type PgEnumColumnBuilderInitial } from "drizzle-orm/pg-core"
+import { type AnyPgColumnBuilder, type PgEnum, pgEnum, PgEnumColumnBuilder, type SetNotNull } from "drizzle-orm/pg-core"
 import { absurd, Effect, Schema as S, Types } from "effect"
 import { Base, type BaseEncoded, type BaseType, ColumnsCommon, type ColumnsConfig } from "./schema_table_common.ts"
 
@@ -22,7 +21,7 @@ export interface TaggedUnionTable<
   readonly columns: <C extends ColumnsConfig<Superset<A>>>(
     columns: C,
   ) => C & ColumnsCommon<B> & {
-    _tag: NotNull<PgEnumColumnBuilderInitial<"_tag", [A["_tag"]]>>
+    _tag: SetNotNull<PgEnumColumnBuilder<[A["_tag"]]>>
   }
   readonly fromRow: <K extends Types.Tags<A> = Types.Tags<A>>(
     _tag?: K | undefined,
@@ -77,7 +76,7 @@ export const make = <
   return {
     tag,
     schema: Object.assign(base, {
-      columns: (columns: Record<string, PgColumnBuilderBase>) => ({
+      columns: (columns: Record<string, AnyPgColumnBuilder>) => ({
         _tag: tag("_tag").notNull(),
         ...ColumnsCommon(id),
         ...columns,

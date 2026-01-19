@@ -1,7 +1,7 @@
 import { chatsAtom, deleteChatAtom, renameChatAtom, runtime } from "@/atoms"
+import { Drizzle } from "@/Drizzle"
 import { router } from "@/router"
 import { chatItems, chats, embeddings } from "@/schema"
-import { Store } from "@/Store"
 import { Button } from "@crosshatch/ui/components/button"
 import { CommandItem } from "@crosshatch/ui/components/command"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTrigger } from "@crosshatch/ui/components/dialog"
@@ -56,22 +56,20 @@ const searchResultsAtom = runtime.atom(Effect.fn(function*(get) {
   const text = get(searchInputAtom)
   if (!text) return []
   const embedding = yield* embed(text)
-  const _ = yield* Store._
-  return yield* Store.f(
-    _
-      .select({
-        id: chatItems.id,
-        chatId: chatItems.chatId,
-        message: chatItems.message,
-        similarity: cosineDistance(embeddings.embedding, embedding),
-        title: chats.title,
-      })
-      .from(chatItems)
-      .innerJoin(embeddings, eq(embeddings.chatItemId, chatItems.id))
-      .leftJoin(chats, eq(chatItems.chatId, chats.id))
-      .orderBy((fields) => fields.similarity)
-      .limit(5),
-  )
+  const _ = yield* Drizzle
+  return yield* _
+    .select({
+      id: chatItems.id,
+      chatId: chatItems.chatId,
+      message: chatItems.message,
+      similarity: cosineDistance(embeddings.embedding, embedding),
+      title: chats.title,
+    })
+    .from(chatItems)
+    .innerJoin(embeddings, eq(embeddings.chatItemId, chatItems.id))
+    .leftJoin(chats, eq(chatItems.chatId, chats.id))
+    .orderBy((fields) => fields.similarity)
+    .limit(5)
 })).pipe(
   Atom.debounce("250  millis"),
   Atom.keepAlive,

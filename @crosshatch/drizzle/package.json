@@ -27,6 +27,7 @@
     "./package.json": "./package.json"
   },
   "peerDependencies": {
+    "@crosshatch/effect-pglite": "workspace:*",
     "@crosshatch/util": "workspace:*",
     "@effect/ai": "catalog:",
     "drizzle-orm": "catalog:"

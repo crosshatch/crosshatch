@@ -1,4 +1,4 @@
-import type { PgColumnBuilderBase } from "drizzle-orm/pg-core"
+import type { AnyPgColumnBuilder } from "drizzle-orm/pg-core"
 import { Schema as S } from "effect"
 import { Base, type BaseEncoded, type BaseType, ColumnsCommon, type ColumnsConfig } from "./schema_table_common.ts"
 
@@ -11,5 +11,5 @@ export const make = <B extends symbol, A, I, R>(
   schema: S.Schema<A, I, R>,
 ): StructTable<B, A, I, R> =>
   Object.assign(Base(id).pipe(S.extend(schema)), {
-    columns: (columns: Record<string, PgColumnBuilderBase>) => ({ ...ColumnsCommon(id), ...columns }),
+    columns: (columns: Record<string, AnyPgColumnBuilder>) => ({ ...ColumnsCommon(id), ...columns }),
   }) as never

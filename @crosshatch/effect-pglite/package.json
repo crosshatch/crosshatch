@@ -1,15 +1,15 @@
 {
-  "name": "@crosshatch/store",
+  "name": "@crosshatch/effect-pglite",
   "version": "0.1.0-beta.1",
   "type": "module",
   "sideEffects": false,
   "license": "Apache-2.0",
-  "description": "A browser-embedded database toolkit.",
+  "description": "PGlite with the Effect PgClient interface.",
   "homepage": "https://crosshatch.dev",
   "repository": {
     "type": "git",
     "url": "https://github.com/crosshatch/crosshatch.git",
-    "directory": "packages/db"
+    "directory": "@crosshatch/effect-sqlite"
   },
   "bugs": {
     "url": "https://github.com/crosshatch/crosshatch/issues"
@@ -17,31 +17,22 @@
   "private": true,
   "exports": {
     ".": {
-      "import": "./index.ts",
-      "types": "./index.ts"
+      "types": "./index.ts",
+      "default": "./dist/index.js"
     },
-    "./migrations": {
-      "import": "./migrations.d.ts",
-      "types": "./migrations.d.ts"
-    },
-    "./plugin": {
-      "import": "./plugin.ts",
-      "types": "./plugin.ts"
-    },
-    "./worker": {
-      "import": "./worker.ts",
-      "types": "./worker.ts"
+    "./*": {
+      "types": "./*.ts",
+      "default": "./dist/*.js"
     },
     "./package.json": "./package.json"
   },
   "peerDependencies": {
     "@crosshatch/util": "workspace:*",
+    "@effect/sql": "catalog:",
     "@effect/sql-pg": "catalog:",
     "@effect/platform": "catalog:",
     "@effect/platform-browser": "catalog:",
     "@electric-sql/pglite": "catalog:",
-    "vite": "catalog:",
-    "drizzle-orm": "catalog:",
-    "effect": "catalog:"
+    "vite": "catalog:"
   }
 }

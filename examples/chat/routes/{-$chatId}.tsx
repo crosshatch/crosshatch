@@ -1,6 +1,6 @@
 import { MessageList } from "@/components/message-list"
+import { ChatId } from "@/ids"
 import { router } from "@/router"
-import { ChatId } from "@/schema"
 import { LoaderView } from "@crosshatch/ui/components/loader-view"
 import { registerCommand } from "@crosshatch/util"
 import { createFileRoute } from "@tanstack/react-router"

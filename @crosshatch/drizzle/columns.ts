@@ -5,7 +5,7 @@ import { bytea } from "./custom_types.ts"
 export const ref = <K extends string, F extends ReferenceConfig["ref"]>(
   id: K,
   f: F,
-  a?: ReferenceConfig["actions"] | undefined,
+  a?: ReferenceConfig["config"] | undefined,
 ) => uuid(id).$type<ReturnType<F>["_"]["data"]>().references(f, a)
 
 export const brandedId = <B extends symbol>() =>

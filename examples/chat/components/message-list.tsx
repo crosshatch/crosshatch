@@ -1,6 +1,6 @@
 import { chatItemsAtom } from "@/atoms"
+import { ChatId } from "@/ids"
 import { Route } from "@/routes/{-$chatId}"
-import { ChatId } from "@/schema"
 import { chatAtom } from "@crosshatch/ui/atoms"
 import { cn } from "@crosshatch/ui/cn"
 import { ChatEventCard } from "@crosshatch/ui/components/chat-event-card"

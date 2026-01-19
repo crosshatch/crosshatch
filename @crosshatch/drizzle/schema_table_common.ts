@@ -1,9 +1,21 @@
-import type { PgColumnBuilderBase } from "drizzle-orm/pg-core"
+import type { AnyPgColumnBuilder, PgColumnBuilderBrand } from "drizzle-orm/pg-core"
 import { Brand, Schema as S } from "effect"
 import { added, brandedId, updated } from "./columns.ts"
 
+// type WrapArray<T, N extends number> = N extends 1 ? T[]
+//   : N extends 2 ? T[][]
+//   : N extends 3 ? T[][][]
+//   : N extends 4 ? T[][][][]
+//   : N extends 5 ? T[][][][][]
+//   : T
+// type ResolveDimensions<T extends AnyPgColumnBuilder[PgColumnBuilderBrand]> = T["dimensions"] extends 1 | 2 | 3 | 4 | 5
+//   ? WrapArray<T["driverParam"], T["dimensions"]> | string
+//   : T["driverParam"]
+
 export type ColumnsConfig<A> = {
-  [K in Exclude<keyof A, "id" | "added" | "updated">]: PgColumnBuilderBase & { _: { data: A[K] } | { $type: A[K] } }
+  [K in Exclude<keyof A, "id" | "added" | "updated">]: AnyPgColumnBuilder & {
+    readonly [PgColumnBuilderBrand]: { data: any } | { $type: any } // TODO: constrain again
+  }
 }
 
 export type ColumnsCommon<B extends symbol> = {
