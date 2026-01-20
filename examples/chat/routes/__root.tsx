@@ -5,6 +5,7 @@ import { Drizzle } from "@/Drizzle"
 import { ChatId } from "@/ids"
 import { router } from "@/router"
 import { chatItems, chats, embeddings } from "@/schema"
+import { tx } from "@/tx"
 import { txNonNullable } from "@crosshatch/drizzle"
 import { challengeAtom, InstallationDialog, installationDialogOpenAtom } from "@crosshatch/react"
 import { chatAtom } from "@crosshatch/ui/atoms"
@@ -20,8 +21,7 @@ import { OpenRouterLanguageModel } from "@effect/ai-openrouter"
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router"
 import { linkHref } from "crosshatch"
 import { eq } from "drizzle-orm"
-import { TaggedDrizzleQueryError } from "drizzle-orm/effect-core"
-import { Effect, Fiber, Layer, Option } from "effect"
+import { Cause, Effect, Fiber, Layer, Option } from "effect"
 import { HandCoins, PanelLeftIcon, Plus } from "lucide-react"
 import { ThemeProvider } from "next-themes"
 import { Suspense } from "react"
@@ -144,7 +144,7 @@ export const submitAtom = runtime.fn<typeof ChatId.Type | undefined>()(Effect.fn
   if (!text) return
   const _ = yield* Drizzle
   let titleFiber:
-    | Fiber.RuntimeFiber<void, TaggedDrizzleQueryError | AiError.AiError>
+    | Fiber.RuntimeFiber<void, Cause.UnknownException | AiError.AiError>
     | undefined
   if (!chatId) {
     const id = ChatId.make(crypto.randomUUID())
@@ -156,7 +156,7 @@ export const submitAtom = runtime.fn<typeof ChatId.Type | undefined>()(Effect.fn
         params: { chatId },
       })
     )
-    yield* _.insert(chats).values({ id })
+    yield* Effect.tryPromise(() => _.insert(chats).values({ id }))
     titleFiber = yield* Effect.gen(function*() {
       const { text: title } = yield* LanguageModel.generateText({
         prompt: `
@@ -170,7 +170,7 @@ export const submitAtom = runtime.fn<typeof ChatId.Type | undefined>()(Effect.fn
           ${text}
         `,
       })
-      yield* _.update(chats).set({ title }).where(eq(chats.id, id))
+      yield* Effect.tryPromise(() => _.update(chats).set({ title }).where(eq(chats.id, id)))
     }).pipe(
       Effect.fork,
     )
@@ -179,21 +179,26 @@ export const submitAtom = runtime.fn<typeof ChatId.Type | undefined>()(Effect.fn
     content: [Prompt.makePart("text", { text })],
   })
   const userMessageEmbedding = yield* embed(text)
-  yield* _.transaction(Effect.fn(function*(_) {
+  yield* tx(Effect.fn(function*(_) {
     const [{ id: chatItemId }] = yield* Effect.all([
-      _
-        .insert(chatItems).values({
-          chatId,
-          message: userMessage,
-        })
-        .returning()
-        .pipe(e0, txNonNullable),
-      _.update(chats).set({ updated: new Date() }).where(eq(chats.id, chatId)),
+      Effect.promise(() =>
+        _
+          .insert(chatItems).values({
+            chatId,
+            message: userMessage,
+          })
+          .returning()
+      ).pipe(e0, txNonNullable),
+      Effect.promise(
+        () => _.update(chats).set({ updated: new Date() }).where(eq(chats.id, chatId)),
+      ),
     ], { concurrency: "unbounded" })
-    yield* _.insert(embeddings).values({
-      chatItemId,
-      embedding: userMessageEmbedding,
-    })
+    yield* Effect.promise(() =>
+      _.insert(embeddings).values({
+        chatItemId,
+        embedding: userMessageEmbedding,
+      })
+    )
   }))
 
   const inflight = new AbortController()
@@ -205,26 +210,31 @@ export const submitAtom = runtime.fn<typeof ChatId.Type | undefined>()(Effect.fn
     prompt: [...items.map((v) => v.message), userMessage],
   })
   const assistantMessageEmbedding = yield* embed(incoming)
-  yield* _.transaction(Effect.fn(function*(_) {
+  yield* tx(Effect.fn(function*(_) {
     const [{ id: chatItemId }] = yield* Effect.all([
-      _
-        .insert(chatItems)
-        .values({
-          chatId,
-          message: Prompt.assistantMessage({
-            content: [Prompt.makePart("text", { text: incoming })],
-          }),
-        })
-        .returning()
-        .pipe(e0, txNonNullable),
-      _
-        .update(chats)
-        .set({ updated: new Date() }).where(eq(chats.id, chatId)),
+      Effect.tryPromise(() =>
+        _
+          .insert(chatItems)
+          .values({
+            chatId,
+            message: Prompt.assistantMessage({
+              content: [Prompt.makePart("text", { text: incoming })],
+            }),
+          })
+          .returning()
+      ).pipe(e0, txNonNullable),
+      Effect.tryPromise(() =>
+        _
+          .update(chats)
+          .set({ updated: new Date() }).where(eq(chats.id, chatId))
+      ),
     ], { concurrency: "unbounded" })
-    yield* _.insert(embeddings).values({
-      chatItemId,
-      embedding: assistantMessageEmbedding,
-    })
+    yield* Effect.tryPromise(() =>
+      _.insert(embeddings).values({
+        chatItemId,
+        embedding: assistantMessageEmbedding,
+      })
+    )
   }))
   AtomUtil.assign(get)(chatAtom(chatId), {
     inflight: undefined,

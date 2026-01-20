@@ -7,7 +7,6 @@
   "include": ["."],
   "exclude": ["dist"],
   "references": [
-    { "path": "../effect-pglite" },
     { "path": "../util" }
   ]
 }

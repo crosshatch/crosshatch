@@ -1,17 +1,16 @@
-import { chatItems, chats } from "@/schema"
+import { chats } from "@/schema"
 import Worker from "@/worker.ts?worker"
-import { liveQuery } from "@crosshatch/drizzle/pglite/index"
-import { PgliteClient } from "@crosshatch/effect-pglite"
 import { BridgeClient } from "@crosshatch/react"
-import { LoggerLive } from "@crosshatch/util"
+import { PgliteClient } from "@crosshatch/store"
+import { access, LoggerLive } from "@crosshatch/util"
 import { Atom } from "@effect-atom/atom-react"
 import { OpenRouterClient } from "@effect/ai-openrouter"
 import { FetchHttpClient } from "@effect/platform"
 import { BrowserKeyValueStore } from "@effect/platform-browser"
 import { fetch } from "crosshatch"
 import { desc, eq, sql } from "drizzle-orm"
-import { Config, ConfigProvider, Effect, Layer, Schema as S } from "effect"
-import { Drizzle } from "./Drizzle"
+import { Array, Config, ConfigProvider, Effect, Layer, Option, Schema as S } from "effect"
+import { Drizzle, latest } from "./Drizzle"
 import type { ChatId } from "./ids"
 
 export const runtime = Atom.runtime(
@@ -19,7 +18,7 @@ export const runtime = Atom.runtime(
     LoggerLive,
     BridgeClient.layer,
     Drizzle.Default.pipe(
-      Layer.provideMerge(PgliteClient.layerWorker(Worker)),
+      Layer.provideMerge(PgliteClient.layer(Worker)),
     ),
     OpenRouterClient.layerConfig({
       apiKey: Config.redacted("VITE_PUBLIC_OPEN_ROUTER_API_KEY"),
@@ -40,17 +39,18 @@ export const runtime = Atom.runtime(
   ),
 )
 
-export const q = liveQuery(Drizzle)
-
 export const chatsAtom = runtime.atom(
-  q((_) => _.select().from(chats).orderBy(desc(chats.updated))),
+  latest((_) => {
+    const g = _.select().from(chats).orderBy(desc(chats.updated))
+    return g
+  }),
 ).pipe(
   Atom.keepAlive,
 )
 
 export const deleteChatAtom = runtime.fn<typeof ChatId.Type>()(Effect.fn(function*(chatId) {
   const _ = yield* Drizzle
-  return yield* _.delete(chats).where(eq(chats.id, chatId))
+  return yield* Effect.tryPromise(() => _.delete(chats).where(eq(chats.id, chatId)))
 }))
 
 export const renameChatAtom = runtime.fn<{
@@ -58,27 +58,51 @@ export const renameChatAtom = runtime.fn<{
   title: string
 }>()(Effect.fn(function*({ id, title }) {
   const _ = yield* Drizzle
-  return yield* _.update(chats).set({ title }).where(eq(chats.id, id))
+  return yield* Effect.tryPromise(() => _.update(chats).set({ title }).where(eq(chats.id, id)))
 }))
 
 export const chatItemsAtom = Atom.family((chatId?: typeof ChatId.Type | undefined) =>
   runtime.atom(
-    q((_) =>
-      _.select().from(chatItems).where(
-        chatId ? eq(chatItems.chatId, chatId) : sql`1 = 0`,
-      )
-    ),
+    latest((_) => {
+      console.log(_)
+      return _.query.chatItems.findMany({
+        where: chatId
+          ? { chatId: { eq: chatId } }
+          : { RAW: sql`1 = 0` },
+      })
+    }),
   ).pipe(
     Atom.keepAlive,
   )
 )
 
+const ListModelsSuccess = S.Struct({
+  data: S.Array(S.Struct({
+    id: S.String,
+    name: S.String,
+    supported_parameters: S.Array(S.String),
+    architecture: S.Struct({
+      input_modalities: S.Array(S.String),
+      output_modalities: S.Array(S.String),
+    }),
+  })),
+})
+
 export const modelIdsAtom = runtime.atom(
-  Effect.gen(function*() {
-    const { client } = yield* OpenRouterClient.OpenRouterClient
-    const { data } = yield* client.getModels()
-    return data.map(({ id }) => id)
-  }),
+  Effect.tryPromise(
+    () => fetch("https://openrouter.ai/api/v1/models").then((v) => v.json()),
+  ).pipe(
+    Effect.flatMap(S.decodeUnknown(ListModelsSuccess)),
+    access("data"),
+    Effect.map(
+      Array.filterMap((v) =>
+        v.supported_parameters.includes("tools") && v.supported_parameters.includes("tool_choice")
+          && !v.supported_parameters.includes("reasoning")
+          ? Option.some(v.id)
+          : Option.none()
+      ),
+    ),
+  ),
 )
 
 const currentModelIdState = Atom.kvs({

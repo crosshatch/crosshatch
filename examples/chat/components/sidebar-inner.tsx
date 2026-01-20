@@ -57,19 +57,21 @@ const searchResultsAtom = runtime.atom(Effect.fn(function*(get) {
   if (!text) return []
   const embedding = yield* embed(text)
   const _ = yield* Drizzle
-  return yield* _
-    .select({
-      id: chatItems.id,
-      chatId: chatItems.chatId,
-      message: chatItems.message,
-      similarity: cosineDistance(embeddings.embedding, embedding),
-      title: chats.title,
-    })
-    .from(chatItems)
-    .innerJoin(embeddings, eq(embeddings.chatItemId, chatItems.id))
-    .leftJoin(chats, eq(chatItems.chatId, chats.id))
-    .orderBy((fields) => fields.similarity)
-    .limit(5)
+  return yield* Effect.tryPromise(() =>
+    _
+      .select({
+        id: chatItems.id,
+        chatId: chatItems.chatId,
+        message: chatItems.message,
+        similarity: cosineDistance(embeddings.embedding, embedding),
+        title: chats.title,
+      })
+      .from(chatItems)
+      .innerJoin(embeddings, eq(embeddings.chatItemId, chatItems.id))
+      .leftJoin(chats, eq(chatItems.chatId, chats.id))
+      .orderBy((fields) => fields.similarity)
+      .limit(5)
+  )
 })).pipe(
   Atom.debounce("250  millis"),
   Atom.keepAlive,

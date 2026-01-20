@@ -20,6 +20,7 @@ catalog:
   "@noble/curves": ^2.0.1
   "@noble/hashes": ^2.0.1
   "@noble/ciphers": ^2.1.1
+  "@openrouter/ai-sdk-provider": ^2.0.0
   "@huggingface/transformers": ^3.8.1
   "@icons-pack/react-simple-icons": ^13.8.0
   "@radix-ui/react-alert-dialog": ^1.1.15
@@ -62,6 +63,7 @@ catalog:
   "@x402/core": ^2.0.0
   "@x402/evm": ^2.0.0
   "@x402/svm": ^2.0.0
+  ai: 6.0.42
   happy-dom: ^20.0.11
   babel-plugin-react-compiler: ^1.0.0
   class-variance-authority: ^0.7.1

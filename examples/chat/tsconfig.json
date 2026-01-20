@@ -4,7 +4,6 @@
     "composite": false,
     "declaration": false,
     "target": "ES2022",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "baseUrl": ".",
     "paths": { "@/*": ["./*"] }
   },
@@ -13,7 +12,6 @@
   "references": [
     { "path": "../../@crosshatch/config" },
     { "path": "../../@crosshatch/drizzle" },
-    { "path": "../../@crosshatch/effect-pglite" },
     { "path": "../../@crosshatch/react" },
     { "path": "../../@crosshatch/store" },
     { "path": "../../@crosshatch/ui" },

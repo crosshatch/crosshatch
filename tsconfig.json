@@ -5,7 +5,6 @@
     { "path": "./@crosshatch/util" },
     { "path": "./@crosshatch/config" },
     { "path": "./@crosshatch/drizzle" },
-    { "path": "./@crosshatch/effect-pglite" },
     { "path": "./@crosshatch/react" },
     { "path": "./@crosshatch/store" },
     { "path": "./@crosshatch/x402" },
