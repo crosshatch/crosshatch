@@ -33,17 +33,14 @@ export const runtime = Atom.runtime(
       ),
     ),
   ).pipe(
-    Layer.provideMerge(
+    Layer.provide(
       Layer.setConfigProvider(ConfigProvider.fromJson(import.meta.env)),
     ),
   ),
 )
 
 export const chatsAtom = runtime.atom(
-  latest((_) => {
-    const g = _.select().from(chats).orderBy(desc(chats.updated))
-    return g
-  }),
+  latest((_) => _.select().from(chats).orderBy(desc(chats.updated))),
 ).pipe(
   Atom.keepAlive,
 )

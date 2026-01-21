@@ -8,23 +8,22 @@ export const AllowanceWindow = S.Literal("Day", "Week", "Month", "Year", "Ever")
 
 export const Allowance = S.Struct({
   window: AllowanceWindow,
-  amount: S.BigInt,
+  amount: S.Number,
 })
 
 export const LinkConfig = S.Struct({
   presentation: Presentation,
-  window: AllowanceWindow,
-  amount: S.BigInt,
   referrer: S.String,
 }).pipe(
   S.extend(LinkChallenge),
+  S.extend(Allowance),
 )
 
 export const linkHref = flow(
   S.encode(LinkConfig),
   Effect.map((c) => {
-    const result = new URL("id", appUrl)
-    Object.entries(c).forEach(([k, v]) => result.searchParams.set(k, v))
+    const result = new URL("link", appUrl)
+    Object.entries(c).forEach(([k, v]) => result.searchParams.set(k, `${v}`))
     return result.href
   }),
 )

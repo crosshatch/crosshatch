@@ -117,7 +117,7 @@ const sessionButtonOnClickAtom = runtime.fn<void>()(Effect.fn(function*(_, get) 
         linkHref({
           id,
           window: "Week",
-          amount: BigInt(10),
+          amount: 10,
           presentation: "Redirect",
           referrer: location.href,
         }).pipe(Effect.andThen((v) => {

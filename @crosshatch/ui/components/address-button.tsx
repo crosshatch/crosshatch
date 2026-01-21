@@ -5,22 +5,26 @@ import { Button } from "./button"
 export const AddressButton = ({
   address,
   className,
+  left,
 }: {
   address: string
   className?: string | undefined
+  left?: React.ReactNode
 }) => {
   const { copy, icon } = useCopy(address)
   return (
     <Button
       className={cn(
-        "flex-row flex justify-between flex-1 w-full font-mono",
+        "flex-row gap-2 w-full",
         className,
       )}
       variant="outline"
       onClick={copy}
     >
-      {address}
-      {icon}
+      {left}
+      <span className="truncate font-mono display sm:hidden">{address.slice(0, 12)}...{address.slice(-10)}</span>
+      <span className="truncate font-mono hidden sm:flex">{address}</span>
+      <div>{icon}</div>
     </Button>
   )
 }
