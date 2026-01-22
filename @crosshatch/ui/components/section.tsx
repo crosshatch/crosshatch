@@ -1,4 +1,4 @@
-import { cn } from "../cn"
+import { cn } from "../cn.ts"
 
 export const Section = ({ className, ...rest }: React.ComponentProps<"div">) => (
   <div className={cn("flex w-full", className)} {...rest} />
