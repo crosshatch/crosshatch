@@ -1,6 +1,6 @@
 import { useTheme } from "next-themes"
-import { cn } from "../cn"
-import { Button } from "./button"
+import { cn } from "../cn.ts"
+import { Button } from "./button.tsx"
 
 export const ThemeToggle = ({
   className,
@@ -27,7 +27,7 @@ export const ThemeToggle = ({
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
-        strokeWidth="2"
+        strokeWidth="1"
         strokeLinecap="round"
         strokeLinejoin="round"
         className="size-5.5"

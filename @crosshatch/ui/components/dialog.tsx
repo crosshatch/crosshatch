@@ -1,5 +1,5 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog"
-import { cn } from "../cn"
+import { cn } from "../cn.ts"
 
 function Dialog({
   ...props

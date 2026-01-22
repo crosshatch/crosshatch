@@ -13,6 +13,7 @@ export const PaidEvent = S.TaggedStruct("PaidEvent", {
   currency: S.String,
   network: S.String,
   address: S.String,
+  host: S.String,
 })
 
 export const UserMessagedEvent = S.TaggedStruct("UserMessaged", {
