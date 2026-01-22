@@ -82,7 +82,7 @@ function RouteComponent() {
 const Header = () => {
   const { toggleSidebar } = useSidebar()
   return (
-    <header className="flex py-2 sticky top-0 right-0 left-0 bg-secondary/75 backdrop-blur-sm items-center border-b p-2 z-50 justify-between">
+    <header className="flex py-2 sticky top-0 right-0 left-0 bg-secondary/75 backdrop-blur-sm items-center border-b p-2 justify-between">
       <Button
         data-sidebar="trigger"
         data-slot="sidebar-trigger"

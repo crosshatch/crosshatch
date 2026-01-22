@@ -1,4 +1,3 @@
-import { u8a } from "@crosshatch/util"
 import { Prompt } from "@effect/ai"
 import { customType } from "drizzle-orm/pg-core"
 import { identity, Schema as S } from "effect"
@@ -13,10 +12,18 @@ export const message = customType<{
 })
 
 export const bytea = customType<{
-  data: u8a
-  driverData: u8a
+  data: Uint8Array
+  driverData: Uint8Array
 }>({
   dataType: () => "bytea",
   toDriver: identity,
-  fromDriver: identity,
+  fromDriver: (v) => {
+    // TODO: why not automatically decoding correctly?
+    if (typeof v === "string") {
+      return S.decodeSync(S.Uint8ArrayFromHex)(
+        (v as string).slice(2),
+      )
+    }
+    return v
+  },
 })
