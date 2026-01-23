@@ -1,3 +1,3 @@
 import { Schema as S } from "effect"
 
-export const Address = S.String
+export const CaAddress = S.String
