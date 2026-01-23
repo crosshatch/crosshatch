@@ -63,6 +63,7 @@ catalog:
   "@x402/core": ^2.0.0
   "@x402/evm": ^2.0.0
   "@x402/svm": ^2.0.0
+  "@tanstack/devtools-vite": ^0.4.1
   ai: 6.0.42
   happy-dom: ^20.0.11
   babel-plugin-react-compiler: ^1.0.0
