@@ -19,7 +19,7 @@ import { useAtom, useAtomSet, useAtomValue } from "@effect-atom/atom-react"
 import { AiError, LanguageModel, Prompt } from "@effect/ai"
 import { OpenRouterLanguageModel } from "@effect/ai-openrouter"
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router"
-import { linkHref } from "crosshatch"
+import { dialog, linkHref } from "crosshatch"
 import { eq } from "drizzle-orm"
 import { Cause, Effect, Fiber, Layer, Option } from "effect"
 import { HandCoins, PanelLeftIcon, Plus } from "lucide-react"
@@ -118,11 +118,11 @@ const sessionButtonOnClickAtom = runtime.fn<void>()(Effect.fn(function*(_, get) 
           id,
           window: "Week",
           amount: 10,
-          presentation: "Redirect",
+          presentation: "Embedded",
           referrer: location.href,
-        }).pipe(Effect.andThen((v) => {
-          location.href = v
-        })),
+        }).pipe(
+          Effect.flatMap(dialog),
+        ),
       onNone: () =>
         Effect.sync(() => {
           get.set(installationDialogOpenAtom, true)

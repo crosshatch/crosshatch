@@ -60,14 +60,13 @@ export const renameChatAtom = runtime.fn<{
 
 export const chatItemsAtom = Atom.family((chatId?: typeof ChatId.Type | undefined) =>
   runtime.atom(
-    latest((_) => {
-      console.log(_)
-      return _.query.chatItems.findMany({
+    latest((_) =>
+      _.query.chatItems.findMany({
         where: chatId
           ? { chatId: { eq: chatId } }
           : { RAW: sql`1 = 0` },
       })
-    }),
+    ),
   ).pipe(
     Atom.keepAlive,
   )
