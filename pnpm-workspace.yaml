@@ -93,6 +93,7 @@ catalog:
   vite: ^7.2.7
   vitest: 4.0.15
   zod: ^4.1.13
+  vite-plugin-mkcert": ^1.17.9
 
 overrides:
   "@types/react": ^19.2.7
