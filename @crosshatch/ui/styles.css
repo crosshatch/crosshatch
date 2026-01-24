@@ -124,6 +124,6 @@
     @apply border-border outline-ring/50 font-light;
   }
   body {
-    @apply bg-background/75 backdrop-blur-sm text-foreground;
+    @apply bg-background/75 text-foreground;
   }
 }

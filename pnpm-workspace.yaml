@@ -5,6 +5,7 @@ packages:
   - examples/*
 
 catalog:
+  "@dotenvx/dotenvx": ^1.52.0
   "@effect-atom/atom-react": ^0.4.3
   "@effect/ai": ^0.33.2
   "@effect/ai-openrouter": ^0.8.1

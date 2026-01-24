@@ -1,4 +1,3 @@
-import { Prompt } from "@effect/ai"
 import { Schema as S } from "effect"
 
 export const PaidEvent = S.TaggedStruct("PaidEvent", {
@@ -16,12 +15,6 @@ export const PaidEvent = S.TaggedStruct("PaidEvent", {
   host: S.String,
 })
 
-export const UserMessagedEvent = S.TaggedStruct("UserMessaged", {
-  id: S.String,
-  message: Prompt.UserMessage,
-})
-
 export const CrosshatchEvent = S.Union(
   PaidEvent,
-  UserMessagedEvent,
 )

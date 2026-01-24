@@ -25,5 +25,9 @@
       "default": "./dist/*.js"
     },
     "./package.json": "./package.json"
+  },
+  "peerDependencies": {
+    "@crosshatch/util": "workspace:*",
+    "viem": "catalog:"
   }
 }
