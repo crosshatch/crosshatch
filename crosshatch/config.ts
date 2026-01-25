@@ -13,7 +13,7 @@ const Common = S.Struct({
 export const HomeConfig = Common
 export const homeHref = flow(
   S.encode(HomeConfig),
-  Effect.map(toHref(new URL("/", appUrl))),
+  Effect.map(toHref(new URL(appUrl))),
 )
 
 export const AllowanceWindow = S.Literal("Day", "Week", "Month", "Year", "Ever")
