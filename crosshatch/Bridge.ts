@@ -2,11 +2,18 @@ import { Rpc, RpcGroup } from "@effect/rpc"
 import type { PaymentPayload, PaymentRequired } from "@x402/core/types"
 import { Schema as S } from "effect"
 import { DeclinedDecision } from "./DeclinedDecision.ts"
-import { LinkChallenge } from "./LinkChallenge.ts"
+import { LinkChallengeId } from "./LinkChallenge.ts"
+
+export const LinkState = S.Union(
+  S.TaggedStruct("Anonymous", {
+    challengeId: LinkChallengeId,
+  }),
+  S.TaggedStruct("Linked", {}),
+)
 
 export class Bridge extends RpcGroup.make(
-  Rpc.make("challenge", {
-    success: LinkChallenge.pipe(S.Option),
+  Rpc.make("linkState", {
+    success: LinkState,
   }),
   Rpc.make("unlink", {}),
   Rpc.make("payment", {

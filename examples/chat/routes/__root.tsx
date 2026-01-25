@@ -7,7 +7,7 @@ import { router } from "@/router"
 import { chatItems, chats, embeddings } from "@/schema"
 import { tx } from "@/tx"
 import { txNonNullable } from "@crosshatch/drizzle"
-import { challengeAtom, InstallationDialog, installationDialogOpenAtom } from "@crosshatch/react"
+import { linkStateAtom } from "@crosshatch/react"
 import { chatAtom } from "@crosshatch/ui/atoms"
 import * as AtomUtil from "@crosshatch/ui/AtomUtil"
 import { Button } from "@crosshatch/ui/components/button"
@@ -19,9 +19,9 @@ import { useAtom, useAtomSet, useAtomValue } from "@effect-atom/atom-react"
 import { AiError, LanguageModel, Prompt } from "@effect/ai"
 import { OpenRouterLanguageModel } from "@effect/ai-openrouter"
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router"
-import { dialog, linkHref } from "crosshatch"
+import { dialog, homeHref, linkHref } from "crosshatch"
 import { eq } from "drizzle-orm"
-import { Cause, Effect, Fiber, Layer, Option } from "effect"
+import { Cause, Effect, Fiber, Layer } from "effect"
 import { HandCoins, PanelLeftIcon, Plus } from "lucide-react"
 import { ThemeProvider } from "next-themes"
 import { Suspense } from "react"
@@ -46,32 +46,30 @@ function RouteComponent() {
         <SidebarInset>
           <Header />
           <Suspense fallback={<LoaderView />}>
-            <InstallationDialog>
-              <div className="relative flex flex-1 w-full h-full flex-col">
-                <Outlet />
-                <ChatControls
-                  {...{ chatId }}
-                  {...chat}
-                  submit={() => submit(chatId)}
-                  onTextChange={(text) => setChat({ ...chat, text })}
-                  inflight={chat.inflight}
-                  additionalDisabled={modelIdsResult._tag !== "Success"}
-                  actions={
-                    <div className="flex items-center gap-2">
-                      <Button
-                        size="icon"
-                        className="rounded-full"
-                        variant="outline"
-                        onClick={() => sessionButtonOnClick()}
-                      >
-                        <HandCoins />
-                      </Button>
-                      <ModelSelect />
-                    </div>
-                  }
-                />
-              </div>
-            </InstallationDialog>
+            <div className="relative flex flex-1 w-full h-full flex-col">
+              <Outlet />
+              <ChatControls
+                {...{ chatId }}
+                {...chat}
+                submit={() => submit(chatId)}
+                onTextChange={(text) => setChat({ ...chat, text })}
+                inflight={chat.inflight}
+                additionalDisabled={modelIdsResult._tag !== "Success"}
+                actions={
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="icon"
+                      className="rounded-full"
+                      variant="outline"
+                      onClick={() => sessionButtonOnClick()}
+                    >
+                      <HandCoins />
+                    </Button>
+                    <ModelSelect />
+                  </div>
+                }
+              />
+            </div>
           </Suspense>
         </SidebarInset>
       </SidebarProvider>
@@ -107,27 +105,28 @@ const Header = () => {
 }
 
 const sessionButtonOnClickAtom = runtime.fn<void>()(Effect.fn(function*(_, get) {
-  const open = get(installationDialogOpenAtom)
-  if (open) {
-    get.set(installationDialogOpenAtom, false)
-  } else {
-    const challenge = yield* get.result(challengeAtom)
-    yield* Option.match(challenge, {
-      onSome: ({ id }) =>
-        linkHref({
-          id,
-          window: "Week",
-          amount: 10,
-          presentation: "Embedded",
-          referrer: location.href,
-        }).pipe(
-          Effect.flatMap(dialog),
-        ),
-      onNone: () =>
-        Effect.sync(() => {
-          get.set(installationDialogOpenAtom, true)
-        }),
-    })
+  const linkState = yield* get.result(linkStateAtom)
+  switch (linkState._tag) {
+    case "Anonymous": {
+      const { challengeId } = linkState
+      return yield* linkHref({
+        id: challengeId,
+        window: "Week",
+        amount: 10,
+        presentation: "Embedded",
+        referrer: location.href,
+      }).pipe(
+        Effect.flatMap(dialog),
+      )
+    }
+    case "Linked": {
+      return yield* homeHref({
+        presentation: "Embedded",
+        referrer: location.href,
+      }).pipe(
+        Effect.flatMap(dialog),
+      )
+    }
   }
 }))
 
