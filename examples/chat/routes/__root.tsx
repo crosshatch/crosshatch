@@ -20,7 +20,9 @@ import { PaymentRequired } from "@crosshatch/x402"
 import { useAtom, useAtomSet, useAtomValue } from "@effect-atom/atom-react"
 import { AiError, LanguageModel, Prompt } from "@effect/ai"
 import { OpenRouterLanguageModel } from "@effect/ai-openrouter"
+// import { openrouter } from "@openrouter/ai-sdk-provider"
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router"
+// import { generateText } from "ai"
 import { dialog, homeHref, linkHref } from "crosshatch"
 import { eq } from "drizzle-orm"
 import { Cause, Effect, Encoding, Fiber, flow, Layer, Schema as S } from "effect"
@@ -46,7 +48,20 @@ const mockAtom = runtime.fn<void>()(Effect.fn(function*() {
   const v = yield* bridge("payment", {
     requirement: requirement as never,
   })
-  console.log(v)
+  if (v._tag === "Approved") {
+    const { payload } = v
+    const payment = Encoding.encodeBase64(JSON.stringify(payload))
+    const result = yield* Effect.tryPromise(() =>
+      fetch("http://localhost:7775", {
+        headers: {
+          "PAYMENT-SIGNATURE": payment,
+        },
+      })
+    ).pipe(
+      Effect.flatMap((v) => Effect.tryPromise(() => v.json())),
+    )
+    console.log("HERE", result)
+  }
 }))
 
 function RouteComponent() {

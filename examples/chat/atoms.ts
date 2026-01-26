@@ -5,9 +5,8 @@ import { PgliteClient } from "@crosshatch/store"
 import { access, LoggerLive } from "@crosshatch/util"
 import { Atom } from "@effect-atom/atom-react"
 import { OpenRouterClient } from "@effect/ai-openrouter"
-import { FetchHttpClient } from "@effect/platform"
 import { BrowserKeyValueStore } from "@effect/platform-browser"
-import { fetch } from "crosshatch"
+import { FetchHttpClientLive } from "crosshatch/effect"
 import { desc, eq, sql } from "drizzle-orm"
 import { Array, Config, ConfigProvider, Effect, Layer, Option, Schema as S } from "effect"
 import { Drizzle, latest } from "./Drizzle"
@@ -23,16 +22,9 @@ export const runtime = Atom.runtime(
     OpenRouterClient.layerConfig({
       apiKey: Config.redacted("VITE_PUBLIC_OPEN_ROUTER_API_KEY"),
       referrer: Config.succeed("chat.crosshatch.dev"),
-    }).pipe(
-      Layer.provide(
-        FetchHttpClient.layer.pipe(
-          Layer.provide(
-            Layer.succeed(FetchHttpClient.Fetch, fetch),
-          ),
-        ),
-      ),
-    ),
+    }),
   ).pipe(
+    Layer.provide(FetchHttpClientLive),
     Layer.provide(
       Layer.setConfigProvider(ConfigProvider.fromJson(import.meta.env)),
     ),
