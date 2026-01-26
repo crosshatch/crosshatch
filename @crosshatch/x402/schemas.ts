@@ -24,7 +24,7 @@ export const PaymentRequirements = S.Struct({
 })
 
 export const PaymentRequired = S.Struct({
-  x402Version: S.Number,
+  x402Version: S.Number, // TODO: narrowly type
   error: S.String.pipe(S.optional),
   resource: ResourceInfo,
   accepts: S.Array(PaymentRequirements),

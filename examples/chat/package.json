@@ -35,7 +35,12 @@
     "lucide-react": "catalog:",
     "next-themes": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "@streamdown/cjk": "catalog:",
+    "@streamdown/code": "catalog:",
+    "@streamdown/math": "catalog:",
+    "@streamdown/mermaid": "catalog:",
+    "streamdown": "catalog:"
   },
   "devDependencies": {
     "@crosshatch/config": "workspace:*",

@@ -40,6 +40,11 @@ catalog:
   "@radix-ui/react-switch": 1.2.6
   "@radix-ui/react-tabs": ^1.1.13
   "@radix-ui/react-tooltip": ^1.2.8
+  "@streamdown/cjk": ^1.0.1
+  "@streamdown/code": ^1.0.1
+  "@streamdown/math": ^1.0.1
+  "@streamdown/mermaid": ^1.0.1
+  streamdown: ^2.1.0
   "@scure/base": ^2.0.0
   "@scure/bip39": ^2.0.1
   "@solana/addresses": ^5.3.0

@@ -1,24 +1,19 @@
-// export { fetch_ as fetch }
-// const fetch_: typeof fetch = (input, init) => {
-//   const headers = new Headers(init?.headers)
-//   headers.delete("traceparent")
-//   headers.delete("tracestate")
-//   headers.delete("b3")
-//   headers.delete("x-b3-traceid")
-//   headers.delete("x-b3-spanid")
-//   headers.delete("x-b3-sampled")
-//   headers.delete("http-referrer")
-//   return fetch(input, { ...init, headers })
-// }
-
 import { PaymentRequired } from "@crosshatch/x402"
 import { absurd, Effect, Encoding, flow, Schema as S } from "effect"
 import { BridgeClient } from "./BridgeClient.ts"
 
-export { fetch_ as fetch }
-const fetch_: typeof fetch = async (input, init) =>
+export const makeFetch = (fetch: typeof globalThis.fetch): typeof globalThis.fetch => async (input, init) =>
   Effect.gen(function*() {
-    const response = yield* Effect.promise(() => fetch(input, init))
+    const headers = new Headers(init?.headers)
+    headers.delete("traceparent")
+    headers.delete("tracestate")
+    headers.delete("b3")
+    headers.delete("x-b3-traceid")
+    headers.delete("x-b3-spanid")
+    headers.delete("x-b3-sampled")
+    headers.delete("http-referrer")
+
+    const response = yield* Effect.promise(() => fetch(input, { ...init, headers }))
     if (response.status !== 402) {
       return response
     }
@@ -55,7 +50,7 @@ const fetch_: typeof fetch = async (input, init) =>
     const newInit = {
       ...init,
       headers: {
-        ...init?.headers,
+        ...headers,
         ...paymentHeaders,
         "Access-Control-Expose-Headers": "PAYMENT-RESPONSE,X-PAYMENT-RESPONSE",
       },

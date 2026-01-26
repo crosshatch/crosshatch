@@ -31,6 +31,18 @@ export const runtime = Atom.runtime(
   ),
 )
 
+export const chatAtom = Atom.family((_chatId?: string | undefined) =>
+  Atom.make({
+    text: "",
+    inflight: undefined,
+  } as {
+    text: string
+    inflight: AbortController | undefined
+  }).pipe(
+    Atom.keepAlive,
+  )
+)
+
 export const chatsAtom = runtime.atom(
   latest((_) => _.select().from(chats).orderBy(desc(chats.updated))),
 ).pipe(

@@ -1,4 +1,4 @@
-import { chatItemsAtom, currentModelIdAtom, modelIdsAtom, runtime } from "@/atoms"
+import { chatAtom, chatItemsAtom, currentModelIdAtom, modelIdsAtom, runtime } from "@/atoms"
 import { ModelSelect } from "@/components/model-select"
 import { SidebarInner } from "@/components/sidebar-inner"
 import { Drizzle } from "@/Drizzle"
@@ -9,7 +9,6 @@ import { tx } from "@/tx"
 import { txNonNullable } from "@crosshatch/drizzle"
 import { linkStateAtom } from "@crosshatch/react"
 import { BridgeClient } from "@crosshatch/react"
-import { chatAtom } from "@crosshatch/ui/atoms"
 import * as AtomUtil from "@crosshatch/ui/AtomUtil"
 import { Button } from "@crosshatch/ui/components/button"
 import { ChatControls } from "@crosshatch/ui/components/chat-controls"
@@ -20,9 +19,7 @@ import { PaymentRequired } from "@crosshatch/x402"
 import { useAtom, useAtomSet, useAtomValue } from "@effect-atom/atom-react"
 import { AiError, LanguageModel, Prompt } from "@effect/ai"
 import { OpenRouterLanguageModel } from "@effect/ai-openrouter"
-// import { openrouter } from "@openrouter/ai-sdk-provider"
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router"
-// import { generateText } from "ai"
 import { dialog, homeHref, linkHref } from "crosshatch"
 import { eq } from "drizzle-orm"
 import { Cause, Effect, Encoding, Fiber, flow, Layer, Schema as S } from "effect"
@@ -178,7 +175,6 @@ export const submitAtom = runtime.fn<typeof ChatId.Type | undefined>()(Effect.fn
   //   get.set(sessionDialogOpenAtom, true)
   //   return
   // }
-
   let { text } = get(chatAtom(chatId))
   const items = yield* get.result(chatItemsAtom(chatId))
   text = text.trim()
