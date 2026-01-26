@@ -1,6 +1,6 @@
 import { Deferred, Effect, Option, Schema as S } from "effect"
 import { appUrl } from "./env.ts"
-import { DialogClose, DialogReady } from "./messages.ts"
+import { DialogClose, DialogReady, Introduction } from "./messages.ts"
 
 export const dialog = Effect.fn(function*(href: string) {
   const dialogReady = yield* Deferred.make<void>()
@@ -8,6 +8,7 @@ export const dialog = Effect.fn(function*(href: string) {
     if (origin === appUrl && Option.isSome(S.decodeUnknownOption(DialogReady)(data))) {
       Deferred.unsafeDone(dialogReady, Effect.succeed(undefined))
       removeEventListener("message", f)
+      iframe.contentWindow?.postMessage(new Introduction(), appUrl)
     }
   })
   const iframe = document.createElement("iframe")

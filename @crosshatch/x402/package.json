@@ -28,6 +28,14 @@
   },
   "peerDependencies": {
     "@crosshatch/util": "workspace:*",
-    "viem": "catalog:"
+    "viem": "catalog:",
+    "@x402/core": "catalog:",
+    "@x402/evm": "catalog:",
+    "@x402/hono": "catalog:",
+    "hono": "catalog:",
+    "@hono/node-server": "catalog:"
+  },
+  "scripts": {
+    "dev": "node --watch ./dev.ts"
   }
 }

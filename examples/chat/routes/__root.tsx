@@ -8,6 +8,7 @@ import { chatItems, chats, embeddings } from "@/schema"
 import { tx } from "@/tx"
 import { txNonNullable } from "@crosshatch/drizzle"
 import { linkStateAtom } from "@crosshatch/react"
+import { BridgeClient } from "@crosshatch/react"
 import { chatAtom } from "@crosshatch/ui/atoms"
 import * as AtomUtil from "@crosshatch/ui/AtomUtil"
 import { Button } from "@crosshatch/ui/components/button"
@@ -15,14 +16,15 @@ import { ChatControls } from "@crosshatch/ui/components/chat-controls"
 import { LoaderView } from "@crosshatch/ui/components/loader-view"
 import { Sidebar, SidebarInset, SidebarProvider, useSidebar } from "@crosshatch/ui/components/sidebar"
 import { e0, embed } from "@crosshatch/util"
+import { PaymentRequired } from "@crosshatch/x402"
 import { useAtom, useAtomSet, useAtomValue } from "@effect-atom/atom-react"
 import { AiError, LanguageModel, Prompt } from "@effect/ai"
 import { OpenRouterLanguageModel } from "@effect/ai-openrouter"
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router"
 import { dialog, homeHref, linkHref } from "crosshatch"
 import { eq } from "drizzle-orm"
-import { Cause, Effect, Fiber, Layer } from "effect"
-import { HandCoins, PanelLeftIcon, Plus } from "lucide-react"
+import { Cause, Effect, Encoding, Fiber, flow, Layer, Schema as S } from "effect"
+import { FlaskRound, HandCoins, PanelLeftIcon, Plus } from "lucide-react"
 import { ThemeProvider } from "next-themes"
 import { Suspense } from "react"
 import { Route as ChatRoute } from "./{-$chatId}"
@@ -31,12 +33,29 @@ export const Route = createRootRoute({
   component: RouteComponent,
 })
 
+const mockAtom = runtime.fn<void>()(Effect.fn(function*() {
+  const g = yield* Effect.tryPromise(() => fetch("http://localhost:7775"))
+  const paymentRequired = yield* Effect.fromNullable(g.headers.get("PAYMENT-REQUIRED"))
+  const requirement = yield* Encoding.decodeBase64String(paymentRequired).pipe(
+    Effect.flatMap(flow(
+      JSON.parse,
+      S.decodeUnknown(PaymentRequired),
+    )),
+  )
+  const bridge = yield* BridgeClient
+  const v = yield* bridge("payment", {
+    requirement: requirement as never,
+  })
+  console.log(v)
+}))
+
 function RouteComponent() {
   const { chatId } = ChatRoute.useParams()
   const [chat, setChat] = useAtom(chatAtom(chatId))
   const submit = useAtomSet(submitAtom)
   const modelIdsResult = useAtomValue(modelIdsAtom)
   const sessionButtonOnClick = useAtomSet(sessionButtonOnClickAtom)
+  const mock = useAtomSet(mockAtom)
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <SidebarProvider>
@@ -64,6 +83,14 @@ function RouteComponent() {
                       onClick={() => sessionButtonOnClick()}
                     >
                       <HandCoins />
+                    </Button>
+                    <Button
+                      size="icon"
+                      className="rounded-full"
+                      variant="outline"
+                      onClick={() => mock()}
+                    >
+                      <FlaskRound />
                     </Button>
                     <ModelSelect />
                   </div>

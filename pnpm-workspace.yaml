@@ -64,6 +64,8 @@ catalog:
   "@x402/core": ^2.0.0
   "@x402/evm": ^2.0.0
   "@x402/svm": ^2.0.0
+  "@x402/hono": ^2.2.0
+  "@hono/node-server": ^1.19.9
   "@tanstack/devtools-vite": ^0.4.1
   ai: 6.0.42
   happy-dom: ^20.0.11
@@ -96,6 +98,7 @@ catalog:
   vitest: 4.0.15
   zod: ^4.1.13
   vite-plugin-mkcert": ^1.17.9
+  hono: ^4.11.5
 
 overrides:
   "@types/react": ^19.2.7

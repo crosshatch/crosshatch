@@ -29,6 +29,7 @@ export const get = Effect.fn(function*(
 
 const getEvmChain = (chainId: typeof ChainId.Type) => ({
   8453: chains.base,
+  84532: chains.baseSepolia,
   42161: chains.arbitrum,
   1: chains.mainnet,
   10: chains.optimism,

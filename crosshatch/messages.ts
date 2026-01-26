@@ -1,5 +1,11 @@
 import { Schema as S } from "effect"
 
+export class Introduction extends S.TaggedClass<Introduction>("Introduction")("Introduction", {}) {}
+
+export class RequestIntroduction
+  extends S.TaggedClass<RequestIntroduction>("RequestIntroduction")("RequestIntroduction", {})
+{}
+
 export class DialogReady extends S.TaggedClass<DialogReady>("DialogReady")("DialogReady", {}) {}
 
 export class DialogClose extends S.TaggedClass<DialogClose>("DialogClose")("DialogClose", {}) {}
