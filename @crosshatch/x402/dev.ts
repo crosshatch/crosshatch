@@ -11,7 +11,7 @@ const app = new Hono()
   .use(
     "*",
     cors({
-      origin: "https://chat.crosshatch.local",
+      origin: "https://local.crosshatch.chat",
       allowMethods: ["*"],
       allowHeaders: ["*"],
       exposeHeaders: ["*"],
@@ -39,10 +39,7 @@ const app = new Hono()
       ).register("eip155:8453", new ExactEvmScheme()),
     ),
   )
-  .get("/", (c) =>
-    c.json({
-      message: "This content is behind a paywall",
-    }))
+  .get("/", (c) => c.text("This content is behind a paywall"))
   .get("/health", (c) => c.text("ok"))
 
 serve({

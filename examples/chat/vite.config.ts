@@ -3,8 +3,8 @@ import store from "@crosshatch/store/plugin"
 import { defineConfig } from "vite"
 
 const { root, plugins } = make({
-  origin: "chat.crosshatch.local",
-  allow: ["app.crosshatch.local"],
+  origin: "local.crosshatch.chat",
+  allow: ["local.crosshatch.dev"],
   port: 7779,
   url: import.meta.url,
   envDir: "../../..",

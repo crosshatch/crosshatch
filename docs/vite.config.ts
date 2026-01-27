@@ -4,8 +4,8 @@ import mdx from "fumadocs-mdx/vite"
 import { defineConfig } from "vite"
 
 const { root, plugins } = make({
-  origin: "docs.crosshatch.local",
-  allow: ["docs.crosshatch.local"],
+  origin: "local.docs.crosshatch.dev",
+  allow: ["local.docs.crosshatch.dev"],
   port: 7778,
   url: import.meta.url,
   envDir: "..",

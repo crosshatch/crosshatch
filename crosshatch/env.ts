@@ -4,6 +4,12 @@ export const dev = Config.boolean("DEV").pipe(
   Config.withDefault(true),
   Effect.runSync,
 )
-export const domain = `crosshatch.${dev ? "local" : "dev"}`
-export const appUrl = `https://${domain}`
-export const appAppsUrl = `${appUrl}/me/apps`
+const prefix = dev ? "local." : ""
+
+export const appDomain = `${prefix}crosshatch.dev`
+export const docsDomain = `${prefix}docs.crosshatch.dev`
+
+const urlLeading = (v: string) => `https://${v}`
+
+export const appUrl = urlLeading(appDomain)
+export const docsUrl = urlLeading(docsDomain)

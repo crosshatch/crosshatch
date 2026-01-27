@@ -1,5 +1,5 @@
 {
-  "name": "@crosshatch/chat",
+  "name": "crosshatch.chat",
   "version": "0.1.0-beta.1",
   "private": true,
   "type": "module",

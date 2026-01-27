@@ -1,7 +1,7 @@
 import { BrowserWorker } from "@effect/platform-browser"
 import { Deferred, Effect, Layer, Option, Schema as S } from "effect"
 import { appUrl } from "./env.ts"
-import { AppReady, BridgeReady } from "./messages.ts"
+import { AppReady as AppPort, BridgeReady, Introduction, RequestIntroduction } from "./messages.ts"
 
 const style = Object
   .entries({
@@ -22,10 +22,16 @@ const style = Object
   .join(" ")
 
 export const BridgeWorkerLive = Effect.gen(function*() {
-  const bridgeReady = yield* Deferred.make<void>()
+  const deferred = yield* Deferred.make<void>()
   addEventListener("message", function f({ data, origin }: MessageEvent) {
     if (origin === appUrl && Option.isSome(S.decodeUnknownOption(BridgeReady)(data))) {
-      Deferred.unsafeDone(bridgeReady, Effect.succeed(undefined))
+      Deferred.unsafeDone(deferred, Effect.succeed(undefined))
+      removeEventListener("message", f)
+    }
+  })
+  addEventListener("message", function f({ data, origin }: MessageEvent) {
+    if (origin === appUrl && Option.isSome(S.decodeUnknownOption(RequestIntroduction)(data))) {
+      context.postMessage(new Introduction(), "*")
       removeEventListener("message", f)
     }
   })
@@ -38,10 +44,10 @@ export const BridgeWorkerLive = Effect.gen(function*() {
     style,
   })
   document.body.appendChild(iframe)
-  yield* Deferred.await(bridgeReady)
+  yield* Deferred.await(deferred)
   const context = yield* Effect.fromNullable(iframe.contentWindow)
   const channel = new MessageChannel()
-  context.postMessage(new AppReady(), "*", [channel.port2])
+  context.postMessage(new AppPort(), "*", [channel.port2])
   return BrowserWorker.layerPlatform(() => channel.port1)
 }).pipe(
   Layer.unwrapEffect,

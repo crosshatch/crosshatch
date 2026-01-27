@@ -1,12 +1,12 @@
 import { Deferred, Effect, Option, Schema as S } from "effect"
 import { appUrl } from "./env.ts"
-import { DialogClose, DialogReady, Introduction } from "./messages.ts"
+import { DialogClose, Introduction, RequestIntroduction } from "./messages.ts"
 
 export const dialog = Effect.fn(function*(href: string) {
-  const dialogReady = yield* Deferred.make<void>()
+  const deferred = yield* Deferred.make<void>()
   addEventListener("message", function f({ data, origin }: MessageEvent) {
-    if (origin === appUrl && Option.isSome(S.decodeUnknownOption(DialogReady)(data))) {
-      Deferred.unsafeDone(dialogReady, Effect.succeed(undefined))
+    if (origin === appUrl && Option.isSome(S.decodeUnknownOption(RequestIntroduction)(data))) {
+      Deferred.unsafeDone(deferred, Effect.succeed(undefined))
       removeEventListener("message", f)
       iframe.contentWindow?.postMessage(new Introduction(), appUrl)
     }
@@ -24,7 +24,7 @@ export const dialog = Effect.fn(function*(href: string) {
   iframe.style.height = "100vh"
   iframe.style.zIndex = "100000"
   document.body.appendChild(iframe)
-  yield* Deferred.await(dialogReady)
+  yield* Deferred.await(deferred)
   iframe.style.opacity = "1"
   addEventListener("message", function f({ data, origin }: MessageEvent) {
     if (origin === appUrl && Option.isSome(S.decodeUnknownOption(DialogClose)(data))) {

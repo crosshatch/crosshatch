@@ -1,5 +1,5 @@
 {
-  "name": "@crosshatch/docs",
+  "name": "docs.crosshatch.dev",
   "private": true,
   "type": "module",
   "scripts": {

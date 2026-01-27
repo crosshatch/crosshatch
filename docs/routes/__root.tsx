@@ -14,7 +14,7 @@ const getMetadata = createServerFn({ method: "GET" })
       const { description, keywords } = doc.page.data
       return {
         title: "Crosshatch",
-        image: `https://crosshatch.dev/og${doc.page.url}`,
+        image: `https://docs.crosshatch.dev/og${doc.page.url}`,
         description,
         keywords,
       }

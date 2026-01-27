@@ -29,7 +29,7 @@ export default (): Plugin => {
   const contents: Array<typeof Migration.Type> = []
 
   return {
-    name: "@crosshatch/local",
+    name: "@crosshatch/store",
     buildStart: () =>
       Effect.gen(function*() {
         contents.length = 0

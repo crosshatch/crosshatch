@@ -6,8 +6,6 @@ export class RequestIntroduction
   extends S.TaggedClass<RequestIntroduction>("RequestIntroduction")("RequestIntroduction", {})
 {}
 
-export class DialogReady extends S.TaggedClass<DialogReady>("DialogReady")("DialogReady", {}) {}
-
 export class DialogClose extends S.TaggedClass<DialogClose>("DialogClose")("DialogClose", {}) {}
 
 export class BridgeReady extends S.TaggedClass<BridgeReady>("BridgeReady")("BridgeReady", {}) {}
