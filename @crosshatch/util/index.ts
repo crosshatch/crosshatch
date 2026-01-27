@@ -1,5 +1,4 @@
 export * from "./branded.ts"
-export * from "./embed.ts"
 export * from "./EnsureOriginMiddleware.ts"
 export * from "./fmt.ts"
 export * from "./http_api_util.ts"

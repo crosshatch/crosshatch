@@ -34,8 +34,5 @@
     "@x402/hono": "catalog:",
     "hono": "catalog:",
     "@hono/node-server": "catalog:"
-  },
-  "scripts": {
-    "dev": "node --watch ./dev.ts"
   }
 }

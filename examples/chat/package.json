@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build && tsc",
     "serve": "vite preview",
-    "migrate": "drizzle-kit generate"
+    "migrate": "drizzle-kit generate --help"
   },
   "dependencies": {
     "crosshatch": "workspace:*",
@@ -28,10 +28,12 @@
     "@electric-sql/pglite": "catalog:",
     "@tanstack/react-router": "catalog:",
     "ai": "catalog:",
+    "@ai-sdk/openai": "catalog:",
     "@openrouter/ai-sdk-provider": "catalog:",
     "babel-plugin-react-compiler": "catalog:",
     "drizzle-orm": "catalog:",
     "effect": "catalog:",
+    "openai": "catalog:",
     "lucide-react": "catalog:",
     "next-themes": "catalog:",
     "react": "catalog:",

@@ -2,13 +2,12 @@ import { chats } from "@/schema"
 import Worker from "@/worker.ts?worker"
 import { BridgeClient } from "@crosshatch/react"
 import { PgliteClient } from "@crosshatch/store"
-import { access, LoggerLive } from "@crosshatch/util"
+import { LoggerLive } from "@crosshatch/util"
 import { Atom } from "@effect-atom/atom-react"
-import { OpenRouterClient } from "@effect/ai-openrouter"
 import { BrowserKeyValueStore } from "@effect/platform-browser"
 import { FetchHttpClientLive } from "crosshatch/effect"
 import { desc, eq, sql } from "drizzle-orm"
-import { Array, Config, ConfigProvider, Effect, Layer, Option, Schema as S } from "effect"
+import { ConfigProvider, Effect, Layer, Schema as S } from "effect"
 import { Drizzle, latest } from "./Drizzle"
 import type { ChatId } from "./ids"
 
@@ -19,10 +18,6 @@ export const runtime = Atom.runtime(
     Drizzle.Default.pipe(
       Layer.provideMerge(PgliteClient.layer(Worker)),
     ),
-    OpenRouterClient.layerConfig({
-      apiKey: Config.redacted("VITE_PUBLIC_OPEN_ROUTER_API_KEY"),
-      referrer: Config.succeed("chat.crosshatch.dev"),
-    }),
   ).pipe(
     Layer.provide(FetchHttpClientLive),
     Layer.provide(
@@ -66,9 +61,7 @@ export const chatItemsAtom = Atom.family((chatId?: typeof ChatId.Type | undefine
   runtime.atom(
     latest((_) =>
       _.query.chatItems.findMany({
-        where: chatId
-          ? { chatId: { eq: chatId } }
-          : { RAW: sql`1 = 0` },
+        where: chatId ? { chatId: { eq: chatId } } : { RAW: sql`1 = 0` },
       })
     ),
   ).pipe(
@@ -76,32 +69,16 @@ export const chatItemsAtom = Atom.family((chatId?: typeof ChatId.Type | undefine
   )
 )
 
-const ListModelsSuccess = S.Struct({
-  data: S.Array(S.Struct({
-    id: S.String,
-    name: S.String,
-    supported_parameters: S.Array(S.String),
-    architecture: S.Struct({
-      input_modalities: S.Array(S.String),
-      output_modalities: S.Array(S.String),
-    }),
-  })),
-})
-
 export const modelIdsAtom = runtime.atom(
   Effect.tryPromise(
-    () => fetch("https://openrouter.ai/api/v1/models").then((v) => v.json()),
+    () => fetch("http://localhost:7775/models").then((v) => v.json()),
   ).pipe(
-    Effect.flatMap(S.decodeUnknown(ListModelsSuccess)),
-    access("data"),
-    Effect.map(
-      Array.filterMap((v) =>
-        v.supported_parameters.includes("tools") && v.supported_parameters.includes("tool_choice")
-          && !v.supported_parameters.includes("reasoning")
-          ? Option.some(v.id)
-          : Option.none()
-      ),
-    ),
+    Effect.flatMap(S.decodeUnknown(S.Struct({
+      data: S.Array(S.Struct({
+        id: S.String,
+      })),
+    }))),
+    Effect.map((v) => v.data.map(({ id }) => id)),
   ),
 )
 
@@ -109,7 +86,7 @@ const currentModelIdState = Atom.kvs({
   runtime: Atom.runtime(BrowserKeyValueStore.layerLocalStorage),
   key: "current-model",
   schema: S.String.pipe(S.NullOr),
-  defaultValue: () => null,
+  defaultValue: () => "gpt-3.5-turbo",
 }).pipe(
   Atom.keepAlive,
 )

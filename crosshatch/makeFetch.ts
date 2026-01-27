@@ -4,6 +4,7 @@ import { BridgeClient } from "./BridgeClient.ts"
 
 export const makeFetch = (fetch: typeof globalThis.fetch): typeof globalThis.fetch => async (input, init) =>
   Effect.gen(function*() {
+    // TODO: remove this header manipulation
     const headers = new Headers(init?.headers)
     headers.delete("traceparent")
     headers.delete("tracestate")

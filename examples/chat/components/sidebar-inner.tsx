@@ -1,5 +1,6 @@
 import { chatsAtom, deleteChatAtom, renameChatAtom, runtime } from "@/atoms"
 import { Drizzle } from "@/Drizzle"
+import { embed } from "@/lib/openai"
 import { router } from "@/router"
 import { chatItems, chats, embeddings } from "@/schema"
 import { Button } from "@crosshatch/ui/components/button"
@@ -24,12 +25,11 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@crosshatch/ui/components/sidebar"
-import { Skeleton } from "@crosshatch/ui/components/skeleton"
-import { embed, registerCommand } from "@crosshatch/util"
+import { registerCommand } from "@crosshatch/util"
 import { useAtomSet, useAtomSuspense } from "@effect-atom/atom-react"
 import { Atom } from "@effect-atom/atom-react"
 import { Link } from "@tanstack/react-router"
-import { cosineDistance, eq } from "drizzle-orm"
+import { cosineDistance, eq, sql } from "drizzle-orm"
 import { Effect } from "effect"
 import { MoreHorizontal, PencilLine, Trash2 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
@@ -59,7 +59,7 @@ const searchResultsAtom = runtime.atom(Effect.fn(function*(get) {
   const _ = yield* Drizzle
   return yield* Effect.tryPromise(() =>
     _
-      .select({
+      .selectDistinctOn([chatItems.id], {
         id: chatItems.id,
         chatId: chatItems.chatId,
         message: chatItems.message,
@@ -69,7 +69,10 @@ const searchResultsAtom = runtime.atom(Effect.fn(function*(get) {
       .from(chatItems)
       .innerJoin(embeddings, eq(embeddings.chatItemId, chatItems.id))
       .leftJoin(chats, eq(chatItems.chatId, chats.id))
-      .orderBy((fields) => fields.similarity)
+      .orderBy(
+        chatItems.id,
+        sql`${cosineDistance(embeddings.embedding, embedding)}`,
+      )
       .limit(5)
   )
 })).pipe(
@@ -130,41 +133,37 @@ const ChatLink = ({ title, id }: typeof chats["$inferSelect"]) => {
   return (
     <Dialog {...{ open }} onOpenChange={setOpen}>
       <SidebarMenuItem>
-        {!title ? <Skeleton className="h-8 p-0 rounded-sm" /> : (
-          <>
-            <SidebarMenuButton className="px-2 h-8 rounded-sm" asChild>
-              <Link
-                activeProps={{ className: "bg-primary/15 hover:bg-primary/15!" }}
-                to="/{-$chatId}"
-                params={{ chatId: id }}
-              >
-                <span className="font-light">{title}</span>
-              </Link>
-            </SidebarMenuButton>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuAction showOnHover>
-                  <MoreHorizontal />
-                  <span className="sr-only">More</span>
-                </SidebarMenuAction>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-48 rounded-lg" side="right" align="start">
-                <>
-                  <DialogTrigger asChild>
-                    <DropdownMenuItem>
-                      <PencilLine className="text-muted-foreground" />
-                      <span>Rename</span>
-                    </DropdownMenuItem>
-                  </DialogTrigger>
-                  <DropdownMenuItem onClick={() => deleteChat(id)}>
-                    <Trash2 className="text-muted-foreground" />
-                    <span>Delete chat</span>
-                  </DropdownMenuItem>
-                </>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
-        )}
+        <SidebarMenuButton className="px-2 h-8 rounded-sm" asChild>
+          <Link
+            activeProps={{ className: "bg-primary/15 hover:bg-primary/15!" }}
+            to="/{-$chatId}"
+            params={{ chatId: id }}
+          >
+            <span className="font-light">{title}</span>
+          </Link>
+        </SidebarMenuButton>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuAction showOnHover>
+              <MoreHorizontal />
+              <span className="sr-only">More</span>
+            </SidebarMenuAction>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-48 rounded-lg" side="right" align="start">
+            <>
+              <DialogTrigger asChild>
+                <DropdownMenuItem>
+                  <PencilLine className="text-muted-foreground" />
+                  <span>Rename</span>
+                </DropdownMenuItem>
+              </DialogTrigger>
+              <DropdownMenuItem onClick={() => deleteChat(id)}>
+                <Trash2 className="text-muted-foreground" />
+                <span>Delete chat</span>
+              </DropdownMenuItem>
+            </>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </SidebarMenuItem>
       <DialogContent className="p-4">
         <DialogHeader>
