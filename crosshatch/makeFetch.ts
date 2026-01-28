@@ -32,8 +32,8 @@ export const makeFetch = (fetch: typeof globalThis.fetch): typeof globalThis.fet
           Effect.filterOrFail(({ x402Version }) => x402Version === 1),
         )
     )
-    const enclave = yield* BridgeClient
-    const decision = yield* enclave.payment({
+    const bridge = yield* BridgeClient
+    const decision = yield* bridge.payment({
       requirement: requirement as never,
     })
     if (decision._tag !== "Approved") {
@@ -42,21 +42,21 @@ export const makeFetch = (fetch: typeof globalThis.fetch): typeof globalThis.fet
     }
     const { payload } = decision
     const value = Encoding.encodeBase64(JSON.stringify(payload))
-    const paymentHeaders = yield* Effect.fromNullable(
-      {
-        1: { "X-PAYMENT": value },
-        2: { "PAYMENT-SIGNATURE": value },
-      }[payload.x402Version],
-    )
-    const newInit = {
-      ...init,
-      headers: {
-        ...headers,
-        ...paymentHeaders,
-        "Access-Control-Expose-Headers": "PAYMENT-RESPONSE,X-PAYMENT-RESPONSE",
-      },
+    switch (payload.x402Version) {
+      case 1: {
+        headers.set("X-PAYMENT", value)
+        break
+      }
+      case 2: {
+        headers.set("PAYMENT-SIGNATURE", value)
+        break
+      }
+      default: {
+        absurd<never>(null!)
+      }
     }
-    return yield* Effect.promise(() => fetch(input, newInit))
+
+    return yield* Effect.promise(() => fetch(input, { ...init, headers }))
   }).pipe(
     Effect.provide(BridgeClient.Default),
     (x) =>

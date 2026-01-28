@@ -42,7 +42,11 @@
     "@streamdown/code": "catalog:",
     "@streamdown/math": "catalog:",
     "@streamdown/mermaid": "catalog:",
-    "streamdown": "catalog:"
+    "streamdown": "catalog:",
+    "@tailwindcss/vite": "catalog:",
+    "@tanstack/router-plugin": "catalog:",
+    "vite-plugin-mkcert": "catalog:",
+    "@vitejs/plugin-react": "catalog:"
   },
   "devDependencies": {
     "@crosshatch/config": "workspace:*",

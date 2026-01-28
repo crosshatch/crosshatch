@@ -1,4 +1,5 @@
 import { chatAtom, chatItemsAtom, currentModelIdAtom, modelIdsAtom, runtime } from "@/atoms"
+import { ChatControls } from "@/components/ChatControls"
 import { ModelSelect } from "@/components/model-select"
 import { SidebarInner } from "@/components/sidebar-inner"
 import { Drizzle } from "@/Drizzle"
@@ -11,7 +12,6 @@ import { txNonNullable } from "@crosshatch/drizzle"
 import { linkStateAtom } from "@crosshatch/react"
 import * as AtomUtil from "@crosshatch/ui/AtomUtil"
 import { Button } from "@crosshatch/ui/components/button"
-import { ChatControls } from "@crosshatch/ui/components/chat-controls"
 import { LoaderView } from "@crosshatch/ui/components/loader-view"
 import { Sidebar, SidebarInset, SidebarProvider, useSidebar } from "@crosshatch/ui/components/sidebar"
 import { e0 } from "@crosshatch/util"
@@ -52,7 +52,6 @@ function RouteComponent() {
                 {...chat}
                 submit={() => submit(chatId)}
                 onTextChange={(text) => setChat({ ...chat, text })}
-                inflight={chat.inflight}
                 additionalDisabled={modelIdsResult._tag !== "Success"}
                 actions={
                   <div className="flex items-center gap-2">

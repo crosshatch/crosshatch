@@ -9,15 +9,18 @@ export const createRequirement = ({ recipient, amount }: {
   accepts: [{
     amount: String(amount),
     asset: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-    extra: {},
+    extra: {
+      name: "USDC",
+      version: "2",
+    },
     maxTimeoutSeconds: 60,
     network: `eip155:8453`,
     payTo: recipient,
     scheme: "exact",
   }],
   resource: {
-    description: "",
-    mimeType: "",
+    description: "TODO",
+    mimeType: "text/plain",
     url: "",
   },
 })

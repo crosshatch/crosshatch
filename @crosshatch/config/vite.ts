@@ -44,6 +44,8 @@ export const make = ({ origin, port, url, allow, envDir }: {
     worker: { format: "es" },
     optimizeDeps: {
       exclude: [
+        "@effect-atom/atom",
+        "@effect-atom/atom-react",
         "@effect/platform",
         "@electric-sql/pglite",
         "@electric-sql/pglite/contrib/uuid_ossp",

@@ -7,7 +7,6 @@ export const dialog = Effect.fn(function*(href: string) {
   addEventListener("message", function f({ data, origin }: MessageEvent) {
     if (origin === appUrl && Option.isSome(S.decodeUnknownOption(RequestIntroduction)(data))) {
       Deferred.unsafeDone(deferred, Effect.succeed(undefined))
-      removeEventListener("message", f)
       iframe.contentWindow?.postMessage(new Introduction(), appUrl)
     }
   })

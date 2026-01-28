@@ -1,6 +1,8 @@
+import { chatAtom } from "@/atoms"
 import { Button } from "@crosshatch/ui/components/button"
 import { Section, SectionInner } from "@crosshatch/ui/components/section"
 import { Textarea } from "@crosshatch/ui/components/textarea"
+import { useAtomValue } from "@effect-atom/atom-react"
 import { ArrowUp } from "lucide-react"
 import { useEffect, useRef } from "react"
 
@@ -9,7 +11,6 @@ export const ChatControls = ({
   text,
   onTextChange,
   submit,
-  inflight,
   actions,
   additionalDisabled,
 }: {
@@ -17,11 +18,11 @@ export const ChatControls = ({
   text: string
   onTextChange: (text: string) => void
   submit: () => void
-  inflight: AbortController | undefined
   actions?: React.ReactNode | undefined
   additionalDisabled?: boolean | undefined
 }) => {
   const ref = useRef<HTMLTextAreaElement>(null)
+  const { inflight } = useAtomValue(chatAtom(chatId))
   useEffect(() => ref?.current?.focus(), [chatId])
   return (
     <Section className="p-4 sticky border-t bottom-0 right-0 left-0 bg-background/90 backdrop-blur-lg">
