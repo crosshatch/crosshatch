@@ -1,5 +1,5 @@
 import { SearchToggleLg, SearchToggleSm } from "@/components/search-toggle"
-import { ThemeToggle } from "@crosshatch/ui/components/theme-toggle"
+import { ThemeToggle } from "@crosshatch/ui/components/ThemeToggle"
 import { CrosshatchIcon, DiscordIcon, GithubIcon, XIcon } from "@crosshatch/ui/icons"
 import type { BaseLayoutProps, LinkItemType } from "fumadocs-ui/layouts/shared"
 

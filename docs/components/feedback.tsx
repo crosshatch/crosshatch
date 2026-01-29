@@ -1,5 +1,5 @@
 import { cn } from "@crosshatch/ui/cn"
-import { Button } from "@crosshatch/ui/components/button"
+import { Button } from "@crosshatch/ui/components/Button"
 import { useLocation } from "@tanstack/react-router"
 import { cva } from "class-variance-authority"
 import { Collapsible, CollapsibleContent } from "fumadocs-ui/components/ui/collapsible"

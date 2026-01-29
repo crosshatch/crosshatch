@@ -1,6 +1,6 @@
-import { cn } from "../cn"
-import { useCopy } from "../hooks/use-copy"
-import { Button } from "./button"
+import { cn } from "../cn.ts"
+import { useCopy } from "../hooks/useCopy.ts"
+import { Button } from "./Button.tsx"
 
 export const AddressButton = ({
   address,

@@ -1,6 +1,6 @@
 import { currentModelIdAtom, modelIdsAtom } from "@/atoms"
 import { cn } from "@crosshatch/ui/cn"
-import { Button } from "@crosshatch/ui/components/button"
+import { Button } from "@crosshatch/ui/components/Button"
 import {
   Command,
   CommandEmpty,
@@ -8,8 +8,8 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@crosshatch/ui/components/command"
-import { Popover, PopoverContent, PopoverTrigger } from "@crosshatch/ui/components/popover"
+} from "@crosshatch/ui/components/Command"
+import { Popover, PopoverContent, PopoverTrigger } from "@crosshatch/ui/components/Popover"
 import { Result, useAtomSet, useAtomSuspense, useAtomValue } from "@effect-atom/atom-react"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { useState } from "react"

@@ -1,7 +1,7 @@
 // TODO: share button
 
 import { articles } from "@/lib/source"
-import { Button } from "@crosshatch/ui/components/button"
+import { Button } from "@crosshatch/ui/components/Button"
 import { createFileRoute, Link, notFound } from "@tanstack/react-router"
 import { createServerFn } from "@tanstack/react-start"
 

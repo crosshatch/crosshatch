@@ -1,6 +1,12 @@
 import { ChevronRight } from "lucide-react"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./collapsible"
-import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from "./sidebar"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./Collapsible.tsx"
+import {
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+} from "./Sidebar.tsx"
 
 export const CollapsibleMenuItem = ({ label, isActive, icon, items }: {
   label: string

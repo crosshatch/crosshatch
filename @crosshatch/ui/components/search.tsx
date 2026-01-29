@@ -2,10 +2,10 @@ import { registerCommand } from "@crosshatch/util"
 import { Atom, useAtom, useAtomMount } from "@effect-atom/atom-react"
 import { Search as SearchIcon } from "lucide-react"
 import { Suspense } from "react"
-import { Button } from "./button"
-import { CommandDialog, CommandGroup, CommandInput, CommandList } from "./command"
-import { LoaderView } from "./loader-view"
-import { Separator } from "./separator"
+import { Button } from "./Button.tsx"
+import { CommandDialog, CommandGroup, CommandInput, CommandList } from "./Command.tsx"
+import { LoaderView } from "./LoaderView.tsx"
+import { Separator } from "./Separator.tsx"
 
 export const searchInputAtom = Atom.make("").pipe(Atom.keepAlive)
 

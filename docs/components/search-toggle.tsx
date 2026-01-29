@@ -1,5 +1,5 @@
 import { cn } from "@crosshatch/ui/cn"
-import { Button } from "@crosshatch/ui/components/button"
+import { Button } from "@crosshatch/ui/components/Button"
 import { useI18n } from "fumadocs-ui/contexts/i18n"
 import { useSearchContext } from "fumadocs-ui/contexts/search"
 import { Search } from "lucide-react"

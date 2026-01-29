@@ -3,19 +3,25 @@ import { Drizzle } from "@/Drizzle"
 import { embed } from "@/lib/openai"
 import { router } from "@/router"
 import { chatItems, chats, embeddings } from "@/schema"
-import { Button } from "@crosshatch/ui/components/button"
-import { CommandItem } from "@crosshatch/ui/components/command"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTrigger } from "@crosshatch/ui/components/dialog"
-import { DialogTitle } from "@crosshatch/ui/components/dialog"
+import { Button } from "@crosshatch/ui/components/Button"
+import { CommandItem } from "@crosshatch/ui/components/Command"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@crosshatch/ui/components/Dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@crosshatch/ui/components/dropdown-menu"
-import { Input } from "@crosshatch/ui/components/input"
-import { Message } from "@crosshatch/ui/components/message"
-import { Search, searchInputAtom, searchOpenAtom } from "@crosshatch/ui/components/search"
+} from "@crosshatch/ui/components/DropdownMenu"
+import { Input } from "@crosshatch/ui/components/Input"
+import { Message } from "@crosshatch/ui/components/Message"
+import { Search, searchInputAtom, searchOpenAtom } from "@crosshatch/ui/components/Search"
 import {
   SidebarContent,
   SidebarGroup,
@@ -24,7 +30,7 @@ import {
   SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@crosshatch/ui/components/sidebar"
+} from "@crosshatch/ui/components/Sidebar"
 import { registerCommand } from "@crosshatch/util"
 import { useAtomSet, useAtomSuspense } from "@effect-atom/atom-react"
 import { Atom } from "@effect-atom/atom-react"

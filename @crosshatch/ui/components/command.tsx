@@ -1,8 +1,8 @@
 import { Command as CommandPrimitive } from "cmdk"
 import { SearchIcon } from "lucide-react"
 import * as React from "react"
-import { cn } from "../cn"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./dialog.tsx"
+import { cn } from "../cn.ts"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./Dialog.tsx"
 
 function Command({
   className,

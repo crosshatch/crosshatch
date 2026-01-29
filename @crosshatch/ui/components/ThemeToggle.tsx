@@ -1,6 +1,6 @@
 import { useTheme } from "next-themes"
 import { cn } from "../cn.ts"
-import { Button } from "./button.tsx"
+import { Button } from "./Button.tsx"
 
 export const ThemeToggle = ({
   className,
