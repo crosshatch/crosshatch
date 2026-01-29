@@ -1,9 +1,10 @@
 import type { Address } from "./Address.ts"
-import type { PaymentRequired } from "./schemas.ts"
+import type { PaymentRequired, ResourceInfo } from "./schemas.ts"
 
-export const createRequirement = ({ recipient, amount }: {
+export const createRequirement = ({ recipient, amount, resource }: {
   recipient: typeof Address.Type
   amount: bigint
+  resource: typeof ResourceInfo.Type
 }): typeof PaymentRequired.Type => ({
   x402Version: 2,
   accepts: [{
@@ -18,9 +19,5 @@ export const createRequirement = ({ recipient, amount }: {
     payTo: recipient,
     scheme: "exact",
   }],
-  resource: {
-    description: "TODO",
-    mimeType: "text/plain",
-    url: "",
-  },
+  resource,
 })

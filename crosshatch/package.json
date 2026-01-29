@@ -29,6 +29,7 @@
   "peerDependencies": {
     "@crosshatch/util": "workspace:*",
     "@crosshatch/x402": "workspace:*",
+    "@effect-atom/atom": "catalog:",
     "@effect/ai": "catalog:",
     "@effect/platform": "catalog:",
     "@effect/platform-browser": "catalog:",

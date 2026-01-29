@@ -1,10 +1,10 @@
 import { chats } from "@/schema"
 import Worker from "@/worker.ts?worker"
-import { BridgeClient } from "@crosshatch/react"
 import { PgliteClient } from "@crosshatch/store"
 import { LoggerLive } from "@crosshatch/util"
 import { Atom } from "@effect-atom/atom-react"
 import { BrowserKeyValueStore } from "@effect/platform-browser"
+import { BridgeClientLive } from "crosshatch"
 import { FetchHttpClientLive } from "crosshatch/effect"
 import { desc, eq, sql } from "drizzle-orm"
 import { ConfigProvider, Effect, Layer, Schema as S } from "effect"
@@ -14,7 +14,7 @@ import type { ChatId } from "./ids"
 export const runtime = Atom.runtime(
   Layer.mergeAll(
     LoggerLive,
-    BridgeClient.layer,
+    BridgeClientLive,
     Drizzle.Default.pipe(
       Layer.provideMerge(PgliteClient.layer(Worker)),
     ),

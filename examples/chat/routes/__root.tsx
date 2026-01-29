@@ -9,7 +9,6 @@ import { router } from "@/router"
 import { chatItems, chats, embeddings } from "@/schema"
 import { tx } from "@/tx"
 import { txNonNullable } from "@crosshatch/drizzle"
-import { linkStateAtom } from "@crosshatch/react"
 import * as AtomUtil from "@crosshatch/ui/AtomUtil"
 import { Button } from "@crosshatch/ui/components/button"
 import { LoaderView } from "@crosshatch/ui/components/loader-view"
@@ -18,7 +17,7 @@ import { e0 } from "@crosshatch/util"
 import { useAtom, useAtomSet, useAtomValue } from "@effect-atom/atom-react"
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router"
 import { generateText, type UserModelMessage } from "ai"
-import { dialog, homeHref, linkHref } from "crosshatch"
+import { isLinkedAtom, openSessionWidgetAtom } from "crosshatch"
 import { eq } from "drizzle-orm"
 import { Cause, Effect, Fiber } from "effect"
 import { HandCoins, PanelLeftIcon, Plus } from "lucide-react"
@@ -35,7 +34,7 @@ function RouteComponent() {
   const [chat, setChat] = useAtom(chatAtom(chatId))
   const submit = useAtomSet(submitAtom)
   const modelIdsResult = useAtomValue(modelIdsAtom)
-  const sessionButtonOnClick = useAtomSet(sessionButtonOnClickAtom)
+  const sessionButtonOnClick = useAtomSet(openSessionWidgetAtom)
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <SidebarProvider>
@@ -102,43 +101,17 @@ const Header = () => {
   )
 }
 
-const sessionButtonOnClickAtom = runtime.fn<void>()(Effect.fn(function*(_, get) {
-  const linkState = yield* get.result(linkStateAtom)
-  switch (linkState._tag) {
-    case "Anonymous": {
-      const { challengeId } = linkState
-      return yield* linkHref({
-        id: challengeId,
-        window: "Week",
-        amount: 10,
-        presentation: "Embedded",
-        referrer: location.href,
-      }).pipe(
-        Effect.flatMap(dialog),
-      )
-    }
-    case "Linked": {
-      return yield* homeHref({
-        presentation: "Embedded",
-        referrer: location.href,
-      }).pipe(
-        Effect.flatMap(dialog),
-      )
-    }
-  }
-}))
-
 export const submitAtom = runtime.fn<typeof ChatId.Type | undefined>()(Effect.fn(function*(chatId, get) {
-  // const session = yield* get.result(sessionDetailsAtom)
-  // if (Option.isNone(session)) {
-  //   get.set(sessionDialogOpenAtom, true)
-  //   return
-  // }
+  const isLinked = yield* get.result(isLinkedAtom)
+  if (!isLinked) {
+    yield* get.setResult(openSessionWidgetAtom, void 0)
+  }
   let { text } = get(chatAtom(chatId))
   const items = yield* get.result(chatItemsAtom(chatId))
   text = text.trim()
   if (!text) return
   const _ = yield* Drizzle
+  const modelId = yield* get.result(currentModelIdAtom)
   let titleFiber: Fiber.RuntimeFiber<void, Cause.UnknownException> | undefined
   if (!chatId) {
     const id = ChatId.make(crypto.randomUUID())
@@ -154,17 +127,17 @@ export const submitAtom = runtime.fn<typeof ChatId.Type | undefined>()(Effect.fn
     titleFiber = yield* Effect.gen(function*() {
       const { text: title } = yield* Effect.tryPromise(() =>
         generateText({
+          maxRetries: 0,
           model: openai("gpt-3.5-turbo"),
-          prompt: `
-            I'm about to provide you with a message.
-            Create a concise title for the message.
-            Don't place the title inside of quotes.
-            Provide just a few words in title case.
-
-            ---
-
-            ${text}
-          `,
+          messages: [{
+            role: "user",
+            content: `
+              I'm about to provide you with a message. Create a concise title for the message.
+              Don't place the title inside of quotes. Provide just a few words in title case.
+              ---
+              ${text}
+            `,
+          }],
         })
       )
       yield* Effect.tryPromise(() => _.update(chats).set({ title }).where(eq(chats.id, id)))
@@ -204,11 +177,11 @@ export const submitAtom = runtime.fn<typeof ChatId.Type | undefined>()(Effect.fn
     inflight,
     text: "",
   })
-  const modelId = yield* get.result(currentModelIdAtom)
   const { text: incoming, response: { messages } } = yield* Effect.tryPromise(() =>
     generateText({
       model: openai(modelId),
       messages: [...items.map((v) => v.message), userMessage],
+      maxRetries: 0,
     })
   )
   const assistantMessageEmbedding = yield* embed(incoming)

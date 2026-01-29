@@ -29,6 +29,7 @@ export const BridgeWorkerLive = Effect.gen(function*() {
       removeEventListener("message", f)
     }
   })
+  // TODO: solve deadlock
   addEventListener("message", function f({ data, origin }: MessageEvent) {
     if (origin === appUrl && Option.isSome(S.decodeUnknownOption(RequestIntroduction)(data))) {
       context.postMessage(new Introduction(), "*")
