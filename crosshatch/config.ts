@@ -1,5 +1,6 @@
 import { toHref } from "@crosshatch/util"
 import { Effect, flow, Schema as S } from "effect"
+import { Escalation } from "./DeclinedDecision.ts"
 import { appUrl } from "./env.ts"
 import { LinkChallengeId } from "./LinkChallenge.ts"
 
@@ -31,4 +32,9 @@ export const LinkConfig = S.Struct({
 export const linkHref = flow(
   S.encode(LinkConfig),
   Effect.map(toHref(new URL("/link", appUrl))),
+)
+
+export const escalationHref = flow(
+  S.encode(Escalation),
+  Effect.map(toHref(new URL("/escalation", appUrl))),
 )

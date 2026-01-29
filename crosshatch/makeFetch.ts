@@ -1,7 +1,12 @@
 import { PaymentRequired } from "@crosshatch/x402"
-import { absurd, Effect, Encoding, flow, Schema as S } from "effect"
+import { absurd, Data, Effect, Encoding, flow, Schema as S } from "effect"
 import { BridgeClient } from "./BridgeClient.ts"
 import { runtime } from "./BridgeClientLive.ts"
+import { escalationHref } from "./config.ts"
+import { dialog } from "./dialog.ts"
+
+export class InsufficientFundsError extends Data.TaggedError("InsufficientFundsError")<{}> {}
+export class EscalationRejectedError extends Data.TaggedError("EscalationRejectedError")<{}> {}
 
 export const makeFetch = (fetch: typeof globalThis.fetch): typeof globalThis.fetch => async (input, init) =>
   Effect.gen(function*() {
@@ -25,16 +30,25 @@ export const makeFetch = (fetch: typeof globalThis.fetch): typeof globalThis.fet
         )
     )
     const bridge = yield* BridgeClient
-    const decision = yield* bridge.payment({
+    let decision = yield* bridge.propose({
       requirement: requirement as never,
     })
-    if (decision._tag !== "Approved") {
-      // TODO: escalation
-      return absurd<never>(null!)
+    if (decision._tag === "Escalation") {
+      yield* escalationHref(decision).pipe(
+        Effect.flatMap(dialog),
+      )
+      decision = yield* bridge.propose({
+        requirement: requirement as never,
+      })
+      if (decision._tag === "Escalation") {
+        throw new EscalationRejectedError()
+      }
+    }
+    if (decision._tag === "InsufficientFunds") {
+      throw new InsufficientFundsError()
     }
     const { payload } = decision
     const value = Encoding.encodeBase64(JSON.stringify(payload))
-    // console.log("HERE", init?.body, value)
     switch (payload.x402Version) {
       case 1: {
         headers.set("X-PAYMENT", value)
