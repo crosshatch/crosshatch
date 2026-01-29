@@ -6,10 +6,11 @@ export const dev = Config.boolean("DEV").pipe(
 )
 const prefix = dev ? "local." : ""
 
-export const appDomain = `${prefix}crosshatch.dev`
+export const domain = `${prefix}crosshatch.dev`
+
 export const docsDomain = `${prefix}docs.crosshatch.dev`
 
 const urlLeading = (v: string) => `https://${v}`
 
-export const appUrl = urlLeading(appDomain)
+export const appUrl = urlLeading(domain)
 export const docsUrl = urlLeading(docsDomain)

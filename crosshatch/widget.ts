@@ -3,18 +3,20 @@ import { appUrl } from "./env.ts"
 import { DialogClose, Introduction, RequestIntroduction } from "./messages.ts"
 
 // TODO: make resolve to value of a specified schema
-export const dialog = Effect.fn(function*(
+export const widget = Effect.fn(function*<A, I, R>(
   href: string,
+  _schema: S.Schema<A, I, R>,
 ) {
   const deferred = yield* Deferred.make<void>()
   addEventListener("message", function f({ data, origin }: MessageEvent) {
     if (origin === appUrl && Option.isSome(S.decodeUnknownOption(RequestIntroduction)(data))) {
-      Deferred.unsafeDone(deferred, Effect.succeed(undefined))
       iframe.contentWindow?.postMessage(new Introduction(), appUrl)
+      Deferred.unsafeDone(deferred, Effect.succeed(undefined))
     }
   })
   const iframe = document.createElement("iframe")
   iframe.sandbox = "allow-scripts allow-same-origin allow-popups"
+  iframe.style.transition = "opacity 1s ease"
   iframe.style.opacity = "0"
   iframe.src = href
   iframe.style.position = "fixed"
