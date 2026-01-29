@@ -2,7 +2,10 @@ import { Deferred, Effect, Option, Schema as S } from "effect"
 import { appUrl } from "./env.ts"
 import { DialogClose, Introduction, RequestIntroduction } from "./messages.ts"
 
-export const dialog = Effect.fn(function*(href: string) {
+// TODO: make resolve to value of a specified schema
+export const dialog = Effect.fn(function*(
+  href: string,
+) {
   const deferred = yield* Deferred.make<void>()
   addEventListener("message", function f({ data, origin }: MessageEvent) {
     if (origin === appUrl && Option.isSome(S.decodeUnknownOption(RequestIntroduction)(data))) {
@@ -11,7 +14,7 @@ export const dialog = Effect.fn(function*(href: string) {
     }
   })
   const iframe = document.createElement("iframe")
-  iframe.sandbox = "allow-scripts allow-same-origin"
+  iframe.sandbox = "allow-scripts allow-same-origin allow-popups"
   iframe.style.opacity = "0"
   iframe.src = href
   iframe.style.position = "fixed"
