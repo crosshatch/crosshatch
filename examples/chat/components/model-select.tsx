@@ -15,12 +15,12 @@ import { Check, ChevronsUpDown } from "lucide-react"
 import { useState } from "react"
 
 export const ModelSelect = () => {
-  const [open, setOpen] = useState(false)
+  const [open, onOpenChange] = useState(false)
   const modelIdsResult = useAtomValue(modelIdsAtom)
   const { value: selected } = useAtomSuspense(currentModelIdAtom)
   const setSelected = useAtomSet(currentModelIdAtom)
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover {...{ open, onOpenChange }}>
       <PopoverTrigger asChild>
         <Button variant="outline" role="combobox" aria-expanded={open} className="justify-between rounded-full">
           {Result
@@ -45,7 +45,7 @@ export const ModelSelect = () => {
                       value={model}
                       onSelect={(currentValue) => {
                         setSelected(currentValue)
-                        setOpen(false)
+                        onOpenChange(false)
                       }}
                     >
                       {model}

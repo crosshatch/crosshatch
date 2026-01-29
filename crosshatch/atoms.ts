@@ -1,8 +1,8 @@
 import { Atom } from "@effect-atom/atom"
-import { Effect } from "effect"
+import { Effect, Schema as S } from "effect"
 import { homeHref, linkHref } from "./config.ts"
-import { dialog } from "./dialog.ts"
 import { linkState } from "./methods.ts"
+import { widget } from "./widget.ts"
 
 export const linkStateAtom = Atom.make(linkState)
 
@@ -31,5 +31,5 @@ export const openSessionWidgetAtom = Atom.fn<void>()(
         })
       }
     }
-  }, Effect.flatMap(dialog)),
+  }, Effect.flatMap((v) => widget(v, S.Void))),
 )

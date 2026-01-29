@@ -20,7 +20,7 @@ const searchInitAtom = Atom.make((get) => {
 
 export const Search = ({ results }: { results: React.ReactNode }) => {
   const [input, setInput] = useAtom(searchInputAtom)
-  const [open, setOpen] = useAtom(searchOpenAtom)
+  const [open, onOpenChange] = useAtom(searchOpenAtom)
   useAtomMount(searchInitAtom)
 
   return (
@@ -28,7 +28,7 @@ export const Search = ({ results }: { results: React.ReactNode }) => {
       <Button
         variant="outline"
         className="relative bg-background/25! py-2.75 border flex flex-1 justify-start rounded-md text-sm shadow-none"
-        onClick={() => setOpen(true)}
+        onClick={() => onOpenChange(true)}
       >
         <SearchIcon />
         <span className="inline-flex group-data-[collapsible=icon]:hidden">Search...</span>
@@ -36,7 +36,7 @@ export const Search = ({ results }: { results: React.ReactNode }) => {
           <span className="text-xs mt-[1px]">⌘</span>K
         </kbd>
       </Button>
-      <CommandDialog open={open} onOpenChange={setOpen}>
+      <CommandDialog {...{ open, onOpenChange }}>
         <CommandInput
           placeholder="Search messages..."
           onValueChange={setInput}

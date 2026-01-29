@@ -1,4 +1,5 @@
 import { Deferred, Effect, Option, Schema as S } from "effect"
+import { IFRAME } from "./constants.ts"
 import { appUrl } from "./env.ts"
 import { DialogClose, Introduction, RequestIntroduction } from "./messages.ts"
 
@@ -15,7 +16,8 @@ export const widget = Effect.fn(function*<A, I, R>(
     }
   })
   const iframe = document.createElement("iframe")
-  iframe.sandbox = "allow-scripts allow-same-origin allow-popups"
+  iframe.sandbox = IFRAME.sandbox
+  iframe.allow = IFRAME.allow
   iframe.style.transition = "opacity 1s ease"
   iframe.style.opacity = "0"
   iframe.src = href
