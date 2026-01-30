@@ -1,5 +1,3 @@
-// TODO: last updated
-
 import { docs } from "@/.source"
 import { Feedback } from "@/components/feedback"
 import { components } from "@/components/mdx"
