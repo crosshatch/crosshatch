@@ -1,7 +1,8 @@
+import { Widget } from "@crosshatch/util"
 import { BrowserWorker } from "@effect/platform-browser"
 import { Deferred, Effect, Layer, Option, Schema as S } from "effect"
 import { appUrl } from "./env.ts"
-import { AppReady as AppPort, BridgeReady, Introduction, RequestIntroduction } from "./messages.ts"
+import { AppReady as AppPort, BridgeReady } from "./messages.ts"
 
 const style = Object
   .entries({
@@ -31,8 +32,8 @@ export const BridgeWorkerLive = Effect.gen(function*() {
   })
   // TODO: solve deadlock
   addEventListener("message", function f({ data, origin }: MessageEvent) {
-    if (origin === appUrl && Option.isSome(S.decodeUnknownOption(RequestIntroduction)(data))) {
-      context.postMessage(new Introduction(), "*")
+    if (origin === appUrl && Option.isSome(Widget.RequestIntroduction.decodeOption(data))) {
+      context.postMessage(new Widget.Introduction(), "*")
       removeEventListener("message", f)
     }
   })

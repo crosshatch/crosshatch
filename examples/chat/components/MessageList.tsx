@@ -3,7 +3,7 @@ import { ChatId } from "@/ids"
 import { Route } from "@/routes/{-$chatId}"
 import { cn } from "@crosshatch/ui/cn"
 import { ChatEventCard } from "@crosshatch/ui/components/ChatEventCard"
-import { LoaderView } from "@crosshatch/ui/components/LoaderView"
+import { CircularLoader } from "@crosshatch/ui/components/Loader"
 import { Message } from "@crosshatch/ui/components/Message"
 import { Section, SectionInner } from "@crosshatch/ui/components/Section"
 import { Skeleton } from "@crosshatch/ui/components/Skeleton"
@@ -58,7 +58,9 @@ export const MessageList = () => {
           <ChatEventCard className="border-none p-2">
             <div className="relative">
               <Skeleton className="rounded-xs h-14" />
-              <LoaderView className="absolute top-0 right-0 bottom-0 left-0" />
+              <div className="absolute top-0 right-0 bottom-0 left-0">
+                <CircularLoader />
+              </div>
             </div>
           </ChatEventCard>
         )}

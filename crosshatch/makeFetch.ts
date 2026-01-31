@@ -1,9 +1,9 @@
+import { Widget } from "@crosshatch/util"
 import { PaymentRequired } from "@crosshatch/x402"
-import { absurd, Data, Effect, Encoding, flow, Schema as S } from "effect"
+import { absurd, Data, Effect, Encoding, flow, Schema as S, Stream } from "effect"
 import { BridgeClient } from "./BridgeClient.ts"
 import { runtime } from "./BridgeClientLive.ts"
 import { escalationHref } from "./config.ts"
-import { widget } from "./widget.ts"
 
 export class InsufficientFundsError extends Data.TaggedError("InsufficientFundsError")<{}> {}
 export class EscalationRejectedError extends Data.TaggedError("EscalationRejectedError")<{}> {}
@@ -35,7 +35,12 @@ export const makeFetch = (fetch: typeof globalThis.fetch): typeof globalThis.fet
     })
     if (decision._tag === "Escalation") {
       yield* escalationHref(decision).pipe(
-        Effect.flatMap((v) => widget(v, S.Void)),
+        Effect.flatMap((src) =>
+          Widget.make({
+            src,
+            schema: S.Void,
+          }).pipe(Stream.runDrain)
+        ),
       )
       decision = yield* bridge.propose({
         requirement: requirement as never,

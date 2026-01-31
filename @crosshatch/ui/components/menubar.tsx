@@ -1,6 +1,6 @@
 import * as MenubarPrimitive from "@radix-ui/react-menubar"
 import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react"
-import { cn } from "../cn"
+import { cn } from "../cn.ts"
 
 function Menubar({
   className,

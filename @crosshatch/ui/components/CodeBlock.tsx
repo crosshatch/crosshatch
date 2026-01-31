@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { codeToHtml } from "shiki"
-import { cn } from "../cn"
+import { cn } from "../cn.ts"
 
 export type CodeBlockProps = {
   children?: React.ReactNode

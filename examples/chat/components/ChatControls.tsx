@@ -1,9 +1,12 @@
 import { chatAtom } from "@/atoms"
+import { ModelSelect } from "@/components/ModelSelect"
 import { Button } from "@crosshatch/ui/components/Button"
 import { Section, SectionInner } from "@crosshatch/ui/components/Section"
 import { Textarea } from "@crosshatch/ui/components/Textarea"
-import { useAtomValue } from "@effect-atom/atom-react"
+import { useAtomSet, useAtomValue } from "@effect-atom/atom-react"
+import { openSessionWidgetAtom } from "crosshatch"
 import { ArrowUp } from "lucide-react"
+import { HandCoins } from "lucide-react"
 import { useEffect, useRef } from "react"
 
 export const ChatControls = ({
@@ -11,16 +14,15 @@ export const ChatControls = ({
   text,
   onTextChange,
   submit,
-  actions,
   additionalDisabled,
 }: {
   chatId: string | undefined
   text: string
   onTextChange: (text: string) => void
   submit: () => void
-  actions?: React.ReactNode | undefined
   additionalDisabled?: boolean | undefined
 }) => {
+  const sessionButtonOnClick = useAtomSet(openSessionWidgetAtom)
   const ref = useRef<HTMLTextAreaElement>(null)
   const { inflight } = useAtomValue(chatAtom(chatId))
   useEffect(() => ref?.current?.focus(), [chatId])
@@ -42,7 +44,17 @@ export const ChatControls = ({
         />
         <div className="flex items-center gap-2 w-full justify-between">
           <div className="flex flex-row">
-            {actions}
+            <div className="flex items-center gap-2">
+              <Button
+                size="icon"
+                className="rounded-full"
+                variant="outline"
+                onClick={() => sessionButtonOnClick()}
+              >
+                <HandCoins />
+              </Button>
+              <ModelSelect />
+            </div>
           </div>
           <Button
             onClick={() => inflight ? inflight.abort() : submit()}

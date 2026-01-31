@@ -1,10 +1,9 @@
 import { registerCommand } from "@crosshatch/util"
 import { Atom, useAtom, useAtomMount } from "@effect-atom/atom-react"
 import { Search as SearchIcon } from "lucide-react"
-import { Suspense } from "react"
 import { Button } from "./Button.tsx"
 import { CommandDialog, CommandGroup, CommandInput, CommandList } from "./Command.tsx"
-import { LoaderView } from "./LoaderView.tsx"
+import { CSuspense } from "./CSuspense.tsx"
 import { Separator } from "./Separator.tsx"
 
 export const searchInputAtom = Atom.make("").pipe(Atom.keepAlive)
@@ -47,9 +46,7 @@ export const Search = ({ results }: { results: React.ReactNode }) => {
             <Separator />
             <CommandList>
               <CommandGroup>
-                <Suspense fallback={<LoaderView className="p-8" />}>
-                  {results}
-                </Suspense>
+                <CSuspense className="p-8">{results}</CSuspense>
               </CommandGroup>
             </CommandList>
           </>

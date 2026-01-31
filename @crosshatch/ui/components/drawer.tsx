@@ -1,5 +1,5 @@
 import { Drawer as DrawerPrimitive } from "vaul"
-import { cn } from "../cn"
+import { cn } from "../cn.ts"
 
 function Drawer({
   ...props

@@ -1,4 +1,4 @@
-import { cn } from "../cn"
+import { cn } from "../cn.ts"
 
 export const ChatEventCard = ({ children, className, actions }: {
   children: React.ReactNode

@@ -1,6 +1,5 @@
 import { chatAtom, chatItemsAtom, currentModelIdAtom, modelIdsAtom, runtime } from "@/atoms"
 import { ChatControls } from "@/components/ChatControls"
-import { ModelSelect } from "@/components/ModelSelect"
 import { SidebarInner } from "@/components/SidebarInner"
 import { Drizzle } from "@/Drizzle"
 import { ChatId } from "@/ids"
@@ -11,7 +10,6 @@ import { tx } from "@/tx"
 import { txNonNullable } from "@crosshatch/drizzle"
 import * as AtomUtil from "@crosshatch/ui/AtomUtil"
 import { Button } from "@crosshatch/ui/components/Button"
-import { LoaderView } from "@crosshatch/ui/components/LoaderView"
 import { Sidebar, SidebarInset, SidebarProvider, useSidebar } from "@crosshatch/ui/components/Sidebar"
 import { e0 } from "@crosshatch/util"
 import { useAtom, useAtomSet, useAtomValue } from "@effect-atom/atom-react"
@@ -20,9 +18,8 @@ import { generateText, type UserModelMessage } from "ai"
 import { isLinkedAtom, openSessionWidgetAtom } from "crosshatch"
 import { eq } from "drizzle-orm"
 import { Cause, Effect, Fiber } from "effect"
-import { HandCoins, PanelLeftIcon, Plus } from "lucide-react"
+import { PanelLeftIcon, Plus } from "lucide-react"
 import { ThemeProvider } from "next-themes"
-import { Suspense } from "react"
 import { Route as ChatRoute } from "./{-$chatId}"
 
 export const Route = createRootRoute({
@@ -34,7 +31,6 @@ function RouteComponent() {
   const [chat, setChat] = useAtom(chatAtom(chatId))
   const submit = useAtomSet(submitAtom)
   const modelIdsResult = useAtomValue(modelIdsAtom)
-  const sessionButtonOnClick = useAtomSet(openSessionWidgetAtom)
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <SidebarProvider>
@@ -43,31 +39,16 @@ function RouteComponent() {
         </Sidebar>
         <SidebarInset>
           <Header />
-          <Suspense fallback={<LoaderView />}>
-            <div className="relative flex flex-1 w-full h-full flex-col">
-              <Outlet />
-              <ChatControls
-                {...{ chatId }}
-                {...chat}
-                submit={() => submit(chatId)}
-                onTextChange={(text) => setChat({ ...chat, text })}
-                additionalDisabled={modelIdsResult._tag !== "Success"}
-                actions={
-                  <div className="flex items-center gap-2">
-                    <Button
-                      size="icon"
-                      className="rounded-full"
-                      variant="outline"
-                      onClick={() => sessionButtonOnClick()}
-                    >
-                      <HandCoins />
-                    </Button>
-                    <ModelSelect />
-                  </div>
-                }
-              />
-            </div>
-          </Suspense>
+          <div className="relative flex flex-1 w-full h-full flex-col">
+            <Outlet />
+            <ChatControls
+              {...{ chatId }}
+              {...chat}
+              submit={() => submit(chatId)}
+              onTextChange={(text) => setChat({ ...chat, text })}
+              additionalDisabled={modelIdsResult._tag !== "Success"}
+            />
+          </div>
         </SidebarInset>
       </SidebarProvider>
     </ThemeProvider>

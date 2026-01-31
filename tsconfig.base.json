@@ -49,5 +49,5 @@
     "useUnknownInCatchVariables": true,
     "verbatimModuleSyntax": true
   },
-  "exclude": [".context", "node_modules"]
+  "exclude": ["node_modules", "repos"]
 }

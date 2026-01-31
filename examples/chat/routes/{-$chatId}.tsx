@@ -1,11 +1,11 @@
 import { MessageList } from "@/components/MessageList"
 import { ChatId } from "@/ids"
 import { router } from "@/router"
-import { LoaderView } from "@crosshatch/ui/components/LoaderView"
+import { CSuspense } from "@crosshatch/ui/components/CSuspense"
 import { registerCommand } from "@crosshatch/util"
 import { createFileRoute } from "@tanstack/react-router"
 import { Struct } from "effect"
-import { Suspense, useEffect } from "react"
+import { useEffect } from "react"
 
 export const Route = createFileRoute("/{-$chatId}")({
   component: RouteComponent,
@@ -35,8 +35,8 @@ function RouteComponent() {
   }, [chatId])
 
   return (
-    <Suspense fallback={<LoaderView />}>
+    <CSuspense skeletonClassName="flex-1">
       <MessageList />
-    </Suspense>
+    </CSuspense>
   )
 }

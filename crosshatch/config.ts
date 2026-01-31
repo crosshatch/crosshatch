@@ -7,7 +7,6 @@ import { LinkChallengeId } from "./LinkChallenge.ts"
 export const Presentation = S.Literal("Redirect", "Embedded", "Popup")
 
 const Common = S.Struct({
-  presentation: Presentation.pipe(S.optional),
   referrer: S.String.pipe(S.optional),
 })
 
