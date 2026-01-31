@@ -8,18 +8,14 @@ export const CSuspense = ({ className, skeletonClassName, children, dev }: {
   readonly children: React.ReactNode
   readonly dev?: boolean | undefined
 }) => {
-  const props = { className: cn("flex justify-center items-center", skeletonClassName) }
+  const props = {
+    className: cn("flex justify-center items-center rounded-none", skeletonClassName),
+  }
   return dev
     ? <Skeleton {...props} />
     : (
       <Suspense fallback={<Skeleton {...props} />}>
-        {className
-          ? (
-            <div className={cn("flex flex-col flex-1", className)}>
-              {children}
-            </div>
-          )
-          : children}
+        {className ? <div {...{ className }}>{children}</div> : children}
       </Suspense>
     )
 }

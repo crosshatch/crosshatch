@@ -4,8 +4,6 @@ import { Escalation } from "./DeclinedDecision.ts"
 import { appUrl } from "./env.ts"
 import { LinkChallengeId } from "./LinkChallenge.ts"
 
-export const Presentation = S.Literal("Redirect", "Embedded", "Popup")
-
 const Common = S.Struct({
   referrer: S.String.pipe(S.optional),
 })

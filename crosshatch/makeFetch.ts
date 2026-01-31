@@ -2,8 +2,8 @@ import { Widget } from "@crosshatch/util"
 import { PaymentRequired } from "@crosshatch/x402"
 import { absurd, Data, Effect, Encoding, flow, Schema as S, Stream } from "effect"
 import { BridgeClient } from "./BridgeClient.ts"
-import { runtime } from "./BridgeClientLive.ts"
 import { escalationHref } from "./config.ts"
+import { runtime } from "./Live.ts"
 
 export class InsufficientFundsError extends Data.TaggedError("InsufficientFundsError")<{}> {}
 export class EscalationRejectedError extends Data.TaggedError("EscalationRejectedError")<{}> {}

@@ -37,7 +37,7 @@ import { Atom } from "@effect-atom/atom-react"
 import { Link } from "@tanstack/react-router"
 import { cosineDistance, eq, sql } from "drizzle-orm"
 import { Effect } from "effect"
-import { MoreHorizontal, PencilLine, Trash2 } from "lucide-react"
+import { MoreHorizontal, PencilLine, Plus, Trash2 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 
 export const SidebarInner = () => {
@@ -50,6 +50,14 @@ export const SidebarInner = () => {
       <SidebarContent className="flex [&::-webkit-scrollbar]:hidden max-h-screen p-[0.5]">
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
           <SidebarMenu>
+            <Button variant="outline" asChild className="font-light h-8 justify-between">
+              <Link to="/{-$chatId}" params={{ chatId: undefined }}>
+                New chat
+                <Plus />
+              </Link>
+            </Button>
+          </SidebarMenu>
+          <SidebarMenu className="mt-2">
             {chats?.map((chat) => <ChatLink key={chat.id} {...chat} />)}
           </SidebarMenu>
         </SidebarGroup>

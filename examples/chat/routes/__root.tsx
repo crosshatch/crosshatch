@@ -13,12 +13,12 @@ import { Button } from "@crosshatch/ui/components/Button"
 import { Sidebar, SidebarInset, SidebarProvider, useSidebar } from "@crosshatch/ui/components/Sidebar"
 import { e0 } from "@crosshatch/util"
 import { useAtom, useAtomSet, useAtomValue } from "@effect-atom/atom-react"
-import { createRootRoute, Link, Outlet } from "@tanstack/react-router"
+import { createRootRoute, Outlet } from "@tanstack/react-router"
 import { generateText, type UserModelMessage } from "ai"
 import { isLinkedAtom, openSessionWidgetAtom } from "crosshatch"
 import { eq } from "drizzle-orm"
 import { Cause, Effect, Fiber } from "effect"
-import { PanelLeftIcon, Plus } from "lucide-react"
+import { PanelLeftIcon, PocketKnife } from "lucide-react"
 import { ThemeProvider } from "next-themes"
 import { Route as ChatRoute } from "./{-$chatId}"
 
@@ -57,6 +57,7 @@ function RouteComponent() {
 
 const Header = () => {
   const { toggleSidebar } = useSidebar()
+  const sessionButtonOnClick = useAtomSet(openSessionWidgetAtom)
   return (
     <header className="flex z-1 py-2 sticky top-0 right-0 left-0 bg-secondary/75 backdrop-blur-sm items-center border-b p-2 justify-between">
       <Button
@@ -66,17 +67,16 @@ const Header = () => {
         onClick={toggleSidebar}
         className="size-11"
       >
-        <PanelLeftIcon className="size-7 stroke-[1.5]" />
+        <PanelLeftIcon className="size-7 stroke-1" />
         <span className="sr-only">Toggle Sidebar</span>
       </Button>
       <Button
-        asChild
-        className="shadow-none rounded-full size-11"
+        size="icon"
+        className="size-11"
         variant="outline"
+        onClick={() => sessionButtonOnClick()}
       >
-        <Link to="/{-$chatId}" params={{ chatId: undefined }}>
-          <Plus className="size-6 stroke-2" />
-        </Link>
+        <PocketKnife className="size-6 stroke-1" />
       </Button>
     </header>
   )

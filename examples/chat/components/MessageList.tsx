@@ -2,8 +2,6 @@ import { chatAtom, chatItemsAtom } from "@/atoms"
 import { ChatId } from "@/ids"
 import { Route } from "@/routes/{-$chatId}"
 import { cn } from "@crosshatch/ui/cn"
-import { ChatEventCard } from "@crosshatch/ui/components/ChatEventCard"
-import { CircularLoader } from "@crosshatch/ui/components/Loader"
 import { Message } from "@crosshatch/ui/components/Message"
 import { Section, SectionInner } from "@crosshatch/ui/components/Section"
 import { Skeleton } from "@crosshatch/ui/components/Skeleton"
@@ -57,10 +55,7 @@ export const MessageList = () => {
         {inflight && (
           <ChatEventCard className="border-none p-2">
             <div className="relative">
-              <Skeleton className="rounded-xs h-14" />
-              <div className="absolute top-0 right-0 bottom-0 left-0">
-                <CircularLoader />
-              </div>
+              <Skeleton className="rounded-xs h-14 flex-1" />
             </div>
           </ChatEventCard>
         )}
@@ -68,3 +63,18 @@ export const MessageList = () => {
     </Section>
   )
 }
+
+export const ChatEventCard = ({ children, className, actions }: {
+  children: React.ReactNode
+  className?: string | undefined
+  actions?: React.ReactNode | undefined
+}) => (
+  <div className={cn("w-full flex flex-row", className)}>
+    <div className="w-2/3">
+      <div className="rounded-sm border overflow-hidden">
+        {children}
+      </div>
+      {actions && <div className="flex w-full">{actions}</div>}
+    </div>
+  </div>
+)
