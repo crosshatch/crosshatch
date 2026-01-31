@@ -1,27 +1,22 @@
-import { chatAtom } from "@/atoms"
+import { chatAtom, modelIdsAtom } from "@/atoms"
+import { submitAtom } from "@/atoms/submit"
 import { ModelSelect } from "@/components/ModelSelect"
+import { Route } from "@/routes/{-$chatId}"
 import { Button } from "@crosshatch/ui/components/Button"
+import { CSuspense } from "@crosshatch/ui/components/CSuspense"
 import { Section, SectionInner } from "@crosshatch/ui/components/Section"
 import { Textarea } from "@crosshatch/ui/components/Textarea"
-import { useAtomValue } from "@effect-atom/atom-react"
-import { ArrowUp } from "lucide-react"
+import { useAtom, useAtomSet, useAtomValue } from "@effect-atom/atom-react"
+import { ArrowUp, PocketKnife } from "lucide-react"
 import { useEffect, useRef } from "react"
 
-export const ChatControls = ({
-  chatId,
-  text,
-  onTextChange,
-  submit,
-  additionalDisabled,
-}: {
-  chatId: string | undefined
-  text: string
-  onTextChange: (text: string) => void
-  submit: () => void
-  additionalDisabled?: boolean | undefined
-}) => {
+export const ChatControls = () => {
+  const { chatId } = Route.useParams()
+  const submit = useAtomSet(submitAtom)
+  const [chat, setChat] = useAtom(chatAtom(chatId))
+  const { inflight, text } = chat
   const ref = useRef<HTMLTextAreaElement>(null)
-  const { inflight } = useAtomValue(chatAtom(chatId))
+  const modelIdsLoaded = useAtomValue(modelIdsAtom)._tag === "Success"
   useEffect(() => ref?.current?.focus(), [chatId])
   return (
     <Section className="p-4 sticky border-t bottom-0 right-0 left-0 bg-background/90 backdrop-blur-lg">
@@ -29,30 +24,37 @@ export const ChatControls = ({
         <Textarea
           ref={ref}
           value={text}
-          onChange={({ target: { value } }) => onTextChange(value)}
+          onChange={({ target: { value } }) =>
+            setChat({
+              ...chat,
+              text: value,
+            })}
           placeholder="Your message..."
           className="text-primary p-4 min-h-30 rounded-2xl w-full resize-none border shadow-none outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
           onKeyDown={(e) => {
             if (!e.shiftKey && e.key === "Enter") {
               e.preventDefault()
-              submit()
+              submit(chatId)
             }
           }}
         />
         <div className="flex items-center gap-2 w-full justify-between">
-          <div className="flex flex-row">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-row gap-2">
+            <CSuspense skeletonClassName="flex items-center gap-2 w-36 h-9 rounded-full">
               <ModelSelect />
-            </div>
+            </CSuspense>
+            <Button size="icon" className="size-9 rounded-full cursor-pointer" variant="outline">
+              <PocketKnife className="stroke-1" size={18} />
+            </Button>
           </div>
           <Button
-            onClick={() => inflight ? inflight.abort() : submit()}
+            onClick={() => inflight ? inflight.abort() : submit(chatId)}
             size="icon"
             className="size-9 rounded-full cursor-pointer"
             variant="outline"
-            disabled={!(text || inflight) || additionalDisabled}
+            disabled={!(text || inflight) || !modelIdsLoaded}
           >
-            {inflight ? <span className="size-3 rounded-xs bg-primary" /> : <ArrowUp size={18} />}
+            {inflight ? <span className="size-3 rounded-xs bg-primary" /> : <ArrowUp className="stroke-1 size-5" />}
           </Button>
         </div>
       </SectionInner>

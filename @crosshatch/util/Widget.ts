@@ -20,15 +20,16 @@ export class Close extends S.TaggedClass<Close>("Close")("Close", {}) {
   static decodeOption = S.decodeUnknownOption(this)
 }
 
-// TODO: rename to make
 export const make = <A, I>({
   src,
   schema,
+  matchReady,
   sandbox = DEFAULT_SANDBOX,
   allow = DEFAULT_ALLOW,
 }: {
   readonly src: string
   readonly schema: S.Schema<A, I>
+  readonly matchReady?: (v: A) => boolean
   readonly sandbox?: string | undefined
   readonly allow?: string | undefined
 }) =>
@@ -44,7 +45,11 @@ export const make = <A, I>({
         }
         const option = decodeOption(data)
         if (option._tag === "Some") {
-          emit.single(option.value)
+          const { value } = option
+          if (matchReady?.(value)) {
+            iframe.style.opacity = "1"
+          }
+          emit.single(value)
         }
         if (Option.isSome(Close.decodeOption(data))) {
           controller.abort()
@@ -57,6 +62,9 @@ export const make = <A, I>({
     iframe.allow = allow
     iframe.style.transition = "opacity 1s ease"
     iframe.src = src
+    if (matchReady) {
+      iframe.style.opacity = "0"
+    }
     iframe.style.position = "fixed"
     iframe.style.top = "0"
     iframe.style.right = "0"
