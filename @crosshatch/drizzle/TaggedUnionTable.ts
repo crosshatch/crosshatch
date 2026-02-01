@@ -23,6 +23,7 @@ export interface TaggedUnionTable<
   ) => C & ColumnsCommon<B> & {
     _tag: SetNotNull<PgEnumColumnBuilder<[A["_tag"]]>>
   }
+  // TODO: move tag spec into optional second param
   readonly fromRow: <K extends Types.Tags<A> = Types.Tags<A>>(
     _tag?: K | undefined,
     // TODO: further-constrain row?
