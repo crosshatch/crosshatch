@@ -1,4 +1,4 @@
-import { CSuspense } from "@crosshatch/ui/components/CSuspense"
+import { Sus } from "@crosshatch/ui/components/Sus"
 import { ImageZoom } from "fumadocs-ui/components/image-zoom"
 import { useTheme } from "next-themes"
 import { use, useEffect, useId, useState } from "react"
@@ -8,9 +8,9 @@ export const Mermaid = ({ chart }: { chart: string }) => {
   useEffect(() => setMounted(true), [])
   if (!mounted) return
   return (
-    <CSuspense>
+    <Sus>
       <MermaidContent {...{ chart }} />
-    </CSuspense>
+    </Sus>
   )
 }
 

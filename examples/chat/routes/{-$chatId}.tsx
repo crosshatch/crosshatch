@@ -1,7 +1,7 @@
 import { MessageList } from "@/components/MessageList"
 import { ChatId } from "@/ids"
 import { router } from "@/router"
-import { CSuspense } from "@crosshatch/ui/components/CSuspense"
+import { Sus } from "@crosshatch/ui/components/Sus"
 import { registerCommand } from "@crosshatch/util"
 import { createFileRoute } from "@tanstack/react-router"
 import { Struct } from "effect"
@@ -35,8 +35,8 @@ function RouteComponent() {
   }, [chatId])
 
   return (
-    <CSuspense skeletonClassName="flex-1">
+    <Sus skeletonClassName="flex-1">
       <MessageList />
-    </CSuspense>
+    </Sus>
   )
 }

@@ -3,11 +3,10 @@ import { submitAtom } from "@/atoms/submit"
 import { ModelSelect } from "@/components/ModelSelect"
 import { Route } from "@/routes/{-$chatId}"
 import { Button } from "@crosshatch/ui/components/Button"
-import { CSuspense } from "@crosshatch/ui/components/CSuspense"
 import { Section, SectionInner } from "@crosshatch/ui/components/Section"
+import { Sus } from "@crosshatch/ui/components/Sus"
 import { Textarea } from "@crosshatch/ui/components/Textarea"
 import { useAtom, useAtomSet, useAtomValue } from "@effect-atom/atom-react"
-import { openSessionWidgetAtom } from "crosshatch"
 import { ArrowUp, PocketKnife } from "lucide-react"
 import { useEffect, useRef } from "react"
 
@@ -19,7 +18,6 @@ export const ChatControls = () => {
   const ref = useRef<HTMLTextAreaElement>(null)
   const modelIdsLoaded = useAtomValue(modelIdsAtom)._tag === "Success"
   useEffect(() => ref?.current?.focus(), [chatId])
-  const openSessionWidget = useAtomSet(openSessionWidgetAtom)
   return (
     <Section className="p-4 sticky border-t bottom-0 right-0 left-0 bg-background/90 backdrop-blur-lg">
       <SectionInner className="space-y-2">
@@ -42,15 +40,10 @@ export const ChatControls = () => {
         />
         <div className="flex items-center gap-2 w-full justify-between">
           <div className="flex flex-row gap-2">
-            <CSuspense skeletonClassName="flex items-center gap-2 w-36 h-9 rounded-full">
+            <Sus skeletonClassName="flex items-center gap-2 w-36 h-9 rounded-full">
               <ModelSelect />
-            </CSuspense>
-            <Button
-              size="icon"
-              className="size-9 rounded-full cursor-pointer"
-              variant="outline"
-              onClick={() => openSessionWidget()}
-            >
+            </Sus>
+            <Button size="icon" className="size-9 rounded-full cursor-pointer" variant="outline">
               <PocketKnife className="stroke-1" size={18} />
             </Button>
           </div>

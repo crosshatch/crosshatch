@@ -2,11 +2,11 @@ import { Suspense } from "react"
 import { cn } from "../cn.ts"
 import { Skeleton } from "./Skeleton.tsx"
 
-export const CSuspense = ({ className, skeletonClassName, children, dev }: {
-  readonly className?: string | undefined
-  readonly skeletonClassName?: string | undefined
-  readonly children: React.ReactNode
-  readonly dev?: boolean | undefined
+export const Sus = ({ className, skeletonClassName, children, dev }: {
+  className?: string | undefined
+  skeletonClassName?: string | undefined
+  children: React.ReactNode
+  dev?: boolean | undefined
 }) => {
   const props = {
     className: cn("flex justify-center items-center rounded-none", skeletonClassName),

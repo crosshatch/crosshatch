@@ -3,8 +3,8 @@ import { Atom, useAtom, useAtomMount } from "@effect-atom/atom-react"
 import { Search as SearchIcon } from "lucide-react"
 import { Button } from "./Button.tsx"
 import { CommandDialog, CommandGroup, CommandInput, CommandList } from "./Command.tsx"
-import { CSuspense } from "./CSuspense.tsx"
 import { Separator } from "./Separator.tsx"
+import { Sus } from "./Sus.tsx"
 
 export const searchInputAtom = Atom.make("").pipe(Atom.keepAlive)
 
@@ -46,7 +46,7 @@ export const Search = ({ results }: { results: React.ReactNode }) => {
             <Separator />
             <CommandList>
               <CommandGroup>
-                <CSuspense className="p-8">{results}</CSuspense>
+                <Sus className="p-8">{results}</Sus>
               </CommandGroup>
             </CommandList>
           </>

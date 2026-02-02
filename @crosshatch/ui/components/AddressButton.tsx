@@ -2,6 +2,7 @@ import { cn } from "../cn.ts"
 import { useCopy } from "../hooks/useCopy.ts"
 import { Button } from "./Button.tsx"
 
+// TODO: clean up trunaction
 export const AddressButton = ({
   address,
   className,
@@ -11,7 +12,7 @@ export const AddressButton = ({
   className?: string | undefined
   left?: React.ReactNode
 }) => {
-  const { copy, icon } = useCopy(address)
+  const { copy, icon } = useCopy(address, 4)
   return (
     <Button
       className={cn(
