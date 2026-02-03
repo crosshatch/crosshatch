@@ -2,11 +2,13 @@ import { Widget } from "@crosshatch/util"
 import { PaymentRequired } from "@crosshatch/x402"
 import { absurd, Data, Effect, Encoding, flow, Schema as S, Stream } from "effect"
 import { BridgeClient } from "./BridgeClient.ts"
-import { escalationHref } from "./config.ts"
+import { escalationHref, onrampExplainerHref, thawHref } from "./config.ts"
 import { runtime } from "./Live.ts"
 
+// TODO: use this internally?
 export class InsufficientFundsError extends Data.TaggedError("InsufficientFundsError")<{}> {}
 export class EscalationRejectedError extends Data.TaggedError("EscalationRejectedError")<{}> {}
+export class AccountFrozenError extends Data.TaggedError("AccountFrozenError")<{}> {}
 
 export const makeFetch = (fetch: typeof globalThis.fetch): typeof globalThis.fetch => async (input, init) =>
   Effect.gen(function*() {
@@ -33,6 +35,19 @@ export const makeFetch = (fetch: typeof globalThis.fetch): typeof globalThis.fet
     let decision = yield* bridge.propose({
       requirement: requirement as never,
     })
+    if (decision._tag === "AccountFrozen") {
+      yield* thawHref(decision).pipe(
+        Effect.flatMap((src) =>
+          Widget.embed({
+            src,
+            schema: S.Void,
+          }).pipe(Stream.runDrain)
+        ),
+      )
+      decision = yield* bridge.propose({
+        requirement: requirement as never,
+      })
+    }
     if (decision._tag === "Escalation") {
       yield* escalationHref(decision).pipe(
         Effect.flatMap((src) =>
@@ -45,12 +60,22 @@ export const makeFetch = (fetch: typeof globalThis.fetch): typeof globalThis.fet
       decision = yield* bridge.propose({
         requirement: requirement as never,
       })
-      if (decision._tag === "Escalation") {
-        throw new EscalationRejectedError()
-      }
     }
     if (decision._tag === "InsufficientFunds") {
-      throw new InsufficientFundsError()
+      yield* onrampExplainerHref(decision).pipe(
+        Effect.flatMap((src) =>
+          Widget.embed({
+            src,
+            schema: S.Void,
+          }).pipe(Stream.runDrain)
+        ),
+      )
+      decision = yield* bridge.propose({
+        requirement: requirement as never,
+      })
+    }
+    if (decision._tag !== "Approved") {
+      throw 0
     }
     const { payload } = decision
     const value = Encoding.encodeBase64(JSON.stringify(payload))
@@ -69,9 +94,8 @@ export const makeFetch = (fetch: typeof globalThis.fetch): typeof globalThis.fet
     }
 
     return yield* Effect.promise(() => fetch(input, { ...init, headers }))
-  }).pipe(
-    (x) =>
-      runtime.runPromise(x, {
-        signal: init?.signal ?? undefined,
-      }),
+  }).pipe((x) =>
+    runtime.runPromise(x, {
+      signal: init?.signal ?? undefined,
+    })
   )

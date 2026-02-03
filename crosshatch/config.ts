@@ -1,6 +1,6 @@
 import { toHref } from "@crosshatch/util"
 import { Effect, flow, Schema as S } from "effect"
-import { Escalation } from "./DeclinedDecision.ts"
+import { AccountFrozen, Escalation, InsufficientFunds } from "./DeclinedDecision.ts"
 import { appUrl } from "./env.ts"
 import { LinkChallengeId } from "./LinkChallenge.ts"
 
@@ -34,4 +34,14 @@ export const linkHref = flow(
 export const escalationHref = flow(
   S.encode(Escalation),
   Effect.map(toHref(new URL("/escalation", appUrl))),
+)
+
+export const thawHref = flow(
+  S.encode(AccountFrozen),
+  Effect.map(toHref(new URL("/thaw", appUrl))),
+)
+
+export const onrampExplainerHref = flow(
+  S.encode(InsufficientFunds),
+  Effect.map(toHref(new URL("/onramp-explainer", appUrl))),
 )

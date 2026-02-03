@@ -110,6 +110,7 @@ catalog:
   hono: ^4.11.5
   "@ai-sdk/openai": 3.0.19
   markdown-to-jsx: ^9.6.1
+  stripe: 20.3.0
 
 overrides:
   "@types/react": ^19.2.7

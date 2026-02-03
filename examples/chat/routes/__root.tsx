@@ -2,10 +2,11 @@ import { ChatControls } from "@/components/ChatControls"
 import { SidebarInner } from "@/components/SidebarInner"
 import { Button } from "@crosshatch/ui/components/Button"
 import { Sidebar, SidebarInset, SidebarProvider, useSidebar } from "@crosshatch/ui/components/Sidebar"
+import { CrosshatchIcon } from "@crosshatch/ui/icons"
 import { useAtomSet } from "@effect-atom/atom-react"
 import { createRootRoute, Outlet } from "@tanstack/react-router"
 import { openSessionWidgetAtom } from "crosshatch"
-import { Coins, PanelLeftIcon } from "lucide-react"
+import { PanelLeftIcon } from "lucide-react"
 import { ThemeProvider } from "next-themes"
 
 export const Route = createRootRoute({
@@ -52,7 +53,7 @@ const Header = () => {
         variant="outline"
         onClick={() => sessionButtonOnClick()}
       >
-        <Coins className="size-6 stroke-1" />
+        <CrosshatchIcon className="size-6 stroke-1" />
       </Button>
     </header>
   )
