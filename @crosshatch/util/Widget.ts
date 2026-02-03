@@ -1,4 +1,4 @@
-import { Effect, Option, Schema as S, Stream } from "effect"
+import { Data, Effect, Option, Schema as S, Stream } from "effect"
 import { getParentContext } from "./getParentContext.ts"
 
 const DEFAULT_SANDBOX = "allow-scripts allow-same-origin allow-popups allow-forms"
@@ -20,24 +20,28 @@ export class Close extends S.TaggedClass<Close>("Close")("Close", {}) {
   static decodeOption = S.decodeUnknownOption(this)
 }
 
-export const make = <A, I>({
-  src,
-  schema,
-  matchReady,
-  sandbox = DEFAULT_SANDBOX,
-  allow = DEFAULT_ALLOW,
-}: {
+export interface WidgetConfig<A, I> {
   readonly src: string
   readonly schema: S.Schema<A, I>
-  readonly matchReady?: (v: A) => boolean
-  readonly sandbox?: string | undefined
-  readonly allow?: string | undefined
-}) =>
+}
+
+export const embed = <A, I>(
+  { src, schema }: WidgetConfig<A, I>,
+  matchReady?: undefined | ((v: A) => boolean),
+) =>
   Stream.asyncScoped<A>(Effect.fn(function*(emit) {
     const { origin: expectedOrigin } = new URL(src)
     const decodeOption = S.decodeUnknownOption(schema)
     const controller = new AbortController()
     const { signal } = controller
+    let ended = false
+    const end = () => {
+      if (!ended) {
+        controller.abort()
+        document.body.removeChild(iframe)
+        emit.end()
+      }
+    }
     addEventListener("message", async ({ data, origin }) => {
       if (origin === expectedOrigin) {
         if (Option.isSome(RequestIntroduction.decodeOption(data))) {
@@ -51,15 +55,12 @@ export const make = <A, I>({
           }
           emit.single(value)
         }
-        if (Option.isSome(Close.decodeOption(data))) {
-          controller.abort()
-          await emit.end()
-        }
+        if (Option.isSome(Close.decodeOption(data))) end()
       }
     }, { signal })
     const iframe = document.createElement("iframe")
-    iframe.sandbox = sandbox
-    iframe.allow = allow
+    iframe.sandbox = DEFAULT_SANDBOX
+    iframe.allow = DEFAULT_ALLOW
     iframe.style.transition = "opacity 1s ease"
     iframe.src = src
     if (matchReady) {
@@ -75,13 +76,46 @@ export const make = <A, I>({
     iframe.style.zIndex = `${currentZ++}`
     iframe.referrerPolicy = "no-referrer"
     document.body.appendChild(iframe)
-    yield* Effect.addFinalizer(() =>
+    yield* Effect.addFinalizer(() => Effect.sync(end))
+  }))
+
+export const popup = <A, I>({ src, schema }: WidgetConfig<A, I>) =>
+  Stream.asyncScoped<A>((emit) => {
+    const { origin: expectedOrigin } = new URL(src)
+    const decodeOption = S.decodeUnknownOption(schema)
+    const controller = new AbortController()
+    const { signal } = controller
+    const timeout = setInterval(async () => {
+      if (context?.closed) {
+        controller.abort()
+        emit.end()
+        clearTimeout(timeout) // TODO
+      }
+    }, 1)
+    addEventListener("message", async ({ data, origin }) => {
+      if (origin === expectedOrigin) {
+        if (Option.isSome(RequestIntroduction.decodeOption(data))) {
+          context?.postMessage(new Introduction(), origin)
+        }
+        const option = decodeOption(data)
+        if (option._tag === "Some") {
+          const { value } = option
+          emit.single(value)
+        }
+        if (Option.isSome(Close.decodeOption(data))) {
+          controller.abort()
+          await emit.end()
+        }
+      }
+    }, { signal })
+    const context = open(src)
+    return Effect.addFinalizer(() =>
       Effect.sync(() => {
         controller.abort()
-        document.body.removeChild(iframe)
+        context?.close()
       })
     )
-  }))
+  })
 
 export const closeSelf = (redirect: string) => {
   const parentContext = getParentContext()

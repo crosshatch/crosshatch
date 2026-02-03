@@ -32,7 +32,7 @@ export const openSessionWidgetAtom = Atom.fn<void>()(
       }
     },
     Effect.flatMap((src) =>
-      Widget.make({
+      Widget.embed({
         src,
         schema: S.Void,
       }).pipe(Stream.runDrain)

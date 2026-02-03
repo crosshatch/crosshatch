@@ -36,7 +36,7 @@ export const makeFetch = (fetch: typeof globalThis.fetch): typeof globalThis.fet
     if (decision._tag === "Escalation") {
       yield* escalationHref(decision).pipe(
         Effect.flatMap((src) =>
-          Widget.make({
+          Widget.embed({
             src,
             schema: S.Void,
           }).pipe(Stream.runDrain)
