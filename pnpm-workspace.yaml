@@ -74,6 +74,7 @@ catalog:
   "@x402/hono": ^2.2.0
   "@hono/node-server": ^1.19.9
   "@tanstack/devtools-vite": ^0.4.1
+  "@ai-sdk/mcp": ^1.0.18
   ai: 6.0.42
   happy-dom: ^20.0.11
   babel-plugin-react-compiler: ^1.0.0

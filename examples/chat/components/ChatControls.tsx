@@ -3,6 +3,7 @@ import { submitAtom } from "@/atoms/submit"
 import { ModelSelect } from "@/components/ModelSelect"
 import { Route } from "@/routes/{-$chatId}"
 import { Button } from "@crosshatch/ui/components/Button"
+import { Dialog, DialogContent, DialogTrigger } from "@crosshatch/ui/components/Dialog"
 import { Section, SectionInner } from "@crosshatch/ui/components/Section"
 import { Sus } from "@crosshatch/ui/components/Sus"
 import { Textarea } from "@crosshatch/ui/components/Textarea"
@@ -43,9 +44,16 @@ export const ChatControls = () => {
             <Sus skeletonClassName="flex items-center gap-2 w-36 h-9 rounded-full">
               <ModelSelect />
             </Sus>
-            <Button size="icon" className="size-9 rounded-full cursor-pointer" variant="outline">
-              <PocketKnife className="stroke-1" size={18} />
-            </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button size="icon" className="size-9 rounded-full cursor-pointer" variant="outline">
+                  <PocketKnife className="stroke-1" size={18} />
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                TODO
+              </DialogContent>
+            </Dialog>
           </div>
           <Button
             onClick={() => inflight ? inflight.abort() : submit(chatId)}

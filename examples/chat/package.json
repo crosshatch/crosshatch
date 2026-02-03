@@ -30,6 +30,7 @@
     "ai": "catalog:",
     "@ai-sdk/openai": "catalog:",
     "@openrouter/ai-sdk-provider": "catalog:",
+    "@ai-sdk/mcp": "catalog:",
     "babel-plugin-react-compiler": "catalog:",
     "drizzle-orm": "catalog:",
     "effect": "catalog:",

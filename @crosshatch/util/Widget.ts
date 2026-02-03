@@ -1,4 +1,4 @@
-import { Data, Effect, Option, Schema as S, Stream } from "effect"
+import { Effect, Option, Schema as S, Stream } from "effect"
 import { getParentContext } from "./getParentContext.ts"
 
 const DEFAULT_SANDBOX = "allow-scripts allow-same-origin allow-popups allow-forms"
@@ -111,6 +111,7 @@ export const popup = <A, I>({ src, schema }: WidgetConfig<A, I>) =>
     const context = open(src)
     return Effect.addFinalizer(() =>
       Effect.sync(() => {
+        console.log("HEREEEE")
         controller.abort()
         context?.close()
       })
