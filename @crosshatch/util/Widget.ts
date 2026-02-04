@@ -111,7 +111,6 @@ export const popup = <A, I>({ src, schema }: WidgetConfig<A, I>) =>
     const context = open(src)
     return Effect.addFinalizer(() =>
       Effect.sync(() => {
-        console.log("HEREEEE")
         controller.abort()
         context?.close()
       })

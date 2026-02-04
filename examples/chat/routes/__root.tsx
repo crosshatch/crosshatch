@@ -49,11 +49,11 @@ const Header = () => {
       </Button>
       <Button
         size="icon"
-        className="size-11 rounded-full"
+        className="size-11"
         variant="outline"
         onClick={() => sessionButtonOnClick()}
       >
-        <CrosshatchIcon className="size-6 stroke-1" />
+        <CrosshatchIcon className="size-7 stroke-1" />
       </Button>
     </header>
   )
