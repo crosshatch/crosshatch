@@ -23,11 +23,13 @@ export const PaymentRequirements = S.Struct({
   extra: UnknownRecord,
 })
 
+export const Version = S.Literal(1, 2)
+
 export const PaymentRequired = S.Struct({
-  x402Version: S.Number, // TODO: narrowly type
+  x402Version: Version,
   error: S.String.pipe(S.optional),
   resource: ResourceInfo,
-  accepts: S.Array(PaymentRequirements),
+  accepts: S.Tuple([PaymentRequirements], PaymentRequirements),
   extensions: UnknownRecord.pipe(S.optional),
 })
 

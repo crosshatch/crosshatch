@@ -1,14 +1,14 @@
 import { Widget } from "@crosshatch/util"
-import { PaymentRequired } from "@crosshatch/x402"
-import { absurd, Data, Effect, Encoding, flow, Schema as S, Stream } from "effect"
+import { PaymentRequired, Version } from "@crosshatch/x402"
+import { Effect, Encoding, flow, Schema as S, Stream } from "effect"
 import { BridgeClient } from "./BridgeClient.ts"
 import { escalationHref, onrampExplainerHref, thawHref } from "./config.ts"
+import { DeclinedDecision } from "./DeclinedDecision.ts"
 import { runtime } from "./Live.ts"
 
-// TODO: use this internally?
-export class InsufficientFundsError extends Data.TaggedError("InsufficientFundsError")<{}> {}
-export class EscalationRejectedError extends Data.TaggedError("EscalationRejectedError")<{}> {}
-export class AccountFrozenError extends Data.TaggedError("AccountFrozenError")<{}> {}
+export class CrosshatchFetchError extends S.TaggedError<CrosshatchFetchError>()("CrosshatchFetchError", {
+  decision: DeclinedDecision,
+}) {}
 
 export const makeFetch = (fetch: typeof globalThis.fetch): typeof globalThis.fetch => async (input, init) =>
   Effect.gen(function*() {
@@ -35,51 +35,29 @@ export const makeFetch = (fetch: typeof globalThis.fetch): typeof globalThis.fet
     let decision = yield* bridge.propose({
       requirement: requirement as never,
     })
-    if (decision._tag === "AccountFrozen") {
-      yield* thawHref(decision).pipe(
-        Effect.flatMap((src) =>
-          Widget.embed({
-            src,
-            schema: S.Void,
-          }).pipe(Stream.runDrain)
-        ),
-      )
-      decision = yield* bridge.propose({
-        requirement: requirement as never,
-      })
-    }
-    if (decision._tag === "Escalation") {
-      yield* escalationHref(decision).pipe(
-        Effect.flatMap((src) =>
-          Widget.embed({
-            src,
-            schema: S.Void,
-          }).pipe(Stream.runDrain)
-        ),
-      )
-      decision = yield* bridge.propose({
-        requirement: requirement as never,
-      })
-    }
-    if (decision._tag === "InsufficientFunds") {
-      yield* onrampExplainerHref(decision).pipe(
-        Effect.flatMap((src) =>
-          Widget.embed({
-            src,
-            schema: S.Void,
-          }).pipe(Stream.runDrain)
-        ),
+    while (decision._tag !== "Approved") {
+      const src = yield* ({
+        AccountFrozen: thawHref,
+        InsufficientFunds: onrampExplainerHref,
+        Escalation: escalationHref,
+      }[decision._tag])(decision as never)
+      yield* Widget.embed({
+        src,
+        schema: S.Void,
+      }).pipe(
+        Stream.runDrain,
       )
       decision = yield* bridge.propose({
         requirement: requirement as never,
       })
     }
     if (decision._tag !== "Approved") {
-      throw 0
+      throw new CrosshatchFetchError({ decision })
     }
     const { payload } = decision
+    const version = yield* S.decodeUnknown(Version)(payload.x402Version)
     const value = Encoding.encodeBase64(JSON.stringify(payload))
-    switch (payload.x402Version) {
+    switch (version) {
       case 1: {
         headers.set("X-PAYMENT", value)
         break
@@ -87,9 +65,6 @@ export const makeFetch = (fetch: typeof globalThis.fetch): typeof globalThis.fet
       case 2: {
         headers.set("PAYMENT-SIGNATURE", value)
         break
-      }
-      default: {
-        absurd<never>(null!)
       }
     }
 
