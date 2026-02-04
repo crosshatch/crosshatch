@@ -1,5 +1,5 @@
 export * from "./branded.ts"
-export * from "./EnsureOriginMiddleware.ts"
+export * from "./config.ts"
 export * from "./fmt.ts"
 export * from "./getParentContext.ts"
 export * from "./http_api_util.ts"
