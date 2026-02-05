@@ -6,17 +6,15 @@ const DEFAULT_ALLOW = "payment; clipboard-write; accelerometer; gyroscope"
 
 let currentZ = 100
 
-export class Introduction extends S.TaggedClass<Introduction>("Introduction")("Introduction", {}) {
+export class Introduction extends S.TaggedClass<Introduction>()("Introduction", {}) {
   static decodeOption = S.decodeUnknownOption(this)
 }
 
-export class RequestIntroduction
-  extends S.TaggedClass<RequestIntroduction>("RequestIntroduction")("RequestIntroduction", {})
-{
+export class RequestIntroduction extends S.TaggedClass<RequestIntroduction>()("RequestIntroduction", {}) {
   static decodeOption = S.decodeUnknownOption(this)
 }
 
-export class Close extends S.TaggedClass<Close>("Close")("Close", {}) {
+export class Close extends S.TaggedClass<Close>()("Close", {}) {
   static decodeOption = S.decodeUnknownOption(this)
 }
 

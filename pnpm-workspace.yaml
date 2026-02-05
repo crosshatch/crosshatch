@@ -5,27 +5,30 @@ packages:
   - examples/*
 
 catalog:
+  "@ai-sdk/mcp": ^1.0.18
+  "@ai-sdk/openai": 3.0.19
   "@dotenvx/dotenvx": ^1.52.0
-  "@effect-atom/atom-react": ^0.4.3
+  "@effect-atom/atom-react": ^0.5.0
   "@effect/ai": ^0.33.2
   "@effect/ai-openrouter": ^0.8.1
-  "@effect/language-service": 0.63.2
-  "@effect/platform": ^0.94.1
-  "@effect/platform-browser": ^0.74.0
-  "@effect/platform-node": ^0.104.0
-  "@effect/rpc": ^0.73.0
-  "@effect/vitest": ^0.27.0
   "@effect/cli": ^0.73.1
+  "@effect/language-service": 0.73.0
+  "@effect/platform": ^0.94.3
+  "@effect/platform-browser": ^0.74.0
+  "@effect/platform-node": ^0.104.1
+  "@effect/rpc": ^0.73.0
   "@effect/sql": ^0.49.0
   "@effect/sql-pg": ^0.50.1
+  "@effect/vitest": ^0.27.0
   "@electric-sql/pglite": ^0.3.14
-  "@radix-ui/react-accordion": ^1.2.12
-  "@noble/curves": ^2.0.1
-  "@noble/hashes": ^2.0.1
-  "@noble/ciphers": ^2.1.1
-  "@openrouter/ai-sdk-provider": ^2.0.0
+  "@hono/node-server": ^1.19.9
   "@huggingface/transformers": ^3.8.1
   "@icons-pack/react-simple-icons": ^13.8.0
+  "@noble/ciphers": ^2.1.1
+  "@noble/curves": ^2.0.1
+  "@noble/hashes": ^2.0.1
+  "@openrouter/ai-sdk-provider": ^2.0.0
+  "@radix-ui/react-accordion": ^1.2.12
   "@radix-ui/react-alert-dialog": ^1.1.15
   "@radix-ui/react-avatar": ^1.1.11
   "@radix-ui/react-checkbox": ^1.3.3
@@ -42,78 +45,75 @@ catalog:
   "@radix-ui/react-switch": 1.2.6
   "@radix-ui/react-tabs": ^1.1.13
   "@radix-ui/react-tooltip": ^1.2.8
-  "@streamdown/cjk": ^1.0.1
-  "@streamdown/code": ^1.0.1
-  "@streamdown/math": ^1.0.1
-  "@streamdown/mermaid": ^1.0.1
-  streamdown: ^2.1.0
   "@scure/base": ^2.0.0
   "@scure/bip39": ^2.0.1
   "@solana/addresses": ^5.3.0
   "@solana/kit": ^5.1.0
-  "@standard-schema/spec": ^1.0.0
-  "@tailwindcss/vite": ^4.1.17
+  "@standard-schema/spec": ^1.1.0
+  "@streamdown/cjk": ^1.0.1
+  "@streamdown/code": ^1.0.1
+  "@streamdown/math": ^1.0.1
+  "@streamdown/mermaid": ^1.0.1
+  "@tailwindcss/vite": ^4.1.18
+  "@tanstack/devtools-vite": ^0.4.1
+  "@tanstack/react-router": ^1.158.0
+  "@tanstack/react-router-devtools": ^1.158.0
+  "@tanstack/react-start": ^1.158.0
   "@tanstack/router-core": ^1.141.1
-  "@tanstack/react-router": ^1.140.5
-  "@tanstack/react-router-devtools": ^1.140.5
-  "@tanstack/react-start": ^1.134.14
   "@tanstack/router-plugin": ^1.140.5
   "@testcontainers/postgresql": ^11.11.0
+  "@types/node": ^25.2.0
   "@types/pg": ^8.16.0
-  "@types/node": ^25.0.0
-  "@types/react": ^19.2.7
+  "@types/react": ^19.2.11
   "@types/react-dom": ^19.2.3
-  "@vitest/browser": "^3.2.4"
-  "@vitest/coverage-v8": "^3.2.4"
-  "@vitest/expect": "^3.2.4"
-  "@vitest/web-worker": "^3.2.4"
   "@vitejs/plugin-react": ^5.1.2
+  "@vitest/browser": ^3.2.4
+  "@vitest/coverage-v8": ^3.2.4
+  "@vitest/expect": ^3.2.4
+  "@vitest/web-worker": ^3.2.4
   "@x402/core": ^2.0.0
   "@x402/evm": ^2.0.0
-  "@x402/svm": ^2.0.0
   "@x402/hono": ^2.2.0
-  "@hono/node-server": ^1.19.9
-  "@tanstack/devtools-vite": ^0.4.1
-  "@ai-sdk/mcp": ^1.0.18
+  "@x402/svm": ^2.0.0
   ai: 6.0.42
-  happy-dom: ^20.0.11
   babel-plugin-react-compiler: ^1.0.0
   class-variance-authority: ^0.7.1
   date-fns: ^4.1.0
-  dedent: ^1.7.0
-  dprint: ^0.50.2
-  drizzle-orm: 1.0.0-beta.11-05230d9
+  dedent: ^1.7.1
+  dprint: ^0.51.1
   drizzle-kit: 1.0.0-beta.11-05230d9
-  micro-key-producer: ^0.8.2
-  postgres: ^3.4.7
-  effect: ^3.19.10
+  drizzle-orm: 1.0.0-beta.11-05230d9
+  effect: ^3.19.16
+  happy-dom: ^20.0.11
+  hono: ^4.11.5
   http-message-sig: ^0.1.0
-  web-bot-auth: ^0.1.1
-  lucide-react: ^0.553.0
+  lucide-react: ^0.563.0
+  markdown-to-jsx: ^9.6.1
+  micro-key-producer: ^0.8.2
   next-themes: ^0.4.6
   openai: ^6.16.0
   ox: ^0.10.5
   oxlint: ^1.35.0
   pg: ^8.16.3
-  react: ^19.2.3
-  react-dom: ^19.2.3
-  shiki: ^3.19.0
+  postgres: ^3.4.7
+  react: ^19.2.4
+  react-dom: ^19.2.4
+  shiki: ^3.22.0
+  streamdown: ^2.1.0
+  stripe: 20.3.0
   tailwind-merge: ^3.4.0
   ts-patch: ^3.3.0
-  turbo: ^2.7.3
+  turbo: ^2.8.3
   typescript: ^5.9.3
   viem: ^2.43.1
-  vite: ^7.2.7
-  vitest: 4.0.15
-  zod: ^4.1.13
+  vite: ^7.3.1
   vite-plugin-mkcert": ^1.17.9
-  hono: ^4.11.5
-  "@ai-sdk/openai": 3.0.19
-  markdown-to-jsx: ^9.6.1
-  stripe: 20.3.0
+  vitest: 4.0.18
+  web-bot-auth: ^0.1.1
+  zod: ^4.1.13
 
 overrides:
-  "@types/react": ^19.2.7
+  "@types/react": ^19.2.11
   "@types/react-dom": ^19.2.3
-  react: ^19.2.3
-  react-dom: ^19.2.3
+  react: ^19.2.4
+  react-dom: ^19.2.4

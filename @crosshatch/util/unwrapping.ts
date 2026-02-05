@@ -21,3 +21,9 @@ export const nullable = <A, E, R>(x: Effect.Effect<A, E, R>) =>
 export const nullableError =
   <C>(c: new() => C) => <A, E, R>(x: Effect.Effect<A, E | Cause.NoSuchElementException, R>) =>
     x.pipe(Effect.catchTag("NoSuchElementException", () => Effect.fail(new c())))
+
+export const nonEmpty = <A>(x: Array<A>): Effect.Effect<[A, ...Array<A>], Cause.NoSuchElementException> =>
+  Effect.fromNullable(x[0]).pipe(Effect.map((e0) => {
+    const [_0, ...rest] = x
+    return [e0, ...rest]
+  }))

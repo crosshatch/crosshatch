@@ -1,5 +1,5 @@
 import { Schema as S } from "effect"
 
-export class BridgeReady extends S.TaggedClass<BridgeReady>("BridgeReady")("BridgeReady", {}) {}
+export class BridgeReady extends S.TaggedClass<BridgeReady>()("BridgeReady", {}) {}
 
-export class AppReady extends S.TaggedClass<AppReady>("AppReady")("AppReady", {}) {}
+export class AppReady extends S.TaggedClass<AppReady>()("AppReady", {}) {}

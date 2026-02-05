@@ -9,7 +9,7 @@
     { "path": "./@crosshatch/store" },
     { "path": "./@crosshatch/x402" },
     { "path": "./crosshatch" },
-    { "path": "./docs" },
+    // { "path": "./docs" },
     { "path": "./examples/chat" }
   ]
 }

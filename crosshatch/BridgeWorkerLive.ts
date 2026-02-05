@@ -26,11 +26,11 @@ export const BridgeWorkerLive = Effect.gen(function*() {
   const deferred = yield* Deferred.make<void>()
   addEventListener("message", function f({ data, origin }: MessageEvent) {
     if (origin === appUrl && Option.isSome(S.decodeUnknownOption(BridgeReady)(data))) {
-      Deferred.unsafeDone(deferred, Effect.succeed(undefined))
+      Deferred.unsafeDone(deferred, Effect.void)
       removeEventListener("message", f)
     }
   })
-  // TODO: solve deadlock
+  // TODO: solve possible deadlock?
   addEventListener("message", function f({ data, origin }: MessageEvent) {
     if (origin === appUrl && Option.isSome(Widget.RequestIntroduction.decodeOption(data))) {
       context.postMessage(new Widget.Introduction(), "*")

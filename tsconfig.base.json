@@ -29,7 +29,10 @@
         "name": "@effect/language-service",
         "transform": "@effect/language-service/transform",
         "diagnosticSeverity": {
-          "returnEffectInGen": "off"
+          "returnEffectInGen": "off",
+          "layerMergeAllWithDependencies": "off",
+          "preferSchemaOverJson": "off",
+          "effectSucceedWithVoid": "off"
         }
       }
     ],
