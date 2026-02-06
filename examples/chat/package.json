@@ -16,7 +16,6 @@
     "@crosshatch/store": "workspace:*",
     "@crosshatch/ui": "workspace:*",
     "@crosshatch/util": "workspace:*",
-    "@crosshatch/x402": "workspace:*",
     "@effect/ai": "catalog:",
     "@effect/ai-openai": "catalog:",
     "@effect/ai-openrouter": "catalog:",

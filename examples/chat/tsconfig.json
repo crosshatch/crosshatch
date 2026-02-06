@@ -16,7 +16,6 @@
     { "path": "../../@crosshatch/store" },
     { "path": "../../@crosshatch/ui" },
     { "path": "../../@crosshatch/util" },
-    { "path": "../../@crosshatch/x402" },
     { "path": "../../crosshatch" }
   ]
 }

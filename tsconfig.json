@@ -7,7 +7,6 @@
     { "path": "./@crosshatch/drizzle" },
     { "path": "./@crosshatch/react" },
     { "path": "./@crosshatch/store" },
-    { "path": "./@crosshatch/x402" },
     { "path": "./crosshatch" },
     // { "path": "./docs" },
     { "path": "./examples/chat" }

@@ -7,7 +7,6 @@
   "include": [".", "models/Link.ts"],
   "exclude": ["dist"],
   "references": [
-    { "path": "../@crosshatch/util" },
-    { "path": "../@crosshatch/x402" }
+    { "path": "../@crosshatch/util" }
   ]
 }
