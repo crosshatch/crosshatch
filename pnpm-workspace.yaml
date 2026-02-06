@@ -112,6 +112,7 @@ catalog:
   web-bot-auth: ^0.1.1
   zod: ^4.1.13
   alchemy: ^0.83.2
+  testcontainers: ^11.11.0
 
 overrides:
   "@types/react": ^19.2.11
