@@ -23,10 +23,7 @@ export interface WidgetConfig<A, I> {
   readonly schema: S.Schema<A, I>
 }
 
-export const embed = <A, I>(
-  { src, schema }: WidgetConfig<A, I>,
-  matchReady?: undefined | ((v: A) => boolean),
-) =>
+export const embed = <A, I>({ src, schema }: WidgetConfig<A, I>) =>
   Stream.asyncScoped<A>(Effect.fn(function*(emit) {
     const { origin: expectedOrigin } = new URL(src)
     const decodeOption = S.decodeUnknownOption(schema)
@@ -48,9 +45,6 @@ export const embed = <A, I>(
         const option = decodeOption(data)
         if (option._tag === "Some") {
           const { value } = option
-          if (matchReady?.(value)) {
-            iframe.style.opacity = "1"
-          }
           emit.single(value)
         }
         if (Option.isSome(Close.decodeOption(data))) end()
@@ -59,11 +53,7 @@ export const embed = <A, I>(
     const iframe = document.createElement("iframe")
     iframe.sandbox = DEFAULT_SANDBOX
     iframe.allow = DEFAULT_ALLOW
-    iframe.style.transition = "opacity 1s ease"
     iframe.src = src
-    if (matchReady) {
-      iframe.style.opacity = "0"
-    }
     iframe.style.position = "fixed"
     iframe.style.top = "0"
     iframe.style.right = "0"
