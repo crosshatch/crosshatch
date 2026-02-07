@@ -1,4 +1,4 @@
-import { prefix } from "@crosshatch/util"
+import { prefix } from "@crosshatch/util/prefix"
 import { live, type LiveNamespace } from "@electric-sql/pglite/live"
 import { PGliteWorker } from "@electric-sql/pglite/worker"
 import { Context, Effect, Layer } from "effect"

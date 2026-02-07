@@ -1,4 +1,4 @@
-import { LoggerLive } from "@crosshatch/util"
+import { LoggerLive } from "@crosshatch/util/LoggerLive"
 import { BrowserSocket } from "@effect/platform-browser"
 import { PGlite } from "@electric-sql/pglite"
 import { fuzzystrmatch } from "@electric-sql/pglite/contrib/fuzzystrmatch"
