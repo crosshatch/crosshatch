@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build && tsc",
     "serve": "vite preview",
-    "migrate": "drizzle-kit generate --help"
+    "migrate": "drizzle-kit generate"
   },
   "dependencies": {
     "crosshatch": "workspace:*",
