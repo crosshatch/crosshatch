@@ -1,4 +1,5 @@
 import { chatsAtom, deleteChatAtom, renameChatAtom, runtime } from "@/atoms"
+import { Search, searchInputAtom, searchOpenAtom } from "@/components/Search"
 import { Drizzle } from "@/Drizzle"
 import { embed } from "@/lib/openai"
 import { router } from "@/router"
@@ -21,7 +22,6 @@ import {
 } from "@crosshatch/ui/components/DropdownMenu"
 import { Input } from "@crosshatch/ui/components/Input"
 import { Message } from "@crosshatch/ui/components/Message"
-import { Search, searchInputAtom, searchOpenAtom } from "@crosshatch/ui/components/Search"
 import {
   SidebarContent,
   SidebarGroup,

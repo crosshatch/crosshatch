@@ -23,42 +23,40 @@ export const MessageList = () => {
   }, [items.length, inflight, chatId])
 
   return (
-    <Section className="h-full p-2">
+    <Section className="h-full p-4">
       <SectionInner className="space-y-4">
-        {items.map((item) => {
-          return (
-            <ChatEventCard
-              key={item.id}
-              className={cn(
-                "p-2",
-                item.message.role === "user" && "justify-end",
-              )}
-            >
-              {(() => {
-                const { message } = item
-                const inner = <Message {...{ message }} />
-                switch (message.role) {
-                  case "user": {
-                    return <div className="p-4">{inner}</div>
-                  }
-                  case "assistant": {
-                    return <div className="p-4 bg-gray-500/25">{inner}</div>
-                  }
-                  default: {
-                    return <div />
-                  }
-                }
-              })()}
-            </ChatEventCard>
-          )
+        {items.map((item, i) => {
+          const { message } = item
+          const inner = <Message {...{ message }} />
+          switch (message.role) {
+            case "user": {
+              return (
+                <>
+                  <ChatEventCard key={item.id} className="p-2 justify-end">
+                    <div className="p-4">{inner}</div>
+                  </ChatEventCard>
+                  {inflight && i === items.length - 1 && (
+                    <ChatEventCard className="border-none p-2">
+                      <div className="relative">
+                        <Skeleton className="rounded-xs h-14 flex-1" />
+                      </div>
+                    </ChatEventCard>
+                  )}
+                </>
+              )
+            }
+            case "assistant": {
+              return (
+                <ChatEventCard key={item.id} className="p-2">
+                  <div className="p-4 bg-gray-500/25">{inner}</div>
+                </ChatEventCard>
+              )
+            }
+            default: {
+              return <div />
+            }
+          }
         })}
-        {inflight && (
-          <ChatEventCard className="border-none p-2">
-            <div className="relative">
-              <Skeleton className="rounded-xs h-14 flex-1" />
-            </div>
-          </ChatEventCard>
-        )}
       </SectionInner>
     </Section>
   )
