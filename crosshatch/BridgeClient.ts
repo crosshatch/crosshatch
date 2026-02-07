@@ -1,4 +1,4 @@
-import { prefix } from "@crosshatch/util"
+import { prefix } from "@crosshatch/util/prefix"
 import { RpcClient } from "@effect/rpc"
 import { Effect, Layer } from "effect"
 import { Bridge } from "./Bridge.ts"

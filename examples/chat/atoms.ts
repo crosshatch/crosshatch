@@ -1,7 +1,7 @@
 import { chats } from "@/schema"
 import Worker from "@/worker.ts?worker"
 import { PgliteClient } from "@crosshatch/store"
-import { LoggerLive } from "@crosshatch/util"
+import { LoggerLive } from "@crosshatch/util/LoggerLive"
 import { Atom } from "@effect-atom/atom-react"
 import { BrowserKeyValueStore } from "@effect/platform-browser"
 import { Live } from "crosshatch"

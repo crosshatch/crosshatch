@@ -1,4 +1,4 @@
-import { toHref } from "@crosshatch/util"
+import { toHref } from "@crosshatch/util/toHref"
 import { Effect, flow, Schema as S } from "effect"
 import { AccountFrozen, Escalation, InsufficientFunds } from "./DeclinedDecision.ts"
 import { appUrl } from "./env.ts"

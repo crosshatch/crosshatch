@@ -1,5 +1,5 @@
 import { latest as latest_, PgliteClient } from "@crosshatch/store"
-import { prefix } from "@crosshatch/util"
+import { prefix } from "@crosshatch/util/prefix"
 import type { AnyPgAsyncRelationalQuery, AnyPgAsyncSelect } from "drizzle-orm/pg-core"
 import { drizzle } from "drizzle-orm/pglite"
 import { Effect, Stream } from "effect"

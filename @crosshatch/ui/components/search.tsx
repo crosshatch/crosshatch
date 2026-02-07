@@ -1,4 +1,4 @@
-import { registerCommand } from "@crosshatch/util"
+import { registerCommand } from "@crosshatch/util/registerCommand"
 import { Atom, useAtom, useAtomMount } from "@effect-atom/atom-react"
 import { Search as SearchIcon } from "lucide-react"
 import { Button } from "./Button.tsx"

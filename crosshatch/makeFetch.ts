@@ -1,4 +1,4 @@
-import { Widget } from "@crosshatch/util"
+import * as Widget from "@crosshatch/util/Widget"
 import { PaymentRequired, Version } from "@crosshatch/x402"
 import { Effect, Encoding, flow, Schema as S, Stream } from "effect"
 import { BridgeClient } from "./BridgeClient.ts"

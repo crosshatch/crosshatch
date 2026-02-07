@@ -31,7 +31,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@crosshatch/ui/components/Sidebar"
-import { registerCommand } from "@crosshatch/util"
+import { registerCommand } from "@crosshatch/util/registerCommand"
 import { useAtomSet, useAtomSuspense } from "@effect-atom/atom-react"
 import { Atom } from "@effect-atom/atom-react"
 import { Link } from "@tanstack/react-router"

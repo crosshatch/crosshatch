@@ -1,4 +1,4 @@
-import { nonNullable, nullableError } from "@crosshatch/util"
+import { nonNullable, nullableError } from "@crosshatch/util/unwrapping"
 import { TaggedTransactionRollbackError } from "drizzle-orm/effect-core"
 import { Effect } from "effect"
 

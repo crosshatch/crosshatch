@@ -16,9 +16,9 @@
   },
   "private": true,
   "exports": {
-    ".": {
-      "types": "./index.ts",
-      "default": "./dist/index.js"
+    "./*": {
+      "types": "./*.ts",
+      "default": "./dist/*.js"
     },
     "./package.json": "./package.json"
   },
