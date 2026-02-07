@@ -7,11 +7,13 @@
     "build": "tsc -b",
     "watch": "tsc -b -w",
     "dev": "turbo run //#watch //#test dev",
-    "test": "vitest"
+    "test": "vitest",
+    "clean": "repo-util clean --ignore repos"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.8",
     "@crosshatch/config": "workspace:*",
+    "@crosshatch/repo-util": "catalog:",
     "@effect/language-service": "catalog:",
     "@effect/platform-node": "catalog:",
     "@effect/vitest": "catalog:",
