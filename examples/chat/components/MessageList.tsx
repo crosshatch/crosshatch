@@ -26,13 +26,13 @@ export const MessageList = () => {
     <Section className="h-full p-4">
       <SectionInner className="space-y-4">
         {items.map((item, i) => {
-          const { message } = item
+          const { message, id } = item
           const inner = <Message {...{ message }} />
           switch (message.role) {
             case "user": {
               return (
                 <>
-                  <ChatEventCard key={item.id} className="p-2 justify-end">
+                  <ChatEventCard key={id} className="p-2 justify-end">
                     <div className="p-4">{inner}</div>
                   </ChatEventCard>
                   {inflight && i === items.length - 1 && (
@@ -47,13 +47,13 @@ export const MessageList = () => {
             }
             case "assistant": {
               return (
-                <ChatEventCard key={item.id} className="p-2">
+                <ChatEventCard key={id} className="p-2">
                   <div className="p-4 bg-gray-500/25">{inner}</div>
                 </ChatEventCard>
               )
             }
             default: {
-              return <div />
+              return <div key={id} />
             }
           }
         })}
