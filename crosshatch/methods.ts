@@ -18,9 +18,9 @@ export const unlink = Effect.gen(function*() {
 )
 
 export const pay = Effect.fn(
-  function*(requirement: PaymentRequired) {
+  function*(required: PaymentRequired) {
     const bridge = yield* BridgeClient
-    return yield* bridge.propose({ requirement })
+    return yield* bridge.propose({ required })
   },
   Effect.provide(Live),
 )

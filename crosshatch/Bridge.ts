@@ -11,7 +11,7 @@ export class Bridge extends RpcGroup.make(
   Rpc.make("unlink", {}),
   Rpc.make("propose", {
     payload: {
-      requirement: S.Unknown as S.Schema<PaymentRequired>,
+      required: S.Unknown as S.Schema<PaymentRequired>,
     },
     success: S.Union(
       S.TaggedStruct("Approved", {

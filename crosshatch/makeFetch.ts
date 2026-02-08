@@ -18,7 +18,7 @@ export const makeFetch = (fetch: typeof globalThis.fetch): typeof globalThis.fet
       return response
     }
     const header = response.headers.get("PAYMENT-REQUIRED")
-    const requirement = yield* (
+    const required = yield* (
       header
         ? Encoding.decodeBase64String(header).pipe(
           Effect.flatMap(flow(
@@ -33,7 +33,7 @@ export const makeFetch = (fetch: typeof globalThis.fetch): typeof globalThis.fet
     )
     const bridge = yield* BridgeClient
     let decision = yield* bridge.propose({
-      requirement: requirement as never,
+      required: required as never,
     })
     while (decision._tag !== "Approved") {
       const src = yield* ({
@@ -48,7 +48,7 @@ export const makeFetch = (fetch: typeof globalThis.fetch): typeof globalThis.fet
         Stream.runDrain,
       )
       decision = yield* bridge.propose({
-        requirement: requirement as never,
+        required: required as never,
       })
     }
     if (decision._tag !== "Approved") {

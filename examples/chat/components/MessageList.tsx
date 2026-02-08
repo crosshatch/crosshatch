@@ -6,7 +6,7 @@ import { Message } from "@crosshatch/ui/components/Message"
 import { Section, SectionInner } from "@crosshatch/ui/components/Section"
 import { Skeleton } from "@crosshatch/ui/components/Skeleton"
 import { useAtomSuspense, useAtomValue } from "@effect-atom/atom-react"
-import { useEffect } from "react"
+import { Fragment, useEffect } from "react"
 
 export const MessageList = () => {
   const { chatId } = Route.useParams()
@@ -31,8 +31,8 @@ export const MessageList = () => {
           switch (message.role) {
             case "user": {
               return (
-                <>
-                  <ChatEventCard key={id} className="p-2 justify-end">
+                <Fragment key={id}>
+                  <ChatEventCard className="p-2 justify-end">
                     <div className="p-4">{inner}</div>
                   </ChatEventCard>
                   {inflight && i === items.length - 1 && (
@@ -42,7 +42,7 @@ export const MessageList = () => {
                       </div>
                     </ChatEventCard>
                   )}
-                </>
+                </Fragment>
               )
             }
             case "assistant": {
