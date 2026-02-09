@@ -20,6 +20,10 @@
       "types": "./index.ts",
       "default": "./dist/index.js"
     },
+    "./effect": {
+      "types": "./effect.ts",
+      "default": "./dist/effect.js"
+    },
     "./fetch": {
       "default": "./dist/augment.js"
     },
