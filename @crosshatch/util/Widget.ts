@@ -14,6 +14,10 @@ export class RequestIntroduction extends S.TaggedClass<RequestIntroduction>()("R
   static decodeOption = S.decodeUnknownOption(this)
 }
 
+export class Ready extends S.TaggedClass<Ready>()("Ready", {}) {
+  static is = S.is(this)
+}
+
 export class Close extends S.TaggedClass<Close>()("Close", {}) {
   static decodeOption = S.decodeUnknownOption(this)
 }

@@ -2,7 +2,7 @@ import * as Widget from "@crosshatch/util/Widget"
 import { BrowserWorker } from "@effect/platform-browser"
 import { Deferred, Effect, Layer, Option, Schema as S } from "effect"
 import { appUrl } from "./env.ts"
-import { AppReady as AppPort, BridgeReady } from "./messages.ts"
+import { AppReady, BridgeReady } from "./messages.ts"
 
 const style = Object
   .entries({
@@ -49,7 +49,7 @@ export const BridgeWorkerLive = Effect.gen(function*() {
   yield* Deferred.await(deferred)
   const context = yield* Effect.fromNullable(iframe.contentWindow)
   const channel = new MessageChannel()
-  context.postMessage(new AppPort(), "*", [channel.port2])
+  context.postMessage(new AppReady(), "*", [channel.port2])
   return BrowserWorker.layerPlatform(() => channel.port1)
 }).pipe(
   Layer.unwrapEffect,
