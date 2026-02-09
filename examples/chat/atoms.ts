@@ -3,9 +3,9 @@ import Worker from "@/worker.ts?worker"
 import { PgliteClient } from "@crosshatch/store"
 import { LoggerLive } from "@crosshatch/util/LoggerLive"
 import { Atom } from "@effect-atom/atom-react"
+import { FetchHttpClient } from "@effect/platform"
 import { BrowserKeyValueStore } from "@effect/platform-browser"
-import { Live } from "crosshatch"
-import { FetchHttpClientLive } from "crosshatch/effect"
+import { Live, makeFetch } from "crosshatch"
 import { desc, eq, sql } from "drizzle-orm"
 import { ConfigProvider, Effect, Layer, Schema as S } from "effect"
 import { Drizzle, latest } from "./Drizzle"
@@ -19,7 +19,13 @@ export const runtime = Atom.runtime(
       Layer.provideMerge(PgliteClient.layer(Worker)),
     ),
   ).pipe(
-    Layer.provide(FetchHttpClientLive),
+    Layer.provide(
+      FetchHttpClient.layer.pipe(
+        Layer.provide(
+          Layer.succeed(FetchHttpClient.Fetch, makeFetch(fetch)),
+        ),
+      ),
+    ),
     Layer.provide(
       Layer.setConfigProvider(ConfigProvider.fromJson(import.meta.env)),
     ),
