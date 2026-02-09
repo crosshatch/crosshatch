@@ -1,7 +1,7 @@
-import type { PaymentRequired } from "@x402/core/types"
 import { Effect } from "effect"
 import { BridgeClient } from "./BridgeClient.ts"
 import { Live } from "./Live.ts"
+import type { PaymentRequired } from "./X402/schemas.ts"
 
 export const linkState = Effect.gen(function*() {
   const bridge = yield* BridgeClient
@@ -18,7 +18,7 @@ export const unlink = Effect.gen(function*() {
 )
 
 export const pay = Effect.fn(
-  function*(required: PaymentRequired) {
+  function*(required: typeof PaymentRequired.Type) {
     const bridge = yield* BridgeClient
     return yield* bridge.propose({ required })
   },

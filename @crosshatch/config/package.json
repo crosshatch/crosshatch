@@ -22,8 +22,8 @@
     "@vitejs/plugin-react": "catalog:",
     "drizzle-orm": "catalog:",
     "effect": "catalog:",
-    "fake-indexeddb": "^6.2.5",
-    "vite-plugin-mkcert": "^1.17.9",
+    "fake-indexeddb": "catalog:",
+    "vite-plugin-mkcert": "catalog:",
     "vite": "catalog:"
   }
 }

@@ -1,10 +1,10 @@
 import * as Widget from "@crosshatch/util/Widget"
-import { PaymentRequired, Version } from "@crosshatch/x402"
 import { Effect, Encoding, flow, Schema as S, Stream } from "effect"
 import { BridgeClient } from "./BridgeClient.ts"
 import { escalationHref, onrampExplainerHref, thawHref } from "./config.ts"
 import { DeclinedDecision } from "./DeclinedDecision.ts"
 import { runtime } from "./Live.ts"
+import { PaymentRequired, Version } from "./X402/schemas.ts"
 
 export class CrosshatchFetchError extends S.TaggedError<CrosshatchFetchError>()("CrosshatchFetchError", {
   decision: DeclinedDecision,

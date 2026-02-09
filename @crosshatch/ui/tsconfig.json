@@ -8,7 +8,5 @@
   },
   "include": ["."],
   "exclude": ["dist"],
-  "references": [
-    { "path": "../util" }
-  ]
+  "references": [{ "path": "../util" }]
 }

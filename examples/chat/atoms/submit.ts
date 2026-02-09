@@ -5,9 +5,8 @@ import { embed, openai } from "@/lib/openai"
 import { router } from "@/router"
 import { chatItems, chats, embeddings } from "@/schema"
 import { tx } from "@/tx"
-import { txNonNullable } from "@crosshatch/drizzle"
 import * as AtomUtil from "@crosshatch/ui/AtomUtil"
-import { e0 } from "@crosshatch/util/unwrapping"
+import { e0, nonNullable } from "@crosshatch/util/unwrapping"
 import { generateText, type UserModelMessage } from "ai"
 import { isLinkedAtom, openSessionWidgetAtom } from "crosshatch"
 import { eq } from "drizzle-orm"
@@ -72,7 +71,7 @@ export const submitAtom = runtime.fn<typeof ChatId.Type | undefined>()(Effect.fn
             message: userMessage,
           })
           .returning()
-      ).pipe(e0, txNonNullable),
+      ).pipe(e0, nonNullable),
       Effect.promise(
         () => _.update(chats).set({ updated: new Date() }).where(eq(chats.id, chatId)),
       ),
@@ -104,7 +103,7 @@ export const submitAtom = runtime.fn<typeof ChatId.Type | undefined>()(Effect.fn
           .insert(chatItems)
           .values(messages.map((message) => ({ chatId, message })))
           .returning()
-      ).pipe(e0, txNonNullable),
+      ).pipe(e0, nonNullable),
       Effect.tryPromise(() =>
         _
           .update(chats)

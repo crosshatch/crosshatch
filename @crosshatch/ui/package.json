@@ -52,7 +52,7 @@
     "@radix-ui/react-tooltip": "catalog:",
     "@tanstack/react-router": "catalog:",
     "@radix-ui/react-hover-card": "catalog:",
-    "class-variance-authority": "^0.7.1",
+    "class-variance-authority": "catalog:",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "effect": "catalog:",
