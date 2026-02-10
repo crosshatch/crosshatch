@@ -35,6 +35,12 @@ export const PaymentRequired = S.Struct({
   extensions: UnknownRecord.pipe(S.optional),
 })
 
+export const parseRequired = ({ accepts: [{ amount, asset, network }] }: typeof PaymentRequired.Type) => ({
+  amount: BigInt(parseInt(amount) / 1000000),
+  network,
+  asset,
+})
+
 export const PaymentPayload = S.Struct({
   x402Version: S.Number,
   resource: ResourceInfo,

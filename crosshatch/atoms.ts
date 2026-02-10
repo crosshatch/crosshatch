@@ -1,7 +1,7 @@
 import { Atom } from "@effect-atom/atom"
 import { Effect, Stream } from "effect"
 import { linkState } from "./methods.ts"
-import { EventsWidget, LinkWidget } from "./Widgets.ts"
+import { EventsWidget, LinkWidget } from "./widgets.ts"
 
 export const linkStateAtom = Atom.make(linkState)
 

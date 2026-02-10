@@ -2,7 +2,7 @@ import { Effect, Encoding, flow, Schema as S, Stream } from "effect"
 import { BridgeClient } from "./BridgeClient.ts"
 import { DeclinedDecision } from "./DeclinedDecision.ts"
 import { runtime } from "./Live.ts"
-import { EscalationWidget, OnrampExplainerWidget, ThawWidget } from "./Widgets.ts"
+import { EscalationWidget, OnrampExplainerWidget, ThawWidget } from "./widgets.ts"
 import { PaymentRequired, Version } from "./X402/schemas.ts"
 
 export class CrosshatchFetchError extends S.TaggedError<CrosshatchFetchError>()("CrosshatchFetchError", {
