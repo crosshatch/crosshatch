@@ -15,7 +15,13 @@ export const Route = createRootRoute({
 
 function RouteComponent() {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+      enableColorScheme={false}
+    >
       <SidebarProvider>
         <Sidebar collapsible="offcanvas">
           <SidebarInner />

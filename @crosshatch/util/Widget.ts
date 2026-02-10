@@ -66,6 +66,7 @@ export const embed = <A, I>({ src, event }: WidgetConfig<A, I>) =>
     iframe.style.width = "100vw"
     iframe.style.height = "100vh"
     iframe.style.zIndex = `${currentZ++}`
+    iframe.style.background = "transparent"
     iframe.referrerPolicy = "no-referrer"
     document.body.appendChild(iframe)
     yield* Effect.addFinalizer(() => Effect.sync(end))
