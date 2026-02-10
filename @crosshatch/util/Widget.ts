@@ -2,7 +2,7 @@ import { Effect, Option, Schema as S, Stream } from "effect"
 import { getParentContext } from "./getParentContext.ts"
 
 const DEFAULT_SANDBOX = "allow-scripts allow-same-origin allow-popups allow-forms"
-const DEFAULT_ALLOW = "payment; clipboard-write; accelerometer; gyroscope"
+const DEFAULT_ALLOW = "payment; clipboard-write; accelerometer; gyroscope; publickey-credentials-create *"
 
 let currentZ = 100
 
