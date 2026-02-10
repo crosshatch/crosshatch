@@ -8,4 +8,5 @@ export const fmt = {
   address: {
     abbreviated: (address: string) => `${address.slice(0, 4)}...${address.slice(-4)}`,
   },
+  amount: (v: string) => `${parseInt(v) * 1_000_000}`,
 }

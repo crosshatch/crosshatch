@@ -1,9 +1,8 @@
-import * as Widget from "@crosshatch/util/Widget"
 import { Effect, Encoding, flow, Schema as S, Stream } from "effect"
 import { BridgeClient } from "./BridgeClient.ts"
-import { escalationHref, onrampExplainerHref, thawHref } from "./config.ts"
 import { DeclinedDecision } from "./DeclinedDecision.ts"
 import { runtime } from "./Live.ts"
+import { EscalationWidget, OnrampExplainerWidget, ThawWidget } from "./Widgets.ts"
 import { PaymentRequired, Version } from "./X402/schemas.ts"
 
 export class CrosshatchFetchError extends S.TaggedError<CrosshatchFetchError>()("CrosshatchFetchError", {
@@ -36,15 +35,12 @@ export const makeFetch = (fetch: typeof globalThis.fetch): typeof globalThis.fet
       required: required as never,
     })
     while (decision._tag !== "Approved") {
-      const src = yield* ({
-        AccountFrozen: thawHref,
-        InsufficientFunds: onrampExplainerHref,
-        Escalation: escalationHref,
-      }[decision._tag])(decision as never)
-      yield* Widget.embed({
-        src,
-        schema: S.Void,
-      }).pipe(
+      const widget = {
+        AccountFrozen: ThawWidget,
+        InsufficientFunds: OnrampExplainerWidget,
+        Escalation: EscalationWidget,
+      }[decision._tag]
+      yield* widget.stream(decision as never).pipe(
         Stream.runDrain,
       )
       decision = yield* bridge.propose({

@@ -24,13 +24,13 @@ export class Close extends S.TaggedClass<Close>()("Close", {}) {
 
 export interface WidgetConfig<A, I> {
   readonly src: string
-  readonly schema: S.Schema<A, I>
+  readonly event: S.Schema<A, I>
 }
 
-export const embed = <A, I>({ src, schema }: WidgetConfig<A, I>) =>
+export const embed = <A, I>({ src, event }: WidgetConfig<A, I>) =>
   Stream.asyncScoped<A>(Effect.fn(function*(emit) {
     const { origin: expectedOrigin } = new URL(src)
-    const decodeOption = S.decodeUnknownOption(schema)
+    const decodeOption = S.decodeUnknownOption(event)
     const controller = new AbortController()
     const { signal } = controller
     let ended = false
@@ -71,7 +71,7 @@ export const embed = <A, I>({ src, schema }: WidgetConfig<A, I>) =>
     yield* Effect.addFinalizer(() => Effect.sync(end))
   }))
 
-export const popup = <A, I>({ src, schema }: WidgetConfig<A, I>) =>
+export const popup = <A, I>({ src, event: schema }: WidgetConfig<A, I>) =>
   Stream.asyncScoped<A>((emit) => {
     const { origin: expectedOrigin } = new URL(src)
     const decodeOption = S.decodeUnknownOption(schema)

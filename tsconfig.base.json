@@ -47,10 +47,10 @@
     "strictPropertyInitialization": true,
     "stripInternal": true,
     "target": "ESNext",
-    "typeRoots": ["node_modules/@types"],
     "useDefineForClassFields": true,
     "useUnknownInCatchVariables": true,
-    "verbatimModuleSyntax": true
+    "verbatimModuleSyntax": true,
+    "typeRoots": ["node_modules/@types"]
   },
   "exclude": ["node_modules", "repos"]
 }

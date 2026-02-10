@@ -48,6 +48,8 @@
     "@crosshatch/config": "workspace:*",
     "drizzle-kit": "catalog:",
     "vite": "catalog:",
-    "vitest": "catalog:"
+    "vitest": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:"
   }
 }

@@ -115,6 +115,12 @@ catalog:
   vitest: 4.0.18
   web-bot-auth: ^0.1.1
   zod: ^4.1.13
+  clsx: ^2.1.1
+  cmdk: ^1.1.1
+  sonner: ^2.0.7
+  vaul: ^1.1.2
+  playwright: ^1.58.2
+  "@playwright/test": ^1.58.2
 
 overrides:
   "@effect/sql-pg": ^0.50.3
