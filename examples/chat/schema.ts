@@ -17,7 +17,7 @@ export const chatItems = pgTable("chat_items", {
   chatId: ref("chat_id", () => chats.id, { onDelete: "cascade" }).notNull(),
   message: customType<{
     data: Prompt.Message
-    driverData: typeof Prompt.Message["Encoded"]
+    driverData: typeof Prompt.Message.Encoded
   }>({
     dataType: () => "jsonb",
     toDriver: S.encodeSync(Prompt.Message),

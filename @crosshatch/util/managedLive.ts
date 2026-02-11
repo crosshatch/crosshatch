@@ -9,10 +9,9 @@ export const managedLive = <ROut, E>(
     prefix(key),
     () => ManagedRuntime.make(layer),
   )
-  const Live = Layer.effectContext(
+  return Layer.effectContext(
     runtime.runtimeEffect.pipe(
       Effect.map((v) => v.context),
     ),
   )
-  return { runtime, Live }
 }

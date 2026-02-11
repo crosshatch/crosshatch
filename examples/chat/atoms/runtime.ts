@@ -1,7 +1,8 @@
 import { FirecrawlToolkitLive } from "@/tools/FirecrawlToolkitLive"
 import Worker from "@/worker.ts?worker"
 import { PgliteClient } from "@crosshatch/store"
-import { LoggerLive } from "@crosshatch/util/LoggerLive"
+// import { Env } from "@crosshatch/util/Env"
+// import { LoggerLive } from "@crosshatch/util/LoggerLive"
 import { Atom } from "@effect-atom/atom-react"
 import { OpenAiClient, OpenAiEmbeddingModel } from "@effect/ai-openai"
 import { FetchLive, Live } from "crosshatch"
@@ -25,7 +26,7 @@ export const runtime = Atom.runtime(
     FirecrawlToolkitLive,
   ).pipe(
     Layer.provide(FetchLive),
-    Layer.provide(LoggerLive),
+    // Layer.provide(LoggerLive.pipe(Layer.provide(Env.layer))),
     Layer.provide(
       Layer.setConfigProvider(ConfigProvider.fromJson(import.meta.env)),
     ),
