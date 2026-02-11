@@ -1,4 +1,4 @@
-import { chatAtom, chatItemsAtom } from "@/atoms"
+import { chatAtom, chatItemsAtom } from "@/atoms/chat_atoms"
 import { ChatId } from "@/ids"
 import { Route } from "@/routes/{-$chatId}"
 import { cn } from "@crosshatch/ui/cn"

@@ -1,11 +1,7 @@
-import { chatsAtom, deleteChatAtom, renameChatAtom, runtime } from "@/atoms"
-import { Search, searchInputAtom, searchOpenAtom } from "@/components/Search"
-import { Drizzle } from "@/Drizzle"
-import { embed } from "@/lib/openai"
-import { router } from "@/router"
-import { chatItems, chats, embeddings } from "@/schema"
+import { chatsAtom, deleteChatAtom, renameChatAtom } from "@/atoms/chat_atoms"
+import { Search } from "@/components/Search"
+import { chats } from "@/schema"
 import { Button } from "@crosshatch/ui/components/Button"
-import { CommandItem } from "@crosshatch/ui/components/Command"
 import {
   Dialog,
   DialogContent,
@@ -21,7 +17,6 @@ import {
   DropdownMenuTrigger,
 } from "@crosshatch/ui/components/DropdownMenu"
 import { Input } from "@crosshatch/ui/components/Input"
-import { Message } from "@crosshatch/ui/components/Message"
 import {
   SidebarContent,
   SidebarGroup,
@@ -33,10 +28,7 @@ import {
 } from "@crosshatch/ui/components/Sidebar"
 import { registerCommand } from "@crosshatch/util/registerCommand"
 import { useAtomSet, useAtomSuspense } from "@effect-atom/atom-react"
-import { Atom } from "@effect-atom/atom-react"
 import { Link } from "@tanstack/react-router"
-import { cosineDistance, eq, sql } from "drizzle-orm"
-import { Effect } from "effect"
 import { MoreHorizontal, PencilLine, Plus, Trash2 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 
@@ -45,7 +37,7 @@ export const SidebarInner = () => {
   return (
     <div className="absolute top-0 right-0 bottom-0 left-0 overflow-y-scroll">
       <SidebarHeader className="sticky top-0 right-0 left-0 border-b bg-secondary/75 z-50 backdrop-blur-sm">
-        <Search results={<SearchResults />} />
+        <Search />
       </SidebarHeader>
       <SidebarContent className="flex [&::-webkit-scrollbar]:hidden max-h-screen p-[0.5]">
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -64,59 +56,6 @@ export const SidebarInner = () => {
       </SidebarContent>
     </div>
   )
-}
-
-const searchResultsAtom = runtime.atom(Effect.fn(function*(get) {
-  const text = get(searchInputAtom)
-  if (!text) return []
-  const embedding = yield* embed(text)
-  const _ = yield* Drizzle
-  return yield* Effect.tryPromise(() =>
-    _
-      .selectDistinctOn([chatItems.id], {
-        id: chatItems.id,
-        chatId: chatItems.chatId,
-        message: chatItems.message,
-        similarity: cosineDistance(embeddings.embedding, embedding),
-        title: chats.title,
-      })
-      .from(chatItems)
-      .innerJoin(embeddings, eq(embeddings.chatItemId, chatItems.id))
-      .leftJoin(chats, eq(chatItems.chatId, chats.id))
-      .orderBy(
-        chatItems.id,
-        sql`${cosineDistance(embeddings.embedding, embedding)}`,
-      )
-      .limit(5)
-  )
-})).pipe(
-  Atom.debounce("250  millis"),
-  Atom.keepAlive,
-)
-
-const SearchResults = () => {
-  const { value: items } = useAtomSuspense(searchResultsAtom)
-  const setSearchOpen = useAtomSet(searchOpenAtom)
-  return items.map(({ id, title, message, chatId }) => {
-    return (
-      <CommandItem
-        key={id}
-        value={id}
-        onSelect={() => {
-          setSearchOpen(false)
-          router.navigate({
-            to: "/{-$chatId}",
-            params: { chatId },
-          })
-        }}
-      >
-        <div className="flex flex-col">
-          <span className="text-lg">{title}</span>
-          <Message {...{ message }} />
-        </div>
-      </CommandItem>
-    )
-  })
 }
 
 const ChatLink = ({ title, id }: typeof chats["$inferSelect"]) => {

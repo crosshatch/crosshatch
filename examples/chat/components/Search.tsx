@@ -1,9 +1,18 @@
+import { runtime } from "@/atoms/runtime"
+import { Drizzle } from "@/Drizzle"
+import { router } from "@/router"
+import { chatItems, chats, embeddings } from "@/schema"
 import { Button } from "@crosshatch/ui/components/Button"
 import { CommandDialog, CommandGroup, CommandInput, CommandList } from "@crosshatch/ui/components/Command"
+import { CommandItem } from "@crosshatch/ui/components/Command"
+import { Message } from "@crosshatch/ui/components/Message"
 import { Separator } from "@crosshatch/ui/components/Separator"
 import { Sus } from "@crosshatch/ui/components/Sus"
 import { registerCommand } from "@crosshatch/util/registerCommand"
-import { Atom, useAtom, useAtomMount } from "@effect-atom/atom-react"
+import { Atom, useAtom, useAtomMount, useAtomSet, useAtomSuspense } from "@effect-atom/atom-react"
+import { EmbeddingModel } from "@effect/ai"
+import { cosineDistance, eq } from "drizzle-orm"
+import { Effect } from "effect"
 import { Search as SearchIcon } from "lucide-react"
 
 export const searchInputAtom = Atom.make("").pipe(Atom.keepAlive)
@@ -17,7 +26,7 @@ const searchInitAtom = Atom.make((get) => {
   ))
 })
 
-export const Search = ({ results }: { results: React.ReactNode }) => {
+export const Search = () => {
   const [input, setInput] = useAtom(searchInputAtom)
   const [open, onOpenChange] = useAtom(searchOpenAtom)
   useAtomMount(searchInitAtom)
@@ -45,7 +54,9 @@ export const Search = ({ results }: { results: React.ReactNode }) => {
             <Separator />
             <CommandList>
               <CommandGroup>
-                <Sus className="p-8">{results}</Sus>
+                <Sus skeletonClassName="min-h-70 rounded-md">
+                  <SearchResults />
+                </Sus>
               </CommandGroup>
             </CommandList>
           </>
@@ -53,4 +64,56 @@ export const Search = ({ results }: { results: React.ReactNode }) => {
       </CommandDialog>
     </>
   )
+}
+
+const searchResultsAtom = runtime.atom(Effect.fn(function*(get) {
+  const text = get(searchInputAtom)
+  if (!text) return []
+  const em = yield* EmbeddingModel.EmbeddingModel
+  const embedding = yield* em.embed(text)
+  const _ = yield* Drizzle
+  const distance = cosineDistance(embeddings.embedding, embedding)
+  return yield* Effect.tryPromise(() =>
+    _
+      .select({
+        id: chatItems.id,
+        chatId: chatItems.chatId,
+        message: chatItems.message,
+        title: chats.title,
+      })
+      .from(chatItems)
+      .innerJoin(embeddings, eq(embeddings.chatItemId, chatItems.id))
+      .leftJoin(chats, eq(chatItems.chatId, chats.id))
+      .orderBy(distance)
+      .limit(5)
+  )
+})).pipe(
+  Atom.debounce("250 millis"),
+  Atom.keepAlive,
+)
+
+const SearchResults = () => {
+  const { value: items } = useAtomSuspense(searchResultsAtom)
+  const setSearchOpen = useAtomSet(searchOpenAtom)
+  return items.map(({ id, title, message, chatId }) => {
+    return (
+      <CommandItem
+        className="p-2!"
+        key={id}
+        value={id}
+        onSelect={() => {
+          setSearchOpen(false)
+          router.navigate({
+            to: "/{-$chatId}",
+            params: { chatId },
+          })
+        }}
+      >
+        <div className="flex flex-col">
+          <span className="text-md">{title}</span>
+          <Message {...{ message }} />
+        </div>
+      </CommandItem>
+    )
+  })
 }

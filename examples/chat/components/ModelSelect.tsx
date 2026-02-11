@@ -1,4 +1,4 @@
-import { currentModelIdAtom, modelIdsAtom } from "@/atoms"
+import { currentModelIdAtom, modelIdsAtom } from "@/atoms/ai_atoms"
 import { cn } from "@crosshatch/ui/cn"
 import { Button } from "@crosshatch/ui/components/Button"
 import {
@@ -10,15 +10,14 @@ import {
   CommandList,
 } from "@crosshatch/ui/components/Command"
 import { Popover, PopoverContent, PopoverTrigger } from "@crosshatch/ui/components/Popover"
-import { Result, useAtomSet, useAtomSuspense, useAtomValue } from "@effect-atom/atom-react"
+import { Result, useAtom, useAtomValue } from "@effect-atom/atom-react"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { useState } from "react"
 
 export const ModelSelect = () => {
   const [open, onOpenChange] = useState(false)
   const modelIdsResult = useAtomValue(modelIdsAtom)
-  const { value: selected } = useAtomSuspense(currentModelIdAtom)
-  const setSelected = useAtomSet(currentModelIdAtom)
+  const [selected, setSelected] = useAtom(currentModelIdAtom)
   return (
     <Popover {...{ open, onOpenChange }}>
       <PopoverTrigger asChild>

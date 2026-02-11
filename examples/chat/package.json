@@ -10,7 +10,6 @@
     "migrate": "drizzle-kit generate"
   },
   "dependencies": {
-    "@ai-sdk/openai": "catalog:",
     "@crosshatch/drizzle": "workspace:*",
     "@crosshatch/react": "workspace:*",
     "@crosshatch/store": "workspace:*",
@@ -18,6 +17,7 @@
     "@crosshatch/util": "workspace:*",
     "@effect-atom/atom-react": "catalog:",
     "@effect/ai": "catalog:",
+    "@effect/ai-openai": "catalog:",
     "@effect/platform": "catalog:",
     "@effect/platform-browser": "catalog:",
     "@effect/sql": "catalog:",
@@ -29,7 +29,6 @@
     "@streamdown/mermaid": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@tanstack/react-router": "catalog:",
-    "ai": "catalog:",
     "crosshatch": "workspace:*",
     "drizzle-orm": "catalog:",
     "effect": "catalog:",

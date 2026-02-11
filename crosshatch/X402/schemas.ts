@@ -36,7 +36,7 @@ export const PaymentRequired = S.Struct({
 })
 
 export const parseRequired = ({ accepts: [{ amount, asset, network }] }: typeof PaymentRequired.Type) => ({
-  amount: BigInt(parseInt(amount) / 1000000),
+  amount: BigInt(amount),
   network,
   asset,
 })

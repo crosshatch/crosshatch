@@ -1,5 +1,6 @@
-import { chatAtom, modelIdsAtom } from "@/atoms"
-import { submitAtom } from "@/atoms/submit"
+import { modelIdsAtom } from "@/atoms/ai_atoms"
+import { chatAtom } from "@/atoms/chat_atoms"
+import { sendMessageAtom } from "@/atoms/sendMessageAtom"
 import { ModelSelect } from "@/components/ModelSelect"
 import { Route } from "@/routes/{-$chatId}"
 import { Button } from "@crosshatch/ui/components/Button"
@@ -13,7 +14,7 @@ import { useEffect, useRef } from "react"
 
 export const ChatControls = () => {
   const { chatId } = Route.useParams()
-  const submit = useAtomSet(submitAtom)
+  const sendMessage = useAtomSet(sendMessageAtom)
   const [chat, setChat] = useAtom(chatAtom(chatId))
   const { inflight, text } = chat
   const ref = useRef<HTMLTextAreaElement>(null)
@@ -35,7 +36,7 @@ export const ChatControls = () => {
           onKeyDown={(e) => {
             if (!e.shiftKey && e.key === "Enter") {
               e.preventDefault()
-              submit(chatId)
+              sendMessage(chatId)
             }
           }}
         />
@@ -56,7 +57,7 @@ export const ChatControls = () => {
             </Dialog>
           </div>
           <Button
-            onClick={() => inflight ? inflight.abort() : submit(chatId)}
+            onClick={() => inflight ? inflight.abort() : sendMessage(chatId)}
             size="icon"
             className="size-9 rounded-full cursor-pointer"
             variant="outline"

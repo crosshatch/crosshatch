@@ -65,7 +65,6 @@
     "tailwindcss": "catalog:",
     "tw-animate-css": "catalog:",
     "vaul": "catalog:",
-    "ai": "catalog:",
     "markdown-to-jsx": "catalog:"
   },
   "devDependencies": {

@@ -5,7 +5,6 @@ packages:
   - examples/*
 
 catalog:
-  "@ai-sdk/openai": 3.0.19
   "@crosshatch/repo-util": ^0.1.4
   "@dotenvx/dotenvx": ^1.52.0
   "@effect-atom/atom": ^0.5.0

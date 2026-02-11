@@ -1,6 +1,7 @@
 import { added, brandedId, ordinal, ref, updated } from "@crosshatch/drizzle"
-import type { ModelMessage } from "ai"
-import { index, jsonb, pgTable, text, vector } from "drizzle-orm/pg-core"
+import { Prompt } from "@effect/ai"
+import { customType, index, pgTable, text, vector } from "drizzle-orm/pg-core"
+import { Schema as S } from "effect"
 import type { ChatIdTypeId, ChatItemIdTypeId, EmbeddingIdTypeId } from "./ids"
 
 export const chats = pgTable("chats", {
@@ -14,7 +15,14 @@ export const chatItems = pgTable("chat_items", {
   id: brandedId<typeof ChatItemIdTypeId>(),
   ordinal,
   chatId: ref("chat_id", () => chats.id, { onDelete: "cascade" }).notNull(),
-  message: jsonb("message").$type<ModelMessage>().notNull(),
+  message: customType<{
+    data: Prompt.Message
+    driverData: typeof Prompt.Message["Encoded"]
+  }>({
+    dataType: () => "jsonb",
+    toDriver: S.encodeSync(Prompt.Message),
+    fromDriver: S.decodeSync(Prompt.Message),
+  })("message").notNull(),
   added,
 })
 

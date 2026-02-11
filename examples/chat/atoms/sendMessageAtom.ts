@@ -1,18 +1,20 @@
-import { chatAtom, chatItemsAtom, currentModelIdAtom, runtime } from "@/atoms"
+import { currentModelIdAtom } from "@/atoms/ai_atoms"
+import { chatAtom, chatItemsAtom } from "@/atoms/chat_atoms"
+import { runtime } from "@/atoms/runtime"
 import { Drizzle } from "@/Drizzle"
 import { ChatId } from "@/ids"
-import { embed, openai } from "@/lib/openai"
 import { router } from "@/router"
 import { chatItems, chats, embeddings } from "@/schema"
 import { tx } from "@/tx"
 import * as AtomUtil from "@crosshatch/ui/AtomUtil"
 import { e0, nonNullable } from "@crosshatch/util/unwrapping"
-import { generateText, type UserModelMessage } from "ai"
+import { AiError, EmbeddingModel, LanguageModel, Prompt } from "@effect/ai"
+import { OpenAiLanguageModel } from "@effect/ai-openai"
 import { isLinkedAtom, openSessionWidgetAtom } from "crosshatch"
 import { eq } from "drizzle-orm"
 import { Cause, Effect, Fiber } from "effect"
 
-export const submitAtom = runtime.fn<typeof ChatId.Type | undefined>()(Effect.fn(function*(chatId, get) {
+export const sendMessageAtom = runtime.fn<typeof ChatId.Type | undefined>()(Effect.fn(function*(chatId, get) {
   const isLinked = yield* get.result(isLinkedAtom)
   if (!isLinked) {
     yield* get.setResult(openSessionWidgetAtom, void 0)
@@ -22,8 +24,7 @@ export const submitAtom = runtime.fn<typeof ChatId.Type | undefined>()(Effect.fn
   text = text.trim()
   if (!text) return
   const _ = yield* Drizzle
-  const modelId = yield* get.result(currentModelIdAtom)
-  let titleFiber: Fiber.RuntimeFiber<void, Cause.UnknownException> | undefined
+  let titleFiber: Fiber.RuntimeFiber<void, Cause.UnknownException | AiError.AiError> | undefined
   if (!chatId) {
     const id = ChatId.make(crypto.randomUUID())
     chatId = id
@@ -36,31 +37,26 @@ export const submitAtom = runtime.fn<typeof ChatId.Type | undefined>()(Effect.fn
     )
     yield* Effect.tryPromise(() => _.insert(chats).values({ id }))
     titleFiber = yield* Effect.gen(function*() {
-      const { text: title } = yield* Effect.tryPromise(() =>
-        generateText({
-          maxRetries: 0,
-          model: openai("gpt-3.5-turbo"),
-          messages: [{
-            role: "user",
-            content: `
-              I'm about to provide you with a message. Create a concise title for the message.
-              Don't place the title inside of quotes. Provide just a few words in title case.
-              ---
-              ${text}
-            `,
-          }],
-        })
-      )
+      const { text: title } = yield* LanguageModel.generateText({
+        prompt: `
+          I'm about to provide you with a message. Create a concise title for the message.
+          Don't place the title inside of quotes. Provide just a few words in title case.
+          ---
+          ${text}
+        `,
+      }).pipe(Effect.provide(OpenAiLanguageModel.layer({
+        model: "gpt-3.5-turbo",
+      })))
       yield* Effect.tryPromise(() => _.update(chats).set({ title }).where(eq(chats.id, id)))
     }).pipe(
       Effect.fork,
     )
   }
-  const userMessage: UserModelMessage = {
-    role: "user",
-    content: text,
-  }
-  const userMessageEmbedding = yield* embed(text)
+  const userMessage = Prompt.userMessage({
+    content: [Prompt.makePart("text", { text })],
+  })
+  const em = yield* EmbeddingModel.EmbeddingModel
+  const userMessageEmbedding = yield* em.embed(text)
   yield* tx(Effect.fn(function*(_) {
     const [{ id: chatItemId }] = yield* Effect.all([
       Effect.promise(() =>
@@ -88,20 +84,21 @@ export const submitAtom = runtime.fn<typeof ChatId.Type | undefined>()(Effect.fn
     inflight,
     text: "",
   })
-  const { text: incoming, response: { messages } } = yield* Effect.tryPromise(() =>
-    generateText({
-      model: openai(modelId),
-      messages: [...items.map((v) => v.message), userMessage],
-      maxRetries: 0,
-    })
-  )
-  const assistantMessageEmbedding = yield* embed(incoming)
+  const { text: incoming } = yield* LanguageModel.generateText({
+    prompt: [...items.map(({ message }) => message), userMessage],
+  })
+  const assistantMessageEmbedding = yield* em.embed(incoming)
   yield* tx(Effect.fn(function*(_) {
     const [{ id: chatItemId }] = yield* Effect.all([
       Effect.tryPromise(() =>
         _
           .insert(chatItems)
-          .values(messages.map((message) => ({ chatId, message })))
+          .values({
+            chatId,
+            message: Prompt.assistantMessage({
+              content: [Prompt.makePart("text", { text: incoming })],
+            }),
+          })
           .returning()
       ).pipe(e0, nonNullable),
       Effect.tryPromise(() =>
@@ -122,4 +119,10 @@ export const submitAtom = runtime.fn<typeof ChatId.Type | undefined>()(Effect.fn
   })
   if (titleFiber) yield* Fiber.join(titleFiber)
   inflight.abort()
-}))
+}, (x, _1, get) =>
+  Effect.provide(
+    x,
+    OpenAiLanguageModel.layer({
+      model: get(currentModelIdAtom),
+    }),
+  )))
