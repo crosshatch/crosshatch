@@ -5,7 +5,7 @@
   "sideEffects": false,
   "license": "Apache-2.0",
   "description": "Tools for integrating Crosshatch into React apps.",
-  "homepage": "https://docs.crosshatch.dev",
+  "homepage": "https://crosshatch.dev",
   "repository": {
     "type": "git",
     "url": "https://github.com/crosshatch/crosshatch.git",

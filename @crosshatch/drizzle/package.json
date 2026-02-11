@@ -5,7 +5,7 @@
   "sideEffects": false,
   "license": "Apache-2.0",
   "description": "Drizzle-related utilities used by Crosshatch.",
-  "homepage": "https://docs.crosshatch.dev",
+  "homepage": "https://crosshatch.dev",
   "repository": {
     "type": "git",
     "url": "https://github.com/crosshatch/crosshatch.git",
