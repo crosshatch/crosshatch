@@ -1,14 +1,12 @@
 import * as Widget from "@crosshatch/util/Widget"
 import { BrowserWorker } from "@effect/platform-browser"
 import { Deferred, Effect, Layer, Option, Schema as S } from "effect"
-import { CrosshatchEnv } from "./CrosshatchEnv.ts"
+import { env } from "./env.ts"
 import { AppReady, BridgeReady } from "./messages.ts"
 
 const style = Object
   .entries({
     position: "absolute",
-    width: "1px",
-    height: "1px",
     padding: 0,
     bottom: "-1px",
     left: "-1px",
@@ -24,17 +22,16 @@ const style = Object
   .join(" ")
 
 export const BridgeWorkerLive = Effect.gen(function*() {
-  const { url, isCrosshatch } = yield* CrosshatchEnv
   const deferred = yield* Deferred.make<void>()
   addEventListener("message", function f({ data, origin }: MessageEvent) {
-    if (isCrosshatch(origin) && Option.isSome(S.decodeUnknownOption(BridgeReady)(data))) {
+    if (env.isCrosshatch(origin) && Option.isSome(S.decodeUnknownOption(BridgeReady)(data))) {
       Deferred.unsafeDone(deferred, Effect.void)
       removeEventListener("message", f)
     }
   })
   // TODO: solve possible deadlock?
   addEventListener("message", function f({ data, origin }: MessageEvent) {
-    if (isCrosshatch(origin) && Option.isSome(Widget.RequestIntroduction.decodeOption(data))) {
+    if (env.isCrosshatch(origin) && Option.isSome(Widget.RequestIntroduction.decodeOption(data))) {
       context.postMessage(new Widget.Introduction(), "*")
       removeEventListener("message", f)
     }
@@ -42,7 +39,7 @@ export const BridgeWorkerLive = Effect.gen(function*() {
   const iframe = document.createElement("iframe")
   Object.assign(iframe, {
     sandbox: "allow-scripts allow-same-origin",
-    src: `${url}/bridge`,
+    src: env.href("bridge"),
     width: 1,
     height: 1,
     style,

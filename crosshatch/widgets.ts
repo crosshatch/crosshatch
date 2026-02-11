@@ -2,8 +2,8 @@ import { access } from "@crosshatch/util/unwrapping"
 import * as Widget from "@crosshatch/util/Widget"
 import { UrlParams } from "@effect/platform"
 import { Effect, flow, Option, Schema as S, Stream } from "effect"
-import { CrosshatchEnv } from "./CrosshatchEnv.ts"
 import { AccountFrozen, Escalation, InsufficientFunds } from "./DeclinedDecision.ts"
+import { env } from "./env.ts"
 import { LinkChallengeId } from "./LinkChallenge.ts"
 
 const widget = <A, I extends UrlParams.Input, A2, I2>({ pathname, payload, event }: {
@@ -16,9 +16,11 @@ const widget = <A, I extends UrlParams.Input, A2, I2>({ pathname, payload, event
     stream: flow(
       S.encode(payload),
       Effect.flatMap(Effect.fn(function*(v) {
-        const { url } = yield* CrosshatchEnv
-        const { href } = new URL(pathname, url)
-        return yield* UrlParams.makeUrl(href, UrlParams.fromInput(v), Option.none())
+        return yield* UrlParams.makeUrl(
+          env.href(pathname),
+          UrlParams.fromInput(v),
+          Option.none(),
+        )
       })),
       access("href"),
       Effect.map((src) => ({

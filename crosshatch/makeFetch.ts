@@ -1,7 +1,6 @@
 import { Effect, Encoding, flow, Schema as S, Stream } from "effect"
 import { BridgeClient } from "./BridgeClient.ts"
 import { DeclinedDecision } from "./DeclinedDecision.ts"
-import { Live } from "./Live.ts"
 import { EscalationWidget, OnrampExplainerWidget, ThawWidget } from "./widgets.ts"
 import { PaymentRequired, Version } from "./X402/schemas.ts"
 
@@ -65,10 +64,8 @@ export const makeFetch = (fetch: typeof globalThis.fetch): typeof globalThis.fet
     }
 
     return yield* Effect.promise(() => fetch(input, { ...init, headers }))
-  }).pipe(
-    Effect.provide(Live),
-    (x) =>
-      Effect.runPromise(x, {
-        signal: init?.signal ?? undefined,
-      }),
+  }).pipe((x) =>
+    BridgeClient.managedRuntime.runPromise(x, {
+      signal: init?.signal ?? undefined,
+    })
   )
