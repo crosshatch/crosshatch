@@ -5,6 +5,7 @@ import { Drizzle } from "@/Drizzle"
 import { ChatId } from "@/ids"
 import { router } from "@/router"
 import { chatItems, chats, embeddings } from "@/schema"
+import { FirecrawlToolkit } from "@/tools/FirecrawlToolkit"
 import { tx } from "@/tx"
 import * as AtomUtil from "@crosshatch/ui/AtomUtil"
 import { e0, nonNullable } from "@crosshatch/util/unwrapping"
@@ -84,9 +85,20 @@ export const sendMessageAtom = runtime.fn<typeof ChatId.Type | undefined>()(Effe
     inflight,
     text: "",
   })
-  const { text: incoming } = yield* LanguageModel.generateText({
-    prompt: [...items.map(({ message }) => message), userMessage],
+  let prompt = Prompt.make([...items.map(({ message }) => message), userMessage])
+  let generated = yield* LanguageModel.generateText({
+    prompt,
+    toolkit: FirecrawlToolkit,
   })
+  // TODO: save tool calls in database
+  while (generated.toolCalls.length > 0) {
+    prompt = Prompt.merge(prompt, Prompt.fromResponseParts(generated.content))
+    generated = yield* LanguageModel.generateText({
+      prompt,
+      toolkit: FirecrawlToolkit,
+    })
+  }
+  const { text: incoming } = generated
   const assistantMessageEmbedding = yield* em.embed(incoming)
   yield* tx(Effect.fn(function*(_) {
     const [{ id: chatItemId }] = yield* Effect.all([

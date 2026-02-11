@@ -37,7 +37,8 @@
     "openai": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "streamdown": "catalog:"
+    "streamdown": "catalog:",
+    "dedent": "catalog:"
   },
   "devDependencies": {
     "@tanstack/router-plugin": "catalog:",

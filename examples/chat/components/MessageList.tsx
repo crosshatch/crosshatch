@@ -23,8 +23,8 @@ export const MessageList = () => {
   }, [items.length, inflight, chatId])
 
   return (
-    <Section className="h-full p-4">
-      <SectionInner className="space-y-4">
+    <Section className="h-full p-2">
+      <SectionInner>
         {items.map((item, i) => {
           const { message, id } = item
           const inner = <Message {...{ message }} />
