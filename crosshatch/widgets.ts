@@ -77,3 +77,9 @@ export const OnrampExplainerWidget = widget({
   payload: InsufficientFunds,
   event: S.Void,
 })
+
+export const IdWidget = widget({
+  pathname: "/id",
+  payload: Common,
+  event: S.Void,
+})
