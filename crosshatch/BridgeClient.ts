@@ -14,6 +14,6 @@ export class BridgeClient extends Effect.Service<BridgeClient>()(prefix("kit/Bri
   static readonly layer = BridgeClient.Default.pipe(
     Layer.provide(BridgeWorkerLive),
   )
-  static readonly runtime = Atom.context({ memoMap })(this.layer)
+  static readonly atomRuntime = Atom.context({ memoMap })(this.layer)
   static readonly managedRuntime = ManagedRuntime.make(this.layer, memoMap)
 }

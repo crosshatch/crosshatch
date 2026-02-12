@@ -5,7 +5,7 @@ import { env } from "./env.ts"
 import { EventsWidget, IdWidget, LinkWidget } from "./widgets.ts"
 import type { PaymentRequired } from "./X402/schemas.ts"
 
-export const linkStateAtom = BridgeClient.runtime.atom(Effect.gen(function*() {
+export const linkStateAtom = BridgeClient.atomRuntime.atom(Effect.gen(function*() {
   const bridge = yield* BridgeClient
   return yield* bridge.status()
 }))
@@ -14,7 +14,7 @@ export const isLinkedAtom = linkStateAtom.pipe(
   Atom.mapResult(({ _tag }) => _tag === "Linked"),
 )
 
-export const unlinkAtom = BridgeClient.runtime.fn<void>()(Effect.fn(function*() {
+export const unlinkAtom = BridgeClient.atomRuntime.fn<void>()(Effect.fn(function*() {
   const bridge = yield* BridgeClient
   return yield* bridge.unlink()
 }))
@@ -24,7 +24,7 @@ export const payAtom = Effect.fn(function*(required: typeof PaymentRequired.Type
   return yield* bridge.propose({ required })
 })
 
-export const openSessionWidgetAtom = BridgeClient.runtime.fn<void>()(Effect.fn(function*(_, get) {
+export const openSessionWidgetAtom = BridgeClient.atomRuntime.fn<void>()(Effect.fn(function*(_, get) {
   const linkState = yield* get.result(linkStateAtom)
   switch (linkState._tag) {
     case "Anonymous": {
