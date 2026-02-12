@@ -29,9 +29,10 @@ export const BridgeWorkerLive = Effect.gen(function*() {
       removeEventListener("message", f)
     }
   })
-  // TODO: solve possible deadlock?
-  addEventListener("message", function f({ data, origin }: MessageEvent) {
+  const contextPending = Promise.withResolvers<void>()
+  addEventListener("message", async function f({ data, origin }: MessageEvent) {
     if (env.isCrosshatch(origin) && Option.isSome(Widget.RequestIntroduction.decodeOption(data))) {
+      await contextPending.promise
       context.postMessage(new Widget.Introduction(), "*")
       removeEventListener("message", f)
     }
@@ -47,6 +48,7 @@ export const BridgeWorkerLive = Effect.gen(function*() {
   document.body.appendChild(iframe)
   yield* Deferred.await(deferred)
   const context = yield* Effect.fromNullable(iframe.contentWindow)
+  contextPending.resolve()
   const channel = new MessageChannel()
   context.postMessage(new AppReady(), "*", [channel.port2])
   return BrowserWorker.layerPlatform(() => channel.port1)

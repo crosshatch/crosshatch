@@ -23,6 +23,7 @@
     "./package.json": "./package.json"
   },
   "peerDependencies": {
+    "@effect/experimental": "catalog:",
     "@huggingface/transformers": "catalog:",
     "date-fns": "catalog:",
     "effect": "catalog:"
