@@ -12,7 +12,6 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.8",
-    "@crosshatch/config": "workspace:*",
     "@crosshatch/repo-util": "catalog:",
     "@effect/language-service": "catalog:",
     "@effect/platform-node": "catalog:",

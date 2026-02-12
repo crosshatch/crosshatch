@@ -1,4 +1,4 @@
-import { LoggerLive } from "@crosshatch/util/LoggerLive"
+import { layerLogger } from "@crosshatch/util/layerLogger"
 import { BrowserSocket } from "@effect/platform-browser"
 import { PGlite } from "@electric-sql/pglite"
 import { fuzzystrmatch } from "@electric-sql/pglite/contrib/fuzzystrmatch"
@@ -10,7 +10,11 @@ import { Effect } from "effect"
 import { migrate } from "./migrate.ts"
 import type { Migration } from "./Migration.ts"
 
-export const worker = (key: string, migrations: Array<typeof Migration.Type>) =>
+export const worker = (
+  key: string,
+  migrations: Array<typeof Migration.Type>,
+  dev?: boolean | undefined,
+) =>
   worker_({
     init: () =>
       Effect.gen(function*() {
@@ -30,7 +34,7 @@ export const worker = (key: string, migrations: Array<typeof Migration.Type>) =>
         return client
       }).pipe(
         Effect.provide([
-          LoggerLive,
+          layerLogger(dev ?? false),
           BrowserSocket.layerWebSocketConstructor,
         ]),
         Effect.scoped,

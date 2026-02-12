@@ -45,7 +45,6 @@
     "@vitejs/plugin-react": "catalog:",
     "babel-plugin-react-compiler": "catalog:",
     "vite-plugin-mkcert": "catalog:",
-    "@crosshatch/config": "workspace:*",
     "drizzle-kit": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:",

@@ -10,7 +10,6 @@
   "include": ["."],
   "exclude": ["dist"],
   "references": [
-    { "path": "../../@crosshatch/config" },
     { "path": "../../@crosshatch/drizzle" },
     { "path": "../../@crosshatch/react" },
     { "path": "../../@crosshatch/store" },
