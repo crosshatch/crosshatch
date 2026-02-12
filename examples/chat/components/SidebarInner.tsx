@@ -35,11 +35,11 @@ import { useEffect, useRef, useState } from "react"
 export const SidebarInner = () => {
   const { value: chats } = useAtomSuspense(chatsAtom)
   return (
-    <div className="absolute top-0 right-0 bottom-0 left-0 overflow-y-scroll">
+    <div className="absolute top-0 right-0 bottom-0 left-0 overflow-y-scroll [&::-webkit-scrollbar]:hidden">
       <SidebarHeader className="sticky top-0 right-0 left-0 border-b bg-secondary/75 z-50 backdrop-blur-sm">
         <Search />
       </SidebarHeader>
-      <SidebarContent className="flex [&::-webkit-scrollbar]:hidden max-h-screen p-[0.5]">
+      <SidebarContent className="flex max-h-screen p-[0.5]">
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
           <SidebarMenu>
             <Button variant="outline" asChild className="font-light h-8 justify-between">

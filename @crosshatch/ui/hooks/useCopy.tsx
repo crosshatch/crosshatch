@@ -1,25 +1,32 @@
+import { Atom, useAtom } from "@effect-atom/atom-react"
 import { CheckIcon, ClipboardIcon } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect, useRef } from "react"
+
+const copiedIdAtom = Atom.make<string | undefined>(undefined)
 
 export const useCopy = (text: string, size?: number | undefined) => {
-  const [copied, setCopied] = useState(false)
-
+  const idRef = useRef(crypto.randomUUID())
+  const [copiedId, setCopiedId] = useAtom(copiedIdAtom)
+  const copied = idRef.current === copiedId
   useEffect(() => {
     if (!copied) return
-    const timeoutId = setTimeout(() => setCopied(false), 2000)
+    const timeoutId = setTimeout(() => {
+      if (idRef.current === copiedId) {
+        setCopiedId(undefined)
+      }
+    }, 2000)
     return () => clearTimeout(timeoutId)
   }, [copied])
-
   const copy = async () => {
     await navigator.clipboard.writeText(text)
-    setCopied(true)
+    setCopiedId(idRef.current)
   }
-
-  const props = { className: `size-${size} stroke-1 opacity-50` }
-
+  const iconProps = {
+    className: `size-${size} stroke-1 opacity-50`,
+  }
   return {
     copied,
     copy,
-    icon: copied ? <CheckIcon {...props} /> : <ClipboardIcon {...props} />,
+    icon: copied ? <CheckIcon {...iconProps} /> : <ClipboardIcon {...iconProps} />,
   }
 }

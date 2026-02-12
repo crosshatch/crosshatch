@@ -24,7 +24,7 @@ export const MessageList = () => {
 
   return (
     <Section className="h-full p-2">
-      <SectionInner>
+      <SectionInner className="min-w-0">
         {items.map((item, i) => {
           const { message, id } = item
           const inner = <Message {...{ message }} />
@@ -33,7 +33,7 @@ export const MessageList = () => {
               return (
                 <Fragment key={id}>
                   <ChatEventCard className="p-2 justify-end">
-                    <div className="p-4">{inner}</div>
+                    <div className="p-4 min-w-0 break-all whitespace-normal">{inner}</div>
                   </ChatEventCard>
                   {inflight && i === items.length - 1 && (
                     <ChatEventCard className="border-none p-2">
@@ -48,7 +48,7 @@ export const MessageList = () => {
             case "assistant": {
               return (
                 <ChatEventCard key={id} className="p-2">
-                  <div className="p-4 bg-gray-500/25">{inner}</div>
+                  <div className="p-4 bg-gray-500/25 min-w-0 break-all whitespace-normal">{inner}</div>
                 </ChatEventCard>
               )
             }
@@ -68,7 +68,7 @@ export const ChatEventCard = ({ children, className, actions }: {
   actions?: React.ReactNode | undefined
 }) => (
   <div className={cn("w-full flex flex-row", className)}>
-    <div className="w-2/3">
+    <div className="min-w-0 w-full">
       <div className="rounded-sm border overflow-hidden">
         {children}
       </div>

@@ -35,6 +35,7 @@
     "./package.json": "./package.json"
   },
   "peerDependencies": {
+    "@crosshatch/ui": "workspace:*",
     "@crosshatch/util": "workspace:*",
     "@effect/sql-pg": "catalog:",
     "@effect/platform": "catalog:",

@@ -4,17 +4,15 @@ import { Deferred, Effect, Layer, Option, Schema as S } from "effect"
 import { env } from "./env.ts"
 import { AppReady, BridgeReady } from "./messages.ts"
 
-const style = Object
+const cssText = Object
   .entries({
     position: "absolute",
     padding: 0,
     bottom: "-1px",
     left: "-1px",
     overflow: "hidden",
-    clip: "rect(0, 0, 0, 0)",
     clipPath: "inset(50%)",
     border: 0,
-    whiteSpace: "nowrap",
     pointerEvents: "none",
     opacity: 0,
   })
@@ -22,17 +20,17 @@ const style = Object
   .join(" ")
 
 export const BridgeWorkerLive = Effect.gen(function*() {
-  const deferred = yield* Deferred.make<void>()
+  const bridgeReady = yield* Deferred.make<void>()
   addEventListener("message", function f({ data, origin }: MessageEvent) {
     if (env.isCrosshatch(origin) && Option.isSome(S.decodeUnknownOption(BridgeReady)(data))) {
-      Deferred.unsafeDone(deferred, Effect.void)
+      Deferred.unsafeDone(bridgeReady, Effect.void)
       removeEventListener("message", f)
     }
   })
-  const contextPending = Promise.withResolvers<void>()
+  const contextReady = Promise.withResolvers<void>()
   addEventListener("message", async function f({ data, origin }: MessageEvent) {
     if (env.isCrosshatch(origin) && Option.isSome(Widget.RequestIntroduction.decodeOption(data))) {
-      await contextPending.promise
+      await contextReady.promise
       context.postMessage(new Widget.Introduction(), "*")
       removeEventListener("message", f)
     }
@@ -43,12 +41,12 @@ export const BridgeWorkerLive = Effect.gen(function*() {
     src: env.href("bridge"),
     width: 1,
     height: 1,
-    style,
   })
+  Object.assign(iframe.style, { cssText })
   document.body.appendChild(iframe)
-  yield* Deferred.await(deferred)
+  yield* Deferred.await(bridgeReady)
   const context = yield* Effect.fromNullable(iframe.contentWindow)
-  contextPending.resolve()
+  contextReady.resolve()
   const channel = new MessageChannel()
   context.postMessage(new AppReady(), "*", [channel.port2])
   return BrowserWorker.layerPlatform(() => channel.port1)
