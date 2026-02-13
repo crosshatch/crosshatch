@@ -49,6 +49,7 @@
     "vite": "catalog:",
     "vitest": "catalog:",
     "@types/react": "catalog:",
-    "@types/react-dom": "catalog:"
+    "@types/react-dom": "catalog:",
+    "vite-tsconfig-paths": "catalog:"
   }
 }

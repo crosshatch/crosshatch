@@ -56,7 +56,6 @@ catalog:
   "@tanstack/devtools-vite": ^0.4.1
   "@tanstack/react-router": ^1.159.4
   "@tanstack/react-router-devtools": ^1.159.4
-  "@tanstack/react-start": ^1.159.4
   "@tanstack/router-core": ^1.141.1
   "@tanstack/router-plugin": ^1.159.4
   "@testcontainers/postgresql": ^11.11.0
@@ -119,6 +118,7 @@ catalog:
   vaul: ^1.1.2
   playwright: ^1.58.2
   "@playwright/test": ^1.58.2
+  vite-tsconfig-paths: ^6.1.1
 
 overrides:
   "@effect/sql-pg": ^0.50.3

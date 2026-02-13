@@ -5,6 +5,7 @@ import react from "@vitejs/plugin-react"
 import { fileURLToPath, URL } from "node:url"
 import { defineConfig } from "vite"
 import mkcert from "vite-plugin-mkcert"
+import tsconfigPaths from "vite-tsconfig-paths"
 
 // proxy: {
 //   "/v1/traces": {
@@ -24,7 +25,9 @@ export default defineConfig({
     fs: { strict: false },
   },
   resolve: {
-    alias: { "@": fileURLToPath(new URL(".", import.meta.url)) },
+    alias: {
+      "@": fileURLToPath(new URL(".", import.meta.url)),
+    },
   },
   worker: { format: "es" },
   optimizeDeps: {
@@ -47,6 +50,9 @@ export default defineConfig({
       autoCodeSplitting: true,
       routesDirectory: "routes",
       generatedRouteTree: "routeTree.gen.ts",
+    }),
+    tsconfigPaths({
+      projects: ["tsconfig.json"],
     }),
     store(),
     mkcert({

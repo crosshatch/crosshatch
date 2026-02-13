@@ -60,35 +60,25 @@ export const makeTagEnum = <
 
 export const make = <
   B extends symbol,
-  K extends string,
   A extends { _tag: string },
   I,
   R,
 >(
   id: S.brand<typeof S.UUID, B>,
-  tagKey: K,
   schema: S.Schema<A, I, R>,
-): {
-  tag: PgEnum<[A["_tag"]]>
-  schema: TaggedUnionTable<B, A, I, R>
-} => {
-  const tag = makeTagEnum(tagKey, schema)
+): TaggedUnionTable<B, A, I, R> => {
   const base = Base(id).pipe(S.extend(schema))
-  return {
-    tag,
-    schema: Object.assign(base, {
-      columns: (columns: Record<string, AnyPgColumnBuilder>) => ({
-        _tag: tag("_tag").notNull(),
-        ...ColumnsCommon(id),
-        ...columns,
-      }),
-      fromRow: <K extends Types.Tags<A> = Types.Tags<A>>(
-        _tag?: K | undefined,
-      ) =>
-      (row: unknown) =>
-        S.encodeUnknown(base)(row).pipe(
-          Effect.flatMap(S.decode(base)),
-        ),
-    }) as never,
-  }
+  return Object.assign(base, {
+    columns: (columns: Record<string, AnyPgColumnBuilder>) => ({
+      ...ColumnsCommon(id),
+      ...columns,
+    }),
+    fromRow: <K extends Types.Tags<A> = Types.Tags<A>>(
+      _tag?: K | undefined,
+    ) =>
+    (row: unknown) =>
+      S.encodeUnknown(base)(row).pipe(
+        Effect.flatMap(S.decode(base)),
+      ),
+  }) as never
 }
