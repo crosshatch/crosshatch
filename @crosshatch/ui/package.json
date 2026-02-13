@@ -2,7 +2,7 @@
   "name": "@crosshatch/ui",
   "version": "0.1.0-beta.1",
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": true,
   "license": "Apache-2.0",
   "description": "React UI components shared between Crosshatch packages.",
   "homepage": "https://crosshatch.dev",
@@ -16,6 +16,10 @@
   },
   "private": true,
   "exports": {
+    "./prelude": {
+      "types": "./prelude.ts",
+      "import": "./dist/prelude.js"
+    },
     "./*": {
       "types": "./*.tsx",
       "import": "./dist/*.js"
@@ -27,8 +31,8 @@
   },
   "peerDependencies": {
     "@crosshatch/util": "workspace:*",
-    "@effect/ai": "catalog:",
     "@effect-atom/atom-react": "catalog:",
+    "@effect/ai": "catalog:",
     "@effect/platform-browser": "catalog:",
     "@icons-pack/react-simple-icons": "catalog:",
     "@radix-ui/react-accordion": "catalog:",
@@ -39,6 +43,7 @@
     "@radix-ui/react-dialog": "catalog:",
     "@radix-ui/react-dialog": "catalog:",
     "@radix-ui/react-dropdown-menu": "catalog:",
+    "@radix-ui/react-hover-card": "catalog:",
     "@radix-ui/react-label": "catalog:",
     "@radix-ui/react-menubar": "catalog:",
     "@radix-ui/react-popover": "catalog:",
@@ -51,24 +56,21 @@
     "@radix-ui/react-tabs": "catalog:",
     "@radix-ui/react-tooltip": "catalog:",
     "@tanstack/react-router": "catalog:",
-    "@radix-ui/react-hover-card": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@types/react": "catalog:",
     "class-variance-authority": "catalog:",
+    "clsx": "catalog:",
+    "cmdk": "catalog:",
     "effect": "catalog:",
     "lucide-react": "catalog:",
+    "markdown-to-jsx": "catalog:",
     "next-themes": "catalog:",
     "react": "catalog:",
     "shiki": "catalog:",
-    "tailwind-merge": "catalog:",
-    "clsx": "catalog:",
-    "cmdk": "catalog:",
     "sonner": "catalog:",
+    "tailwind-merge": "catalog:",
     "tailwindcss": "catalog:",
     "tw-animate-css": "catalog:",
-    "vaul": "catalog:",
-    "markdown-to-jsx": "catalog:"
-  },
-  "devDependencies": {
-    "@types/react": "catalog:",
-    "@types/react-dom": "catalog:"
+    "vaul": "catalog:"
   }
 }

@@ -1,7 +1,7 @@
 import { Atom } from "@effect-atom/atom"
 import { Effect, Stream } from "effect"
 import { BridgeClient } from "./BridgeClient.ts"
-import { env } from "./env.ts"
+import { CrosshatchEnv } from "./CrosshatchEnv.ts"
 import { EventsWidget, IdWidget, LinkWidget } from "./widgets.ts"
 import type { PaymentRequired } from "./X402/schemas.ts"
 
@@ -25,10 +25,11 @@ export const payAtom = Effect.fn(function*(required: typeof PaymentRequired.Type
 })
 
 export const openSessionWidgetAtom = BridgeClient.atomRuntime.fn<void>()(Effect.fn(function*(_, get) {
+  const { isCrosshatch } = yield* CrosshatchEnv
   const linkState = yield* get.result(linkStateAtom)
   switch (linkState._tag) {
     case "Anonymous": {
-      if (env.isCrosshatch(origin)) {
+      if (isCrosshatch(origin)) {
         return yield* IdWidget.stream({
           referrer: location.href,
         }).pipe(

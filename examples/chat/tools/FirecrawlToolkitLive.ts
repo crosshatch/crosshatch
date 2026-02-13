@@ -1,6 +1,6 @@
 import { HttpBody, HttpClient, HttpClientRequest, HttpClientResponse } from "@effect/platform"
-import { FetchLive } from "crosshatch"
-import { Config, Console, Effect, flow, Layer, Redacted, Schema as S } from "effect"
+import { CrosshatchHttpClient } from "crosshatch"
+import { Config, Effect, flow, Layer, Redacted, Schema as S } from "effect"
 import { FirecrawlToolkit } from "./FirecrawlToolkit"
 
 const FirecrawlSearchResponse = S.Struct({
@@ -16,7 +16,7 @@ const FirecrawlScrapeResponse = S.Struct({
 })
 
 class FirecrawlClient extends Effect.Service<FirecrawlClient>()("FirecrawlClient", {
-  dependencies: [FetchLive],
+  dependencies: [CrosshatchHttpClient],
   effect: Effect.gen(function*() {
     const apiKey = yield* Config.redacted("VITE_PUBLIC_FIRECRAWL_API_KEY")
     const httpClient = yield* HttpClient.HttpClient
@@ -58,7 +58,6 @@ export const FirecrawlToolkitLive = FirecrawlToolkit.toLayer(
           acceptJson: true,
         }).pipe(
           Effect.flatMap(HttpClientResponse.schemaBodyJson(FirecrawlScrapeResponse)),
-          Effect.tap(Console.log),
           Effect.map((res) => ({ url, markdown: res.data.markdown })),
         )
       }, Effect.orDie),

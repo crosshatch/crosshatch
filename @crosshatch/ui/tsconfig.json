@@ -6,7 +6,7 @@
     "baseUrl": ".",
     "paths": { "@/*": ["./*"] }
   },
-  "include": [".", "../../setGlobals.ts"],
+  "include": ["."],
   "exclude": ["dist"],
   "references": [{ "path": "../util" }]
 }

@@ -1,7 +1,7 @@
 import * as Widget from "@crosshatch/util/Widget"
 import { BrowserWorker } from "@effect/platform-browser"
 import { Deferred, Effect, Layer, Option, Schema as S } from "effect"
-import { env } from "./env.ts"
+import { CrosshatchEnv } from "./CrosshatchEnv.ts"
 import { AppReady, BridgeReady } from "./messages.ts"
 
 const cssText = Object
@@ -21,6 +21,7 @@ const cssText = Object
 
 export const BridgeWorkerLive = Effect.gen(function*() {
   const bridgeReady = yield* Deferred.make<void>()
+  const env = yield* CrosshatchEnv
   addEventListener("message", function f({ data, origin }: MessageEvent) {
     if (env.isCrosshatch(origin) && Option.isSome(S.decodeUnknownOption(BridgeReady)(data))) {
       Deferred.unsafeDone(bridgeReady, Effect.void)

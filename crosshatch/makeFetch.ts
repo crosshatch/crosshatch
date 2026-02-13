@@ -8,8 +8,8 @@ export class CrosshatchFetchError extends S.TaggedError<CrosshatchFetchError>()(
   decision: DeclinedDecision,
 }) {}
 
-export const makeFetch = (fetch: typeof globalThis.fetch): typeof globalThis.fetch => async (input, init) =>
-  Effect.gen(function*() {
+export const makeFetch = (fetch: typeof globalThis.fetch): typeof globalThis.fetch => async (input, init) => {
+  return Effect.gen(function*() {
     const headers = new Headers(init?.headers)
     const response = yield* Effect.promise(() => fetch(input, { ...init, headers }))
     if (response.status !== 402) {
@@ -69,3 +69,4 @@ export const makeFetch = (fetch: typeof globalThis.fetch): typeof globalThis.fet
       signal: init?.signal ?? undefined,
     })
   )
+}
