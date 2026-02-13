@@ -1,4 +1,4 @@
-import * as Path from "node:path"
+import Path from "node:path"
 import { defaultExclude, type ViteUserConfig } from "vitest/config"
 
 export default {
