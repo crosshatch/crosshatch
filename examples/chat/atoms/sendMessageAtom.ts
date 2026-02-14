@@ -59,20 +59,24 @@ export const sendMessageAtom = runtime.fn<typeof ChatId.Type | undefined>()(Effe
   const em = yield* EmbeddingModel.EmbeddingModel
   const userMessageEmbedding = yield* em.embed(text)
   yield* tx(Effect.fn(function*(_) {
-    const [{ id: chatItemId }] = yield* Effect.all([
-      Effect.promise(() =>
-        _
-          .insert(chatItems)
-          .values({
-            chatId,
-            message: userMessage,
-          })
-          .returning()
-      ).pipe(e0, nonNullable),
-      Effect.promise(
-        () => _.update(chats).set({ updated: new Date() }).where(eq(chats.id, chatId)),
+    const { id: chatItemId } = yield* Effect.promise(() =>
+      _
+        .insert(chatItems)
+        .values({
+          chatId,
+          message: userMessage,
+        })
+        .returning()
+    ).pipe(
+      e0,
+      nonNullable,
+      Effect.zipLeft(
+        Effect.promise(
+          () => _.update(chats).set({ updated: new Date() }).where(eq(chats.id, chatId)),
+        ),
+        { concurrent: true },
       ),
-    ], { concurrency: "unbounded" })
+    )
     yield* Effect.promise(() =>
       _.insert(embeddings).values({
         chatItemId,
