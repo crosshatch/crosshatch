@@ -1,4 +1,4 @@
-import store from "@crosshatch/store/plugin"
+// import store from "@crosshatch/store/plugin"
 import tailwind from "@tailwindcss/vite"
 import { tanstackRouter } from "@tanstack/router-plugin/vite"
 import react from "@vitejs/plugin-react"
@@ -46,7 +46,7 @@ export default defineConfig({
     ],
   },
   plugins: [
-    store(),
+    // store(),
     alchemy(),
     tanstackRouter({
       target: "react",

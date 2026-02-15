@@ -1,0 +1,21 @@
+{
+  "name": "docs",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vocs dev",
+    "build": "vocs build",
+    "preview": "vocs preview"
+  },
+  "dependencies": {
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "vocs": "latest",
+    "crosshatch": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "catalog:",
+    "typescript": "catalog:"
+  }
+}

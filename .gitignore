@@ -5,6 +5,7 @@ node_modules/
 repomix-output.xml
 .DS_Store
 
+.alchemy
 .direnv/
 dist/
 *.tsbuildinfo

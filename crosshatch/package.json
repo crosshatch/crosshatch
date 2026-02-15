@@ -4,7 +4,7 @@
   "type": "module",
   "sideEffects": false,
   "license": "Apache-2.0",
-  "description": "An embeddable browser wallet that intercepts and retries 402s.",
+  "description": "A non-custodial embedded stablecoin wallet that intercepts and pays x402s.",
   "homepage": "https://crosshatch.dev",
   "repository": {
     "type": "git",

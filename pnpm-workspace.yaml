@@ -1,6 +1,7 @@
 packages:
   - "@crosshatch/*"
   - crosshatch
+  - docs
   - examples/*
 
 catalog:

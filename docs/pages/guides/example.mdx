@@ -1,0 +1,23 @@
+# Example
+
+This is an example page.
+
+```ts
+import { Decision, Payload, Requirement, settle } from "crosshatch"
+
+while (true) {
+  // Create the x402 payment requirement.
+  const requirement = Requirement.make({
+    value: ".001 USDC",
+    network: "base",
+    recipient: "0x...",
+  })
+
+  const decision = await propose(requirement)
+
+  if (decision._tag === "Approval") {
+    const { payload } = decision
+    await settle({ payload, requirement })
+  }
+}
+```

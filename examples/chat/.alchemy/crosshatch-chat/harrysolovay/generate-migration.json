@@ -4,7 +4,7 @@
   "fqn": "crosshatch-chat/harrysolovay/generate-migration",
   "seq": 0,
   "data": {},
-  "status": "created",
+  "status": "updated",
   "output": {
     "Symbol(alchemy::ResourceKind)": "os::Exec",
     "Symbol(alchemy::ResourceID)": "generate-migration",
@@ -19,7 +19,7 @@
     "exitCode": 0,
     "stdout": "",
     "stderr": "",
-    "executedAt": 1771107016351,
+    "executedAt": 1771168540806,
     "completed": true
   },
   "props": {
