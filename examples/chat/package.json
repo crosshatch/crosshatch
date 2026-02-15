@@ -33,6 +33,7 @@
     "@tanstack/react-router": "catalog:",
     "alchemy": "catalog:",
     "crosshatch": "workspace:*",
+    "dedent": "catalog:",
     "drizzle-orm": "catalog:",
     "effect": "catalog:",
     "lucide-react": "catalog:",
@@ -40,19 +41,18 @@
     "openai": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "streamdown": "catalog:",
-    "dedent": "catalog:"
+    "streamdown": "catalog:"
   },
   "devDependencies": {
     "@tanstack/router-plugin": "catalog:",
-    "@vitejs/plugin-react": "catalog:",
-    "babel-plugin-react-compiler": "catalog:",
-    "vite-plugin-mkcert": "catalog:",
-    "drizzle-kit": "catalog:",
-    "vite": "catalog:",
-    "vitest": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "vite-tsconfig-paths": "catalog:"
+    "@vitejs/plugin-react": "catalog:",
+    "babel-plugin-react-compiler": "catalog:",
+    "drizzle-kit": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-mkcert": "catalog:",
+    "vite-tsconfig-paths": "catalog:",
+    "vitest": "catalog:"
   }
 }

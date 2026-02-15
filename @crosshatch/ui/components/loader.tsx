@@ -164,20 +164,11 @@ export function DotsLoader({
   }
 
   return (
-    <div
-      className={cn(
-        "flex items-center space-x-1",
-        containerSizes[size],
-        className,
-      )}
-    >
+    <div className={cn("flex items-center space-x-1", containerSizes[size], className)}>
       {[...Array(3)].map((_, i) => (
         <div
           key={i}
-          className={cn(
-            "bg-primary animate-[bounce-dots_1.4s_ease-in-out_infinite] rounded-full",
-            dotSizes[size],
-          )}
+          className={cn("bg-primary animate-[bounce-dots_1.4s_ease-in-out_infinite] rounded-full", dotSizes[size])}
           style={{
             animationDelay: `${i * 160}ms`,
           }}
@@ -208,20 +199,11 @@ export function TypingLoader({
   }
 
   return (
-    <div
-      className={cn(
-        "flex items-center space-x-1",
-        containerSizes[size],
-        className,
-      )}
-    >
+    <div className={cn("flex items-center space-x-1", containerSizes[size], className)}>
       {[...Array(3)].map((_, i) => (
         <div
           key={i}
-          className={cn(
-            "bg-primary animate-[typing_1s_infinite] rounded-full",
-            dotSizes[size],
-          )}
+          className={cn("bg-primary animate-[typing_1s_infinite] rounded-full", dotSizes[size])}
           style={{
             animationDelay: `${i * 250}ms`,
           }}
@@ -258,20 +240,11 @@ export function WaveLoader({
   }
 
   return (
-    <div
-      className={cn(
-        "flex items-center gap-0.5",
-        containerSizes[size],
-        className,
-      )}
-    >
+    <div className={cn("flex items-center gap-0.5", containerSizes[size], className)}>
       {[...Array(5)].map((_, i) => (
         <div
           key={i}
-          className={cn(
-            "bg-primary animate-[wave_1s_ease-in-out_infinite] rounded-full",
-            barWidths[size],
-          )}
+          className={cn("bg-primary animate-[wave_1s_ease-in-out_infinite] rounded-full", barWidths[size])}
           style={{
             animationDelay: `${i * 100}ms`,
             height: heights[size][i],
@@ -307,10 +280,7 @@ export function BarsLoader({
       {[...Array(3)].map((_, i) => (
         <div
           key={i}
-          className={cn(
-            "bg-primary h-full animate-[wave-bars_1.2s_ease-in-out_infinite]",
-            barWidths[size],
-          )}
+          className={cn("bg-primary h-full animate-[wave-bars_1.2s_ease-in-out_infinite]", barWidths[size])}
           style={{
             animationDelay: `${i * 0.2}s`,
           }}
@@ -347,22 +317,9 @@ export function TerminalLoader({
   }
 
   return (
-    <div
-      className={cn(
-        "flex items-center space-x-1",
-        containerSizes[size],
-        className,
-      )}
-    >
-      <span className={cn("text-primary font-mono", textSizes[size])}>
-        {">"}
-      </span>
-      <div
-        className={cn(
-          "bg-primary animate-[blink_1s_step-end_infinite]",
-          cursorSizes[size],
-        )}
-      />
+    <div className={cn("flex items-center space-x-1", containerSizes[size], className)}>
+      <span className={cn("text-primary font-mono", textSizes[size])}>{">"}</span>
+      <div className={cn("bg-primary animate-[blink_1s_step-end_infinite]", cursorSizes[size])} />
       <span className="sr-only">Loading</span>
     </div>
   )
@@ -384,13 +341,7 @@ export function TextBlinkLoader({
   }
 
   return (
-    <div
-      className={cn(
-        "animate-[text-blink_2s_ease-in-out_infinite] font-medium",
-        textSizes[size],
-        className,
-      )}
-    >
+    <div className={cn("animate-[text-blink_2s_ease-in-out_infinite] font-medium", textSizes[size], className)}>
       {text}
     </div>
   )
@@ -442,33 +393,18 @@ export function TextDotsLoader({
   }
 
   return (
-    <div
-      className={cn("inline-flex items-center", className)}
-    >
-      <span className={cn("text-primary font-medium", textSizes[size])}>
-        {text}
-      </span>
+    <div className={cn("inline-flex items-center", className)}>
+      <span className={cn("text-primary font-medium", textSizes[size])}>{text}</span>
       <span className="inline-flex">
-        <span className="text-primary animate-[loading-dots_1.4s_infinite_0.2s]">
-          .
-        </span>
-        <span className="text-primary animate-[loading-dots_1.4s_infinite_0.4s]">
-          .
-        </span>
-        <span className="text-primary animate-[loading-dots_1.4s_infinite_0.6s]">
-          .
-        </span>
+        <span className="text-primary animate-[loading-dots_1.4s_infinite_0.2s]">.</span>
+        <span className="text-primary animate-[loading-dots_1.4s_infinite_0.4s]">.</span>
+        <span className="text-primary animate-[loading-dots_1.4s_infinite_0.6s]">.</span>
       </span>
     </div>
   )
 }
 
-function Loader({
-  variant = "circular",
-  size = "md",
-  text,
-  className,
-}: LoaderProps) {
+function Loader({ variant = "circular", size = "md", text, className }: LoaderProps) {
   switch (variant) {
     case "circular":
       return <CircularLoader size={size} className={className} />

@@ -1,48 +1,48 @@
 {
   "name": "@crosshatch/store",
   "version": "0.1.0-beta.1",
-  "type": "module",
-  "sideEffects": false,
-  "license": "Apache-2.0",
+  "private": true,
   "description": "A browser-embedded database toolkit.",
   "homepage": "https://crosshatch.dev",
+  "bugs": {
+    "url": "https://github.com/crosshatch/crosshatch/issues"
+  },
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/crosshatch/crosshatch.git",
     "directory": "packages/db"
   },
-  "bugs": {
-    "url": "https://github.com/crosshatch/crosshatch/issues"
-  },
-  "private": true,
+  "type": "module",
+  "sideEffects": false,
   "exports": {
     ".": {
-      "import": "./index.ts",
-      "types": "./index.ts"
+      "types": "./index.ts",
+      "import": "./index.ts"
     },
     "./migrations": {
-      "import": "./migrations.d.ts",
-      "types": "./migrations.d.ts"
+      "types": "./migrations.d.ts",
+      "import": "./migrations.d.ts"
     },
     "./plugin": {
-      "import": "./plugin.ts",
-      "types": "./plugin.ts"
+      "types": "./plugin.ts",
+      "import": "./plugin.ts"
     },
     "./worker": {
-      "import": "./worker.ts",
-      "types": "./worker.ts"
+      "types": "./worker.ts",
+      "import": "./worker.ts"
     },
     "./package.json": "./package.json"
   },
   "peerDependencies": {
     "@crosshatch/ui": "workspace:*",
     "@crosshatch/util": "workspace:*",
-    "@effect/sql-pg": "catalog:",
     "@effect/platform": "catalog:",
     "@effect/platform-browser": "catalog:",
+    "@effect/sql-pg": "catalog:",
     "@electric-sql/pglite": "catalog:",
-    "vite": "catalog:",
     "drizzle-orm": "catalog:",
-    "effect": "catalog:"
+    "effect": "catalog:",
+    "vite": "catalog:"
   }
 }

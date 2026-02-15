@@ -50,7 +50,9 @@ export const SidebarInner = () => {
             </Button>
           </SidebarMenu>
           <SidebarMenu className="mt-2">
-            {chats?.map((chat) => <ChatLink key={chat.id} {...chat} />)}
+            {chats?.map((chat) => (
+              <ChatLink key={chat.id} {...chat} />
+            ))}
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
@@ -58,7 +60,7 @@ export const SidebarInner = () => {
   )
 }
 
-const ChatLink = ({ title, id }: typeof chats["$inferSelect"]) => {
+const ChatLink = ({ title, id }: (typeof chats)["$inferSelect"]) => {
   const unnamed = useRef(title === undefined)
   const renameChat = useAtomSet(renameChatAtom)
   const [newTitle, setNewTitle] = useState(title ?? "")
@@ -121,9 +123,7 @@ const ChatLink = ({ title, id }: typeof chats["$inferSelect"]) => {
       <DialogContent className="p-4">
         <DialogHeader>
           <DialogTitle>Rename Chat</DialogTitle>
-          <DialogDescription>
-            Input the new title. Click save when you're done.
-          </DialogDescription>
+          <DialogDescription>Input the new title. Click save when you're done.</DialogDescription>
         </DialogHeader>
         <Input value={newTitle} onChange={({ target: { value } }) => setNewTitle(value)} />
         <Button

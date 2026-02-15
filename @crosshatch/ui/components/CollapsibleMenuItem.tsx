@@ -8,23 +8,23 @@ import {
   SidebarMenuSubItem,
 } from "./Sidebar.tsx"
 
-export const CollapsibleMenuItem = ({ label, isActive, icon, items }: {
+export const CollapsibleMenuItem = ({
+  label,
+  isActive,
+  icon,
+  items,
+}: {
   label: string
   isActive?: boolean | undefined
   icon: React.ReactNode
   items?:
     | Array<{
-      label: string
-      url: string
-    }>
+        label: string
+        url: string
+      }>
     | undefined
 }) => (
-  <Collapsible
-    key={label}
-    asChild
-    defaultOpen={isActive ?? false}
-    className="group/collapsible"
-  >
+  <Collapsible key={label} asChild defaultOpen={isActive ?? false} className="group/collapsible">
     <SidebarMenuItem>
       <CollapsibleTrigger asChild>
         <SidebarMenuButton tooltip={label}>

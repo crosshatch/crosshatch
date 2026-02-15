@@ -1,20 +1,20 @@
 {
   "name": "@crosshatch/drizzle",
   "version": "0.1.0-beta.1",
-  "type": "module",
-  "sideEffects": false,
-  "license": "Apache-2.0",
+  "private": true,
   "description": "Drizzle-related utilities used by Crosshatch.",
   "homepage": "https://crosshatch.dev",
+  "bugs": {
+    "url": "https://github.com/crosshatch/crosshatch/issues"
+  },
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/crosshatch/crosshatch.git",
     "directory": "@crosshatch/drizzle"
   },
-  "bugs": {
-    "url": "https://github.com/crosshatch/crosshatch/issues"
-  },
-  "private": true,
+  "type": "module",
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./index.ts",

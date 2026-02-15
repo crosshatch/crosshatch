@@ -6,7 +6,11 @@ import { CrosshatchEnv } from "./CrosshatchEnv.ts"
 import { AccountFrozen, Escalation, InsufficientFunds } from "./DeclinedDecision.ts"
 import { LinkChallengeId } from "./LinkChallenge.ts"
 
-const widget = <A, I extends UrlParams.Input, A2, I2>({ pathname, payload, event }: {
+const widget = <A, I extends UrlParams.Input, A2, I2>({
+  pathname,
+  payload,
+  event,
+}: {
   readonly pathname: string
   readonly payload: S.Schema<A, I>
   readonly event: S.Schema<A2, I2>
@@ -15,19 +19,20 @@ const widget = <A, I extends UrlParams.Input, A2, I2>({ pathname, payload, event
     payload,
     stream: flow(
       S.encode(payload),
-      Effect.flatMap(Effect.fn(function*(v) {
-        const env = yield* CrosshatchEnv
-        return yield* UrlParams.makeUrl(
-          env.href(pathname),
-          UrlParams.fromInput(v),
-          Option.none(),
-        )
-      })),
+      Effect.flatMap(
+        Effect.fn(function* (v) {
+          const env = yield* CrosshatchEnv
+          return yield* UrlParams.makeUrl(env.href(pathname), UrlParams.fromInput(v), Option.none())
+        }),
+      ),
       access("href"),
-      Effect.map((src) => ({
-        src,
-        event,
-      } satisfies Widget.WidgetConfig<A2, I2>)),
+      Effect.map(
+        (src) =>
+          ({
+            src,
+            event,
+          }) satisfies Widget.WidgetConfig<A2, I2>,
+      ),
       Effect.map(Widget.embed),
       Stream.unwrap,
     ),
@@ -54,10 +59,7 @@ export const LinkWidget = widget({
   pathname: "/link",
   payload: S.Struct({
     id: LinkChallengeId,
-  }).pipe(
-    S.extend(Common),
-    S.extend(Allowance),
-  ),
+  }).pipe(S.extend(Common), S.extend(Allowance)),
   event: S.Void,
 })
 

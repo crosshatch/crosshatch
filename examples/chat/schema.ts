@@ -26,10 +26,12 @@ export const chatItems = pgTable("chat_items", {
   added,
 })
 
-export const embeddings = pgTable("embeddings", {
-  id: brandedId<typeof EmbeddingIdTypeId>(),
-  embedding: vector("embedding", { dimensions: 1536 }),
-  chatItemId: ref("chat_item_id", () => chatItems.id, { onDelete: "cascade" }).notNull(),
-}, (_) => [
-  index("embeddings_embedding_index").using("hnsw", _.embedding.op("vector_cosine_ops")),
-])
+export const embeddings = pgTable(
+  "embeddings",
+  {
+    id: brandedId<typeof EmbeddingIdTypeId>(),
+    embedding: vector("embedding", { dimensions: 1536 }),
+    chatItemId: ref("chat_item_id", () => chatItems.id, { onDelete: "cascade" }).notNull(),
+  },
+  (_) => [index("embeddings_embedding_index").using("hnsw", _.embedding.op("vector_cosine_ops"))],
+)

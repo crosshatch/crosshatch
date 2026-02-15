@@ -13,9 +13,9 @@ await Exec("generate-migration", {
 export const worker = await Vite("crosshatch.chat", {
   spa: true,
   bindings: {
-    ...!app.local && {
+    ...(!app.local && {
       DEV: Alchemy.env("DEV", "false"),
-    },
+    }),
   },
   domains: ["crosshatch.chat"],
 })

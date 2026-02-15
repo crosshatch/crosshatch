@@ -6,6 +6,6 @@ export const uniqueIndices =
     indices.map((keys_) => {
       const keys = keys_.toSorted()
       return uniqueIndex([prefix, ...keys].join("_")).on(
-        ...keys.map((key) => _[key as I[number][number]]) as never as [ExtraConfigColumn],
+        ...(keys.map((key) => _[key as I[number][number]]) as never as [ExtraConfigColumn]),
       )
     })

@@ -3,37 +3,15 @@ import { ChevronDownIcon, ChevronUpIcon } from "lucide-react"
 import * as React from "react"
 import { cn } from "../cn.ts"
 
-function Accordion({
-  className,
-  ...props
-}: React.ComponentProps<typeof Root>) {
-  return (
-    <Root
-      data-slot="accordion"
-      className={cn("flex w-full flex-col", className)}
-      {...props}
-    />
-  )
+function Accordion({ className, ...props }: React.ComponentProps<typeof Root>) {
+  return <Root data-slot="accordion" className={cn("flex w-full flex-col", className)} {...props} />
 }
 
-function AccordionItem({
-  className,
-  ...props
-}: React.ComponentProps<typeof Item>) {
-  return (
-    <Item
-      data-slot="accordion-item"
-      className={cn("not-last:border-b", className)}
-      {...props}
-    />
-  )
+function AccordionItem({ className, ...props }: React.ComponentProps<typeof Item>) {
+  return <Item data-slot="accordion-item" className={cn("not-last:border-b", className)} {...props} />
 }
 
-function AccordionTrigger({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<typeof Trigger>) {
+function AccordionTrigger({ className, children, ...props }: React.ComponentProps<typeof Trigger>) {
   return (
     <Header className="flex">
       <Trigger
@@ -58,11 +36,7 @@ function AccordionTrigger({
   )
 }
 
-function AccordionContent({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<typeof Content>) {
+function AccordionContent({ className, children, ...props }: React.ComponentProps<typeof Content>) {
   return (
     <Content
       data-slot="accordion-content"

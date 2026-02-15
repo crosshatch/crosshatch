@@ -6,10 +6,7 @@ export default {
   optimizeDeps: { exclude: [] },
   test: {
     environment: "happy-dom",
-    setupFiles: [
-      Path.join(import.meta.dirname, "vitest.setup.ts"),
-      "fake-indexeddb/auto",
-    ],
+    setupFiles: [Path.join(import.meta.dirname, "vitest.setup.ts"), "fake-indexeddb/auto"],
     fakeTimers: { toFake: undefined },
     sequence: { concurrent: true },
     exclude: defaultExclude,

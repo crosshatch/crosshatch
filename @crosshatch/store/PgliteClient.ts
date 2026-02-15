@@ -10,13 +10,11 @@ export class PgliteClient extends Context.Tag(prefix("store/PgliteClient"))<
   }
 >() {}
 
-export const layer = (worker: new(options?: { name?: string }) => Worker) =>
+export const layer = (worker: new (options?: { name?: string }) => Worker) =>
   Layer.scoped(
     PgliteClient,
-    Effect.gen(function*() {
-      const client = yield* Effect.tryPromise(
-        () => PGliteWorker.create(new worker(), { extensions: { live } }),
-      )
+    Effect.gen(function* () {
+      const client = yield* Effect.tryPromise(() => PGliteWorker.create(new worker(), { extensions: { live } }))
       yield* Effect.addFinalizer(() => Effect.promise(() => client.close()))
       yield* Effect.tryPromise(() => client.waitReady)
       return client

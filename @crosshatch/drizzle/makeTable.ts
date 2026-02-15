@@ -15,11 +15,16 @@ const base = <B extends symbol>(_id: S.brand<typeof S.UUID, B>) => ({
   added: timestamp("added", {
     mode: "date",
     withTimezone: true,
-  }).notNull().defaultNow(),
+  })
+    .notNull()
+    .defaultNow(),
   updated: timestamp("updated", {
     mode: "date",
     withTimezone: true,
-  }).notNull().defaultNow().$onUpdateFn(() => new Date()),
+  })
+    .notNull()
+    .defaultNow()
+    .$onUpdateFn(() => new Date()),
 })
 
 export const makeTable = <

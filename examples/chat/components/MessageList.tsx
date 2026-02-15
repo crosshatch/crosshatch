@@ -11,9 +11,7 @@ import { Fragment, useEffect } from "react"
 export const MessageList = () => {
   const { chatId } = Route.useParams()
   const { inflight } = useAtomValue(chatAtom(chatId))
-  const { value: items } = useAtomSuspense(chatItemsAtom(
-    chatId ? ChatId.make(chatId) : undefined,
-  ))
+  const { value: items } = useAtomSuspense(chatItemsAtom(chatId ? ChatId.make(chatId) : undefined))
 
   useEffect(() => {
     scrollTo({
@@ -62,16 +60,18 @@ export const MessageList = () => {
   )
 }
 
-export const ChatEventCard = ({ children, className, actions }: {
+export const ChatEventCard = ({
+  children,
+  className,
+  actions,
+}: {
   children: React.ReactNode
   className?: string | undefined
   actions?: React.ReactNode | undefined
 }) => (
   <div className={cn("w-full flex flex-row", className)}>
     <div className="min-w-0 w-full">
-      <div className="rounded-sm border overflow-hidden">
-        {children}
-      </div>
+      <div className="rounded-sm border overflow-hidden">{children}</div>
       {actions && <div className="flex w-full">{actions}</div>}
     </div>
   </div>

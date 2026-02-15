@@ -15,11 +15,11 @@ export class BridgeClient extends Effect.Service<BridgeClient>()(prefix("kit/Bri
 }) {
   static readonly layer = BridgeClient.Default.pipe(
     Layer.provide(BridgeWorkerLive),
-    Layer.provideMerge(CrosshatchEnv.layer.pipe(
-      Layer.provideMerge(
-        Layer.setConfigProvider(ConfigProvider.fromJson((import.meta as any).env)),
+    Layer.provideMerge(
+      CrosshatchEnv.layer.pipe(
+        Layer.provideMerge(Layer.setConfigProvider(ConfigProvider.fromJson((import.meta as any).env))),
       ),
-    )),
+    ),
   )
   static readonly atomRuntime = Atom.context({ memoMap })(this.layer)
   static readonly managedRuntime = ManagedRuntime.make(this.layer, memoMap)

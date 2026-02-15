@@ -22,7 +22,10 @@ export const createRequirements = ({
   scheme: "exact",
 })
 
-export const createRequired = ({ accepts, resource }: {
+export const createRequired = ({
+  accepts,
+  resource,
+}: {
   accepts: typeof Accepts.Type
   resource?: typeof ResourceInfo.Type | undefined
 }): typeof PaymentRequired.Type => ({

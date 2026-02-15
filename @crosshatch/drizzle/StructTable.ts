@@ -11,5 +11,8 @@ export const make = <B extends symbol, A, I, R>(
   schema: S.Schema<A, I, R>,
 ): StructTable<B, A, I, R> =>
   Object.assign(Base(id).pipe(S.extend(schema)), {
-    columns: (columns: Record<string, AnyPgColumnBuilder>) => ({ ...ColumnsCommon(id), ...columns }),
+    columns: (columns: Record<string, AnyPgColumnBuilder>) => ({
+      ...ColumnsCommon(id),
+      ...columns,
+    }),
   }) as never

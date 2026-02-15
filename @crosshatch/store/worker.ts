@@ -10,19 +10,22 @@ import { migrate } from "./migrate.ts"
 import type { Migration } from "./Migration.ts"
 import "@crosshatch/ui/prelude"
 
-export const worker = ({ key, migrations }: {
+export const worker = ({
+  key,
+  migrations,
+}: {
   readonly key: string
   readonly migrations: Array<typeof Migration.Type>
 }) =>
   worker_({
     init: () =>
-      Effect.gen(function*() {
+      Effect.gen(function* () {
         const client = yield* Effect.tryPromise(() =>
           PGlite.create({
             extensions: { uuid_ossp, fuzzystrmatch, lo, vector },
             dataDir: `idb://${key}`,
             relaxedDurability: true,
-          })
+          }),
         )
         yield* migrate({
           client,
@@ -31,9 +34,5 @@ export const worker = ({ key, migrations }: {
         })
         yield* Effect.log(`${key} worker initialized`)
         return client
-      }).pipe(
-        Effect.provide(BrowserSocket.layerWebSocketConstructor),
-        Effect.scoped,
-        Effect.runPromise,
-      ),
+      }).pipe(Effect.provide(BrowserSocket.layerWebSocketConstructor), Effect.scoped, Effect.runPromise),
   })

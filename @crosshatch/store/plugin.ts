@@ -31,7 +31,7 @@ export default (): Plugin => {
   return {
     name: "@crosshatch/store",
     buildStart: () =>
-      Effect.gen(function*() {
+      Effect.gen(function* () {
         contents.length = 0
 
         const fs = yield* FileSystem.FileSystem
@@ -39,14 +39,18 @@ export default (): Plugin => {
 
         const migrationsDir = join(cwd(), "migrations")
         const entries = yield* fs.readDirectory(migrationsDir).pipe(
-          Effect.map(flow(
-            Array.filterMap((name) =>
-              name === "meta" ? Option.none() : Option.some({
-                name,
-                path: join(migrationsDir, name, "migration.sql"),
-              })
+          Effect.map(
+            flow(
+              Array.filterMap((name) =>
+                name === "meta"
+                  ? Option.none()
+                  : Option.some({
+                      name,
+                      path: join(migrationsDir, name, "migration.sql"),
+                    }),
+              ),
             ),
-          )),
+          ),
         )
 
         entries.sort((a, b) => a.name.localeCompare(b.name))
@@ -61,10 +65,8 @@ export default (): Plugin => {
           const when = whenFromFolderName(name)
 
           const hash = yield* Effect.tryPromise(() =>
-            crypto.subtle.digest({ name: "SHA-256" }, new TextEncoder().encode(content))
-          ).pipe(
-            Effect.map((v) => Encoding.encodeHex(new Uint8Array(v))),
-          )
+            crypto.subtle.digest({ name: "SHA-256" }, new TextEncoder().encode(content)),
+          ).pipe(Effect.map((v) => Encoding.encodeHex(new Uint8Array(v))))
 
           const sql = pipe(
             content,
@@ -76,10 +78,7 @@ export default (): Plugin => {
 
           contents.push({ idx, when, tag: name, hash, sql })
         }
-      }).pipe(
-        Effect.provide(NodeContext.layer),
-        Effect.runPromise,
-      ),
+      }).pipe(Effect.provide(NodeContext.layer), Effect.runPromise),
 
     resolveId(source) {
       if (source === VIRTUAL_ID) {

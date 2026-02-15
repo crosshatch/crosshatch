@@ -4,7 +4,7 @@
   "fqn": "crosshatch-chat/harrysolovay/generate-migration",
   "seq": 0,
   "data": {},
-  "status": "updated",
+  "status": "updating",
   "output": {
     "Symbol(alchemy::ResourceKind)": "os::Exec",
     "Symbol(alchemy::ResourceID)": "generate-migration",
@@ -23,6 +23,9 @@
     "completed": true
   },
   "props": {
+    "command": "pnpm generate"
+  },
+  "oldProps": {
     "command": "pnpm generate"
   }
 }

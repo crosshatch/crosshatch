@@ -14,7 +14,9 @@ export const brandedId = <B extends symbol>() =>
 export const lastUsed = timestamp("last_used", {
   mode: "date",
   withTimezone: true,
-}).notNull().defaultNow()
+})
+  .notNull()
+  .defaultNow()
 
 export const amount = numeric("amount", {
   precision: 36,
@@ -25,12 +27,17 @@ export const amount = numeric("amount", {
 export const added = timestamp("added", {
   mode: "date",
   withTimezone: true,
-}).notNull().defaultNow()
+})
+  .notNull()
+  .defaultNow()
 
 export const updated = timestamp("updated", {
   mode: "date",
   withTimezone: true,
-}).notNull().defaultNow().$onUpdateFn(() => new Date())
+})
+  .notNull()
+  .defaultNow()
+  .$onUpdateFn(() => new Date())
 
 export const label = text("label").notNull()
 

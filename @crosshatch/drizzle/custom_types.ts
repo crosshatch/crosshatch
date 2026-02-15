@@ -10,9 +10,7 @@ export const bytea = customType<{
   fromDriver: (v) => {
     // TODO: why not automatically decoding correctly?
     if (typeof v === "string") {
-      return S.decodeSync(S.Uint8ArrayFromHex)(
-        (v as string).slice(2),
-      )
+      return S.decodeSync(S.Uint8ArrayFromHex)((v as string).slice(2))
     }
     return v
   },

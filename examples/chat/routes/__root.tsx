@@ -53,12 +53,7 @@ const Header = () => {
         <PanelLeftIcon className="size-7 stroke-1" />
         <span className="sr-only">Toggle Sidebar</span>
       </Button>
-      <Button
-        size="icon"
-        className="size-11"
-        variant="outline"
-        onClick={() => sessionButtonOnClick()}
-      >
+      <Button size="icon" className="size-11" variant="outline" onClick={() => sessionButtonOnClick()}>
         <CrosshatchIcon className="size-7 stroke-1" />
       </Button>
     </header>

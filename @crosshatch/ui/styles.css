@@ -123,7 +123,8 @@
   * {
     @apply border-border outline-ring/50 font-light;
   }
-  html, body {
+  html,
+  body {
     @apply bg-transparent;
   }
   body {

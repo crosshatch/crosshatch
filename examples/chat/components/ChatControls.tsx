@@ -30,7 +30,8 @@ export const ChatControls = () => {
             setChat({
               ...chat,
               text: value,
-            })}
+            })
+          }
           placeholder="Your message..."
           className="text-primary p-4 min-h-30 rounded-2xl w-full resize-none border shadow-none outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
           onKeyDown={(e) => {
@@ -51,13 +52,11 @@ export const ChatControls = () => {
                   <PocketKnife className="stroke-1" size={18} />
                 </Button>
               </DialogTrigger>
-              <DialogContent>
-                TODO
-              </DialogContent>
+              <DialogContent>TODO</DialogContent>
             </Dialog>
           </div>
           <Button
-            onClick={() => inflight ? inflight.abort() : sendMessage(chatId)}
+            onClick={() => (inflight ? inflight.abort() : sendMessage(chatId))}
             size="icon"
             className="size-9 rounded-full cursor-pointer"
             variant="outline"

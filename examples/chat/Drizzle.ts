@@ -7,7 +7,7 @@ import { relations } from "./relations"
 import * as schema from "./schema"
 
 export class Drizzle extends Effect.Service<Drizzle>()(prefix("chat/Drizzle"), {
-  scoped: Effect.gen(function*() {
+  scoped: Effect.gen(function* () {
     const pg = yield* PgliteClient.PgliteClient
     return drizzle({
       schema,
@@ -19,16 +19,12 @@ export class Drizzle extends Effect.Service<Drizzle>()(prefix("chat/Drizzle"), {
 
 type Preparable = AnyPgAsyncRelationalQuery | AnyPgAsyncSelect
 
-export const latest = <
-  T extends Partial<Preparable> & Pick<Preparable, "prepare" | "_">,
->(f: (_: Drizzle) => T): Stream.Stream<T["_"]["result"]> =>
-  Effect.gen(function*() {
+export const latest = <T extends Partial<Preparable> & Pick<Preparable, "prepare" | "_">>(
+  f: (_: Drizzle) => T,
+): Stream.Stream<T["_"]["result"]> =>
+  Effect.gen(function* () {
     const _ = yield* Drizzle
     const built = f(_)
     const prepared = built.prepare("")
-    return latest_(built.toSQL!()).pipe(
-      Stream.map((rows) => prepared.mapResult(rows)),
-    )
-  }).pipe(
-    Stream.unwrap,
-  ) as never
+    return latest_(built.toSQL!()).pipe(Stream.map((rows) => prepared.mapResult(rows)))
+  }).pipe(Stream.unwrap) as never

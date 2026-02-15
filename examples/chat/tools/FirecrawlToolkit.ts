@@ -14,11 +14,13 @@ export const FirecrawlToolkit = Toolkit.make(
       limit: S.Number,
     },
     success: S.Struct({
-      results: S.Array(S.Struct({
-        url: S.String,
-        title: S.String,
-        description: S.String,
-      })),
+      results: S.Array(
+        S.Struct({
+          url: S.String,
+          title: S.String,
+          description: S.String,
+        }),
+      ),
     }),
   }),
   Tool.make("FirecrawlScrape", {

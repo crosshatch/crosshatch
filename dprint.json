@@ -7,23 +7,12 @@
     "quoteProps": "asNeeded",
     "semiColons": "asi"
   },
-  "exec": {
-    "commands": [
-      {
-        "command": "nixfmt",
-        "exts": ["nix"]
-      }
-    ]
-  },
   "plugins": [
     "https://plugins.dprint.dev/exec-0.6.0.json@a054130d458f124f9b5c91484833828950723a5af3f8ff2bd1523bd47b83b364",
     "https://plugins.dprint.dev/g-plane/malva-v0.15.1.wasm",
     "https://plugins.dprint.dev/g-plane/markup_fmt-v0.25.1.wasm",
     "https://plugins.dprint.dev/g-plane/pretty_yaml-v0.5.1.wasm",
-    "https://plugins.dprint.dev/json-0.21.0.wasm",
-    "https://plugins.dprint.dev/markdown-0.20.0.wasm",
     "https://plugins.dprint.dev/toml-0.7.0.wasm",
-    "https://plugins.dprint.dev/typescript-0.95.13.wasm",
-    "https://plugins.dprint.dev/prettier-0.62.0.json@80fefd1450bfd3f469590cc6a3f40f6ace26974f948b9602124f486036fbdfab"
+    "https://plugins.dprint.dev/toml-0.7.0.wasm"
   ]
 }

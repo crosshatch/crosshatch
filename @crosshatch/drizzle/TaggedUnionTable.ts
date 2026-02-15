@@ -12,17 +12,17 @@ type Superset<U extends { _tag: string }> = {
   }[Types.Tags<U>]
 }
 
-export interface TaggedUnionTable<
-  B extends symbol,
-  A extends { _tag: string },
-  I,
-  R,
-> extends S.Schema<A & BaseType<B>, I & BaseEncoded, R> {
+export interface TaggedUnionTable<B extends symbol, A extends { _tag: string }, I, R> extends S.Schema<
+  A & BaseType<B>,
+  I & BaseEncoded,
+  R
+> {
   readonly columns: <C extends ColumnsConfig<Superset<A>>>(
     columns: C,
-  ) => C & ColumnsCommon<B> & {
-    _tag: SetNotNull<PgEnumColumnBuilder<[A["_tag"]]>>
-  }
+  ) => C &
+    ColumnsCommon<B> & {
+      _tag: SetNotNull<PgEnumColumnBuilder<[A["_tag"]]>>
+    }
   // TODO: move tag spec into optional second param
   readonly fromRow: <K extends Types.Tags<A> = Types.Tags<A>>(
     _tag?: K | undefined,
@@ -30,12 +30,7 @@ export interface TaggedUnionTable<
   ) => (row: unknown) => Effect.Effect<Types.ExtractTag<A, K> & BaseType<B>>
 }
 
-export const makeTagEnum = <
-  K extends string,
-  A extends { _tag: string },
-  I,
-  R,
->(
+export const makeTagEnum = <K extends string, A extends { _tag: string }, I, R>(
   key: K,
   schema: S.Schema<A, I, R>,
 ): PgEnum<[A["_tag"]]> => {
@@ -58,12 +53,7 @@ export const makeTagEnum = <
   return pgEnum(key, values as never) as never
 }
 
-export const make = <
-  B extends symbol,
-  A extends { _tag: string },
-  I,
-  R,
->(
+export const make = <B extends symbol, A extends { _tag: string }, I, R>(
   id: S.brand<typeof S.UUID, B>,
   schema: S.Schema<A, I, R>,
 ): TaggedUnionTable<B, A, I, R> => {
@@ -73,12 +63,9 @@ export const make = <
       ...ColumnsCommon(id),
       ...columns,
     }),
-    fromRow: <K extends Types.Tags<A> = Types.Tags<A>>(
-      _tag?: K | undefined,
-    ) =>
-    (row: unknown) =>
-      S.encodeUnknown(base)(row).pipe(
-        Effect.flatMap(S.decode(base)),
-      ),
+    fromRow:
+      <K extends Types.Tags<A> = Types.Tags<A>>(_tag?: K | undefined) =>
+      (row: unknown) =>
+        S.encodeUnknown(base)(row).pipe(Effect.flatMap(S.decode(base))),
   }) as never
 }

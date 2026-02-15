@@ -22,8 +22,7 @@ export const ModelSelect = () => {
     <Popover {...{ open, onOpenChange }}>
       <PopoverTrigger asChild>
         <Button variant="outline" role="combobox" aria-expanded={open} className="justify-between rounded-full">
-          {Result
-            .builder(modelIdsResult)
+          {Result.builder(modelIdsResult)
             .onSuccess((models) => models.find((model) => model === selected))
             .onInitialOrWaiting(() => "Loading models...")
             .orElse(() => "Failed to load models")}
@@ -50,7 +49,7 @@ export const ModelSelect = () => {
                       {model}
                       <Check className={cn("ml-auto", model === selected ? "opacity-100" : "opacity-0")} />
                     </CommandItem>
-                  ))
+                  )),
                 )
                 .orElse(() => undefined)}
             </CommandGroup>

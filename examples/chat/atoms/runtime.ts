@@ -13,23 +13,17 @@ const OpenAiClientLive = CrosshatchChatEnv.pipe(
     OpenAiClient.layer({
       apiKey: Redacted.make(""),
       apiUrl,
-    })
+    }),
   ),
   Layer.unwrapEffect,
 )
 
 export const runtime = Atom.runtime(
   Layer.mergeAll(
-    Drizzle.Default.pipe(
-      Layer.provideMerge(PgliteClient.layer(Worker)),
-    ),
+    Drizzle.Default.pipe(Layer.provideMerge(PgliteClient.layer(Worker))),
     OpenAiEmbeddingModel.model("text-embedding-ada-002", {
       mode: "batched",
-    }).pipe(
-      Layer.provideMerge(OpenAiClientLive),
-    ),
+    }).pipe(Layer.provideMerge(OpenAiClientLive)),
     FirecrawlToolkitLive,
-  ).pipe(
-    Layer.provide([CrosshatchHttpClient, CrosshatchChatEnv.layer]),
-  ),
+  ).pipe(Layer.provide([CrosshatchHttpClient, CrosshatchChatEnv.layer])),
 )

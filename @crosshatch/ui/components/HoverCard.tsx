@@ -2,15 +2,11 @@ import { Content, Portal, Root, Trigger } from "@radix-ui/react-hover-card"
 import * as React from "react"
 import { cn } from "../cn.ts"
 
-function HoverCard({
-  ...props
-}: React.ComponentProps<typeof Root>) {
+function HoverCard({ ...props }: React.ComponentProps<typeof Root>) {
   return <Root data-slot="hover-card" {...props} />
 }
 
-function HoverCardTrigger({
-  ...props
-}: React.ComponentProps<typeof Trigger>) {
+function HoverCardTrigger({ ...props }: React.ComponentProps<typeof Trigger>) {
   return <Trigger data-slot="hover-card-trigger" {...props} />
 }
 

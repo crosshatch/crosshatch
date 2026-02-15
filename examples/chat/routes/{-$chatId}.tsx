@@ -11,7 +11,7 @@ export const Route = createFileRoute("/{-$chatId}")({
   component: RouteComponent,
   params: {
     parse: Struct.evolve({
-      chatId: (v) => v ? ChatId.make(v) : undefined,
+      chatId: (v) => (v ? ChatId.make(v) : undefined),
     }),
   },
 })

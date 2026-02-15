@@ -2,9 +2,7 @@
   "version": "8",
   "dialect": "postgres",
   "id": "bbde2707-538a-435a-967c-1843dbeebe10",
-  "prevIds": [
-    "00000000-0000-0000-0000-000000000000"
-  ],
+  "prevIds": ["00000000-0000-0000-0000-000000000000"],
   "ddl": [
     {
       "isRlsEnabled": false,
@@ -224,14 +222,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "chat_id"
-      ],
+      "columns": ["chat_id"],
       "schemaTo": "public",
       "tableTo": "chats",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "chat_items_chat_id_chats_id_fkey",
@@ -241,14 +235,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "chat_item_id"
-      ],
+      "columns": ["chat_item_id"],
       "schemaTo": "public",
       "tableTo": "chat_items",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "embeddings_chat_item_id_chat_items_id_fkey",
@@ -257,9 +247,7 @@
       "table": "embeddings"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "chat_items_pkey",
       "schema": "public",
@@ -267,9 +255,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "chats_pkey",
       "schema": "public",
@@ -277,9 +263,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "embeddings_pkey",
       "schema": "public",

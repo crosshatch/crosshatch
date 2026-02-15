@@ -6,8 +6,5 @@
   },
   "include": ["."],
   "exclude": ["dist"],
-  "references": [
-    { "path": "../ui" },
-    { "path": "../util" }
-  ]
+  "references": [{ "path": "../ui" }, { "path": "../util" }]
 }

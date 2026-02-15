@@ -14,16 +14,11 @@ export const AddressButton = ({
 }) => {
   const { copy, icon } = useCopy(address, 4)
   return (
-    <Button
-      className={cn(
-        "flex-row gap-2 w-full",
-        className,
-      )}
-      variant="outline"
-      onClick={copy}
-    >
+    <Button className={cn("flex-row gap-2 w-full", className)} variant="outline" onClick={copy}>
       {left}
-      <span className="truncate font-mono display sm:hidden">{address.slice(0, 12)}...{address.slice(-10)}</span>
+      <span className="truncate font-mono display sm:hidden">
+        {address.slice(0, 12)}...{address.slice(-10)}
+      </span>
       <span className="truncate font-mono hidden sm:flex">{address}</span>
       <div>{icon}</div>
     </Button>

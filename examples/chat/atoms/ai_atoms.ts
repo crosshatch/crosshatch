@@ -17,6 +17,4 @@ export const currentModelIdAtom = Atom.kvs({
   key: "current-model",
   schema: S.String,
   defaultValue: () => "gpt-3.5-turbo",
-}).pipe(
-  Atom.keepAlive,
-)
+}).pipe(Atom.keepAlive)

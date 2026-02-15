@@ -6,8 +6,5 @@
   },
   "include": ["."],
   "exclude": ["dist"],
-  "references": [
-    { "path": "../../crosshatch" },
-    { "path": "../util" }
-  ]
+  "references": [{ "path": "../../crosshatch" }, { "path": "../util" }]
 }

@@ -4,22 +4,21 @@ import { Deferred, Effect, Layer, Option, Schema as S } from "effect"
 import { CrosshatchEnv } from "./CrosshatchEnv.ts"
 import { AppReady, BridgeReady } from "./messages.ts"
 
-const cssText = Object
-  .entries({
-    position: "absolute",
-    padding: 0,
-    bottom: "-1px",
-    left: "-1px",
-    overflow: "hidden",
-    clipPath: "inset(50%)",
-    border: 0,
-    pointerEvents: "none",
-    opacity: 0,
-  })
+const cssText = Object.entries({
+  position: "absolute",
+  padding: 0,
+  bottom: "-1px",
+  left: "-1px",
+  overflow: "hidden",
+  clipPath: "inset(50%)",
+  border: 0,
+  pointerEvents: "none",
+  opacity: 0,
+})
   .map(([k, v]) => `${k}: ${v};`)
   .join(" ")
 
-export const BridgeWorkerLive = Effect.gen(function*() {
+export const BridgeWorkerLive = Effect.gen(function* () {
   const bridgeReady = yield* Deferred.make<void>()
   const env = yield* CrosshatchEnv
   addEventListener("message", function f({ data, origin }: MessageEvent) {
@@ -51,6 +50,4 @@ export const BridgeWorkerLive = Effect.gen(function*() {
   const channel = new MessageChannel()
   context.postMessage(new AppReady(), "*", [channel.port2])
   return BrowserWorker.layerPlatform(() => channel.port1)
-}).pipe(
-  Layer.unwrapEffect,
-)
+}).pipe(Layer.unwrapEffect)

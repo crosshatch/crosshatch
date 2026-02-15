@@ -4,7 +4,7 @@ import { Migration } from "./Migration.ts"
 
 const MIGRATIONS = "_migrations"
 
-export const migrate = Effect.fn(function*({
+export const migrate = Effect.fn(function* ({
   client: _,
   migrations,
   enable,
@@ -21,14 +21,14 @@ export const migrate = Effect.fn(function*({
         tag text NOT NULL,
         created_at bigint NOT NULL
       );
-    `)
+    `),
   )
 
-  yield* Effect.tryPromise(
-    () => _.exec(enable.map((v) => `CREATE EXTENSION IF NOT EXISTS "${v}";`).join(" ")),
-  )
+  yield* Effect.tryPromise(() => _.exec(enable.map((v) => `CREATE EXTENSION IF NOT EXISTS "${v}";`).join(" ")))
 
-  const { rows: [latest] } = yield* Effect.tryPromise(() =>
+  const {
+    rows: [latest],
+  } = yield* Effect.tryPromise(() =>
     _.query<{
       id: number
       hash: string
@@ -39,7 +39,7 @@ export const migrate = Effect.fn(function*({
       FROM "${MIGRATIONS}"
       ORDER BY created_at DESC
       LIMIT 1;
-    `)
+    `),
   )
 
   const pending = migrations.filter((migration) => {
@@ -49,7 +49,7 @@ export const migrate = Effect.fn(function*({
 
   if (!pending.length) return
 
-  yield* Effect.gen(function*() {
+  yield* Effect.gen(function* () {
     yield* Effect.tryPromise(() => _.exec("BEGIN"))
     for (const migration of pending) {
       const { hash, when, tag } = migration
@@ -62,12 +62,10 @@ export const migrate = Effect.fn(function*({
               VALUES ($1, $2, $3);
             `,
             [hash, when, tag],
-          )
+          ),
         )
       }
     }
     yield* Effect.tryPromise(() => _.exec("COMMIT"))
-  }).pipe(
-    Effect.tapErrorTag("UnknownException", () => Effect.tryPromise(() => _.exec("ROLLBACK"))),
-  )
+  }).pipe(Effect.tapErrorTag("UnknownException", () => Effect.tryPromise(() => _.exec("ROLLBACK"))))
 })

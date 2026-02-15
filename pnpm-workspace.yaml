@@ -93,6 +93,7 @@ catalog:
   openai: ^6.18.0
   ox: ^0.10.5
   oxlint: ^1.43.0
+  oxfmt: ^0.32.0
   pg: ^8.16.3
   postgres: ^3.4.7
   react: ^19.2.4

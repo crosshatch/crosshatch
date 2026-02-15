@@ -20,10 +20,12 @@ export const searchInputAtom = Atom.make("").pipe(Atom.keepAlive)
 export const searchOpenAtom = Atom.make(false).pipe(Atom.keepAlive)
 
 const searchInitAtom = Atom.make((get) => {
-  get.addFinalizer(registerCommand(
-    (e) => e.metaKey && e.key === "k",
-    () => get.set(searchOpenAtom, !get(searchOpenAtom)),
-  ))
+  get.addFinalizer(
+    registerCommand(
+      (e) => e.metaKey && e.key === "k",
+      () => get.set(searchOpenAtom, !get(searchOpenAtom)),
+    ),
+  )
 })
 
 export const Search = () => {
@@ -44,11 +46,7 @@ export const Search = () => {
         </kbd>
       </Button>
       <CommandDialog {...{ open, onOpenChange }}>
-        <CommandInput
-          placeholder="Search messages..."
-          onValueChange={setInput}
-          value={input}
-        />
+        <CommandInput placeholder="Search messages..." onValueChange={setInput} value={input} />
         {input.trim() && (
           <>
             <Separator />
@@ -66,31 +64,31 @@ export const Search = () => {
   )
 }
 
-const searchResultsAtom = runtime.atom(Effect.fn(function*(get) {
-  const text = get(searchInputAtom)
-  if (!text) return []
-  const em = yield* EmbeddingModel.EmbeddingModel
-  const embedding = yield* em.embed(text)
-  const _ = yield* Drizzle
-  const distance = cosineDistance(embeddings.embedding, embedding)
-  return yield* Effect.tryPromise(() =>
-    _
-      .select({
-        id: chatItems.id,
-        chatId: chatItems.chatId,
-        message: chatItems.message,
-        title: chats.title,
-      })
-      .from(chatItems)
-      .innerJoin(embeddings, eq(embeddings.chatItemId, chatItems.id))
-      .leftJoin(chats, eq(chatItems.chatId, chats.id))
-      .orderBy(distance)
-      .limit(5)
+const searchResultsAtom = runtime
+  .atom(
+    Effect.fn(function* (get) {
+      const text = get(searchInputAtom)
+      if (!text) return []
+      const em = yield* EmbeddingModel.EmbeddingModel
+      const embedding = yield* em.embed(text)
+      const _ = yield* Drizzle
+      const distance = cosineDistance(embeddings.embedding, embedding)
+      return yield* Effect.tryPromise(() =>
+        _.select({
+          id: chatItems.id,
+          chatId: chatItems.chatId,
+          message: chatItems.message,
+          title: chats.title,
+        })
+          .from(chatItems)
+          .innerJoin(embeddings, eq(embeddings.chatItemId, chatItems.id))
+          .leftJoin(chats, eq(chatItems.chatId, chats.id))
+          .orderBy(distance)
+          .limit(5),
+      )
+    }),
   )
-})).pipe(
-  Atom.debounce("250 millis"),
-  Atom.keepAlive,
-)
+  .pipe(Atom.debounce("250 millis"), Atom.keepAlive)
 
 const SearchResults = () => {
   const { value: items } = useAtomSuspense(searchResultsAtom)
