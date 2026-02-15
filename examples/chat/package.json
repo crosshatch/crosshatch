@@ -4,10 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "alchemy dev",
     "build": "vite build && tsc",
     "serve": "vite preview",
-    "migrate": "drizzle-kit generate"
+    "generate": "drizzle-kit generate",
+    "a:deploy": "alchemy deploy",
+    "a:destroy": "alchemy destroy"
   },
   "dependencies": {
     "@crosshatch/drizzle": "workspace:*",
@@ -29,6 +31,7 @@
     "@streamdown/mermaid": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@tanstack/react-router": "catalog:",
+    "alchemy": "catalog:",
     "crosshatch": "workspace:*",
     "drizzle-orm": "catalog:",
     "effect": "catalog:",

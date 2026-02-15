@@ -1,0 +1,28 @@
+{
+  "kind": "os::Exec",
+  "id": "generate-migration",
+  "fqn": "crosshatch-chat/harrysolovay/generate-migration",
+  "seq": 0,
+  "data": {},
+  "status": "created",
+  "output": {
+    "Symbol(alchemy::ResourceKind)": "os::Exec",
+    "Symbol(alchemy::ResourceID)": "generate-migration",
+    "Symbol(alchemy::ResourceFQN)": "crosshatch-chat/harrysolovay/generate-migration",
+    "Symbol(alchemy::ResourceScope)": {
+      "@scope": null
+    },
+    "Symbol(alchemy::ResourceSeq)": 0,
+    "id": "generate-migration",
+    "command": "pnpm generate",
+    "inheritStdio": true,
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": "",
+    "executedAt": 1771107016351,
+    "completed": true
+  },
+  "props": {
+    "command": "pnpm generate"
+  }
+}

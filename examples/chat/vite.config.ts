@@ -2,6 +2,7 @@ import store from "@crosshatch/store/plugin"
 import tailwind from "@tailwindcss/vite"
 import { tanstackRouter } from "@tanstack/router-plugin/vite"
 import react from "@vitejs/plugin-react"
+import alchemy from "alchemy/cloudflare/vite"
 import { fileURLToPath, URL } from "node:url"
 import { defineConfig } from "vite"
 import mkcert from "vite-plugin-mkcert"
@@ -45,6 +46,8 @@ export default defineConfig({
     ],
   },
   plugins: [
+    store(),
+    alchemy(),
     tanstackRouter({
       target: "react",
       autoCodeSplitting: true,
@@ -54,7 +57,6 @@ export default defineConfig({
     tsconfigPaths({
       projects: ["tsconfig.json"],
     }),
-    store(),
     mkcert({
       hosts: ["local.crosshatch.chat"],
     }),
