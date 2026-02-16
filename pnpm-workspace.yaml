@@ -5,6 +5,8 @@ packages:
   - examples/*
 
 catalog:
+  "@cloudflare/vite-plugin": ^1.25.0
+  "@cloudflare/vitest-pool-workers": ^0.12.12
   "@crosshatch/repo-util": ^0.1.4
   "@effect-atom/atom": ^0.5.0
   "@effect-atom/atom-react": ^0.5.0
@@ -73,12 +75,10 @@ catalog:
   "@x402/hono": ^2.2.0
   "@x402/svm": ^2.0.0
   ai: 6.0.42
-  alchemy: ^0.83.2
   babel-plugin-react-compiler: ^1.0.0
   class-variance-authority: ^0.7.1
   date-fns: ^4.1.0
   dedent: ^1.7.1
-  dprint: ^0.51.1
   drizzle-kit: 1.0.0-beta.15-859cf75
   drizzle-orm: 1.0.0-beta.15-859cf75
   effect: ^3.19.16
@@ -112,6 +112,7 @@ catalog:
   vite-plugin-mkcert: ^1.17.9
   vitest: 4.0.18
   web-bot-auth: ^0.1.1
+  wrangler: 4.65.0
   zod: ^4.1.13
   clsx: ^2.1.1
   cmdk: ^1.1.1
@@ -120,6 +121,7 @@ catalog:
   playwright: ^1.58.2
   "@playwright/test": ^1.58.2
   vite-tsconfig-paths: ^6.1.1
+  vocs: ^1.4.1
 
 overrides:
   "@effect/sql-pg": ^0.50.3

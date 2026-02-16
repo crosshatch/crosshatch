@@ -1,7 +1,7 @@
-import { prefix } from "@crosshatch/util/prefix"
 import { Config, Context, Effect, Layer } from "effect"
+import { ContextKeys } from "./ContextKeys.ts"
 
-export class CrosshatchEnv extends Context.Tag(prefix("util/CrosshatchEnv"))<
+export class CrosshatchEnv extends Context.Tag(ContextKeys.CrosshatchEnv)<
   CrosshatchEnv,
   {
     readonly dev: boolean

@@ -8,43 +8,43 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root"
-import { Route as Char123ChatIdChar125RouteImport } from "./routes/{-$chatId}"
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as Char123ChatIdChar125RouteImport } from './routes/{-$chatId}'
 
 const Char123ChatIdChar125Route = Char123ChatIdChar125RouteImport.update({
-  id: "/{-$chatId}",
-  path: "/{-$chatId}",
+  id: '/{-$chatId}',
+  path: '/{-$chatId}',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
-  "/{-$chatId}": typeof Char123ChatIdChar125Route
+  '/{-$chatId}': typeof Char123ChatIdChar125Route
 }
 export interface FileRoutesByTo {
-  "/{-$chatId}": typeof Char123ChatIdChar125Route
+  '/{-$chatId}': typeof Char123ChatIdChar125Route
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  "/{-$chatId}": typeof Char123ChatIdChar125Route
+  '/{-$chatId}': typeof Char123ChatIdChar125Route
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: "/{-$chatId}"
+  fullPaths: '/{-$chatId}'
   fileRoutesByTo: FileRoutesByTo
-  to: "/{-$chatId}"
-  id: "__root__" | "/{-$chatId}"
+  to: '/{-$chatId}'
+  id: '__root__' | '/{-$chatId}'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   Char123ChatIdChar125Route: typeof Char123ChatIdChar125Route
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/{-$chatId}": {
-      id: "/{-$chatId}"
-      path: "/{-$chatId}"
-      fullPath: "/{-$chatId}"
+    '/{-$chatId}': {
+      id: '/{-$chatId}'
+      path: '/{-$chatId}'
+      fullPath: '/{-$chatId}'
       preLoaderRoute: typeof Char123ChatIdChar125RouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -54,4 +54,6 @@ declare module "@tanstack/react-router" {
 const rootRouteChildren: RootRouteChildren = {
   Char123ChatIdChar125Route: Char123ChatIdChar125Route,
 }
-export const routeTree = rootRouteImport._addFileChildren(rootRouteChildren)._addFileTypes<FileRouteTypes>()
+export const routeTree = rootRouteImport
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()

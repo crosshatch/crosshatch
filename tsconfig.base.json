@@ -49,8 +49,7 @@
     "target": "ESNext",
     "useDefineForClassFields": true,
     "useUnknownInCatchVariables": true,
-    "verbatimModuleSyntax": true,
-    "typeRoots": ["node_modules/@types"]
+    "verbatimModuleSyntax": true
   },
   "exclude": ["node_modules", "repos"]
 }

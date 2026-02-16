@@ -1,9 +1,8 @@
-import { prefix } from "@crosshatch/util/prefix"
 import { live, type LiveNamespace } from "@electric-sql/pglite/live"
 import { PGliteWorker } from "@electric-sql/pglite/worker"
 import { Context, Effect, Layer } from "effect"
 
-export class PgliteClient extends Context.Tag(prefix("store/PgliteClient"))<
+export class PgliteClient extends Context.Tag("@crosshatch/store/PgliteClient")<
   PgliteClient,
   PGliteWorker & {
     live: LiveNamespace

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vocs dev",
+    "dev": "vocs dev --port 7776",
     "build": "vocs build",
     "preview": "vocs preview"
   },
@@ -12,10 +12,10 @@
     "crosshatch": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "vocs": "latest"
+    "vocs": "catalog:"
   },
   "devDependencies": {
     "@types/react": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
   }
 }

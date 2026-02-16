@@ -1,0 +1,63 @@
+name: Deploy Docs
+on:
+  push:
+    branches: [main]
+    paths:
+      - docs/**
+      - crosshatch/**
+      - "@crosshatch/**"
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - docs/**
+      - crosshatch/**
+      - "@crosshatch/**"
+
+permissions:
+  contents: read
+  deployments: write
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: documentation_deployment
+    if: >
+      github.event_name == 'push' ||
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.author_association != 'FIRST_TIMER' &&
+       github.event.pull_request.author_association != 'FIRST_TIME_CONTRIBUTOR' &&
+       github.event.pull_request.author_association != 'NONE')
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build docs
+        run: pnpm --filter docs build
+      - name: Determine branch
+        id: branch
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "name=${{ github.head_ref }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Deploy to Cloudflare Pages
+        id: deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: docs
+          command: pages deploy dist --project-name=crosshatch-docs --branch=${{ steps.branch.outputs.name }}
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+      - name: Deployment summary
+        run: |
+          echo "### Docs Deployment" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **URL:** ${{ steps.deploy.outputs.deployment-url }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Branch URL:** ${{ steps.deploy.outputs.pages-deployment-alias-url }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Environment:** ${{ steps.deploy.outputs.pages-environment }}" >> "$GITHUB_STEP_SUMMARY"

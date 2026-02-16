@@ -2,11 +2,11 @@
 import tailwind from "@tailwindcss/vite"
 import { tanstackRouter } from "@tanstack/router-plugin/vite"
 import react from "@vitejs/plugin-react"
-import alchemy from "alchemy/cloudflare/vite"
 import { fileURLToPath, URL } from "node:url"
 import { defineConfig } from "vite"
 import mkcert from "vite-plugin-mkcert"
 import tsconfigPaths from "vite-tsconfig-paths"
+import { cloudflare } from "@cloudflare/vite-plugin"
 
 // proxy: {
 //   "/v1/traces": {
@@ -47,7 +47,7 @@ export default defineConfig({
   },
   plugins: [
     // store(),
-    alchemy(),
+    cloudflare(),
     tanstackRouter({
       target: "react",
       autoCodeSplitting: true,
