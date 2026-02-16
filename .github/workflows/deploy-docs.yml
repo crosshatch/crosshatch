@@ -52,6 +52,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: docs
+          packageManager: pnpm
           command: pages deploy dist --project-name=crosshatch-docs --branch=${{ steps.branch.outputs.name }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
       - name: Deployment summary
