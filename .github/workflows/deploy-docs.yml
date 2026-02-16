@@ -15,7 +15,6 @@ on:
 
 permissions:
   contents: read
-  deployments: write
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -47,18 +46,8 @@ jobs:
           fi
       - name: Deploy to Cloudflare Pages
         id: deploy
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: docs
-          packageManager: pnpm
-          command: pages deploy dist --project-name=crosshatch-docs --branch=${{ steps.branch.outputs.name }}
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-      - name: Deployment summary
-        run: |
-          echo "### Docs Deployment" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "- **URL:** ${{ steps.deploy.outputs.deployment-url }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- **Branch URL:** ${{ steps.deploy.outputs.pages-deployment-alias-url }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- **Environment:** ${{ steps.deploy.outputs.pages-environment }}" >> "$GITHUB_STEP_SUMMARY"
+        working-directory: docs
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: pnpm dlx wrangler pages deploy dist --project-name=crosshatch-docs --branch=${{ steps.branch.outputs.name }}
