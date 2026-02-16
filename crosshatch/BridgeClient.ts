@@ -17,9 +17,7 @@ export class BridgeClient extends Effect.Service<BridgeClient>()(ContextKeys.Bri
   static readonly layer = BridgeClient.Default.pipe(
     Layer.provide(BridgeWorkerLive),
     Layer.provideMerge(
-      CrosshatchEnv.layer.pipe(
-        Layer.provideMerge(Layer.setConfigProvider(ConfigProvider.fromJson(resolveEnv()))),
-      ),
+      CrosshatchEnv.layer.pipe(Layer.provideMerge(Layer.setConfigProvider(ConfigProvider.fromJson(resolveEnv())))),
     ),
   )
   static readonly atomRuntime = Atom.context({ memoMap })(this.layer)
