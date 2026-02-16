@@ -13,7 +13,7 @@ export const ThemeToggle = ({
   const { setTheme, resolvedTheme } = useTheme()
   return (
     <Button
-      {...{ size, variant, title, ...rest }}
+      {...{ size, title, variant, ...rest }}
       className={cn("group/toggle extend-touch-target size-8", className)}
       onClick={(e) => {
         setTheme(resolvedTheme === "dark" ? "light" : "dark")

@@ -5,6 +5,6 @@ import { Namespace } from "./Namespace.ts"
 
 export const Derivation = S.Struct({
   address: Address,
-  namespace: Namespace,
   chainId: ChainId,
+  namespace: Namespace,
 })

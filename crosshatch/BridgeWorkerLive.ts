@@ -5,15 +5,15 @@ import { CrosshatchEnv } from "./CrosshatchEnv.ts"
 import { AppReady, BridgeReady } from "./messages.ts"
 
 const cssText = Object.entries({
-  position: "absolute",
-  padding: 0,
-  bottom: "-1px",
-  left: "-1px",
-  overflow: "hidden",
-  clipPath: "inset(50%)",
   border: 0,
-  pointerEvents: "none",
+  bottom: "-1px",
+  clipPath: "inset(50%)",
+  left: "-1px",
   opacity: 0,
+  overflow: "hidden",
+  padding: 0,
+  pointerEvents: "none",
+  position: "absolute",
 })
   .map(([k, v]) => `${k}: ${v};`)
   .join(" ")
@@ -37,10 +37,10 @@ export const BridgeWorkerLive = Effect.gen(function* () {
   })
   const iframe = document.createElement("iframe")
   Object.assign(iframe, {
+    height: 1,
     sandbox: "allow-scripts allow-same-origin",
     src: env.href("bridge"),
     width: 1,
-    height: 1,
   })
   Object.assign(iframe.style, { cssText })
   document.body.appendChild(iframe)

@@ -8,8 +8,8 @@ import { Effect } from "effect"
 
 export const chatAtom = Atom.family((_chatId?: string | undefined) =>
   Atom.make({
-    text: "",
     inflight: undefined,
+    text: "",
   } as {
     text: string
     inflight: AbortController | undefined

@@ -11,8 +11,8 @@ export const latest = ({ sql, params }: { readonly sql: string; readonly params:
     return Stream.asyncScoped<Array<{ [key: string]: any }>, LatestError>(
       Effect.fn(function* (emit) {
         const query = yield* Effect.tryPromise({
-          try: () => pg.live.query(sql, params, ({ rows }) => emit.single(rows)),
           catch: (cause) => new LatestError({ cause }),
+          try: () => pg.live.query(sql, params, ({ rows }) => emit.single(rows)),
         })
         yield* Effect.addFinalizer(() => Effect.promise(() => query.unsubscribe()))
       }),

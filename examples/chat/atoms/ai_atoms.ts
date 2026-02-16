@@ -13,8 +13,8 @@ export const modelIdsAtom = runtime.atom(
 )
 
 export const currentModelIdAtom = Atom.kvs({
-  runtime: Atom.runtime(BrowserKeyValueStore.layerLocalStorage),
-  key: "current-model",
-  schema: S.String,
   defaultValue: () => "gpt-3.5-turbo",
+  key: "current-model",
+  runtime: Atom.runtime(BrowserKeyValueStore.layerLocalStorage),
+  schema: S.String,
 }).pipe(Atom.keepAlive)

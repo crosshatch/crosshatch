@@ -19,9 +19,9 @@ export const lastUsed = timestamp("last_used", {
   .defaultNow()
 
 export const amount = numeric("amount", {
+  mode: "string",
   precision: 36,
   scale: 18,
-  mode: "string",
 }).notNull()
 
 export const added = timestamp("added", {

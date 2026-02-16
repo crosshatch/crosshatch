@@ -6,9 +6,9 @@ import { FirecrawlToolkit } from "./FirecrawlToolkit"
 const FirecrawlSearchResponse = S.Struct({
   data: S.Array(
     S.Struct({
-      url: S.String,
-      title: S.String,
       description: S.String,
+      title: S.String,
+      url: S.String,
     }),
   ),
 })
@@ -38,35 +38,35 @@ export const FirecrawlToolkitLive = FirecrawlToolkit.toLayer(
   Effect.gen(function* () {
     const { client } = yield* FirecrawlClient
     return {
+      FirecrawlScrape: Effect.fn(function* ({ url }) {
+        return yield* client
+          .post("/scrape", {
+            acceptJson: true,
+            body: yield* HttpBody.json({ formats: ["markdown"], url }),
+          })
+          .pipe(
+            Effect.flatMap(HttpClientResponse.schemaBodyJson(FirecrawlScrapeResponse)),
+            Effect.map((res) => ({ markdown: res.data.markdown, url })),
+          )
+      }, Effect.orDie),
       FirecrawlSearch: Effect.fn(function* ({ query, limit }) {
         return yield* client
           .post("/search", {
-            body: yield* HttpBody.json({
-              query,
-              limit: limit ?? 5,
-            }),
             acceptJson: true,
+            body: yield* HttpBody.json({
+              limit: limit ?? 5,
+              query,
+            }),
           })
           .pipe(
             Effect.flatMap(HttpClientResponse.schemaBodyJson(FirecrawlSearchResponse)),
             Effect.map((res) => ({
               results: res.data.map((r) => ({
-                url: r.url,
-                title: r.title,
                 description: r.description,
+                title: r.title,
+                url: r.url,
               })),
             })),
-          )
-      }, Effect.orDie),
-      FirecrawlScrape: Effect.fn(function* ({ url }) {
-        return yield* client
-          .post("/scrape", {
-            body: yield* HttpBody.json({ url, formats: ["markdown"] }),
-            acceptJson: true,
-          })
-          .pipe(
-            Effect.flatMap(HttpClientResponse.schemaBodyJson(FirecrawlScrapeResponse)),
-            Effect.map((res) => ({ url, markdown: res.data.markdown })),
           )
       }, Effect.orDie),
     }

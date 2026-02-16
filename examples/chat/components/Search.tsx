@@ -45,7 +45,7 @@ export const Search = () => {
           <span className="text-xs mt-px">⌘</span>K
         </kbd>
       </Button>
-      <CommandDialog {...{ open, onOpenChange }}>
+      <CommandDialog {...{ onOpenChange, open }}>
         <CommandInput placeholder="Search messages..." onValueChange={setInput} value={input} />
         {input.trim() && (
           <>
@@ -75,8 +75,8 @@ const searchResultsAtom = runtime
       const distance = cosineDistance(embeddings.embedding, embedding)
       return yield* Effect.tryPromise(() =>
         _.select({
-          id: chatItems.id,
           chatId: chatItems.chatId,
+          id: chatItems.id,
           message: chatItems.message,
           title: chats.title,
         })
@@ -102,8 +102,8 @@ const SearchResults = () => {
         onSelect={() => {
           setSearchOpen(false)
           router.navigate({
-            to: "/{-$chatId}",
             params: { chatId },
+            to: "/{-$chatId}",
           })
         }}
       >

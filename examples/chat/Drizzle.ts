@@ -10,9 +10,9 @@ export class Drizzle extends Effect.Service<Drizzle>()(ContextKeys.Drizzle, {
   scoped: Effect.gen(function* () {
     const pg = yield* PgliteClient.PgliteClient
     return drizzle({
-      schema,
-      relations,
       client: pg as never,
+      relations,
+      schema,
     })
   }),
 }) {}

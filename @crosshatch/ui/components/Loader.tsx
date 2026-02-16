@@ -32,9 +32,9 @@ export function CircularLoader({
   size?: "sm" | "md" | "lg" | undefined
 }) {
   const sizeClasses = {
-    sm: "size-4",
-    md: "size-5",
     lg: "size-6",
+    md: "size-5",
+    sm: "size-4",
   }
 
   return (
@@ -58,15 +58,15 @@ export function ClassicLoader({
   size?: "sm" | "md" | "lg" | undefined
 }) {
   const sizeClasses = {
-    sm: "size-4",
-    md: "size-5",
     lg: "size-6",
+    md: "size-5",
+    sm: "size-4",
   }
 
   const barSizes = {
-    sm: { height: "6px", width: "1.5px" },
-    md: { height: "8px", width: "2px" },
     lg: { height: "10px", width: "2.5px" },
+    md: { height: "8px", width: "2px" },
+    sm: { height: "6px", width: "1.5px" },
   }
 
   return (
@@ -77,16 +77,16 @@ export function ClassicLoader({
             key={i}
             className="bg-primary absolute animate-[spinner-fade_1.2s_linear_infinite] rounded-full"
             style={{
-              top: "0",
+              animationDelay: `${i * 0.1}s`,
+              height: barSizes[size].height,
               left: "50%",
               marginLeft: size === "sm" ? "-0.75px" : size === "lg" ? "-1.25px" : "-1px",
+              opacity: 0,
+              top: "0",
+              transform: `rotate(${i * 30}deg)`,
               transformOrigin: `${size === "sm" ? "0.75px" : size === "lg" ? "1.25px" : "1px"} ${
                 size === "sm" ? "10px" : size === "lg" ? "14px" : "12px"
               }`,
-              transform: `rotate(${i * 30}deg)`,
-              opacity: 0,
-              animationDelay: `${i * 0.1}s`,
-              height: barSizes[size].height,
               width: barSizes[size].width,
             }}
           />
@@ -105,9 +105,9 @@ export function PulseLoader({
   size?: "sm" | "md" | "lg" | undefined
 }) {
   const sizeClasses = {
-    sm: "size-4",
-    md: "size-5",
     lg: "size-6",
+    md: "size-5",
+    sm: "size-4",
   }
 
   return (
@@ -126,9 +126,9 @@ export function PulseDotLoader({
   size?: "sm" | "md" | "lg" | undefined
 }) {
   const sizeClasses = {
-    sm: "size-1",
-    md: "size-2",
     lg: "size-3",
+    md: "size-2",
+    sm: "size-1",
   }
 
   return (
@@ -152,15 +152,15 @@ export function DotsLoader({
   size?: "sm" | "md" | "lg" | undefined
 }) {
   const dotSizes = {
-    sm: "h-1.5 w-1.5",
-    md: "h-2 w-2",
     lg: "h-2.5 w-2.5",
+    md: "h-2 w-2",
+    sm: "h-1.5 w-1.5",
   }
 
   const containerSizes = {
-    sm: "h-4",
-    md: "h-5",
     lg: "h-6",
+    md: "h-5",
+    sm: "h-4",
   }
 
   return (
@@ -187,15 +187,15 @@ export function TypingLoader({
   size?: "sm" | "md" | "lg" | undefined
 }) {
   const dotSizes = {
-    sm: "h-1 w-1",
-    md: "h-1.5 w-1.5",
     lg: "h-2 w-2",
+    md: "h-1.5 w-1.5",
+    sm: "h-1 w-1",
   }
 
   const containerSizes = {
-    sm: "h-4",
-    md: "h-5",
     lg: "h-6",
+    md: "h-5",
+    sm: "h-4",
   }
 
   return (
@@ -222,21 +222,21 @@ export function WaveLoader({
   size?: "sm" | "md" | "lg" | undefined
 }) {
   const barWidths = {
-    sm: "w-0.5",
-    md: "w-0.5",
     lg: "w-1",
+    md: "w-0.5",
+    sm: "w-0.5",
   }
 
   const containerSizes = {
-    sm: "h-4",
-    md: "h-5",
     lg: "h-6",
+    md: "h-5",
+    sm: "h-4",
   }
 
   const heights = {
-    sm: ["6px", "9px", "12px", "9px", "6px"],
-    md: ["8px", "12px", "16px", "12px", "8px"],
     lg: ["10px", "15px", "20px", "15px", "10px"],
+    md: ["8px", "12px", "16px", "12px", "8px"],
+    sm: ["6px", "9px", "12px", "9px", "6px"],
   }
 
   return (
@@ -264,15 +264,15 @@ export function BarsLoader({
   size?: "sm" | "md" | "lg" | undefined
 }) {
   const barWidths = {
-    sm: "w-1",
-    md: "w-1.5",
     lg: "w-2",
+    md: "w-1.5",
+    sm: "w-1",
   }
 
   const containerSizes = {
-    sm: "h-4 gap-1",
-    md: "h-5 gap-1.5",
     lg: "h-6 gap-2",
+    md: "h-5 gap-1.5",
+    sm: "h-4 gap-1",
   }
 
   return (
@@ -299,21 +299,21 @@ export function TerminalLoader({
   size?: "sm" | "md" | "lg" | undefined
 }) {
   const cursorSizes = {
-    sm: "h-3 w-1.5",
-    md: "h-4 w-2",
     lg: "h-5 w-2.5",
+    md: "h-4 w-2",
+    sm: "h-3 w-1.5",
   }
 
   const textSizes = {
-    sm: "text-xs",
-    md: "text-sm",
     lg: "text-base",
+    md: "text-sm",
+    sm: "text-xs",
   }
 
   const containerSizes = {
-    sm: "h-4",
-    md: "h-5",
     lg: "h-6",
+    md: "h-5",
+    sm: "h-4",
   }
 
   return (
@@ -335,9 +335,9 @@ export function TextBlinkLoader({
   size?: "sm" | "md" | "lg" | undefined
 }) {
   const textSizes = {
-    sm: "text-xs",
-    md: "text-sm",
     lg: "text-base",
+    md: "text-sm",
+    sm: "text-xs",
   }
 
   return (
@@ -357,9 +357,9 @@ export function TextShimmerLoader({
   size?: "sm" | "md" | "lg" | undefined
 }) {
   const textSizes = {
-    sm: "text-xs",
-    md: "text-sm",
     lg: "text-base",
+    md: "text-sm",
+    sm: "text-xs",
   }
 
   return (
@@ -387,9 +387,9 @@ export function TextDotsLoader({
   size?: "sm" | "md" | "lg" | undefined
 }) {
   const textSizes = {
-    sm: "text-xs",
-    md: "text-sm",
     lg: "text-base",
+    md: "text-sm",
+    sm: "text-xs",
   }
 
   return (

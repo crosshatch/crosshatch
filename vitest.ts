@@ -6,9 +6,9 @@ export default {
   optimizeDeps: { exclude: [] },
   test: {
     environment: "happy-dom",
-    setupFiles: [Path.join(import.meta.dirname, "vitest.setup.ts"), "fake-indexeddb/auto"],
+    exclude: defaultExclude,
     fakeTimers: { toFake: undefined },
     sequence: { concurrent: true },
-    exclude: defaultExclude,
+    setupFiles: [Path.join(import.meta.dirname, "vitest.setup.ts"), "fake-indexeddb/auto"],
   },
 } satisfies ViteUserConfig

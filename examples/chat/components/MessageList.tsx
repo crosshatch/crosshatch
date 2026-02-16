@@ -15,8 +15,8 @@ export const MessageList = () => {
 
   useEffect(() => {
     scrollTo({
-      top: document.body.scrollHeight,
       behavior: "smooth",
+      top: document.body.scrollHeight,
     })
   }, [items.length, inflight, chatId])
 

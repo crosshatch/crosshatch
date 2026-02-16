@@ -24,8 +24,8 @@ export type ColumnsCommon<B extends symbol> = {
   updated: typeof updated
 }
 export const ColumnsCommon = <B extends symbol>(_id: S.brand<typeof S.UUID, B>): ColumnsCommon<B> => ({
-  id: brandedId<B>(),
   added,
+  id: brandedId<B>(),
   updated,
 })
 
@@ -41,7 +41,7 @@ export type BaseEncoded = {
 }
 export const Base = <B extends symbol>(id: S.brand<typeof S.UUID, B>) =>
   S.Struct({
-    id,
     added: S.Date,
+    id,
     updated: S.Date,
   })

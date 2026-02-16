@@ -34,8 +34,8 @@ export const sendMessageAtom = runtime.fn<typeof ChatId.Type | undefined>()(
         AtomUtil.assign(get)(chatAtom(undefined), { text: "" })
         yield* Effect.tryPromise(() =>
           router.navigate({
-            to: "/{-$chatId}",
             params: { chatId },
+            to: "/{-$chatId}",
           }),
         )
         yield* Effect.tryPromise(() => _.insert(chats).values({ id }))

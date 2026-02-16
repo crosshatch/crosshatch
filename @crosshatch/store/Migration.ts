@@ -1,9 +1,9 @@
 import { Schema as S } from "effect"
 
 export const Migration = S.Struct({
-  idx: S.Int,
-  tag: S.String,
   hash: S.String,
-  when: S.Number,
+  idx: S.Int,
   sql: S.Array(S.String),
+  tag: S.String,
+  when: S.Number,
 })

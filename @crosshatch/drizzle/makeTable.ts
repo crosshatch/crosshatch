@@ -11,13 +11,13 @@ import {
 import { Brand, Schema as S } from "effect"
 
 const base = <B extends symbol>(_id: S.brand<typeof S.UUID, B>) => ({
-  id: uuid("id").primaryKey().notNull().defaultRandom().$type<string & Brand.Brand<B>>(),
   added: timestamp("added", {
     mode: "date",
     withTimezone: true,
   })
     .notNull()
     .defaultNow(),
+  id: uuid("id").primaryKey().notNull().defaultRandom().$type<string & Brand.Brand<B>>(),
   updated: timestamp("updated", {
     mode: "date",
     withTimezone: true,

@@ -29,7 +29,6 @@ export default (): Plugin => {
   const contents: Array<typeof Migration.Type> = []
 
   return {
-    name: "@crosshatch/store",
     buildStart: () =>
       Effect.gen(function* () {
         contents.length = 0
@@ -76,22 +75,23 @@ export default (): Plugin => {
             Array.filter((v) => v.length > 0),
           )
 
-          contents.push({ idx, when, tag: name, hash, sql })
+          contents.push({ hash, idx, sql, tag: name, when })
         }
       }).pipe(Effect.provide(NodeContext.layer), Effect.runPromise),
+    load(id) {
+      if (id !== resolved) {
+        return null
+      }
+      return `export const migrations = ${JSON.stringify(contents, null, 2)}`
+    },
+
+    name: "@crosshatch/store",
 
     resolveId(source) {
       if (source === VIRTUAL_ID) {
         return `\0${VIRTUAL_ID}`
       }
       return null
-    },
-
-    load(id) {
-      if (id !== resolved) {
-        return null
-      }
-      return `export const migrations = ${JSON.stringify(contents, null, 2)}`
     },
   }
 }

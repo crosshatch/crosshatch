@@ -6,7 +6,6 @@ export const bytea = customType<{
   driverData: Uint8Array
 }>({
   dataType: () => "bytea",
-  toDriver: identity,
   fromDriver: (v) => {
     // TODO: why not automatically decoding correctly?
     if (typeof v === "string") {
@@ -14,4 +13,5 @@ export const bytea = customType<{
     }
     return v
   },
+  toDriver: identity,
 })

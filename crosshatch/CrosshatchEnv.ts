@@ -18,9 +18,9 @@ export class CrosshatchEnv extends Context.Tag(ContextKeys.CrosshatchEnv)<
     return {
       dev,
       domain,
-      url,
-      isCrosshatch: (origin: string) => origin === url,
       href: (subpath: string) => `${url}/${subpath}`,
+      isCrosshatch: (origin: string) => origin === url,
+      url,
     } as const
   }).pipe(Layer.effect(CrosshatchEnv))
 }

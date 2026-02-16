@@ -10,15 +10,15 @@ export const FirecrawlToolkit = Toolkit.make(
     Use a limit of 5 unless otherwise specified.
   `,
     parameters: {
-      query: S.String,
       limit: S.Number,
+      query: S.String,
     },
     success: S.Struct({
       results: S.Array(
         S.Struct({
-          url: S.String,
-          title: S.String,
           description: S.String,
+          title: S.String,
+          url: S.String,
         }),
       ),
     }),
@@ -27,8 +27,8 @@ export const FirecrawlToolkit = Toolkit.make(
     description: "Scrape a URL and return its content as clean markdown.",
     parameters: { url: S.String },
     success: S.Struct({
-      url: S.String,
       markdown: S.String,
+      url: S.String,
     }),
   }),
 )

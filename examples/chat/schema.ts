@@ -12,26 +12,26 @@ export const chats = pgTable("chats", {
 })
 
 export const chatItems = pgTable("chat_items", {
-  id: brandedId<typeof ChatItemIdTypeId>(),
-  ordinal,
+  added,
   chatId: ref("chat_id", () => chats.id, { onDelete: "cascade" }).notNull(),
+  id: brandedId<typeof ChatItemIdTypeId>(),
   message: customType<{
     data: Prompt.Message
     driverData: typeof Prompt.Message.Encoded
   }>({
     dataType: () => "jsonb",
-    toDriver: S.encodeSync(Prompt.Message),
     fromDriver: S.decodeSync(Prompt.Message),
+    toDriver: S.encodeSync(Prompt.Message),
   })("message").notNull(),
-  added,
+  ordinal,
 })
 
 export const embeddings = pgTable(
   "embeddings",
   {
-    id: brandedId<typeof EmbeddingIdTypeId>(),
-    embedding: vector("embedding", { dimensions: 1536 }),
     chatItemId: ref("chat_item_id", () => chatItems.id, { onDelete: "cascade" }).notNull(),
+    embedding: vector("embedding", { dimensions: 1536 }),
+    id: brandedId<typeof EmbeddingIdTypeId>(),
   },
   (_) => [index("embeddings_embedding_index").using("hnsw", _.embedding.op("vector_cosine_ops"))],
 )

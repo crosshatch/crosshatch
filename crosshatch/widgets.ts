@@ -29,8 +29,8 @@ const widget = <A, I extends UrlParams.Input, A2, I2>({
       Effect.map(
         (src) =>
           ({
-            src,
             event,
+            src,
           }) satisfies Widget.WidgetConfig<A2, I2>,
       ),
       Effect.map(Widget.embed),
@@ -44,45 +44,45 @@ const Common = S.Struct({
 })
 
 export const EventsWidget = widget({
+  event: S.Void,
   pathname: "/events",
   payload: Common,
-  event: S.Void,
 })
 
 export const AllowanceWindow = S.Literal("Day", "Week", "Month", "Year", "Ever")
 export const Allowance = S.Struct({
-  window: AllowanceWindow,
   amount: S.Number,
+  window: AllowanceWindow,
 })
 
 export const LinkWidget = widget({
+  event: S.Void,
   pathname: "/link",
   payload: S.Struct({
     id: LinkChallengeId,
   }).pipe(S.extend(Common), S.extend(Allowance)),
-  event: S.Void,
 })
 
 export const EscalationWidget = widget({
+  event: S.Void,
   pathname: "/escalation",
   payload: Escalation,
-  event: S.Void,
 })
 
 export const ThawWidget = widget({
+  event: S.Void,
   pathname: "/thaw",
   payload: AccountFrozen,
-  event: S.Void,
 })
 
 export const OnrampExplainerWidget = widget({
+  event: S.Void,
   pathname: "/onramp-explainer",
   payload: InsufficientFunds,
-  event: S.Void,
 })
 
 export const IdWidget = widget({
+  event: S.Void,
   pathname: "/id",
   payload: Common,
-  event: S.Void,
 })

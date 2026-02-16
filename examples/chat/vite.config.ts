@@ -18,19 +18,6 @@ import { cloudflare } from "@cloudflare/vite-plugin"
 
 export default defineConfig({
   envDir: "../../..",
-  server: {
-    host: "127.0.0.1",
-    port: 7779,
-    strictPort: true,
-    allowedHosts: ["local.crosshatch.chat", "local.crosshatch.dev"],
-    fs: { strict: false },
-  },
-  resolve: {
-    alias: {
-      "@": fileURLToPath(new URL(".", import.meta.url)),
-    },
-  },
-  worker: { format: "es" },
   optimizeDeps: {
     exclude: [
       "@effect/platform",
@@ -49,10 +36,10 @@ export default defineConfig({
     // store(),
     cloudflare(),
     tanstackRouter({
-      target: "react",
       autoCodeSplitting: true,
-      routesDirectory: "routes",
       generatedRouteTree: "routeTree.gen.ts",
+      routesDirectory: "routes",
+      target: "react",
     }),
     tsconfigPaths({
       projects: ["tsconfig.json"],
@@ -67,4 +54,17 @@ export default defineConfig({
     }),
     tailwind(),
   ],
+  resolve: {
+    alias: {
+      "@": fileURLToPath(new URL(".", import.meta.url)),
+    },
+  },
+  server: {
+    allowedHosts: ["local.crosshatch.chat", "local.crosshatch.dev"],
+    fs: { strict: false },
+    host: "127.0.0.1",
+    port: 7779,
+    strictPort: true,
+  },
+  worker: { format: "es" },
 })

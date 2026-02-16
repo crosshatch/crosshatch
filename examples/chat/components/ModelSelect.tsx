@@ -19,7 +19,7 @@ export const ModelSelect = () => {
   const modelIdsResult = useAtomValue(modelIdsAtom)
   const [selected, setSelected] = useAtom(currentModelIdAtom)
   return (
-    <Popover {...{ open, onOpenChange }}>
+    <Popover {...{ onOpenChange, open }}>
       <PopoverTrigger asChild>
         <Button variant="outline" role="combobox" aria-expanded={open} className="justify-between rounded-full">
           {Result.builder(modelIdsResult)

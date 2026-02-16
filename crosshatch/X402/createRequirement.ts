@@ -29,7 +29,7 @@ export const createRequired = ({
   accepts: typeof Accepts.Type
   resource?: typeof ResourceInfo.Type | undefined
 }): typeof PaymentRequired.Type => ({
-  x402Version: 2,
   accepts,
   resource,
+  x402Version: 2,
 })

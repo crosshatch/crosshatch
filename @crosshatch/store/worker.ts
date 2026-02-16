@@ -22,15 +22,15 @@ export const worker = ({
       Effect.gen(function* () {
         const client = yield* Effect.tryPromise(() =>
           PGlite.create({
-            extensions: { uuid_ossp, fuzzystrmatch, lo, vector },
             dataDir: `idb://${key}`,
+            extensions: { fuzzystrmatch, lo, uuid_ossp, vector },
             relaxedDurability: true,
           }),
         )
         yield* migrate({
           client,
-          migrations,
           enable: ["uuid-ossp", "vector", "fuzzystrmatch", "lo"],
+          migrations,
         })
         yield* Effect.log(`${key} worker initialized`)
         return client

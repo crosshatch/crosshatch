@@ -39,10 +39,10 @@ export const openSessionWidgetAtom = BridgeClient.atomRuntime.fn<void>()(
         } else {
           const { challengeId } = linkState
           return yield* LinkWidget.stream({
-            id: challengeId,
-            window: "Week",
             amount: 10,
+            id: challengeId,
             referrer: location.href,
+            window: "Week",
           }).pipe(Stream.runDrain)
         }
       }

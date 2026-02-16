@@ -1,9 +1,9 @@
 import { Schema as S } from "effect"
 
 export const ResourceInfo = S.Struct({
-  url: S.String.pipe(S.optional),
   description: S.String.pipe(S.optional),
   mimeType: S.String.pipe(S.optional),
+  url: S.String.pipe(S.optional),
 })
 
 export const Network = S.TemplateLiteral(S.String, S.Literal(":"), S.String)
@@ -14,13 +14,13 @@ const UnknownRecord = S.Record({
 })
 
 export const PaymentRequirements = S.Struct({
-  scheme: S.Literal("exact"),
-  network: Network,
-  asset: S.String,
   amount: S.String,
-  payTo: S.String,
-  maxTimeoutSeconds: S.Number,
+  asset: S.String,
   extra: UnknownRecord,
+  maxTimeoutSeconds: S.Number,
+  network: Network,
+  payTo: S.String,
+  scheme: S.Literal("exact"),
 })
 
 export const Version = S.Literal(1, 2)
@@ -28,23 +28,23 @@ export const Version = S.Literal(1, 2)
 export const Accepts = S.Tuple([PaymentRequirements], PaymentRequirements)
 
 export const PaymentRequired = S.Struct({
-  x402Version: Version,
-  error: S.String.pipe(S.optional),
-  resource: ResourceInfo.pipe(S.optional),
   accepts: Accepts,
+  error: S.String.pipe(S.optional),
   extensions: UnknownRecord.pipe(S.optional),
+  resource: ResourceInfo.pipe(S.optional),
+  x402Version: Version,
 })
 
 export const parseRequired = ({ accepts: [{ amount, asset, network }] }: typeof PaymentRequired.Type) => ({
   amount: BigInt(amount),
-  network,
   asset,
+  network,
 })
 
 export const PaymentPayload = S.Struct({
-  x402Version: S.Number,
-  resource: ResourceInfo,
   accepted: PaymentRequirements,
-  payload: UnknownRecord,
   extensions: UnknownRecord.pipe(S.optional),
+  payload: UnknownRecord,
+  resource: ResourceInfo,
+  x402Version: S.Number,
 })

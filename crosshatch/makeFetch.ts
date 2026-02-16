@@ -31,8 +31,8 @@ export const makeFetch =
       while (decision._tag !== "Approved") {
         const widget = {
           AccountFrozen: ThawWidget,
-          InsufficientFunds: OnrampExplainerWidget,
           Escalation: EscalationWidget,
+          InsufficientFunds: OnrampExplainerWidget,
         }[decision._tag]
         yield* widget.stream(decision as never).pipe(Stream.runDrain)
         decision = yield* bridge.propose({

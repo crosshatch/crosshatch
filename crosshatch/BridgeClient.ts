@@ -11,8 +11,8 @@ const memoMap = Layer.makeMemoMap.pipe(Effect.runSync)
 
 // TODO: crosshatch_internal flag
 export class BridgeClient extends Effect.Service<BridgeClient>()(ContextKeys.BridgeClient, {
-  scoped: RpcClient.make(Bridge),
   dependencies: [RpcClient.layerProtocolWorker({ size: 1 })],
+  scoped: RpcClient.make(Bridge),
 }) {
   static readonly layer = BridgeClient.Default.pipe(
     Layer.provide(BridgeWorkerLive),

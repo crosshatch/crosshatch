@@ -25,8 +25,8 @@ function RouteComponent() {
         (e) => e.metaKey && e.shiftKey && e.key === "o",
         () =>
           router.navigate({
-            to: "/{-$chatId}",
             params: { chatId: undefined },
+            to: "/{-$chatId}",
           }),
       )
       return unsubscribe
