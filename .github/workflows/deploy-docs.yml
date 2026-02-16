@@ -1,5 +1,6 @@
 name: Deploy Docs
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths:
@@ -20,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: documentation_deployment
     if: >
+      github.event_name == 'workflow_dispatch' ||
       github.event_name == 'push' ||
       (github.event_name == 'pull_request' &&
        github.event.pull_request.author_association != 'FIRST_TIMER' &&
