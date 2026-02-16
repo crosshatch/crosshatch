@@ -5,6 +5,7 @@ import { Bridge } from "./Bridge.ts"
 import { BridgeWorkerLive } from "./BridgeWorkerLive.ts"
 import { CrosshatchEnv } from "./CrosshatchEnv.ts"
 import { ContextKeys } from "./ContextKeys.ts"
+import { resolveEnv } from "@crosshatch/util/resolveEnv"
 
 const memoMap = Layer.makeMemoMap.pipe(Effect.runSync)
 
@@ -17,7 +18,7 @@ export class BridgeClient extends Effect.Service<BridgeClient>()(ContextKeys.Bri
     Layer.provide(BridgeWorkerLive),
     Layer.provideMerge(
       CrosshatchEnv.layer.pipe(
-        Layer.provideMerge(Layer.setConfigProvider(ConfigProvider.fromJson((import.meta as any).env))),
+        Layer.provideMerge(Layer.setConfigProvider(ConfigProvider.fromJson(resolveEnv()))),
       ),
     ),
   )

@@ -31,7 +31,7 @@ catalogs:
       specifier: 0.73.0
       version: 0.73.0
     '@effect/platform':
-      specifier: ^0.94.4
+      specifier: ^0.94.5
       version: 0.94.5
     '@effect/platform-browser':
       specifier: ^0.74.0
@@ -172,7 +172,7 @@ catalogs:
       specifier: 1.0.0-beta.15-859cf75
       version: 1.0.0-beta.15-859cf75
     effect:
-      specifier: ^3.19.16
+      specifier: ^3.19.17
       version: 3.19.17
     lucide-react:
       specifier: ^0.563.0

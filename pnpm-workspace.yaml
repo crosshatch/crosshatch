@@ -15,7 +15,7 @@ catalog:
   "@effect/experimental": ^0.58.0
   "@effect/cli": ^0.73.1
   "@effect/language-service": 0.73.0
-  "@effect/platform": ^0.94.4
+  "@effect/platform": ^0.94.5
   "@effect/platform-browser": ^0.74.0
   "@effect/platform-node": ^0.104.1
   "@effect/rpc": ^0.73.0
@@ -83,7 +83,7 @@ catalog:
   dedent: ^1.7.1
   drizzle-kit: 1.0.0-beta.15-859cf75
   drizzle-orm: 1.0.0-beta.15-859cf75
-  effect: ^3.19.16
+  effect: ^3.19.17
   fake-indexeddb: ^6.2.5
   happy-dom: ^20.0.11
   hono: ^4.11.5
