@@ -1,4 +1,5 @@
 import { ChevronRight } from "lucide-react"
+
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./Collapsible.tsx"
 import {
   SidebarMenuButton,

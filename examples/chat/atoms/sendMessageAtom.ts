@@ -1,3 +1,11 @@
+import * as AtomUtil from "@crosshatch/ui/AtomUtil"
+import { e0, nonNullable } from "@crosshatch/util/unwrapping"
+import { AiError, EmbeddingModel, LanguageModel, Prompt } from "@effect/ai"
+import { OpenAiLanguageModel } from "@effect/ai-openai"
+import { isLinkedAtom, openSessionWidgetAtom } from "crosshatch"
+import { eq } from "drizzle-orm"
+import { Cause, Effect, Fiber } from "effect"
+
 import { currentModelIdAtom } from "@/atoms/ai_atoms"
 import { chatAtom, chatItemsAtom } from "@/atoms/chat_atoms"
 import { runtime } from "@/atoms/runtime"
@@ -7,13 +15,6 @@ import { router } from "@/router"
 import { chatItems, chats, embeddings } from "@/schema"
 import { FirecrawlToolkit } from "@/tools/FirecrawlToolkit"
 import { tx } from "@/tx"
-import * as AtomUtil from "@crosshatch/ui/AtomUtil"
-import { e0, nonNullable } from "@crosshatch/util/unwrapping"
-import { AiError, EmbeddingModel, LanguageModel, Prompt } from "@effect/ai"
-import { OpenAiLanguageModel } from "@effect/ai-openai"
-import { isLinkedAtom, openSessionWidgetAtom } from "crosshatch"
-import { eq } from "drizzle-orm"
-import { Cause, Effect, Fiber } from "effect"
 
 export const sendMessageAtom = runtime.fn<typeof ChatId.Type | undefined>()(
   Effect.fn(

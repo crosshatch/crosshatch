@@ -1,10 +1,12 @@
-import { latest as latest_, PgliteClient } from "@crosshatch/store"
 import type { AnyPgAsyncRelationalQuery, AnyPgAsyncSelect } from "drizzle-orm/pg-core"
+
+import { latest as latest_, PgliteClient } from "@crosshatch/store"
 import { drizzle } from "drizzle-orm/pglite"
 import { Effect, Stream } from "effect"
+
+import { ContextKeys } from "./ContextKeys.ts"
 import { relations } from "./relations.ts"
 import * as schema from "./schema.ts"
-import { ContextKeys } from "./ContextKeys.ts"
 
 export class Drizzle extends Effect.Service<Drizzle>()(ContextKeys.Drizzle, {
   scoped: Effect.gen(function* () {

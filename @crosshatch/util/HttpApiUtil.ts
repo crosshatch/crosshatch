@@ -1,5 +1,6 @@
-import { OpenApi } from "@effect/platform"
 import type { Context } from "effect"
+
+import { OpenApi } from "@effect/platform"
 
 export const description =
   (template: TemplateStringsArray, ...substitutions: Array<unknown>) =>

@@ -1,12 +1,13 @@
-import { chatAtom, chatItemsAtom } from "@/atoms/chat_atoms"
-import { ChatId } from "@/ids"
-import { Route } from "@/routes/{-$chatId}"
 import { cn } from "@crosshatch/ui/cn"
 import { Message } from "@crosshatch/ui/components/Message"
 import { Section, SectionInner } from "@crosshatch/ui/components/Section"
 import { Skeleton } from "@crosshatch/ui/components/Skeleton"
 import { useAtomSuspense, useAtomValue } from "@effect-atom/atom-react"
 import { Fragment, useEffect } from "react"
+
+import { chatAtom, chatItemsAtom } from "@/atoms/chat_atoms"
+import { ChatId } from "@/ids"
+import { Route } from "@/routes/{-$chatId}"
 
 export const MessageList = () => {
   const { chatId } = Route.useParams()
@@ -30,13 +31,13 @@ export const MessageList = () => {
             case "user": {
               return (
                 <Fragment key={id}>
-                  <ChatEventCard className="p-2 justify-end">
-                    <div className="p-4 min-w-0 break-all whitespace-normal">{inner}</div>
+                  <ChatEventCard className="justify-end p-2">
+                    <div className="min-w-0 p-4 break-all whitespace-normal">{inner}</div>
                   </ChatEventCard>
                   {inflight && i === items.length - 1 && (
                     <ChatEventCard className="border-none p-2">
                       <div className="relative">
-                        <Skeleton className="rounded-xs h-14 flex-1" />
+                        <Skeleton className="h-14 flex-1 rounded-xs" />
                       </div>
                     </ChatEventCard>
                   )}
@@ -46,7 +47,7 @@ export const MessageList = () => {
             case "assistant": {
               return (
                 <ChatEventCard key={id} className="p-2">
-                  <div className="p-4 bg-gray-500/25 min-w-0 break-all whitespace-normal">{inner}</div>
+                  <div className="min-w-0 bg-gray-500/25 p-4 break-all whitespace-normal">{inner}</div>
                 </ChatEventCard>
               )
             }
@@ -69,9 +70,9 @@ export const ChatEventCard = ({
   className?: string | undefined
   actions?: React.ReactNode | undefined
 }) => (
-  <div className={cn("w-full flex flex-row", className)}>
-    <div className="min-w-0 w-full">
-      <div className="rounded-sm border overflow-hidden">{children}</div>
+  <div className={cn("flex w-full flex-row", className)}>
+    <div className="w-full min-w-0">
+      <div className="overflow-hidden rounded-sm border">{children}</div>
       {actions && <div className="flex w-full">{actions}</div>}
     </div>
   </div>

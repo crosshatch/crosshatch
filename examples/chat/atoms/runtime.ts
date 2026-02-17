@@ -1,11 +1,13 @@
-import { CrosshatchChatEnv } from "@/CrosshatchChatEnv"
-import { FirecrawlToolkitLive } from "@/tools/FirecrawlToolkitLive"
-import Worker from "@/worker.ts?worker"
 import { PgliteClient } from "@crosshatch/store"
 import { Atom } from "@effect-atom/atom-react"
 import { OpenAiClient, OpenAiEmbeddingModel } from "@effect/ai-openai"
 import { CrosshatchHttpClient } from "crosshatch"
 import { Effect, Layer, Redacted } from "effect"
+
+import { CrosshatchChatEnv } from "@/CrosshatchChatEnv"
+import { FirecrawlToolkitLive } from "@/tools/FirecrawlToolkitLive"
+import Worker from "@/worker.ts?worker"
+
 import { Drizzle } from "../Drizzle"
 
 const OpenAiClientLive = CrosshatchChatEnv.pipe(

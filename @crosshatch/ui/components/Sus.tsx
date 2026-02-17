@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+
 import { cn } from "../cn.ts"
 import { Skeleton } from "./Skeleton.tsx"
 
@@ -14,7 +15,7 @@ export const Sus = ({
   dev?: boolean | undefined
 }) => {
   const props = {
-    className: cn("flex justify-center items-center rounded-none", skeletonClassName),
+    className: cn("flex items-center justify-center rounded-none", skeletonClassName),
   }
   return dev ? (
     <Skeleton {...props} />

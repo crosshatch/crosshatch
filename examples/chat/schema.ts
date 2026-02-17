@@ -2,6 +2,7 @@ import { added, brandedId, ordinal, ref, updated } from "@crosshatch/drizzle"
 import { Prompt } from "@effect/ai"
 import { customType, index, pgTable, text, vector } from "drizzle-orm/pg-core"
 import { Schema as S } from "effect"
+
 import type { ChatIdTypeId, ChatItemIdTypeId, EmbeddingIdTypeId } from "./ids"
 
 export const chats = pgTable("chats", {

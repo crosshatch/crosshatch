@@ -1,5 +1,3 @@
-import { ChatControls } from "@/components/ChatControls"
-import { SidebarInner } from "@/components/SidebarInner"
 import { Button } from "@crosshatch/ui/components/Button"
 import { Sidebar, SidebarInset, SidebarProvider, useSidebar } from "@crosshatch/ui/components/Sidebar"
 import { CrosshatchIcon } from "@crosshatch/ui/icons"
@@ -8,6 +6,9 @@ import { createRootRoute, Outlet } from "@tanstack/react-router"
 import { openSessionWidgetAtom } from "crosshatch"
 import { PanelLeftIcon } from "lucide-react"
 import { ThemeProvider } from "next-themes"
+
+import { ChatControls } from "@/components/ChatControls"
+import { SidebarInner } from "@/components/SidebarInner"
 
 export const Route = createRootRoute({
   component: RouteComponent,
@@ -28,7 +29,7 @@ function RouteComponent() {
         </Sidebar>
         <SidebarInset>
           <Header />
-          <div className="relative flex flex-1 w-full h-full flex-col">
+          <div className="relative flex h-full w-full flex-1 flex-col">
             <Outlet />
             <ChatControls />
           </div>
@@ -42,7 +43,7 @@ const Header = () => {
   const { toggleSidebar } = useSidebar()
   const sessionButtonOnClick = useAtomSet(openSessionWidgetAtom)
   return (
-    <header className="flex z-1 py-2 sticky top-0 right-0 left-0 bg-secondary/75 backdrop-blur-sm items-center border-b p-2 justify-between">
+    <header className="sticky top-0 right-0 left-0 z-1 flex items-center justify-between border-b bg-secondary/75 p-2 py-2 backdrop-blur-sm">
       <Button
         data-sidebar="trigger"
         data-slot="sidebar-trigger"

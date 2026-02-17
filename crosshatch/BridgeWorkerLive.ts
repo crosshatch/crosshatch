@@ -1,6 +1,7 @@
 import * as Widget from "@crosshatch/util/Widget"
 import { BrowserWorker } from "@effect/platform-browser"
 import { Deferred, Effect, Layer, Option, Schema as S } from "effect"
+
 import { CrosshatchEnv } from "./CrosshatchEnv.ts"
 import { AppReady, BridgeReady } from "./messages.ts"
 

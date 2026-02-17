@@ -1,5 +1,7 @@
 import type { PGlite } from "@electric-sql/pglite"
+
 import { Effect } from "effect"
+
 import { Migration } from "./Migration.ts"
 
 const MIGRATIONS = "_migrations"

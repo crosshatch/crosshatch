@@ -1,6 +1,7 @@
 import { HttpBody, HttpClient, HttpClientRequest, HttpClientResponse } from "@effect/platform"
 import { CrosshatchHttpClient } from "crosshatch"
 import { Config, Effect, flow, Layer, Redacted, Schema as S } from "effect"
+
 import { FirecrawlToolkit } from "./FirecrawlToolkit"
 
 const FirecrawlSearchResponse = S.Struct({

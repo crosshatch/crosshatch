@@ -6,8 +6,11 @@ import { uuid_ossp } from "@electric-sql/pglite/contrib/uuid_ossp"
 import { vector } from "@electric-sql/pglite/vector"
 import { worker as worker_ } from "@electric-sql/pglite/worker"
 import { Effect } from "effect"
-import { migrate } from "./migrate.ts"
+
 import type { Migration } from "./Migration.ts"
+
+import { migrate } from "./migrate.ts"
+
 import "@crosshatch/ui/prelude"
 
 export const worker = ({

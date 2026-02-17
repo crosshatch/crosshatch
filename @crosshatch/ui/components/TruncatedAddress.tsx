@@ -24,7 +24,7 @@ export const TruncatedAddress = ({
       {...restProps}
     >
       <span className="text-gray12">{left}</span>
-      <p className="mb-1 font-bold text-gray9">...</p>
+      <p className="text-gray9 mb-1 font-bold">...</p>
       <span className="text-gray12">{right}</span>
     </div>
   )

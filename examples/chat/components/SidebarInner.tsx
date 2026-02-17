@@ -1,6 +1,3 @@
-import { chatsAtom, deleteChatAtom, renameChatAtom } from "@/atoms/chat_atoms"
-import { Search } from "@/components/Search"
-import { chats } from "@/schema"
 import { Button } from "@crosshatch/ui/components/Button"
 import {
   Dialog,
@@ -32,17 +29,21 @@ import { Link } from "@tanstack/react-router"
 import { MoreHorizontal, PencilLine, Plus, Trash2 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 
+import { chatsAtom, deleteChatAtom, renameChatAtom } from "@/atoms/chat_atoms"
+import { Search } from "@/components/Search"
+import { chats } from "@/schema"
+
 export const SidebarInner = () => {
   const { value: chats } = useAtomSuspense(chatsAtom)
   return (
     <div className="absolute top-0 right-0 bottom-0 left-0 overflow-y-scroll [&::-webkit-scrollbar]:hidden">
-      <SidebarHeader className="sticky top-0 right-0 left-0 border-b bg-secondary/75 z-50 backdrop-blur-sm">
+      <SidebarHeader className="sticky top-0 right-0 left-0 z-50 border-b bg-secondary/75 backdrop-blur-sm">
         <Search />
       </SidebarHeader>
       <SidebarContent className="flex max-h-screen p-[0.5]">
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
           <SidebarMenu>
-            <Button variant="outline" asChild className="font-light h-8 justify-between">
+            <Button variant="outline" asChild className="h-8 justify-between font-light">
               <Link to="/{-$chatId}" params={{ chatId: undefined }}>
                 New chat
                 <Plus />
@@ -88,7 +89,7 @@ const ChatLink = ({ title, id }: (typeof chats)["$inferSelect"]) => {
   return (
     <Dialog {...{ open }} onOpenChange={setOpen}>
       <SidebarMenuItem>
-        <SidebarMenuButton className="px-2 h-8 rounded-sm" asChild>
+        <SidebarMenuButton className="h-8 rounded-sm px-2" asChild>
           <Link
             activeProps={{ className: "bg-primary/15 hover:bg-primary/15!" }}
             to="/{-$chatId}"

@@ -1,4 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority"
+
 import { cn } from "../cn.ts"
 
 const badgeVariants = cva(

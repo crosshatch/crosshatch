@@ -1,9 +1,10 @@
-import { runtime } from "@/atoms/runtime"
 import { Atom } from "@effect-atom/atom-react"
-import { BrowserKeyValueStore } from "@effect/platform-browser"
-import { Effect, Schema as S } from "effect"
 import {} from "@effect/ai"
 import { OpenAiClient } from "@effect/ai-openai"
+import { BrowserKeyValueStore } from "@effect/platform-browser"
+import { Effect, Schema as S } from "effect"
+
+import { runtime } from "@/atoms/runtime"
 
 export const modelIdsAtom = runtime.atom(
   OpenAiClient.OpenAiClient.pipe(

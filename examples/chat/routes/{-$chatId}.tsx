@@ -1,11 +1,12 @@
-import { MessageList } from "@/components/MessageList"
-import { ChatId } from "@/ids"
-import { router } from "@/router"
 import { Sus } from "@crosshatch/ui/components/Sus"
 import { registerCommand } from "@crosshatch/util/registerCommand"
 import { createFileRoute } from "@tanstack/react-router"
 import { Struct } from "effect"
 import { useEffect } from "react"
+
+import { MessageList } from "@/components/MessageList"
+import { ChatId } from "@/ids"
+import { router } from "@/router"
 
 export const Route = createFileRoute("/{-$chatId}")({
   component: RouteComponent,

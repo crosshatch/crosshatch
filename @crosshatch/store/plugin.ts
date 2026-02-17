@@ -1,8 +1,10 @@
+import type { Plugin } from "vite"
+
 import { FileSystem, Path } from "@effect/platform"
 import { NodeContext } from "@effect/platform-node"
 import { Array, Effect, Encoding, flow, Option, pipe, String } from "effect"
 import { cwd } from "node:process"
-import type { Plugin } from "vite"
+
 import type { Migration } from "./Migration.ts"
 
 const formatToMillis = (dateStr: string): number => {

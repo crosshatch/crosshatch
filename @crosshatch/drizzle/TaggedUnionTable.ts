@@ -1,5 +1,6 @@
 import { type AnyPgColumnBuilder, type PgEnum, pgEnum, PgEnumColumnBuilder, type SetNotNull } from "drizzle-orm/pg-core"
 import { absurd, Effect, Schema as S, Types } from "effect"
+
 import { Base, type BaseEncoded, type BaseType, ColumnsCommon, type ColumnsConfig } from "./schema_table_common.ts"
 
 type SupersetKey<U extends { _tag: string }> = Exclude<

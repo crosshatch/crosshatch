@@ -1,11 +1,12 @@
+import { resolveEnv } from "@crosshatch/util/resolveEnv"
 import { Atom } from "@effect-atom/atom"
 import { RpcClient } from "@effect/rpc"
 import { ConfigProvider, Effect, Layer, ManagedRuntime } from "effect"
+
 import { Bridge } from "./Bridge.ts"
 import { BridgeWorkerLive } from "./BridgeWorkerLive.ts"
-import { CrosshatchEnv } from "./CrosshatchEnv.ts"
 import { ContextKeys } from "./ContextKeys.ts"
-import { resolveEnv } from "@crosshatch/util/resolveEnv"
+import { CrosshatchEnv } from "./CrosshatchEnv.ts"
 
 const memoMap = Layer.makeMemoMap.pipe(Effect.runSync)
 

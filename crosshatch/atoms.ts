@@ -1,9 +1,11 @@
 import { Atom } from "@effect-atom/atom"
 import { Effect, Stream } from "effect"
+
+import type { PaymentRequired } from "./X402/schemas.ts"
+
 import { BridgeClient } from "./BridgeClient.ts"
 import { CrosshatchEnv } from "./CrosshatchEnv.ts"
 import { EventsWidget, IdWidget, LinkWidget } from "./widgets.ts"
-import type { PaymentRequired } from "./X402/schemas.ts"
 
 export const linkStateAtom = BridgeClient.atomRuntime.atom(
   Effect.gen(function* () {

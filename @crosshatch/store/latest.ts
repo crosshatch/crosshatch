@@ -1,4 +1,5 @@
 import { Data, Effect, Stream } from "effect"
+
 import { PgliteClient } from "./PgliteClient.ts"
 
 export class LatestError extends Data.TaggedError("LatestError")<{

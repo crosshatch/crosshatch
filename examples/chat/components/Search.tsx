@@ -1,7 +1,3 @@
-import { runtime } from "@/atoms/runtime"
-import { Drizzle } from "@/Drizzle"
-import { router } from "@/router"
-import { chatItems, chats, embeddings } from "@/schema"
 import { Button } from "@crosshatch/ui/components/Button"
 import { CommandDialog, CommandGroup, CommandInput, CommandList } from "@crosshatch/ui/components/Command"
 import { CommandItem } from "@crosshatch/ui/components/Command"
@@ -14,6 +10,11 @@ import { EmbeddingModel } from "@effect/ai"
 import { cosineDistance, eq } from "drizzle-orm"
 import { Effect } from "effect"
 import { Search as SearchIcon } from "lucide-react"
+
+import { runtime } from "@/atoms/runtime"
+import { Drizzle } from "@/Drizzle"
+import { router } from "@/router"
+import { chatItems, chats, embeddings } from "@/schema"
 
 export const searchInputAtom = Atom.make("").pipe(Atom.keepAlive)
 
@@ -36,13 +37,13 @@ export const Search = () => {
     <>
       <Button
         variant="outline"
-        className="relative bg-background/25! py-2.75 border border-primary/7.5! flex flex-1 justify-start rounded-md text-sm shadow-none"
+        className="relative flex flex-1 justify-start rounded-md border border-primary/7.5! bg-background/25! py-2.75 text-sm shadow-none"
         onClick={() => onOpenChange(true)}
       >
         <SearchIcon />
         <span className="inline-flex group-data-[collapsible=icon]:hidden">Search...</span>
-        <kbd className="pointer-events-none absolute right-[0.7rem] top-[0.7rem] hidden h-5 select-none group-data-[collapsible=icon]:hidden items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
-          <span className="text-xs mt-px">⌘</span>K
+        <kbd className="pointer-events-none absolute top-[0.7rem] right-[0.7rem] hidden h-5 items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 select-none group-data-[collapsible=icon]:hidden sm:flex">
+          <span className="mt-px text-xs">⌘</span>K
         </kbd>
       </Button>
       <CommandDialog {...{ onOpenChange, open }}>

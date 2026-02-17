@@ -1,10 +1,12 @@
-import { runtime } from "@/atoms/runtime"
-import { Drizzle, latest } from "@/Drizzle"
-import type { ChatId } from "@/ids"
-import { chats } from "@/schema"
 import { Atom } from "@effect-atom/atom-react"
 import { desc, eq, sql } from "drizzle-orm"
 import { Effect } from "effect"
+
+import type { ChatId } from "@/ids"
+
+import { runtime } from "@/atoms/runtime"
+import { Drizzle, latest } from "@/Drizzle"
+import { chats } from "@/schema"
 
 export const chatAtom = Atom.family((_chatId?: string | undefined) =>
   Atom.make({

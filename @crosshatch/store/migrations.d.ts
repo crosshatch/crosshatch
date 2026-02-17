@@ -1,3 +1,3 @@
 import type { Migration } from "./Migration.ts"
 
-export const migrations: Array<typeof Migration.Type>
+export declare const migrations: Array<typeof Migration.Type>

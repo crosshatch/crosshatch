@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { codeToHtml } from "shiki"
+
 import { cn } from "../cn.ts"
 
 export type CodeBlockProps = {
@@ -12,7 +13,7 @@ function CodeBlock({ children, className, ...props }: CodeBlockProps) {
     <div
       className={cn(
         "not-prose flex w-full flex-col overflow-clip border py-4",
-        "border-border bg-card text-card-foreground rounded-md",
+        "rounded-md border-border bg-card text-card-foreground",
         className,
       )}
       {...props}

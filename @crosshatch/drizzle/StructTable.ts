@@ -1,5 +1,7 @@
 import type { AnyPgColumnBuilder } from "drizzle-orm/pg-core"
+
 import { Schema as S } from "effect"
+
 import { Base, type BaseEncoded, type BaseType, ColumnsCommon, type ColumnsConfig } from "./schema_table_common.ts"
 
 export interface StructTable<B extends symbol, A, I, R> extends S.Schema<A & BaseType<B>, I & BaseEncoded, R> {

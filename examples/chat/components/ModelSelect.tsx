@@ -1,4 +1,3 @@
-import { currentModelIdAtom, modelIdsAtom } from "@/atoms/ai_atoms"
 import { cn } from "@crosshatch/ui/cn"
 import { Button } from "@crosshatch/ui/components/Button"
 import {
@@ -13,6 +12,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@crosshatch/ui/componen
 import { Result, useAtom, useAtomValue } from "@effect-atom/atom-react"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { useState } from "react"
+
+import { currentModelIdAtom, modelIdsAtom } from "@/atoms/ai_atoms"
 
 export const ModelSelect = () => {
   const [open, onOpenChange] = useState(false)

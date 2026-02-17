@@ -1,3 +1,4 @@
+import { cloudflare } from "@cloudflare/vite-plugin"
 // import store from "@crosshatch/store/plugin"
 import tailwind from "@tailwindcss/vite"
 import { tanstackRouter } from "@tanstack/router-plugin/vite"
@@ -6,7 +7,6 @@ import { fileURLToPath, URL } from "node:url"
 import { defineConfig } from "vite"
 import mkcert from "vite-plugin-mkcert"
 import tsconfigPaths from "vite-tsconfig-paths"
-import { cloudflare } from "@cloudflare/vite-plugin"
 
 // proxy: {
 //   "/v1/traces": {
