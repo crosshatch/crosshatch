@@ -16,14 +16,8 @@
   "type": "module",
   "sideEffects": false,
   "exports": {
-    ".": {
-      "types": "./index.ts",
-      "default": "./dist/index.js"
-    },
-    "./*": {
-      "types": "./*.ts",
-      "default": "./dist/*.js"
-    },
+    ".": "./index.ts",
+    "./*": "./*.ts",
     "./package.json": "./package.json"
   },
   "peerDependencies": {

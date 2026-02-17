@@ -16,18 +16,12 @@
   "type": "module",
   "sideEffects": true,
   "exports": {
-    "./prelude": {
-      "types": "./prelude.ts",
-      "import": "./dist/prelude.js"
-    },
     "./*": {
-      "types": "./*.tsx",
+      "types": "./*.ts",
       "import": "./dist/*.js"
     },
-    "./styles": {
-      "default": "./styles.css"
-    },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./styles": "./styles.css"
   },
   "peerDependencies": {
     "@crosshatch/util": "workspace:*",
