@@ -1,5 +1,4 @@
 import { cloudflare } from "@cloudflare/vite-plugin"
-// import store from "@crosshatch/store/plugin"
 import tailwind from "@tailwindcss/vite"
 import { tanstackRouter } from "@tanstack/router-plugin/vite"
 import react from "@vitejs/plugin-react"
@@ -7,6 +6,8 @@ import { fileURLToPath, URL } from "node:url"
 import { defineConfig } from "vite"
 import mkcert from "vite-plugin-mkcert"
 import tsconfigPaths from "vite-tsconfig-paths"
+
+import migrations from "./plugin.ts"
 
 // proxy: {
 //   "/v1/traces": {
@@ -33,7 +34,7 @@ export default defineConfig({
     ],
   },
   plugins: [
-    // store(),
+    migrations(),
     cloudflare(),
     tanstackRouter({
       autoCodeSplitting: true,
@@ -56,6 +57,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
+      "@/migrations": "virtual:chat-migrations",
       "@": fileURLToPath(new URL(".", import.meta.url)),
     },
   },
@@ -66,5 +68,8 @@ export default defineConfig({
     port: 7779,
     strictPort: true,
   },
-  worker: { format: "es" },
+  worker: {
+    format: "es",
+    plugins: () => [migrations()],
+  },
 })

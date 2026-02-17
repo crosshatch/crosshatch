@@ -2,7 +2,7 @@ import type { Plugin } from "vite"
 
 import { FileSystem, Path } from "@effect/platform"
 import { NodeContext } from "@effect/platform-node"
-import { Array, Effect, Encoding, flow, Option, pipe, String } from "effect"
+import { Array as EArray, Effect, Encoding, flow, Option, pipe, String as EString } from "effect"
 import { cwd } from "node:process"
 
 import type { Migration } from "./Migration.ts"
@@ -24,9 +24,9 @@ const whenFromFolderName = (name: string): number => {
 }
 
 export default (): Plugin => {
-  const resolved = new URL(import.meta.resolve("./migrations.d.ts", import.meta.url)).pathname
-
-  const VIRTUAL_ID = "virtual:@crosshatch/store/migrations"
+  const ALIAS_ID = "@/migrations"
+  const VIRTUAL_ID = "virtual:chat-migrations"
+  const RESOLVED_ID = `\0${VIRTUAL_ID}`
 
   const contents: Array<typeof Migration.Type> = []
 
@@ -42,7 +42,7 @@ export default (): Plugin => {
         const entries = yield* fs.readDirectory(migrationsDir).pipe(
           Effect.map(
             flow(
-              Array.filterMap((name) =>
+              EArray.filterMap((name) =>
                 name === "meta"
                   ? Option.none()
                   : Option.some({
@@ -61,7 +61,7 @@ export default (): Plugin => {
 
           const content = yield* fs
             .readFileString(path)
-            .pipe(Effect.map(flow(String.replace(/\r\n/g, "\n"), String.trim)))
+            .pipe(Effect.map(flow(EString.replace(/\r\n/g, "\n"), EString.trim)))
 
           const when = whenFromFolderName(name)
 
@@ -71,27 +71,27 @@ export default (): Plugin => {
 
           const sql = pipe(
             content,
-            String.replace(/\n\t?/g, ""),
-            String.split("--> statement-breakpoint"),
-            Array.map(String.trim),
-            Array.filter((v) => v.length > 0),
+            EString.replace(/\n\t?/g, ""),
+            EString.split("--> statement-breakpoint"),
+            EArray.map(EString.trim),
+            EArray.filter((v) => v.length > 0),
           )
 
           contents.push({ hash, idx, sql, tag: name, when })
         }
       }).pipe(Effect.provide(NodeContext.layer), Effect.runPromise),
     load(id) {
-      if (id !== resolved) {
+      if (id !== RESOLVED_ID) {
         return null
       }
-      return `export const migrations = ${JSON.stringify(contents, null, 2)}`
+      return `const migrations = ${JSON.stringify(contents, null, 2)}\nexport { migrations }\nexport default migrations`
     },
 
-    name: "@crosshatch/store",
+    name: "@crosshatch/chat-migrations",
 
     resolveId(source) {
-      if (source === VIRTUAL_ID) {
-        return `\0${VIRTUAL_ID}`
+      if (source === ALIAS_ID || source === VIRTUAL_ID) {
+        return RESOLVED_ID
       }
       return null
     },
