@@ -12,12 +12,12 @@ export class CrosshatchFetchError extends S.TaggedError<CrosshatchFetchError>()(
 export const makeFetch =
   (fetch: typeof globalThis.fetch): typeof globalThis.fetch =>
   async (input, init) => {
+    const headers = new Headers(init?.headers)
+    const response = await fetch(input, { ...init, headers })
+    if (response.status !== 402) {
+      return response
+    }
     return Effect.gen(function* () {
-      const headers = new Headers(init?.headers)
-      const response = yield* Effect.promise(() => fetch(input, { ...init, headers }))
-      if (response.status !== 402) {
-        return response
-      }
       const header = response.headers.get("PAYMENT-REQUIRED")
       const required = yield* header
         ? Encoding.decodeBase64String(header).pipe(Effect.flatMap(flow(JSON.parse, S.decodeUnknown(PaymentRequired))))
@@ -56,8 +56,7 @@ export const makeFetch =
           break
         }
       }
-
-      return yield* Effect.promise(() => fetch(input, { ...init, headers }))
+      return yield* Effect.tryPromise(() => fetch(input, { ...init, headers }))
     }).pipe((x) =>
       BridgeClient.managedRuntime.runPromise(x, {
         signal: init?.signal ?? undefined,

@@ -13,7 +13,7 @@ import { Drizzle } from "@/Drizzle"
 import { ChatId } from "@/ids"
 import { router } from "@/router"
 import { chatItems, chats, embeddings } from "@/schema"
-import { FirecrawlToolkit } from "@/tools/FirecrawlToolkit"
+// import { FirecrawlToolkit } from "@/tools/FirecrawlToolkit"
 import { tx } from "@/tx"
 
 export const sendMessageAtom = runtime.fn<typeof ChatId.Type | undefined>()(
@@ -96,14 +96,14 @@ export const sendMessageAtom = runtime.fn<typeof ChatId.Type | undefined>()(
       let prompt = Prompt.make([...items.map(({ message }) => message), userMessage])
       let generated = yield* LanguageModel.generateText({
         prompt,
-        toolkit: FirecrawlToolkit,
+        // toolkit: FirecrawlToolkit,
       })
       // TODO: save tool calls in database
       while (generated.toolCalls.length > 0) {
         prompt = Prompt.merge(prompt, Prompt.fromResponseParts(generated.content))
         generated = yield* LanguageModel.generateText({
           prompt,
-          toolkit: FirecrawlToolkit,
+          // toolkit: FirecrawlToolkit,
         })
       }
       const { text: incoming } = generated

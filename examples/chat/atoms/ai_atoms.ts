@@ -1,5 +1,4 @@
 import { Atom } from "@effect-atom/atom-react"
-import {} from "@effect/ai"
 import { OpenAiClient } from "@effect/ai-openai"
 import { BrowserKeyValueStore } from "@effect/platform-browser"
 import { Effect, Schema as S } from "effect"
