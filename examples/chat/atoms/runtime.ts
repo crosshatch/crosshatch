@@ -4,7 +4,7 @@ import { CrosshatchHttpClient } from "crosshatch"
 import { Effect, Layer, Redacted } from "effect"
 
 import { CrosshatchChatEnv } from "@/CrosshatchChatEnv"
-import { FirecrawlToolkitLive } from "@/tools/FirecrawlToolkitLive"
+// import { FirecrawlToolkitLive } from "@/tools/FirecrawlToolkitLive"
 
 import { Drizzle, PgliteClient } from "../Drizzle"
 
@@ -24,6 +24,6 @@ export const runtime = Atom.runtime(
     OpenAiEmbeddingModel.model("text-embedding-ada-002", {
       mode: "batched",
     }).pipe(Layer.provideMerge(OpenAiClientLive)),
-    FirecrawlToolkitLive,
+    // FirecrawlToolkitLive,
   ).pipe(Layer.provide([CrosshatchHttpClient, CrosshatchChatEnv.layer])),
 )
