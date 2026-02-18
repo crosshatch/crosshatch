@@ -14,7 +14,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: chat_deployment
+    environment: chat
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/configure_environment
