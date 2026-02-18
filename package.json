@@ -24,6 +24,7 @@
     "@vitest/coverage-v8": "catalog:",
     "@vitest/expect": "catalog:",
     "@vitest/web-worker": "catalog:",
+    "happy-dom": "catalog:",
     "oxlint": "catalog:",
     "ts-patch": "catalog:",
     "turbo": "catalog:",
