@@ -3,6 +3,7 @@ import { Effect, Stream } from "effect"
 
 import { BridgeClient } from "./BridgeClient.ts"
 import { CrosshatchEnv } from "./CrosshatchEnv.ts"
+import { atomRuntime } from "./runtime.ts"
 import { EventsWidget, IdWidget, LinkWidget } from "./widgets.ts"
 
 export const linkStateAtom = BridgeClient.query("status", void 0)
@@ -13,7 +14,7 @@ export const unlinkAtom = BridgeClient.mutation("unlink")
 
 export const proposeAtom = BridgeClient.mutation("propose")
 
-export const openSessionWidgetAtom = BridgeClient.atomRuntime.fn<void>()(
+export const openSessionWidgetAtom = atomRuntime.fn<void>()(
   Effect.fn(function* (_, get) {
     const { isCrosshatch } = yield* CrosshatchEnv
     const linkState = yield* get.result(linkStateAtom)

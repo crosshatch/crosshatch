@@ -23,6 +23,7 @@
     "./package.json": "./package.json"
   },
   "peerDependencies": {
+    "@effect-atom/atom": "catalog:",
     "@effect/experimental": "catalog:",
     "date-fns": "catalog:",
     "effect": "catalog:"

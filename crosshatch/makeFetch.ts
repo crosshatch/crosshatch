@@ -2,6 +2,7 @@ import { Effect, Encoding, flow, Schema as S, Stream } from "effect"
 
 import { BridgeClient } from "./BridgeClient.ts"
 import { DeclinedDecision } from "./DeclinedDecision.ts"
+import { managedRuntime } from "./runtime.ts"
 import { EscalationWidget, OnrampExplainerWidget, ThawWidget } from "./widgets.ts"
 import { PaymentRequired, Version } from "./X402/schemas.ts"
 
@@ -54,7 +55,7 @@ export const makeFetch =
       }
       return yield* Effect.tryPromise(() => fetch(input, { ...init, headers }))
     }).pipe((x) =>
-      BridgeClient.managedRuntime.runPromise(x, {
+      managedRuntime.runPromise(x, {
         signal: init?.signal ?? undefined,
       }),
     )
