@@ -19,5 +19,9 @@
       "pattern": "crosshatch.chat/*",
       "zone_name": "crosshatch.chat",
     },
+    {
+      "pattern": "www.crosshatch.chat/*",
+      "zone_name": "crosshatch.chat",
+    },
   ],
 }
