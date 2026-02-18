@@ -9,7 +9,7 @@ import { ContextKeys } from "./ContextKeys.ts"
 import { relations } from "./relations.ts"
 import * as schema from "./schema.ts"
 // oxlint-disable-next-line import/default
-import worker from "./worker.ts?worker"
+import worker from "./pg-worker.ts?worker"
 
 export class PgliteClient extends Effect.Service<PgliteClient>()("@crosshatch/PgliteClient", {
   scoped: Effect.gen(function* () {

@@ -21,25 +21,18 @@ jobs:
        github.event.pull_request.author_association != 'NONE')
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Build docs
-        run: pnpm --filter docs build
-      - name: Determine branch
-        id: branch
+      - uses: ./.github/actions/configure_environment
+      - run: pnpm build
+      - run: pnpm build
+        working-directory: docs
+      - id: branch
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             echo "name=${{ github.head_ref }}" >> "$GITHUB_OUTPUT"
           else
             echo "name=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
           fi
-      - name: Deploy to Cloudflare Pages
-        id: deploy
+      - id: deploy
         working-directory: docs
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
