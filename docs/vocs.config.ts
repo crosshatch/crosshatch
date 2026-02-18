@@ -6,7 +6,7 @@ export default defineConfig({
   banner: {
     backgroundColor: "#0E0D0F",
     content: "Crosshatch is in preview. Email harrysolovay@gmail.com for details.",
-    dismissable: true,
+    dismissable: false,
     height: "28px",
     textColor: "white",
   },
