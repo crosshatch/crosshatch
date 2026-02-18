@@ -4,7 +4,8 @@ import { BridgeClient } from "./BridgeClient.ts"
 import { DeclinedDecision } from "./DeclinedDecision.ts"
 import { managedRuntime } from "./runtime.ts"
 import { EscalationWidget, OnrampExplainerWidget, ThawWidget } from "./widgets.ts"
-import { PaymentRequired, Version } from "./X402/schemas.ts"
+import { Required } from "./X402/Required.ts"
+import { Version } from "./X402/Version.ts"
 
 export class CrosshatchFetchError extends S.TaggedError<CrosshatchFetchError>()("CrosshatchFetchError", {
   decision: DeclinedDecision,
@@ -21,9 +22,9 @@ export const makeFetch =
     return Effect.gen(function* () {
       const header = response.headers.get("PAYMENT-REQUIRED")
       const required = yield* header
-        ? Encoding.decodeBase64String(header).pipe(Effect.flatMap(flow(JSON.parse, S.decodeUnknown(PaymentRequired))))
+        ? Encoding.decodeBase64String(header).pipe(Effect.flatMap(flow(JSON.parse, S.decodeUnknown(Required))))
         : Effect.tryPromise(() => response.json()).pipe(
-            Effect.flatMap(S.decodeUnknown(PaymentRequired)),
+            Effect.flatMap(S.decodeUnknown(Required)),
             Effect.filterOrFail(({ x402Version }) => x402Version === 1),
           )
       const bridge = yield* BridgeClient

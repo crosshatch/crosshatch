@@ -3,7 +3,8 @@ import { Schema as S } from "effect"
 
 import { DeclinedDecision } from "./DeclinedDecision.ts"
 import { Status } from "./Status.ts"
-import { PaymentPayload, PaymentRequired } from "./X402/schemas.ts"
+import { Payload } from "./X402/Payload.ts"
+import { Required } from "./X402/Required.ts"
 
 export class Bridge extends RpcGroup.make(
   Rpc.make("status", {
@@ -12,11 +13,11 @@ export class Bridge extends RpcGroup.make(
   Rpc.make("unlink", {}),
   Rpc.make("propose", {
     payload: {
-      required: PaymentRequired,
+      required: Required,
     },
     success: S.Union(
       S.TaggedStruct("Approved", {
-        payload: PaymentPayload,
+        payload: Payload,
       }),
       DeclinedDecision,
     ),

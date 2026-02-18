@@ -31,6 +31,10 @@
       "types": "./X402/X402.ts",
       "default": "./dist/X402/X402.js"
     },
+    "./api": {
+      "types": "./api/api.ts",
+      "default": "./dist/api/api.js"
+    },
     "./package.json": "./package.json"
   },
   "peerDependencies": {

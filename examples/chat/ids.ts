@@ -1,4 +1,4 @@
-import { makeId } from "@crosshatch/util/SchemaUtil"
+import { makeId } from "@crosshatch/util/schema"
 
 export const ChatIdTypeId = Symbol()
 export const ChatId = makeId(ChatIdTypeId, "ChatId")

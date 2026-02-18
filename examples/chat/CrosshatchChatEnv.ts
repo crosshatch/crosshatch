@@ -11,7 +11,7 @@ export class CrosshatchChatEnv extends Context.Tag(ContextKeys.CrosshatchChatEnv
 >() {
   static readonly layer = Effect.gen(function* () {
     const dev = yield* Config.boolean("DEV").pipe(Config.withDefault(true))
-    const shapes = `https://${dev ? "local." : ""}shapes.sh`
+    const shapes = `https://${dev ? "local." : ""}shapes.sh/openai`
     return { dev, shapes } as const
   }).pipe(Layer.effect(CrosshatchChatEnv))
 }
