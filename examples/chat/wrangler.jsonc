@@ -10,4 +10,10 @@
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
   },
+  "routes": [
+    {
+      "pattern": "crosshatch.chat/*",
+      "zone_name": "crosshatch.chat",
+    },
+  ],
 }
