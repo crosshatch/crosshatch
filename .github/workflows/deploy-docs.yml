@@ -3,16 +3,8 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths:
-      - docs/**
-      - crosshatch/**
-      - "@crosshatch/**"
   pull_request:
     types: [opened, synchronize, reopened]
-    paths:
-      - docs/**
-      - crosshatch/**
-      - "@crosshatch/**"
 
 permissions:
   contents: read

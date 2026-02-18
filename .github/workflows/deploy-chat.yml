@@ -1,13 +1,9 @@
-name: Deploy Chat App
+name: Deploy Crosshatch Chat
 
 on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths:
-      - examples/chat/**
-      - "@crosshatch/**"
-      - crosshatch/**
 
 permissions:
   contents: read
@@ -19,11 +15,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/configure_environment
-      - name: Build chat app
-        run: pnpm --filter crosshatch.chat build
-      - name: Deploy chat app
+      - run: pnpm --filter crosshatch.chat build
+      - run: pnpm dlx wrangler deploy
         working-directory: examples/chat
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: pnpm dlx wrangler deploy
