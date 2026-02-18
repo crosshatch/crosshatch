@@ -6,7 +6,7 @@
     "build": "tsc -b",
     "watch": "tsc -b -w",
     "dev": "turbo run //#watch //#test dev",
-    "test": "vitest",
+    "test": "vitest run",
     "clean": "repo-util clean --ignore repos",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check"

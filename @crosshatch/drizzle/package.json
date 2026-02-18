@@ -23,6 +23,7 @@
   "peerDependencies": {
     "@crosshatch/util": "workspace:*",
     "@effect/ai": "catalog:",
-    "drizzle-orm": "catalog:"
+    "drizzle-orm": "catalog:",
+    "effect": "catalog:"
   }
 }
