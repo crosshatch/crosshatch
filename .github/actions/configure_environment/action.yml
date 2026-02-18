@@ -1,0 +1,12 @@
+name: Prepare Environment
+description: Install node, pnpm and package dependencies.
+runs:
+  using: composite
+  steps:
+    - uses: pnpm/action-setup@v4
+    - uses: actions/setup-node@v6
+      with:
+        cache: pnpm
+        node-version: 22
+    - shell: bash
+      run: pnpm install --frozen-lockfile
