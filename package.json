@@ -25,6 +25,7 @@
     "@vitest/expect": "catalog:",
     "@vitest/web-worker": "catalog:",
     "happy-dom": "catalog:",
+    "fake-indexeddb": "catalog:",
     "oxlint": "catalog:",
     "ts-patch": "catalog:",
     "turbo": "catalog:",
