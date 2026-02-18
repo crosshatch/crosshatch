@@ -26,9 +26,7 @@ export const makeFetch =
             Effect.filterOrFail(({ x402Version }) => x402Version === 1),
           )
       const bridge = yield* BridgeClient
-      let decision = yield* bridge.propose({
-        required: required as never,
-      })
+      let decision = yield* bridge("propose", { required })
       while (decision._tag !== "Approved") {
         const widget = {
           AccountFrozen: ThawWidget,
@@ -36,9 +34,7 @@ export const makeFetch =
           InsufficientFunds: OnrampExplainerWidget,
         }[decision._tag]
         yield* widget.stream(decision as never).pipe(Stream.runDrain)
-        decision = yield* bridge.propose({
-          required: required as never,
-        })
+        decision = yield* bridge("propose", { required })
       }
       if (decision._tag !== "Approved") {
         throw new CrosshatchFetchError({ decision })
