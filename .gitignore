@@ -1,13 +1,15 @@
 .env*
+.dev.vars
 
 node_modules/
 
 repomix-output.xml
 .DS_Store
 
+.wrangler/
 .direnv/
 dist/
 *.tsbuildinfo
 .tanstack
-.turbo
+.turbo/
 
