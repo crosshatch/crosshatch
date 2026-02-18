@@ -18,7 +18,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/configure_environment
-      - run: pnpm --filter crosshatch.chat build
+      - run: pnpm build
+      - run: pnpm build
+        working-directory: examples/chat
       - run: pnpm dlx wrangler deploy
         working-directory: examples/chat
         env:
