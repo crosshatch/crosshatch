@@ -20,11 +20,7 @@
       "types": "./index.ts",
       "default": "./dist/index.js"
     },
-    "./constants": {
-      "types": "./constants.ts",
-      "default": "./dist/constants.js"
-    },
-    "./fetch": {
+    "./augment": {
       "default": "./dist/augment.js"
     },
     "./X402": {
