@@ -4,9 +4,10 @@ import { HttpApiEndpoint } from "@effect/platform"
 import { Schema as S } from "effect"
 
 import { Network } from "../Network.ts"
+import { Version } from "../Version.ts"
 
 export const SupportedKind = S.Struct({
-  x402Version: S.Number,
+  x402Version: Version,
   scheme: S.String,
   network: Network,
   extra: UnknownRecord.pipe(S.optional),

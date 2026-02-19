@@ -3,6 +3,7 @@ import { Schema as S } from "effect"
 
 import { Address } from "./Address.ts"
 import { Network } from "./Network.ts"
+import { Scheme } from "./Scheme.ts"
 
 export const Requirements = S.Struct({
   amount: S.String,
@@ -11,7 +12,7 @@ export const Requirements = S.Struct({
   maxTimeoutSeconds: S.Number,
   network: Network,
   payTo: Address,
-  scheme: S.Literal("exact"),
+  scheme: Scheme,
 })
 
 export const make = ({
