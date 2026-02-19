@@ -37,4 +37,4 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: pnpm dlx wrangler pages deploy dist --project-name=crosshatch-docs --branch=${{ steps.branch.outputs.name }}
+        run: pnpm wrangler pages deploy dist --project-name=crosshatch-docs --branch=${{ steps.branch.outputs.name }}

@@ -21,7 +21,7 @@ jobs:
       - run: pnpm build
       - run: pnpm build
         working-directory: examples/chat
-      - run: pnpm dlx wrangler deploy
+      - run: pnpm wrangler deploy
         working-directory: examples/chat
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

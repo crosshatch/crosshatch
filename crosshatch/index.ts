@@ -1,4 +1,6 @@
 export * from "./atoms.ts"
+export * from "./PublicApi.ts"
+export * from "./PublicApiClient.ts"
 export * from "./Bridge.ts"
 export * from "./BridgeClient.ts"
 export * from "./BridgeWorkerLive.ts"
