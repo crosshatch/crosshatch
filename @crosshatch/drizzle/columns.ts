@@ -1,5 +1,4 @@
 import { integer, numeric, type ReferenceConfig, text, timestamp, uuid } from "drizzle-orm/pg-core"
-import { Brand } from "effect"
 
 import { bytea } from "./custom_types.ts"
 
@@ -8,9 +7,6 @@ export const ref = <K extends string, F extends ReferenceConfig["ref"]>(
   f: F,
   a?: ReferenceConfig["config"] | undefined,
 ) => uuid(id).$type<ReturnType<F>["_"]["data"]>().references(f, a)
-
-export const brandedId = <B extends symbol>() =>
-  uuid("id").primaryKey().notNull().defaultRandom().$type<string & Brand.Brand<B>>()
 
 export const lastUsed = timestamp("last_used", {
   mode: "date",

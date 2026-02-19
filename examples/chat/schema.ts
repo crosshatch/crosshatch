@@ -1,9 +1,12 @@
-import { added, brandedId, ordinal, ref, updated } from "@crosshatch/drizzle"
+import { added, ordinal, ref, updated } from "@crosshatch/drizzle"
 import { Prompt } from "@effect/ai"
-import { customType, index, pgTable, text, vector } from "drizzle-orm/pg-core"
-import { Schema as S } from "effect"
+import { customType, index, pgTable, text, vector, uuid } from "drizzle-orm/pg-core"
+import { Schema as S, Brand } from "effect"
 
 import type { ChatIdTypeId, ChatItemIdTypeId, EmbeddingIdTypeId } from "./ids"
+
+const brandedId = <B extends symbol>() =>
+  uuid("id").primaryKey().notNull().defaultRandom().$type<string & Brand.Brand<B>>()
 
 export const chats = pgTable("chats", {
   id: brandedId<typeof ChatIdTypeId>(),
