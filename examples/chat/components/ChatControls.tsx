@@ -1,10 +1,9 @@
 import { Button } from "@crosshatch/ui/components/Button"
-import { Dialog, DialogContent, DialogTrigger } from "@crosshatch/ui/components/Dialog"
 import { Section, SectionInner } from "@crosshatch/ui/components/Section"
 import { Sus } from "@crosshatch/ui/components/Sus"
 import { Textarea } from "@crosshatch/ui/components/Textarea"
 import { useAtom, useAtomSet, useAtomValue } from "@effect-atom/atom-react"
-import { ArrowUp, PocketKnife } from "lucide-react"
+import { ArrowUp } from "lucide-react"
 import { useEffect, useRef } from "react"
 
 import { modelIdsAtom } from "@/atoms/ai_atoms"
@@ -47,14 +46,6 @@ export const ChatControls = () => {
             <Sus skeletonClassName="flex items-center gap-2 w-36 h-9 rounded-full">
               <ModelSelect />
             </Sus>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button size="icon" className="size-9 cursor-pointer rounded-full" variant="outline">
-                  <PocketKnife className="stroke-1" size={18} />
-                </Button>
-              </DialogTrigger>
-              <DialogContent>TODO</DialogContent>
-            </Dialog>
           </div>
           <Button
             onClick={() => (inflight ? inflight.abort() : sendMessage(chatId))}
