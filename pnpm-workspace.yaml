@@ -24,7 +24,6 @@ catalog:
   "@effect/sql-pg": ^0.50.3
   "@effect/vitest": ^0.27.0
   "@electric-sql/pglite": ^0.3.15
-  "@hono/node-server": ^1.19.9
   "@icons-pack/react-simple-icons": ^13.8.0
   "@noble/ciphers": ^2.1.1
   "@noble/curves": ^2.0.1
@@ -74,9 +73,7 @@ catalog:
   "@vitest/web-worker": ^3.2.4
   "@x402/core": ^2.3.0
   "@x402/evm": ^2.0.0
-  "@x402/hono": ^2.2.0
   "@x402/svm": ^2.0.0
-  ai: 6.0.42
   babel-plugin-react-compiler: ^1.0.0
   class-variance-authority: ^0.7.1
   date-fns: ^4.1.0
@@ -86,13 +83,11 @@ catalog:
   effect: ^3.19.17
   fake-indexeddb: ^6.2.5
   happy-dom: ^20.0.11
-  hono: ^4.11.5
   http-message-sig: ^0.1.0
   lucide-react: ^0.563.0
   markdown-to-jsx: ^9.7.3
   micro-key-producer: ^0.8.2
   next-themes: ^0.4.6
-  openai: ^6.18.0
   ox: ^0.10.5
   oxlint: ^1.48.0
   oxfmt: ^0.32.0
