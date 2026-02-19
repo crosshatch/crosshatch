@@ -1,4 +1,4 @@
-import packageJson from "crosshatch/package.json" with { type: "json" }
+import PackageJson from "crosshatch/package.json" with { type: "json" }
 import { defineConfig } from "vocs"
 
 export default defineConfig({
@@ -12,7 +12,7 @@ export default defineConfig({
   },
   baseUrl: "https://docs.crosshatch.dev",
   blogDir: "./articles",
-  description: packageJson.description,
+  description: PackageJson.description,
   editLink: {
     pattern: "https://github.com/crosshatch/crosshatch/edit/main/docs/pages/:path",
     text: "Edit on GitHub",
