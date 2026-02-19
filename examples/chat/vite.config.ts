@@ -31,6 +31,10 @@ export default defineConfig({
       "@electric-sql/pglite/worker",
       "tiktoken/lite",
     ],
+    include: [
+      "@effect-atom/atom",
+      "@effect-atom/atom-react",
+    ],
   },
   plugins: [
     migrations(),
@@ -59,6 +63,7 @@ export default defineConfig({
       "@/migrations": "virtual:chat-migrations",
       "@": fileURLToPath(new URL(".", import.meta.url)),
     },
+    dedupe: ["react", "react-dom"],
   },
   server: {
     allowedHosts: ["local.crosshatch.chat", "local.crosshatch.dev"],
