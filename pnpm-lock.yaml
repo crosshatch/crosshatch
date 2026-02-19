@@ -10,8 +10,8 @@ catalogs:
       specifier: ^1.25.0
       version: 1.25.2
     '@crosshatch/repo-util':
-      specifier: ^0.1.4
-      version: 0.1.4
+      specifier: ^0.2.1
+      version: 0.2.1
     '@effect-atom/atom':
       specifier: ^0.5.2
       version: 0.5.2
@@ -248,7 +248,7 @@ importers:
         version: 2.29.8(@types/node@25.3.0)
       '@crosshatch/repo-util':
         specifier: 'catalog:'
-        version: 0.1.4(b03b72a059d522bb491b9a7723be2e13)
+        version: 0.2.1(2e1f7c57df5677331a9a42e55533b4a4)
       '@effect/language-service':
         specifier: 'catalog:'
         version: 0.73.0
@@ -967,13 +967,14 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@crosshatch/repo-util@0.1.4':
-    resolution: {integrity: sha512-rowGNJ2sdlpzE5+vDiXuwY9pfYpRheT+AEskqldxel/6oIrJz2SvwWY9DF7suM3oMdwfzqcu7dPaIw9FFzwTMg==}
+  '@crosshatch/repo-util@0.2.1':
+    resolution: {integrity: sha512-/VapwIOotjIVXd27mQN236JTvn/tf0ePWffIZxDv5er5C6DgBAzS5o/IgkYX1OzUi1lL0vsQk7VardEi6FGwJg==}
     hasBin: true
     peerDependencies:
       '@effect/cli': ^0.73.1
       '@effect/platform': ^0.94.3
       '@effect/platform-node': ^0.104.1
+      diff: ^8.0.3
       effect: 3.19.18
       yaml: ^2.8.2
 
@@ -7304,11 +7305,12 @@ snapshots:
   '@cloudflare/workerd-windows-64@1.20260219.0':
     optional: true
 
-  '@crosshatch/repo-util@0.1.4(b03b72a059d522bb491b9a7723be2e13)':
+  '@crosshatch/repo-util@0.2.1(2e1f7c57df5677331a9a42e55533b4a4)':
     dependencies:
       '@effect/cli': 0.73.2(@effect/platform@0.94.5(effect@3.19.18))(@effect/printer-ansi@0.47.0(@effect/typeclass@0.38.0(effect@3.19.18))(effect@3.19.18))(@effect/printer@0.47.0(@effect/typeclass@0.38.0(effect@3.19.18))(effect@3.19.18))(effect@3.19.18)
       '@effect/platform': 0.94.5(effect@3.19.18)
       '@effect/platform-node': 0.104.1(@effect/cluster@0.56.4(@effect/platform@0.94.5(effect@3.19.18))(@effect/rpc@0.73.2(@effect/platform@0.94.5(effect@3.19.18))(effect@3.19.18))(@effect/sql@0.49.0(@effect/experimental@0.58.0(@effect/platform@0.94.5(effect@3.19.18))(effect@3.19.18))(@effect/platform@0.94.5(effect@3.19.18))(effect@3.19.18))(@effect/workflow@0.16.0(@effect/experimental@0.58.0(@effect/platform@0.94.5(effect@3.19.18))(effect@3.19.18))(@effect/platform@0.94.5(effect@3.19.18))(@effect/rpc@0.73.2(@effect/platform@0.94.5(effect@3.19.18))(effect@3.19.18))(effect@3.19.18))(effect@3.19.18))(@effect/platform@0.94.5(effect@3.19.18))(@effect/rpc@0.73.2(@effect/platform@0.94.5(effect@3.19.18))(effect@3.19.18))(@effect/sql@0.49.0(@effect/experimental@0.58.0(@effect/platform@0.94.5(effect@3.19.18))(effect@3.19.18))(@effect/platform@0.94.5(effect@3.19.18))(effect@3.19.18))(effect@3.19.18)
+      diff: 8.0.3
       effect: 3.19.18
       yaml: 2.8.2
 
