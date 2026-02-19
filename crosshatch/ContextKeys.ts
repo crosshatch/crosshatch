@@ -1,8 +1,6 @@
 import { prefixedKeys } from "@crosshatch/util/prefixedKeys"
 
-import packageJson from "./package.json" with { type: "json" }
-
-export const ContextKeys = prefixedKeys(packageJson.name, {
+export const ContextKeys = prefixedKeys("crosshatch", {
   BridgeClient: true,
   CrosshatchEnv: true,
   PublicClient: true,

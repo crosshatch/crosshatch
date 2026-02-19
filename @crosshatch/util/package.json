@@ -19,8 +19,7 @@
     "./*": {
       "types": "./*.ts",
       "default": "./dist/*.js"
-    },
-    "./package.json": "./package.json"
+    }
   },
   "peerDependencies": {
     "@effect-atom/atom": "catalog:",

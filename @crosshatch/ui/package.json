@@ -20,7 +20,6 @@
       "types": "./*.ts",
       "import": "./dist/*.js"
     },
-    "./package.json": "./package.json",
     "./styles": "./styles.css"
   },
   "peerDependencies": {

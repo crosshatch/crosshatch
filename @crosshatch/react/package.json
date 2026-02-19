@@ -23,8 +23,7 @@
     "./*": {
       "types": "./*.ts",
       "import": "./dist/*.js"
-    },
-    "./package.json": "./package.json"
+    }
   },
   "peerDependencies": {
     "@crosshatch/ui": "workspace:*",

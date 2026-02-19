@@ -17,8 +17,7 @@
   "sideEffects": false,
   "exports": {
     ".": "./index.ts",
-    "./*": "./*.ts",
-    "./package.json": "./package.json"
+    "./*": "./*.ts"
   },
   "peerDependencies": {
     "@crosshatch/util": "workspace:*",

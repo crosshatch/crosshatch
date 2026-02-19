@@ -5,10 +5,10 @@ import { Schema as S } from "effect"
 export const FirecrawlToolkit = Toolkit.make(
   Tool.make("FirecrawlSearch", {
     description: dedent`
-    Search the web using Firecrawl. Returns titles, URLs, and descriptions.
-    Use FirecrawlScrape to get the full markdown content of a specific URL.
-    Use a limit of 5 unless otherwise specified.
-  `,
+      Search the web using Firecrawl. Returns titles, URLs, and descriptions.
+      Use FirecrawlScrape to get the full markdown content of a specific URL.
+      Use a limit of 5 unless otherwise specified.
+    `,
     parameters: {
       limit: S.Number,
       query: S.String,
