@@ -1,10 +1,9 @@
 import { Button } from "@crosshatch/ui/components/Button"
 import { Sidebar, SidebarInset, SidebarProvider, useSidebar } from "@crosshatch/ui/components/Sidebar"
-import { CrosshatchIcon } from "@crosshatch/ui/icons"
 import { useAtomSet } from "@effect-atom/atom-react"
 import { createRootRoute, Outlet } from "@tanstack/react-router"
 import { openSessionWidgetAtom } from "crosshatch"
-import { PanelLeftIcon } from "lucide-react"
+import { PanelLeftIcon, WalletMinimal } from "lucide-react"
 import { ThemeProvider } from "next-themes"
 
 import { ChatControls } from "@/components/ChatControls"
@@ -55,7 +54,7 @@ const Header = () => {
         <span className="sr-only">Toggle Sidebar</span>
       </Button>
       <Button size="icon" className="size-11" variant="outline" onClick={() => sessionButtonOnClick()}>
-        <CrosshatchIcon className="size-7 stroke-1" />
+        <WalletMinimal className="size-7 stroke-1" />
       </Button>
     </header>
   )
