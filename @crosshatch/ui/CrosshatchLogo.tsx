@@ -1,19 +1,7 @@
 import type React from "react"
 
-export interface CrosshatchLogoProps extends React.SVGProps<SVGSVGElement> {
-  size?: number | string | undefined
-}
-
-export const CrosshatchLogo: React.FC<CrosshatchLogoProps> = ({ size, width, height, ...props }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 100 86.6"
-    width={size ?? width}
-    height={size ? undefined : height}
-    role="img"
-    aria-label="Crosshatch"
-    {...props}
-  >
+export const CrosshatchLogo: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 86.6" role="img" aria-label="Crosshatch" {...props}>
     <title>Crosshatch</title>
     <path d="M50 0L60.25 17.91L21.29 86.6H0Z" fill="#0C456B" />
     <path d="M60.25 17.91L50.05 35.7L79.47 86.6H100Z" fill="#1771B7" />
