@@ -5,7 +5,7 @@ import { added, updated } from "./columns.ts"
 
 export type ColumnsConfig<A> = {
   [K in Exclude<keyof A, "id" | "added" | "updated">]: AnyPgColumnBuilder & {
-    readonly [PgColumnBuilderBrand]: { data: any } | { $type: any } // TODO: constrain again
+    readonly [PgColumnBuilderBrand]: { data: A[K] } | { $type: A[K] }
   }
 }
 

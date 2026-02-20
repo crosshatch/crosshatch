@@ -49,7 +49,7 @@ export const taggedUnionColumns = <
   tagEnum: PgEnum<[A["_tag"]]>,
   columns: C,
 ) => ({
-  _tag: tagEnum("_tag"),
+  _tag: tagEnum("_tag").notNull(),
   ...columnsCommon<A>(),
   ...columns,
 })
