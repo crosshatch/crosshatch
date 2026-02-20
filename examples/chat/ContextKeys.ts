@@ -1,6 +1,6 @@
-import { prefixedKeys } from "@crosshatch/util/prefixedKeys"
+import { prefixLookup } from "@crosshatch/util/prefix"
 
-export const ContextKeys = prefixedKeys("crosshatch.chat", {
+export const ContextKeys = prefixLookup("crosshatch.chat", {
   CrosshatchChatEnv: true,
   Drizzle: true,
 })

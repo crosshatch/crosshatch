@@ -1,5 +1,6 @@
 import { Effect, Option, Schema as S, Stream } from "effect"
 
+import { Introduction, RequestIntroduction } from "./cross_origin.ts"
 import { getParentContext } from "./getParentContext.ts"
 
 const DEFAULT_SANDBOX = "allow-scripts allow-same-origin allow-popups allow-forms"
@@ -13,14 +14,6 @@ const DEFAULT_ALLOW = [
 ].join("; ")
 
 let currentZ = 100
-
-export class Introduction extends S.TaggedClass<Introduction>()("Introduction", {}) {
-  static decodeOption = S.decodeUnknownOption(this)
-}
-
-export class RequestIntroduction extends S.TaggedClass<RequestIntroduction>()("RequestIntroduction", {}) {
-  static decodeOption = S.decodeUnknownOption(this)
-}
 
 export class Ready extends S.TaggedClass<Ready>()("Ready", {}) {
   static is = S.is(this)

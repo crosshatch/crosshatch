@@ -1,4 +1,3 @@
-import * as Widget from "@crosshatch/util/Widget"
 import { BrowserWorker } from "@effect/platform-browser"
 import { Deferred, Effect, Layer, Option, Schema as S } from "effect"
 
@@ -28,14 +27,6 @@ export const BridgeWorkerLive = Effect.gen(function* () {
       removeEventListener("message", f)
     }
   })
-  const contextReady = Promise.withResolvers<void>()
-  addEventListener("message", async function f({ data, origin }: MessageEvent) {
-    if (env.isCrosshatch(origin) && Option.isSome(Widget.RequestIntroduction.decodeOption(data))) {
-      await contextReady.promise
-      context.postMessage(new Widget.Introduction(), "*")
-      removeEventListener("message", f)
-    }
-  })
   const iframe = document.createElement("iframe")
   Object.assign(iframe, {
     height: 1,
@@ -47,7 +38,6 @@ export const BridgeWorkerLive = Effect.gen(function* () {
   document.body.appendChild(iframe)
   yield* Deferred.await(bridgeReady)
   const context = yield* Effect.fromNullable(iframe.contentWindow)
-  contextReady.resolve()
   const channel = new MessageChannel()
   context.postMessage(new AppReady(), "*", [channel.port2])
   return BrowserWorker.layerPlatform(() => channel.port1)
