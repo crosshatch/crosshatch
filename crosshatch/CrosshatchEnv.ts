@@ -2,6 +2,9 @@ import { Config, Context, Effect, Layer } from "effect"
 
 import { ContextKeys } from "./ContextKeys.ts"
 
+// TODO: don't expose
+export const makeDomain = (dev: boolean) => `${dev ? "local." : ""}crosshatch.dev`
+
 export class CrosshatchEnv extends Context.Tag(ContextKeys.CrosshatchEnv)<
   CrosshatchEnv,
   {
@@ -14,7 +17,7 @@ export class CrosshatchEnv extends Context.Tag(ContextKeys.CrosshatchEnv)<
 >() {
   static readonly layer = Effect.gen(function* () {
     const dev = yield* Config.boolean("DEV").pipe(Config.withDefault(true))
-    const domain = `${dev ? "local." : ""}crosshatch.dev`
+    const domain = makeDomain(dev)
     const url = `https://${domain}`
     return {
       dev,
