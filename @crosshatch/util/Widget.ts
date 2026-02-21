@@ -121,11 +121,4 @@ export const popup = <A, I>({ src, event: schema }: WidgetConfig<A, I>) =>
     )
   })
 
-export const closeSelf = (redirect?: string | undefined) => {
-  const parentContext = getParentContext()
-  if (parentContext) {
-    parent.postMessage(new Close(), "*")
-  } else if (redirect) {
-    location.href = redirect
-  }
-}
+export const closeSelf = () => getParentContext().postMessage(new Close(), "*")

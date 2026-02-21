@@ -20,7 +20,7 @@ export const openSessionWidgetAtom = atomRuntime.fn<void>()(
     const linkState = yield* get.result(linkStateAtom)
     switch (linkState._tag) {
       case "Anonymous": {
-        if (isCrosshatch(origin)) {
+        if (isCrosshatch(location.origin)) {
           return yield* IdWidget.stream({
             referrer: location.href,
           }).pipe(Stream.runDrain)
