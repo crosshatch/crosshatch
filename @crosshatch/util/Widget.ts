@@ -121,4 +121,4 @@ export const popup = <A, I>({ src, event: schema }: WidgetConfig<A, I>) =>
     )
   })
 
-export const closeSelf = () => getParentContext().postMessage(new Close(), "*")
+export const closeSelf = () => getParentContext()?.postMessage(new Close(), "*")
