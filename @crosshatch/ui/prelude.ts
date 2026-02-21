@@ -3,7 +3,7 @@ import { resolveEnv } from "@crosshatch/util/resolveEnv"
 import { Atom } from "@effect-atom/atom-react"
 import { Layer, Logger, LogLevel, ConfigProvider } from "effect"
 
-const PreludeLive = Layer.mergeAll(Logger.pretty, Logger.minimumLogLevel(LogLevel.Debug)).pipe(
+const PreludeLive = Layer.mergeAll(Logger.pretty, Logger.minimumLogLevel(LogLevel.All)).pipe(
   Layer.provideMerge(Layer.setConfigProvider(ConfigProvider.fromJson(resolveEnv()))),
 )
 
