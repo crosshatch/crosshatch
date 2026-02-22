@@ -63,7 +63,15 @@ export default defineConfig({
       "@/migrations": "virtual:chat-migrations",
       "@": fileURLToPath(new URL(".", import.meta.url)),
     },
-    dedupe: ["react", "react-dom"],
+    dedupe: [
+      "react",
+      "react-dom",
+      "effect",
+      "@effect-atom/atom",
+      "@effect-atom/atom-react",
+      "@crosshatch/util",
+      "crosshatch",
+    ],
   },
   server: {
     allowedHosts: ["local.crosshatch.chat", "local.crosshatch.dev"],
