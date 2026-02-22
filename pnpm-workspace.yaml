@@ -95,6 +95,8 @@ catalog:
   postgres: ^3.4.7
   react: ^19.2.4
   react-dom: ^19.2.4
+  react-day-picker: ^9.13.2
+  recharts: ^3.7.0
   shiki: ^3.22.0
   streamdown: ^2.1.0
   stripe: 20.3.0

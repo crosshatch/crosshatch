@@ -1,4 +1,5 @@
 export * as Address from "./Address.ts"
+export * as StandardExtra from "./StandardExtra.ts"
 export * as Version from "./Version.ts"
 export * as Asset from "./Asset.ts"
 export * as Tx from "./Tx.ts"

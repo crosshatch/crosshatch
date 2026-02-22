@@ -19,16 +19,19 @@ export const make = ({
   recipient,
   amount,
   timeout,
+  extra,
 }: {
   recipient: typeof Address.Type
   amount: string
   timeout?: number | undefined
+  extra?: typeof UnknownRecord.Type
 }): typeof Requirements.Type => ({
   amount,
   asset: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
   extra: {
     name: "USDC",
     version: "2",
+    ...extra,
   },
   maxTimeoutSeconds: timeout ?? 60,
   network: `eip155:8453`,

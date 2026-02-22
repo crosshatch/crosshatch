@@ -183,6 +183,9 @@ catalogs:
     oxlint:
       specifier: ^1.49.0
       version: 1.49.0
+    react-day-picker:
+      specifier: ^9.13.2
+      version: 9.13.2
     shiki:
       specifier: ^3.22.0
       version: 3.22.0
@@ -459,6 +462,9 @@ importers:
       react:
         specifier: ^19.2.4
         version: 19.2.4
+      react-day-picker:
+        specifier: 'catalog:'
+        version: 9.13.2(react@19.2.4)
       shiki:
         specifier: 'catalog:'
         version: 3.22.0
@@ -559,6 +565,9 @@ importers:
       '@crosshatch/util':
         specifier: workspace:*
         version: link:../../@crosshatch/util
+      '@effect-atom/atom':
+        specifier: 'catalog:'
+        version: 0.5.2(@effect/experimental@0.58.0(@effect/platform@0.94.5(effect@3.19.18))(effect@3.19.18))(@effect/platform@0.94.5(effect@3.19.18))(@effect/rpc@0.73.2(@effect/platform@0.94.5(effect@3.19.18))(effect@3.19.18))(effect@3.19.18)
       '@effect-atom/atom-react':
         specifier: 'catalog:'
         version: 0.5.0(@effect/experimental@0.58.0(@effect/platform@0.94.5(effect@3.19.18))(effect@3.19.18))(@effect/platform@0.94.5(effect@3.19.18))(@effect/rpc@0.73.2(@effect/platform@0.94.5(effect@3.19.18))(effect@3.19.18))(effect@3.19.18)(react@19.2.4)(scheduler@0.27.0)
@@ -987,6 +996,9 @@ packages:
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
     engines: {node: '>=12'}
+
+  '@date-fns/tz@1.4.1':
+    resolution: {integrity: sha512-P5LUNhtbj6YfI3iJjw5EL9eUAG6OitD0W3fWQcpQjDRc/QIsL0tRNuO1PcDvPccWL1fSTXXdE1ds+l95DV/OFA==}
 
   '@drizzle-team/brocli@0.11.0':
     resolution: {integrity: sha512-hD3pekGiPg0WPCCGAZmusBBJsDqGUR66Y452YgQsZOnkdQ7ViEPKuyP4huUGEZQefp8g34RRodXYmJ2TbCH+tg==}
@@ -4035,6 +4047,9 @@ packages:
   dagre-d3-es@7.0.13:
     resolution: {integrity: sha512-efEhnxpSuwpYOKRm/L5KbqoZmNNukHa/Flty4Wp62JRvgH2ojwVgPgdYyr4twpieZnyRDdIH7PY2mopX26+j2Q==}
 
+  date-fns-jalali@4.1.0-0:
+    resolution: {integrity: sha512-hTIP/z+t+qKwBDcmmsnmjWTduxCg+5KfdqWQvb2X/8C9+knYY6epN/pfxdDuyVlSVeFz0sM5eEfwIUQ70U4ckg==}
+
   date-fns@4.1.0:
     resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
 
@@ -5864,6 +5879,12 @@ packages:
     resolution: {integrity: sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==}
     engines: {node: '>= 0.6'}
 
+  react-day-picker@9.13.2:
+    resolution: {integrity: sha512-IMPiXfXVIAuR5Yk58DDPBC8QKClrhdXV+Tr/alBrwrHUw0qDDYB1m5zPNuTnnPIr/gmJ4ChMxmtqPdxm8+R4Eg==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      react: ^19.2.4
+
   react-dom@19.2.4:
     resolution: {integrity: sha512-AXJdLo8kgMbimY95O2aKQqsz2iWi9jMgKJhRBAxECE4IFxfcazB2LmzloIoibJI3C12IlY20+KFaLv+71bUJeQ==}
     peerDependencies:
@@ -7323,6 +7344,8 @@ snapshots:
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
+
+  '@date-fns/tz@1.4.1': {}
 
   '@drizzle-team/brocli@0.11.0': {}
 
@@ -10274,6 +10297,8 @@ snapshots:
       d3: 7.9.0
       lodash-es: 4.17.23
 
+  date-fns-jalali@4.1.0-0: {}
+
   date-fns@4.1.0: {}
 
   dayjs@1.11.19: {}
@@ -12386,6 +12411,13 @@ snapshots:
       '@types/react-dom': 19.2.3(@types/react@19.2.14)
 
   range-parser@1.2.1: {}
+
+  react-day-picker@9.13.2(react@19.2.4):
+    dependencies:
+      '@date-fns/tz': 1.4.1
+      date-fns: 4.1.0
+      date-fns-jalali: 4.1.0-0
+      react: 19.2.4
 
   react-dom@19.2.4(react@19.2.4):
     dependencies:

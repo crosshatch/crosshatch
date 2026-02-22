@@ -11,7 +11,7 @@ export const Required = S.Struct({
   accepts: Accepts,
   error: S.String.pipe(S.optional),
   extensions: UnknownRecord.pipe(S.optional),
-  resource: ResourceInfo.pipe(S.optional),
+  resource: ResourceInfo,
   x402Version: Version,
 })
 
@@ -20,7 +20,7 @@ export const make = ({
   resource,
 }: {
   accepts: typeof Accepts.Type
-  resource?: typeof ResourceInfo.Type | undefined
+  resource: typeof ResourceInfo.Type
 }): typeof Required.Type => ({
   accepts,
   resource,

@@ -57,6 +57,8 @@
     "markdown-to-jsx": "catalog:",
     "next-themes": "catalog:",
     "react": "catalog:",
+    "react-day-picker": "catalog:",
+    "recharts": "catalog:",
     "shiki": "catalog:",
     "sonner": "catalog:",
     "tailwind-merge": "catalog:",
