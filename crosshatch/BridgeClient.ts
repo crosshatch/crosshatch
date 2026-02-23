@@ -5,10 +5,10 @@ import { Layer } from "effect"
 
 import { Bridge } from "./Bridge.ts"
 import { BridgeWorkerLive } from "./BridgeWorkerLive.ts"
-import { ContextKeys } from "./ContextKeys.ts"
 import { CrosshatchEnv } from "./CrosshatchEnv.ts"
+import { tag } from "./tag.ts"
 
-export class BridgeClient extends AtomRpc.Tag<BridgeClient>()(ContextKeys.BridgeClient, {
+export class BridgeClient extends AtomRpc.Tag<BridgeClient>()(tag("BridgeClient"), {
   group: Bridge,
   protocol: RpcClient.layerProtocolWorker({ size: 1 }).pipe(
     Layer.provide(BridgeWorkerLive.pipe(Layer.provide(CrosshatchEnv.layer))),

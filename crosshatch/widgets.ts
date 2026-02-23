@@ -1,5 +1,5 @@
 import { access } from "@crosshatch/util/unwrapping"
-import * as Widget from "@crosshatch/util/Widget"
+import { embed } from "@crosshatch/util/widget/embed"
 import { UrlParams } from "@effect/platform"
 import { Effect, flow, Option, Schema as S, Stream } from "effect"
 
@@ -27,14 +27,8 @@ const widget = <A, I extends UrlParams.Input, A2, I2>({
         }),
       ),
       access("href"),
-      Effect.map(
-        (src) =>
-          ({
-            event,
-            src,
-          }) satisfies Widget.WidgetConfig<A2, I2>,
-      ),
-      Effect.map(Widget.embed),
+      Effect.map((src) => ({ event, src })),
+      Effect.map(embed),
       Stream.unwrap,
     ),
   }

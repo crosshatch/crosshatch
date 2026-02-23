@@ -5,22 +5,22 @@ import { PGliteWorker } from "@electric-sql/pglite/worker"
 import { drizzle } from "drizzle-orm/pglite"
 import { Effect, Stream, Data } from "effect"
 
-import { ContextKeys } from "./ContextKeys.ts"
+// oxlint-disable-next-line import/default
+import PgWorker from "./PgWorker.ts?worker"
 import { relations } from "./relations.ts"
 import * as schema from "./schema.ts"
-// oxlint-disable-next-line import/default
-import worker from "./pg-worker.ts?worker"
+import { tag } from "./tag.ts"
 
 export class PgliteClient extends Effect.Service<PgliteClient>()("@crosshatch/PgliteClient", {
   scoped: Effect.gen(function* () {
-    const client = yield* Effect.tryPromise(() => PGliteWorker.create(new worker(), { extensions: { live } }))
+    const client = yield* Effect.tryPromise(() => PGliteWorker.create(new PgWorker(), { extensions: { live } }))
     yield* Effect.addFinalizer(() => Effect.promise(() => client.close()))
     yield* Effect.tryPromise(() => client.waitReady)
     return client
   }),
 }) {}
 
-export class Drizzle extends Effect.Service<Drizzle>()(ContextKeys.Drizzle, {
+export class Drizzle extends Effect.Service<Drizzle>()(tag("Drizzle"), {
   scoped: Effect.gen(function* () {
     const pg = yield* PgliteClient
     return drizzle({

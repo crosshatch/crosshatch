@@ -1,8 +1,8 @@
 import { Config, Context, Effect, Layer } from "effect"
 
-import { ContextKeys } from "./ContextKeys.ts"
+import { tag } from "./tag.ts"
 
-export class CrosshatchChatEnv extends Context.Tag(ContextKeys.CrosshatchChatEnv)<
+export class CrosshatchChatEnv extends Context.Tag(tag("CrosshatchChatEnv"))<
   CrosshatchChatEnv,
   {
     readonly dev: boolean
