@@ -22,7 +22,7 @@ export const getOrUndefined = () => {
 
 export class Origin extends Context.Tag(tag("ParentContextOrigin"))<Origin, string | undefined>() {}
 
-export const layerOrigin = Effect.gen(function* () {
+export const OriginLive = Effect.gen(function* () {
   const parentContext = getOrUndefined()
   if (parentContext) {
     const deferred = yield* Deferred.make<string>()

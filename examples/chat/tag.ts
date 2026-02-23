@@ -1,3 +1,3 @@
 import { TagScope } from "@crosshatch/util/TagScope"
 
-export const tag = TagScope("crosshatch.chat:")
+export const tag = TagScope("crosshatch.chat")

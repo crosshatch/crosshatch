@@ -1,44 +1,38 @@
 import { Atom } from "@effect-atom/atom"
-import { Effect, Stream } from "effect"
+import { Effect, Stream, Option } from "effect"
 
 import { BridgeClient } from "./BridgeClient.ts"
 import { CrosshatchEnv } from "./CrosshatchEnv.ts"
 import { atomRuntime } from "./runtime.ts"
 import { EventsWidget, IdWidget, LinkWidget } from "./widgets.ts"
 
-export const linkStateAtom = BridgeClient.query("status", void 0)
+export const challengeIdAtom = BridgeClient.query("GetChallenge", void 0)
 
-export const isLinkedAtom = linkStateAtom.pipe(Atom.mapResult(({ _tag }) => _tag === "Linked"))
+export const isLinkedAtom = challengeIdAtom.pipe(Atom.mapResult(Option.isNone))
 
-export const unlinkAtom = BridgeClient.mutation("unlink")
+export const unlinkAtom = BridgeClient.mutation("Unlink")
 
-export const proposeAtom = BridgeClient.mutation("propose")
+export const proposeAtom = BridgeClient.mutation("Propose")
 
 export const openSessionWidgetAtom = atomRuntime.fn<void>()(
   Effect.fn(function* (_, get) {
     const { isCrosshatch } = yield* CrosshatchEnv
-    const linkState = yield* get.result(linkStateAtom)
-    switch (linkState._tag) {
-      case "Anonymous": {
+    const challengeId = yield* get.result(challengeIdAtom)
+    const common = { referrer: location.href }
+    const widgetStream = Option.match(challengeId, {
+      onSome: (id) => {
         if (isCrosshatch(location.origin)) {
-          return yield* IdWidget.stream({
-            referrer: location.href,
-          }).pipe(Stream.runDrain)
-        } else {
-          const { challengeId } = linkState
-          return yield* LinkWidget.stream({
-            amount: 10,
-            id: challengeId,
-            referrer: location.href,
-            window: "Week",
-          }).pipe(Stream.runDrain)
+          return IdWidget.stream(common)
         }
-      }
-      case "Linked": {
-        return yield* EventsWidget.stream({
-          referrer: location.href,
-        }).pipe(Stream.runDrain)
-      }
-    }
+        return LinkWidget.stream({
+          amount: 10,
+          id,
+          window: "Week",
+          ...common,
+        })
+      },
+      onNone: () => EventsWidget.stream(common),
+    })
+    yield* widgetStream.pipe(Stream.runDrain)
   }),
 )
