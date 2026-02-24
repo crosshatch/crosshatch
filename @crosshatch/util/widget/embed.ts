@@ -1,7 +1,7 @@
 import { Effect, Option, Schema as S, Stream } from "effect"
 
 import * as ParentContext from "../ParentContext.ts"
-import { Close, type WidgetConfig } from "./self.ts"
+import { Finished, type WidgetConfig } from "./self.ts"
 
 const DEFAULT_SANDBOX = "allow-scripts allow-same-origin allow-popups allow-forms"
 const DEFAULT_ALLOW = [
@@ -34,15 +34,15 @@ export const embed = <A, I>({ src, event }: WidgetConfig<A, I>) =>
         "message",
         async ({ data, origin }) => {
           if (origin === expectedOrigin) {
-            if (Option.isSome(ParentContext.RequestIntroduction.decodeOption(data))) {
-              iframe.contentWindow?.postMessage(new ParentContext.Introduction(), origin)
+            if (S.is(ParentContext.RequestIntroduction)(data)) {
+              iframe.contentWindow?.postMessage(ParentContext.Introduction.make(), origin)
             }
             const option = decodeOption(data)
             if (option._tag === "Some") {
               const { value } = option
               emit.single(value)
             }
-            if (Option.isSome(Close.decodeOption(data))) end()
+            if (Option.isSome(Finished.decodeOption(data))) end()
           }
         },
         { signal },
