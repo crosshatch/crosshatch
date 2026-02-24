@@ -1,5 +1,6 @@
+import { Finished } from "@crosshatch/util/widget/self"
 import { Atom } from "@effect-atom/atom"
-import { Effect, Stream, Option, Scope, Exit } from "effect"
+import { Effect, Stream, Option, Schema as S } from "effect"
 
 import { CrosshatchEnv } from "./CrosshatchEnv.ts"
 import { FacadeClient } from "./FacadeClient.ts"
@@ -19,7 +20,7 @@ export const openSessionWidgetAtom = atomRuntime.fn<void>()(
     const { isCrosshatch } = yield* CrosshatchEnv
     const challengeId = yield* get.result(challengeIdAtom)
     const common = { referrer: location.href }
-    const widgetStream = Option.match(challengeId, {
+    const stream = Option.match(challengeId, {
       onSome: (id) =>
         isCrosshatch(location.origin)
           ? IdWidget.stream(common)
@@ -31,17 +32,6 @@ export const openSessionWidgetAtom = atomRuntime.fn<void>()(
             }),
       onNone: () => EventsWidget.stream(common),
     })
-    const scope = yield* Scope.make()
-    yield* widgetStream.pipe(
-      Stream.runForEach(
-        Effect.fn(function* (item) {
-          if (item._tag === "Finished") {
-            yield* Scope.close(scope, Exit.succeed(undefined))
-          }
-        }),
-      ),
-      Effect.forkScoped,
-      Scope.extend(scope),
-    )
+    yield* stream.pipe(Stream.takeUntil(S.is(Finished)), Stream.runDrain)
   }),
 )

@@ -37,15 +37,14 @@ export const makeFetch =
         }[decision._tag]
         const scope = yield* Scope.make()
         yield* widget.stream(decision as never).pipe(
-          Stream.tap(
+          Stream.runForEach(
             Effect.fn(function* (item) {
               if (item._tag === "Finished") {
                 yield* Scope.close(scope, Exit.succeed(undefined))
               }
             }),
           ),
-          Stream.runDrain,
-          Scope.extend(scope),
+          Scope.use(scope),
         )
         decision = yield* bridge("Propose", { required })
       }

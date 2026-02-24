@@ -46,6 +46,7 @@ export const embed = <A, I>({ src, item = S.Never as never }: WidgetConfig<A, I>
           document.body.removeChild(iframe)
         }),
       )
+      console.log("INITIALIZING")
       Object.assign(iframe, {
         sandbox: DEFAULT_SANDBOX,
         allow: DEFAULT_ALLOW,
