@@ -5,7 +5,7 @@ import { uuid_ossp } from "@electric-sql/pglite/contrib/uuid_ossp"
 import { vector } from "@electric-sql/pglite/vector"
 import { worker as worker_ } from "@electric-sql/pglite/worker"
 import { Effect } from "effect"
-import "@crosshatch/ui/prelude"
+
 import migrations from "@/migrations"
 
 const MIGRATIONS = "_migrations"

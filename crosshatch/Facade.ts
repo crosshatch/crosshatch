@@ -6,7 +6,7 @@ import { LinkChallengeId } from "./LinkChallenge.ts"
 import { Payload } from "./X402/Payload.ts"
 import { Required } from "./X402/Required.ts"
 
-export class Bridge extends RpcGroup.make(
+export class Facade extends RpcGroup.make(
   Rpc.make("GetChallenge", {
     success: S.Option(LinkChallengeId),
   }),

@@ -1,12 +1,14 @@
-import { Effect, Option, Schema as S, Stream } from "effect"
+// TODO: refactor
+import { Effect, Schema as S, Stream } from "effect"
+
+import type { WidgetConfig } from "./self.ts"
 
 import * as ParentContext from "../ParentContext.ts"
-import { type WidgetConfig, Finished } from "./self.ts"
 
-export const popup = <A, I>({ src, event: schema }: WidgetConfig<A, I>) =>
+export const popup = <A, I>({ src, item = S.Never as never }: WidgetConfig<A, I>) =>
   Stream.asyncScoped<A>((emit) => {
     const { origin: expectedOrigin } = new URL(src)
-    const decodeOption = S.decodeUnknownOption(schema)
+    const decodeOption = S.decodeUnknownOption(item)
     const controller = new AbortController()
     const { signal } = controller
     const timeout = setInterval(async () => {
@@ -27,10 +29,6 @@ export const popup = <A, I>({ src, event: schema }: WidgetConfig<A, I>) =>
           if (option._tag === "Some") {
             const { value } = option
             emit.single(value)
-          }
-          if (Option.isSome(Finished.decodeOption(data))) {
-            controller.abort()
-            await emit.end()
           }
         }
       },

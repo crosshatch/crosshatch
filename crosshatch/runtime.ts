@@ -2,10 +2,10 @@ import { memoMap, runtime } from "@crosshatch/util/memoMap"
 import { resolveEnv } from "@crosshatch/util/resolveEnv"
 import { ConfigProvider, Layer, ManagedRuntime } from "effect"
 
-import { BridgeClient } from "./BridgeClient.ts"
 import { CrosshatchEnv } from "./CrosshatchEnv.ts"
+import { FacadeClient } from "./FacadeClient.ts"
 
-const CommonLive = Layer.mergeAll(BridgeClient.layer, CrosshatchEnv.layer).pipe(
+const CommonLive = Layer.mergeAll(FacadeClient.layer, CrosshatchEnv.layer).pipe(
   Layer.provide(Layer.setConfigProvider(ConfigProvider.fromJson(resolveEnv()))),
 )
 export const atomRuntime = runtime(CommonLive)

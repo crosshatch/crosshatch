@@ -1,5 +1,6 @@
 import { access } from "@crosshatch/util/unwrapping"
 import { embed } from "@crosshatch/util/widget/embed"
+import { Finished } from "@crosshatch/util/widget/self"
 import { UrlParams } from "@effect/platform"
 import { Effect, flow, Option, Schema as S, Stream } from "effect"
 
@@ -7,14 +8,14 @@ import { CrosshatchEnv } from "./CrosshatchEnv.ts"
 import { AccountFrozen, Escalation, InsufficientFunds } from "./DeclinedDecision.ts"
 import { LinkChallengeId } from "./LinkChallenge.ts"
 
-const widget = <A, I extends UrlParams.Input, A2, I2>({
+const widget = <A, I extends UrlParams.Input, A2 = never, I2 = never>({
   pathname,
   payload,
-  event,
+  item = S.Never as never,
 }: {
   readonly pathname: string
   readonly payload: S.Schema<A, I>
-  readonly event: S.Schema<A2, I2>
+  readonly item?: S.Schema<A2, I2> | undefined
 }) => {
   return {
     payload,
@@ -27,7 +28,10 @@ const widget = <A, I extends UrlParams.Input, A2, I2>({
         }),
       ),
       access("href"),
-      Effect.map((src) => ({ event, src })),
+      Effect.map((src) => ({
+        item: S.Union(item, Finished),
+        src,
+      })),
       Effect.map(embed),
       Stream.unwrap,
     ),
@@ -39,8 +43,7 @@ const Common = S.Struct({
 })
 
 export const EventsWidget = widget({
-  event: S.Void,
-  pathname: "/events",
+  pathname: "events",
   payload: Common,
 })
 
@@ -51,33 +54,28 @@ export const Allowance = S.Struct({
 })
 
 export const LinkWidget = widget({
-  event: S.Void,
-  pathname: "/link",
+  pathname: "link",
   payload: S.Struct({
     id: LinkChallengeId,
   }).pipe(S.extend(Common), S.extend(Allowance)),
 })
 
 export const EscalationWidget = widget({
-  event: S.Void,
-  pathname: "/escalation",
+  pathname: "escalation",
   payload: Escalation,
 })
 
 export const ThawWidget = widget({
-  event: S.Void,
-  pathname: "/thaw",
+  pathname: "thaw",
   payload: AccountFrozen,
 })
 
 export const OnrampExplainerWidget = widget({
-  event: S.Void,
-  pathname: "/onramp-explainer",
+  pathname: "onramp-explainer",
   payload: InsufficientFunds,
 })
 
 export const IdWidget = widget({
-  event: S.Void,
-  pathname: "/id",
+  pathname: "id",
   payload: Common,
 })

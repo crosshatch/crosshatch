@@ -1,8 +1,8 @@
 import { BrowserWorker } from "@effect/platform-browser"
-import { Deferred, Effect, Layer, Option, Schema as S } from "effect"
+import { Deferred, Effect, Layer, Schema as S } from "effect"
 
 import { CrosshatchEnv } from "./CrosshatchEnv.ts"
-import { AppReady, BridgeReady } from "./messages.ts"
+import { AppReady, FacadeReady } from "./messages.ts"
 
 const cssText = Object.entries({
   border: 0,
@@ -18,27 +18,28 @@ const cssText = Object.entries({
   .map(([k, v]) => `${k}: ${v};`)
   .join(" ")
 
-export const BridgeWorkerLive = Effect.gen(function* () {
-  const bridgeReady = yield* Deferred.make<void>()
+export const FacadeWorker = Effect.gen(function* () {
+  const facadeReady = yield* Deferred.make<void>()
   const env = yield* CrosshatchEnv
   addEventListener("message", function f({ data, origin }: MessageEvent) {
-    if (env.isCrosshatch(origin) && Option.isSome(S.decodeUnknownOption(BridgeReady)(data))) {
-      Deferred.unsafeDone(bridgeReady, Effect.void)
+    if (env.isCrosshatch(origin) && S.is(FacadeReady)(data)) {
+      Deferred.unsafeDone(facadeReady, Effect.void)
       removeEventListener("message", f)
     }
   })
   const iframe = document.createElement("iframe")
   Object.assign(iframe, {
+    id: "crosshatch:enclave",
     height: 1,
     sandbox: "allow-scripts allow-same-origin",
-    src: env.href("bridge"),
+    src: env.href("enclave"),
     width: 1,
   })
   Object.assign(iframe.style, { cssText })
   document.body.appendChild(iframe)
-  yield* Deferred.await(bridgeReady)
+  yield* Deferred.await(facadeReady)
   const context = yield* Effect.fromNullable(iframe.contentWindow)
-  const channel = new MessageChannel()
-  context.postMessage(new AppReady(), "*", [channel.port2])
-  return BrowserWorker.layerPlatform(() => channel.port1)
+  const { port1, port2 } = new MessageChannel()
+  context.postMessage(AppReady.make(), "*", [port2])
+  return BrowserWorker.layerPlatform(() => port1)
 }).pipe(Layer.unwrapEffect)

@@ -1,6 +1,4 @@
-import { Effect, Context, Deferred, Schema as S } from "effect"
-
-import { tag } from "./tag.ts"
+import { Effect, Deferred, Schema as S } from "effect"
 
 export const RequestIntroduction = S.TaggedStruct("RequestIntroduction", {})
 
@@ -9,8 +7,6 @@ export const Introduction = S.TaggedStruct("Introduction", {})
 export const RelayedIntroduction = S.TaggedStruct("RelayedIntroduction", {
   origin: S.String,
 })
-
-export class Origin extends Context.Tag(tag("ParentContextOrigin"))<Origin, string>() {}
 
 export const introduction = Effect.fn(function* (context: Window) {
   const deferred = yield* Deferred.make<string>()

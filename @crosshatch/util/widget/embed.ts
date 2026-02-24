@@ -1,7 +1,6 @@
-import { Effect, Option, Schema as S, Stream } from "effect"
+import { Cause, Effect, Schema as S, Stream } from "effect"
 
-import * as ParentContext from "../ParentContext.ts"
-import { Finished, type WidgetConfig } from "./self.ts"
+import type { WidgetConfig } from "./self.ts"
 
 const DEFAULT_SANDBOX = "allow-scripts allow-same-origin allow-popups allow-forms"
 const DEFAULT_ALLOW = [
@@ -12,56 +11,49 @@ const DEFAULT_ALLOW = [
   "publickey-credentials-create *",
   "publickey-credentials-get *",
 ].join("; ")
-
 let currentZ = 100
+const cssText = Object.entries({
+  position: "fixed",
+  top: 0,
+  right: 0,
+  bottom: 0,
+  left: 0,
+  width: "100vw",
+  height: "100vh",
+  background: "transparent",
+  referrerPolicy: "no-referrer",
+})
+  .map(([k, v]) => `${k}: ${v};`)
+  .join(" ")
 
-export const embed = <A, I>({ src, event }: WidgetConfig<A, I>) =>
-  Stream.asyncScoped<A>(
+export const embed = <A, I>({ src, item = S.Never as never }: WidgetConfig<A, I>) =>
+  Stream.asyncScoped<A, Cause.NoSuchElementException>(
     Effect.fn(function* (emit) {
-      const { origin: expectedOrigin } = new URL(src)
-      const decodeOption = S.decodeUnknownOption(event)
-      const controller = new AbortController()
-      const { signal } = controller
-      let ended = false
-      const end = () => {
-        if (!ended) {
-          controller.abort()
-          document.body.removeChild(iframe)
-          emit.end()
-        }
-      }
-      addEventListener(
-        "message",
-        async ({ data, origin }) => {
-          if (origin === expectedOrigin) {
-            if (S.is(ParentContext.RequestIntroduction)(data)) {
-              iframe.contentWindow?.postMessage(ParentContext.Introduction.make(), origin)
+      yield* Stream.fromEventListener<MessageEvent>(globalThis, "message").pipe(
+        Stream.runForEach(
+          Effect.fn(function* ({ data, source }) {
+            const context = yield* Effect.fromNullable(iframe.contentWindow)
+            if (source === context && S.is(item)(data)) {
+              emit.single(data)
             }
-            const option = decodeOption(data)
-            if (option._tag === "Some") {
-              const { value } = option
-              emit.single(value)
-            }
-            if (Option.isSome(Finished.decodeOption(data))) end()
-          }
-        },
-        { signal },
+          }),
+        ),
+        Effect.forkScoped,
       )
       const iframe = document.createElement("iframe")
-      iframe.sandbox = DEFAULT_SANDBOX
-      iframe.allow = DEFAULT_ALLOW
-      iframe.src = src
-      iframe.style.position = "fixed"
-      iframe.style.top = "0"
-      iframe.style.right = "0"
-      iframe.style.bottom = "0"
-      iframe.style.left = "0"
-      iframe.style.width = "100vw"
-      iframe.style.height = "100vh"
+      yield* Effect.addFinalizer(() =>
+        Effect.sync(() => {
+          document.body.removeChild(iframe)
+        }),
+      )
+      Object.assign(iframe, {
+        sandbox: DEFAULT_SANDBOX,
+        allow: DEFAULT_ALLOW,
+        src: src,
+        referrerPolicy: "no-referrer",
+      })
+      Object.assign(iframe.style, { cssText })
       iframe.style.zIndex = `${currentZ++}`
-      iframe.style.background = "transparent"
-      iframe.referrerPolicy = "no-referrer"
       document.body.appendChild(iframe)
-      yield* Effect.addFinalizer(() => Effect.sync(end))
     }),
   )

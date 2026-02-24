@@ -1,5 +1,5 @@
 import { Schema as S } from "effect"
 
-export class BridgeReady extends S.TaggedClass<BridgeReady>()("BridgeReady", {}) {}
+export const FacadeReady = S.TaggedStruct("FacadeReady", {})
 
-export class AppReady extends S.TaggedClass<AppReady>()("AppReady", {}) {}
+export const AppReady = S.TaggedStruct("AppReady", {})

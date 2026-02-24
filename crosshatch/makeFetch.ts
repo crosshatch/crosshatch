@@ -1,7 +1,7 @@
-import { Effect, Encoding, flow, Schema as S, Stream } from "effect"
+import { Effect, Encoding, Exit, flow, Schema as S, Scope, Stream } from "effect"
 
-import { BridgeClient } from "./BridgeClient.ts"
 import { DeclinedDecision } from "./DeclinedDecision.ts"
+import { FacadeClient } from "./FacadeClient.ts"
 import { managedRuntime } from "./runtime.ts"
 import { EscalationWidget, OnrampExplainerWidget, ThawWidget } from "./widgets.ts"
 import { Required } from "./X402/Required.ts"
@@ -27,7 +27,7 @@ export const makeFetch =
             Effect.flatMap(S.decodeUnknown(Required)),
             Effect.filterOrFail(({ x402Version }) => x402Version === 1),
           )
-      const bridge = yield* BridgeClient
+      const bridge = yield* FacadeClient
       let decision = yield* bridge("Propose", { required })
       while (decision._tag !== "Approved") {
         const widget = {
@@ -35,7 +35,18 @@ export const makeFetch =
           Escalation: EscalationWidget,
           InsufficientFunds: OnrampExplainerWidget,
         }[decision._tag]
-        yield* widget.stream(decision as never).pipe(Stream.runDrain)
+        const scope = yield* Scope.make()
+        yield* widget.stream(decision as never).pipe(
+          Stream.tap(
+            Effect.fn(function* (item) {
+              if (item._tag === "Finished") {
+                yield* Scope.close(scope, Exit.succeed(undefined))
+              }
+            }),
+          ),
+          Stream.runDrain,
+          Scope.extend(scope),
+        )
         decision = yield* bridge("Propose", { required })
       }
       if (decision._tag !== "Approved") {
