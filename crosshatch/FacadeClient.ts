@@ -1,4 +1,4 @@
-import { runtime } from "@crosshatch/util/memoMap"
+import { runtime } from "@crosshatch/util/runtime"
 import { AtomRpc } from "@effect-atom/atom"
 import { RpcClient } from "@effect/rpc"
 import { Layer } from "effect"

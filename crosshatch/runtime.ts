@@ -1,5 +1,5 @@
-import { memoMap, runtime } from "@crosshatch/util/memoMap"
 import { resolveEnv } from "@crosshatch/util/resolveEnv"
+import { memoMap, runtime } from "@crosshatch/util/runtime"
 import { ConfigProvider, Layer, ManagedRuntime } from "effect"
 
 import { CrosshatchEnv } from "./CrosshatchEnv.ts"
