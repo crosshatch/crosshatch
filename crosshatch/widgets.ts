@@ -5,7 +5,13 @@ import { UrlParams } from "@effect/platform"
 import { Effect, flow, Option, Schema as S, Stream } from "effect"
 
 import { CrosshatchEnv } from "./CrosshatchEnv.ts"
-import { AccountFrozen, Escalation, InsufficientFunds } from "./DeclinedDecision.ts"
+import {
+  AccountFrozen,
+  AppFrozen,
+  Escalation,
+  InsufficientAllowanceRemaining,
+  InsufficientFunds,
+} from "./DeclinedDecision.ts"
 import { LinkChallengeId } from "./LinkChallenge.ts"
 
 const widget = <A, I extends UrlParams.Input, A2 = never, I2 = never>({
@@ -65,9 +71,19 @@ export const EscalationWidget = widget({
   payload: Escalation,
 })
 
-export const ThawWidget = widget({
-  pathname: "thaw",
+export const ThawAccountWidget = widget({
+  pathname: "thaw-account",
   payload: AccountFrozen,
+})
+
+export const ThawAppWidget = widget({
+  pathname: "thaw-app",
+  payload: AppFrozen,
+})
+
+export const RaiseAllowanceWidget = widget({
+  pathname: "raise-allowance",
+  payload: InsufficientAllowanceRemaining,
 })
 
 export const OnrampExplainerWidget = widget({

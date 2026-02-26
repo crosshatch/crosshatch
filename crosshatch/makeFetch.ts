@@ -3,7 +3,13 @@ import { Effect, Encoding, Exit, flow, Schema as S, Scope, Stream } from "effect
 import { DeclinedDecision } from "./DeclinedDecision.ts"
 import { FacadeClient } from "./FacadeClient.ts"
 import { managedRuntime } from "./runtime.ts"
-import { EscalationWidget, OnrampExplainerWidget, ThawWidget } from "./widgets.ts"
+import {
+  EscalationWidget,
+  OnrampExplainerWidget,
+  ThawAccountWidget,
+  ThawAppWidget,
+  RaiseAllowanceWidget,
+} from "./widgets.ts"
 import { Required } from "./X402/Required.ts"
 import { Version } from "./X402/Version.ts"
 
@@ -31,9 +37,11 @@ export const makeFetch =
       let decision = yield* bridge("Propose", { required })
       while (decision._tag !== "Approved") {
         const widget = {
-          AccountFrozen: ThawWidget,
+          AppFrozen: ThawAppWidget,
+          AccountFrozen: ThawAccountWidget,
           Escalation: EscalationWidget,
           InsufficientFunds: OnrampExplainerWidget,
+          InsufficientAllowanceRemaining: RaiseAllowanceWidget,
         }[decision._tag]
         const scope = yield* Scope.make()
         yield* widget.stream(decision as never).pipe(
