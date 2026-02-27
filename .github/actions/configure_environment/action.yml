@@ -10,3 +10,5 @@ runs:
         node-version: 22
     - shell: bash
       run: pnpm install --frozen-lockfile
+    - shell: bash
+      run: pnpm playwright install --with-deps
