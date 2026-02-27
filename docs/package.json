@@ -15,11 +15,9 @@
     "vocs": "catalog:"
   },
   "devDependencies": {
-    "@types/react": "catalog:",
     "@types/hast": "^3.0.4",
+    "@types/react": "catalog:",
     "crosshatch": "workspace:*",
-    "playwright": "catalog:",
-    "playwright-chromium": "catalog:",
     "rehype": "^13.0.2",
     "rehype-mermaid": "latest",
     "typescript": "catalog:",
