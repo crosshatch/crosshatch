@@ -8,14 +8,16 @@ on:
 
 permissions:
   contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: docs.crosshatch.dev
     if: >
-      github.event_name == 'workflow_dispatch' ||
-      github.event_name == 'push' ||
-      (github.event_name == 'pull_request' &&
+      github.event_name == 'workflow_dispatch' || github.event_name == 'push' || (github.event_name == 'pull_request' &&
        github.event.pull_request.author_association != 'FIRST_TIMER' &&
        github.event.pull_request.author_association != 'FIRST_TIME_CONTRIBUTOR' &&
        github.event.pull_request.author_association != 'NONE')
