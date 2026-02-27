@@ -10,5 +10,13 @@ runs:
         node-version: 22
     - shell: bash
       run: pnpm install --frozen-lockfile
+    - uses: actions/cache@v4
+      with:
+        path: .cache/ms-playwright
+        key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-playwright-
     - shell: bash
       run: pnpm playwright install --with-deps
+      env:
+        PLAYWRIGHT_BROWSERS_PATH: .cache/ms-playwright
