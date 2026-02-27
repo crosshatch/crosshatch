@@ -1,6 +1,6 @@
 import { Schema as S } from "effect"
 
-export interface WidgetConfig<A, I> {
+export type WidgetConfig<A, I> = {
   readonly src: string
   readonly item?: S.Schema<A, I> | undefined
 }

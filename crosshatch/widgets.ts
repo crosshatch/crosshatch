@@ -37,6 +37,7 @@ const widget = <A, I extends UrlParams.Input, A2 = never, I2 = never>({
       Effect.map((src) => ({
         item: S.Union(item, Finished),
         src,
+        className: "crosshatch-widget",
       })),
       Effect.map(embed),
       Stream.unwrap,

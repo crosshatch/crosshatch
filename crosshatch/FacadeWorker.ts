@@ -29,7 +29,7 @@ export const FacadeWorker = Effect.gen(function* () {
   })
   const iframe = document.createElement("iframe")
   Object.assign(iframe, {
-    id: "crosshatch:enclave",
+    id: "crosshatch-enclave",
     height: 1,
     sandbox: "allow-scripts allow-same-origin",
     src: env.href("enclave"),

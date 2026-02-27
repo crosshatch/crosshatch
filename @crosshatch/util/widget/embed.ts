@@ -26,7 +26,13 @@ const cssText = Object.entries({
   .map(([k, v]) => `${k}: ${v};`)
   .join(" ")
 
-export const embed = <A, I>({ src, item = S.Never as never }: WidgetConfig<A, I>) =>
+export const embed = <A, I>({
+  src,
+  item = S.Never as never,
+  className,
+}: WidgetConfig<A, I> & {
+  readonly className?: string | undefined
+}) =>
   Stream.asyncScoped<A, Cause.NoSuchElementException>(
     Effect.fn(function* (emit) {
       yield* Stream.fromEventListener<MessageEvent>(globalThis, "message").pipe(
@@ -51,6 +57,7 @@ export const embed = <A, I>({ src, item = S.Never as never }: WidgetConfig<A, I>
         allow: DEFAULT_ALLOW,
         src: src,
         referrerPolicy: "no-referrer",
+        ...(className ? { className } : {}),
       })
       Object.assign(iframe.style, { cssText })
       iframe.style.zIndex = `${currentZ++}`
