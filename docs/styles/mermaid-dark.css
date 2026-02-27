@@ -1,0 +1,76 @@
+:root.dark [data-rmiz-modal-overlay="hidden"] {
+  background-color: #000;
+}
+
+:root.dark [data-rmiz-modal-overlay="visible"] {
+  background-color: #000;
+}
+
+:root.dark .actor {
+  fill: #2a2540 !important;
+  stroke: #6c5fa7 !important;
+}
+
+:root.dark .actor-line {
+  stroke: #6c5fa7 !important;
+}
+
+:root.dark text.actor > tspan {
+  fill: #e0e0e0 !important;
+}
+
+:root.dark .messageLine0,
+:root.dark .messageLine1 {
+  stroke: #aaa !important;
+}
+
+:root.dark .messageText {
+  fill: #e0e0e0 !important;
+}
+
+:root.dark .note {
+  fill: #3a3520 !important;
+  stroke: #7a7a30 !important;
+}
+
+:root.dark .noteText > tspan {
+  fill: #e0e0e0 !important;
+}
+
+:root.dark .loopText > tspan {
+  fill: #e0e0e0 !important;
+}
+
+:root.dark .loopLine {
+  stroke: #6c5fa7 !important;
+}
+
+:root.dark .labelBox {
+  fill: #2a2540 !important;
+  stroke: #6c5fa7 !important;
+}
+
+:root.dark .labelText > tspan {
+  fill: #e0e0e0 !important;
+}
+
+:root.dark .activation0,
+:root.dark .activation1,
+:root.dark .activation2 {
+  fill: #2e2b3a !important;
+  stroke: #888 !important;
+}
+
+:root.dark .sequenceNumber {
+  fill: #e0e0e0 !important;
+}
+
+:root.dark #arrowhead path {
+  fill: #aaa !important;
+  stroke: #aaa !important;
+}
+
+:root.dark #crosshead path {
+  fill: #aaa !important;
+  stroke: #aaa !important;
+}

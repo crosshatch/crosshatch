@@ -1,5 +1,27 @@
----
-layout: landing
----
+# Quickstart
 
-Hello Crosshatch
+## Install
+
+:::code-group
+
+```bash [npm]
+npm install crosshatch
+```
+
+```bash [pnpm]
+pnpm add crosshatch
+```
+
+```bash [bun]
+bun add crosshatch
+```
+
+:::
+
+## Fetch X402 Resources
+
+Crosshatch's `fetch` wraps `globalThis.fetch` so that 402s are intercepted and retried automatically.
+
+```ts
+import { fetch } from "crosshatch"
+```

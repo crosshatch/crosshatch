@@ -1,0 +1,85 @@
+# Lifecycle
+
+## Initial Request
+
+The user triggers an action in the app. The app requests a resource from a merchant, which responds with a 402.
+
+## Session Check
+
+The app asks Crosshatch whether there an allowance has already been granted.
+
+## Wallet Onboarding (if needed)
+
+If the app lacks an allowances, a modal (or popup depending on browser) appears and guides the user through the
+necessary steps: allowance approval and/or wallet funding. Once complete, the modal closes.
+
+## Payment Signing
+
+With a funded wallet and an active allowance, the app can forward x402 requirements to Crosshatch, which returns signed
+payloads to the app. User's private keys never leave the Crosshatch enclave.
+
+## Resource Delivery
+
+The app retries the original request with the signed payment payload attached. The merchant verifies the payload and
+returns the paid resource. The app fulfills the user's original action.
+
+## Subsequent Payments
+
+All future x402 payments within the user's allowance can be handled automatically — no further prompts necessary.
+
+## Diagram
+
+The full lifecycle of a Crosshatch session is as follows — from the initial user action through wallet setup, payment
+signing, and resource delivery.
+
+import { Expandable } from "../components/Expandable"
+
+<Expandable>
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User
+    participant App
+    participant Enclave as Crosshatch Enclave (embedded)
+    participant Modal as Crosshatch Modal (embedded)
+    participant Service as Crosshatch Service
+    participant Merchant as Merchant Service
+
+    Note over User: Human using the Crosshatch-integrated app
+    Note over App: Integrator app (frontend logic that calls merchants and talks to Crosshatch embeds)
+    Note over Enclave: A secure embedded context that lives within the app and holds user keys and vends x402 payment payloads
+    Note over Modal: An overlay iframe for user interactions such as onboarding and funding
+    Note over Service: Backend service that persists encrypted secrets and enforces app-specific allowances
+    Note over Merchant: Third-party service that exposes resources through x402
+
+    User->>App: Use application
+    App->>Merchant: Request resource
+    Merchant-->>App: Return 402 (Payment Required)
+    App->>Enclave: Ask for session information
+    Enclave->>Service: Ask for account information
+    Service->>Enclave: Return account information
+    Enclave-->>App: Return session information
+    opt Crosshatch wallet needs linking, creation, and/or funding
+        App->>Modal: Open modal
+        Modal->>User: Prompt user to proceed with relevant setup
+        User->>Modal: Combination of (A) approve app allowance, (B) create wallet, (C) fund wallet
+        Modal->>Service: Save changes
+        Modal-->>App: Tell user setup is complete
+    end
+
+    Note over User, Enclave: Funded flow proceeds
+
+    App->>Enclave: Forward the x402 requirement
+    Enclave->>Service: Verify 402 amount ≤ app-specific allowance remaining
+    Service-->>Enclave: Return an encrypted secret
+    Enclave->>Enclave: Decrypt secret for signing purposes
+    Enclave->>Enclave: Create & sign x402 payment payload
+    Enclave-->>App: Hand over signed payment payload
+    App->>Merchant: Re-request resource with payment payload attached
+    Merchant-->>App: Return paid resource
+    App-->>User: Fulfill initial user action
+    Note over App, Service: Automatically pay subsequent x402s
+```
+
+</Expandable>
