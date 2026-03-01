@@ -1,5 +1,7 @@
 import { Schema as S } from "effect"
 
+import { AbsurdError } from "./errors.ts"
+
 export const makeId = <B extends symbol>(brand: B, identifier: string) =>
   S.UUID.pipe(S.brand(brand), S.annotations({ identifier }))
 
@@ -17,3 +19,23 @@ export const ArrayBuffer_ = S.transform(S.Uint8ArrayFromBase64, S.instanceOf(Arr
     return a
   },
 })
+
+export const taggedLiterals = <A extends { _tag: string }, I, R>(schema: S.Schema<A, I, R>) => {
+  const { ast } = S.encodedBoundSchema(schema)
+  if (ast._tag !== "Union") {
+    throw new AbsurdError()
+  }
+  return ast.types.map((member) => {
+    if (member._tag !== "TypeLiteral") {
+      throw new AbsurdError()
+    }
+    const tagPropertySignature = member.propertySignatures.find(({ name }) => name === "_tag")?.type
+    if (!tagPropertySignature) {
+      throw new AbsurdError()
+    }
+    if (tagPropertySignature._tag !== "Literal" || typeof tagPropertySignature.literal !== "string") {
+      throw new AbsurdError()
+    }
+    return tagPropertySignature.literal
+  }) as never as [A["_tag"], ...Array<A["_tag"]>]
+}
