@@ -13,7 +13,7 @@ import { Result, useAtom, useAtomValue } from "@effect-atom/atom-react"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { useState } from "react"
 
-import { currentModelIdAtom, modelIdsAtom } from "@/atoms/ai_atoms"
+import { currentModelIdAtom, modelIdsAtom } from "@/atoms"
 
 export const ModelSelect = () => {
   const [open, onOpenChange] = useState(false)

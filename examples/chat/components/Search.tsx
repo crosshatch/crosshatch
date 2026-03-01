@@ -11,9 +11,9 @@ import { cosineDistance, eq } from "drizzle-orm"
 import { Effect } from "effect"
 import { Search as SearchIcon } from "lucide-react"
 
-import { runtime } from "@/atoms/runtime"
 import { Drizzle } from "@/Drizzle"
 import { router } from "@/router"
+import { runtime } from "@/runtime"
 import { chatItems, chats, embeddings } from "@/schema"
 
 export const searchInputAtom = Atom.make("").pipe(Atom.keepAlive)

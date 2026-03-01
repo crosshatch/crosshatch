@@ -29,7 +29,7 @@ import { Link } from "@tanstack/react-router"
 import { MoreHorizontal, PencilLine, Plus, Trash2 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 
-import { chatsAtom, deleteChatAtom, renameChatAtom } from "@/atoms/chat_atoms"
+import { chatsAtom, deleteChatAtom, renameChatAtom } from "@/atoms"
 import { Search } from "@/components/Search"
 import { chats } from "@/schema"
 

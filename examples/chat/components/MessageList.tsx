@@ -5,7 +5,7 @@ import { Skeleton } from "@crosshatch/ui/components/Skeleton"
 import { useAtomSuspense, useAtomValue } from "@effect-atom/atom-react"
 import { Fragment, useEffect } from "react"
 
-import { chatAtom, chatItemsAtom } from "@/atoms/chat_atoms"
+import { chatAtom, chatItemsAtom } from "@/atoms"
 import { ChatId } from "@/ids"
 import { Route } from "@/routes/{-$chatId}"
 

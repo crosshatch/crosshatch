@@ -4,7 +4,7 @@ import { OpenAiClient, OpenAiEmbeddingModel } from "@effect/ai-openai"
 import { CrosshatchHttpClient } from "crosshatch"
 import { ConfigProvider, Effect, Layer, Redacted, Config } from "effect"
 
-import { Drizzle, PgliteClient } from "../Drizzle"
+import { Drizzle, PgliteClient } from "./Drizzle"
 
 export const runtime = Atom.runtime(
   Layer.mergeAll(
