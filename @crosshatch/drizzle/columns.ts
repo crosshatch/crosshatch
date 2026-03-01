@@ -1,6 +1,6 @@
 import type { PgEnum } from "drizzle-orm/pg-core"
+import type { PgArrayDimension, PgColumnBuilderBrand, AnyPgColumnBuilder } from "drizzle-orm/pg-core"
 
-import { type PgArrayDimension, type PgColumnBuilderBrand, type AnyPgColumnBuilder } from "drizzle-orm/pg-core"
 import { Types } from "effect"
 
 type Increment<N extends PgArrayDimension> = N extends 0
@@ -15,9 +15,6 @@ type Increment<N extends PgArrayDimension> = N extends 0
           ? 5
           : never
 
-// TODO:
-type NonNullish<T> = T & {}
-
 type UnwrapArray<T, Depth extends PgArrayDimension = 0> = Depth extends 5
   ? { base: T; depth: 5 }
   : T extends readonly (infer U)[]
@@ -25,7 +22,7 @@ type UnwrapArray<T, Depth extends PgArrayDimension = 0> = Depth extends 5
     : { base: T; depth: Depth }
 
 export type ColumnsConfig<A, E> = {
-  [K in Exclude<keyof A, E>]: UnwrapArray<NonNullish<A[K]>> extends infer R extends {
+  [K in Exclude<keyof A, E>]: UnwrapArray<NonNullable<A[K]>> extends infer R extends {
     base: unknown
     depth: PgArrayDimension
   }
