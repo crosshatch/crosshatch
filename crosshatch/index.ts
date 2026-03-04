@@ -1,6 +1,4 @@
 export * from "./atoms.ts"
-export * from "./Public.ts"
-export * from "./PublicClient.ts"
 export * from "./Facade.ts"
 export * from "./FacadeClient.ts"
 export * from "./FacadeWorker.ts"

@@ -14,7 +14,7 @@ export class CrosshatchEnv extends Context.Tag(tag("CrosshatchEnv"))<
 >() {
   static readonly layer = Effect.gen(function* () {
     const dev = yield* Config.boolean("DEV").pipe(Config.withDefault(true))
-    const domain = `${dev ? "local." : ""}crosshatch.dev`
+    const domain = `${dev ? "local." : ""}x.crosshatch.dev`
     const url = `https://${domain}`
     return {
       dev,
