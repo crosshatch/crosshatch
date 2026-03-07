@@ -20,8 +20,9 @@
       "types": "./index.ts",
       "default": "./dist/index.js"
     },
-    "./augment": {
-      "default": "./dist/augment.js"
+    "./*": {
+      "types": "./*.ts",
+      "default": "./dist/*.js"
     },
     "./X402": {
       "types": "./X402/X402.ts",
