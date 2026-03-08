@@ -9,9 +9,8 @@ import { Effect, Stream, Data } from "effect"
 import PgWorker from "./PgWorker.ts?worker"
 import { relations } from "./relations.ts"
 import * as schema from "./schema.ts"
-import { tag } from "./tag.ts"
 
-export class PgliteClient extends Effect.Service<PgliteClient>()("@crosshatch/PgliteClient", {
+export class PgliteClient extends Effect.Service<PgliteClient>()("PgliteClient", {
   scoped: Effect.gen(function* () {
     const client = yield* Effect.tryPromise(() => PGliteWorker.create(new PgWorker(), { extensions: { live } }))
     yield* Effect.addFinalizer(() => Effect.promise(() => client.close()))
@@ -20,7 +19,7 @@ export class PgliteClient extends Effect.Service<PgliteClient>()("@crosshatch/Pg
   }),
 }) {}
 
-export class Drizzle extends Effect.Service<Drizzle>()(tag("Drizzle"), {
+export class Drizzle extends Effect.Service<Drizzle>()("Drizzle", {
   scoped: Effect.gen(function* () {
     const pg = yield* PgliteClient
     return drizzle({

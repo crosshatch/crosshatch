@@ -1,7 +1,5 @@
 import { Config, Context, Effect, Layer } from "effect"
 
-import { tag } from "./tag.ts"
-
 export declare namespace CrosshatchEnv {
   export type Service = {
     readonly dev: boolean
@@ -10,7 +8,7 @@ export declare namespace CrosshatchEnv {
   }
 }
 
-export class CrosshatchEnv extends Context.Tag(tag("CrosshatchEnv"))<CrosshatchEnv, CrosshatchEnv.Service>() {}
+export class CrosshatchEnv extends Context.Tag("CrosshatchEnv")<CrosshatchEnv, CrosshatchEnv.Service>() {}
 
 // TODO: move to internal util
 export const isCrosshatch = (origin: string) => CrosshatchEnv.pipe(Effect.map(({ url }) => origin === url))
