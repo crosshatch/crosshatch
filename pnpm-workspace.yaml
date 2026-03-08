@@ -79,8 +79,8 @@ catalog:
   date-fns: ^4.1.0
   dedent: ^1.7.1
   dprint: ^0.52.0
-  drizzle-kit: 1.0.0-beta.15-859cf75
-  drizzle-orm: 1.0.0-beta.15-859cf75
+  drizzle-kit: 1.0.0-beta.16-ea816b6
+  drizzle-orm: 1.0.0-beta.16-ea816b6
   effect: ^3.19.17
   fake-indexeddb: ^6.2.5
   happy-dom: ^20.0.11
