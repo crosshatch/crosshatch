@@ -1,28 +1,28 @@
-name: Deploy Crosshatch Chat
+# name: Deploy Crosshatch Chat
 
-on:
-  workflow_dispatch:
-  push:
-    branches: [main]
+# on:
+#   workflow_dispatch:
+#   push:
+#     branches: [main]
 
-permissions:
-  contents: read
+# permissions:
+#   contents: read
 
-concurrency:
-  group: ${{ github.workflow }}
+# concurrency:
+#   group: ${{ github.workflow }}
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    environment: crosshatch.chat
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/configure_environment
-      - run: pnpm build
-      - run: DEV=false pnpm build
-        working-directory: examples/chat
-      - run: pnpm wrangler deploy
-        working-directory: examples/chat
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+#     environment: crosshatch.chat
+#     steps:
+#       - uses: actions/checkout@v4
+#       - uses: ./.github/actions/configure_environment
+#       - run: pnpm build
+#       - run: DEV=false pnpm build
+#         working-directory: examples/chat
+#       - run: pnpm wrangler deploy
+#         working-directory: examples/chat
+#         env:
+#           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+#           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
