@@ -23,6 +23,7 @@
   },
   "peerDependencies": {
     "@effect-atom/atom": "catalog:",
+    "@effect-atom/atom-react": "catalog:",
     "@effect/experimental": "catalog:",
     "@effect/platform": "catalog:",
     "date-fns": "catalog:",
