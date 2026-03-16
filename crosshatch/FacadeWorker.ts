@@ -1,7 +1,7 @@
 import { BrowserWorker } from "@effect/platform-browser"
-import { Deferred, Effect, Layer, Schema as S } from "effect"
+import { Exit, Deferred, Effect, Layer, Schema as S, Stream } from "effect"
 
-import { CrosshatchEnv } from "./CrosshatchEnv.ts"
+import * as CrosshatchEnv from "./CrosshatchEnv.ts"
 import { AppReady, FacadeReady } from "./messages.ts"
 
 const cssText = Object.entries({
@@ -20,19 +20,22 @@ const cssText = Object.entries({
 
 export const FacadeWorker = Effect.gen(function* () {
   const facadeReady = yield* Deferred.make<void>()
-  const env = yield* CrosshatchEnv
-  addEventListener("message", function f({ data, origin }: MessageEvent) {
-    if (env.isCrosshatch(origin) && S.is(FacadeReady)(data)) {
-      Deferred.unsafeDone(facadeReady, Effect.void)
-      removeEventListener("message", f)
-    }
-  })
+  yield* Stream.fromEventListener<MessageEvent>(globalThis, "message").pipe(
+    Stream.takeUntilEffect(
+      Effect.fn(function* ({ data, origin }) {
+        const isCrosshatch = yield* CrosshatchEnv.isCrosshatch(origin)
+        return isCrosshatch && S.is(FacadeReady)(data)
+      }),
+    ),
+    Stream.runHead,
+    Effect.andThen(Deferred.done(facadeReady, Exit.void)),
+  )
   const iframe = document.createElement("iframe")
   Object.assign(iframe, {
     id: "crosshatch-enclave",
     height: 1,
     sandbox: "allow-scripts allow-same-origin",
-    src: env.href("enclave"),
+    src: yield* CrosshatchEnv.href("enclave"),
     width: 1,
   })
   Object.assign(iframe.style, { cssText })

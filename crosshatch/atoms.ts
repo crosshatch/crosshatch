@@ -21,12 +21,12 @@ export const openSessionWidgetAtom = atomRuntime.fn<void>()(
     const challengeId = yield* get.result(challengeIdAtom)
     const common = { referrer: location.href }
     const stream = Option.match(challengeId, {
-      onSome: (id) =>
+      onSome: (challengeId) =>
         isCrosshatch
           ? IdWidget.stream(common)
           : LinkWidget.stream({
               amount: 10,
-              id,
+              challengeId,
               window: "Week",
               ...common,
             }),

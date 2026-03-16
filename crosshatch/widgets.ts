@@ -4,7 +4,7 @@ import { Finished } from "@crosshatch/util/widget/self"
 import { UrlParams } from "@effect/platform"
 import { Effect, flow, Option, Schema as S, Stream } from "effect"
 
-import { CrosshatchEnv } from "./CrosshatchEnv.ts"
+import * as CrosshatchEnv from "./CrosshatchEnv.ts"
 import {
   AccountFrozen,
   AppFrozen,
@@ -29,8 +29,7 @@ const widget = <A, I extends UrlParams.Input, A2 = never, I2 = never>({
       S.encode(payload),
       Effect.flatMap(
         Effect.fn(function* (v) {
-          const env = yield* CrosshatchEnv
-          return yield* UrlParams.makeUrl(env.href(pathname), UrlParams.fromInput(v), Option.none())
+          return yield* UrlParams.makeUrl(yield* CrosshatchEnv.href(pathname), UrlParams.fromInput(v), Option.none())
         }),
       ),
       access("href"),
@@ -63,7 +62,7 @@ export const Allowance = S.Struct({
 export const LinkWidget = widget({
   pathname: "link",
   payload: S.Struct({
-    id: LinkChallengeId,
+    challengeId: LinkChallengeId,
   }).pipe(S.extend(Common), S.extend(Allowance)),
 })
 
