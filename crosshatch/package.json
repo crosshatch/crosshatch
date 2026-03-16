@@ -24,10 +24,6 @@
       "types": "./*.ts",
       "default": "./dist/*.js"
     },
-    "./X402": {
-      "types": "./X402/X402.ts",
-      "default": "./dist/X402/X402.js"
-    },
     "./package.json": "./package.json"
   },
   "peerDependencies": {
