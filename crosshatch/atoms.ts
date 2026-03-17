@@ -3,17 +3,36 @@ import { Atom } from "@effect-atom/atom"
 import { Effect, Stream, Option, Schema as S } from "effect"
 
 import * as CrosshatchEnv from "./CrosshatchEnv.ts"
-import { FacadeClient } from "./FacadeClient.ts"
+import * as Facade from "./Facade.ts"
 import { atomRuntime } from "./runtime.ts"
 import { EventsWidget, IdWidget, LinkWidget } from "./widgets.ts"
+import { Required } from "./X402/Required.ts"
 
-export const challengeIdAtom = FacadeClient.query("GetChallenge", void 0)
+export const challengeIdAtom = atomRuntime.atom(
+  Effect.gen(function* () {
+    const facade = yield* Facade.Facade
+    return Stream.fromPubSub(facade.signal).pipe(Stream.map(() => facade.challengeId))
+  }).pipe(Stream.unwrap),
+)
 
 export const isLinkedAtom = challengeIdAtom.pipe(Atom.mapResult(Option.isNone))
 
-export const unlinkAtom = FacadeClient.mutation("Unlink")
+export const unlinkAtom = atomRuntime.fn<void>()(
+  Effect.fn(function* () {
+    const facade = yield* Facade.Facade
+    yield* facade.unlink
+  }),
+)
 
-export const proposeAtom = FacadeClient.mutation("Propose")
+export const proposeAtom = atomRuntime.fn<{
+  readonly required: typeof Required.Type
+}>()(
+  Effect.fn(function* ({ required }) {
+    const facade = yield* Facade.Facade
+    const decision = yield* facade.request(required)
+    return { decision }
+  }),
+)
 
 export const openSessionWidgetAtom = atomRuntime.fn<void>()(
   Effect.fn(function* (_, get) {

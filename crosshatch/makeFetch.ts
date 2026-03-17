@@ -1,7 +1,7 @@
 import { Effect, Encoding, Exit, flow, Schema as S, Scope, Stream } from "effect"
 
-import { DeclinedDecision } from "./DeclinedDecision.ts"
-import { FacadeClient } from "./FacadeClient.ts"
+import { DeclinedDecision } from "./Decision.ts"
+import * as Facade from "./Facade.ts"
 import { managedRuntime } from "./runtime.ts"
 import {
   EscalationWidget,
@@ -33,8 +33,8 @@ export const makeFetch =
             Effect.flatMap(S.decodeUnknown(Required)),
             Effect.filterOrFail(({ x402Version }) => x402Version === 1),
           )
-      const bridge = yield* FacadeClient
-      let decision = yield* bridge("Propose", { required })
+      const facade = yield* Facade.Facade
+      let decision = yield* facade.request(required)
       while (decision._tag !== "Approved") {
         const widget = {
           AppFrozen: ThawAppWidget,
@@ -54,7 +54,7 @@ export const makeFetch =
           ),
           Scope.use(scope),
         )
-        decision = yield* bridge("Propose", { required })
+        decision = yield* facade.request(required)
       }
       if (decision._tag !== "Approved") {
         throw new CrosshatchFetchError({ decision })

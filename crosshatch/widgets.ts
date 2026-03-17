@@ -5,13 +5,7 @@ import { UrlParams } from "@effect/platform"
 import { Effect, flow, Option, Schema as S, Stream } from "effect"
 
 import * as CrosshatchEnv from "./CrosshatchEnv.ts"
-import {
-  AccountFrozen,
-  AppFrozen,
-  Escalation,
-  InsufficientAllowanceRemaining,
-  InsufficientFunds,
-} from "./DeclinedDecision.ts"
+import { AccountFrozen, AppFrozen, Escalation, InsufficientAllowanceRemaining, InsufficientFunds } from "./Decision.ts"
 import { LinkChallengeId } from "./LinkChallenge.ts"
 
 const widget = <A, I extends UrlParams.Input, A2 = never, I2 = never>({
