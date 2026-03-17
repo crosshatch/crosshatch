@@ -1,4 +1,4 @@
-import { BrowserWorker } from "@effect/platform-browser"
+import { BrowserWorker, BrowserStream } from "@effect/platform-browser"
 import { Exit, Deferred, Effect, Layer, Schema as S, Stream } from "effect"
 
 import * as CrosshatchEnv from "./CrosshatchEnv.ts"
@@ -20,7 +20,7 @@ const cssText = Object.entries({
 
 export const FacadeWorker = Effect.gen(function* () {
   const facadeReady = yield* Deferred.make<void>()
-  yield* Stream.fromEventListener<MessageEvent>(globalThis, "message").pipe(
+  yield* BrowserStream.fromEventListenerWindow("message").pipe(
     Stream.takeUntilEffect(
       Effect.fn(function* ({ data, origin }) {
         const isCrosshatch = yield* CrosshatchEnv.isCrosshatch(origin)

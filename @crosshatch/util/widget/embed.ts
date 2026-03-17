@@ -1,3 +1,4 @@
+import { BrowserStream } from "@effect/platform-browser"
 import { Cause, Effect, Schema as S, Stream } from "effect"
 
 import type { WidgetConfig } from "./self.ts"
@@ -35,7 +36,7 @@ export const embed = <A, I>({
 }) =>
   Stream.asyncScoped<A, Cause.NoSuchElementException>(
     Effect.fn(function* (emit) {
-      yield* Stream.fromEventListener<MessageEvent>(globalThis, "message").pipe(
+      yield* BrowserStream.fromEventListenerWindow("message").pipe(
         Stream.runForEach(
           Effect.fn(function* ({ data, source }) {
             const context = yield* Effect.fromNullable(iframe.contentWindow)

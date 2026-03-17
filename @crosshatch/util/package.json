@@ -26,6 +26,7 @@
     "@effect-atom/atom-react": "catalog:",
     "@effect/experimental": "catalog:",
     "@effect/platform": "catalog:",
+    "@effect/platform-browser": "catalog:",
     "date-fns": "catalog:",
     "effect": "catalog:"
   }
