@@ -2,6 +2,8 @@ import { Schema as S } from "effect"
 
 import { AbsurdError } from "./errors.ts"
 
+export type { AnyTaggedRequestSchema as RequestDefinition } from "@effect/ai/Tool"
+
 export const makeId = <B extends symbol>(brand: B, identifier: string) =>
   S.UUID.pipe(S.brand(brand), S.annotations({ identifier }))
 
@@ -38,4 +40,14 @@ export const taggedLiterals = <A extends { _tag: string }, I, R>(schema: S.Schem
     }
     return tagPropertySignature.literal
   }) as never as [A["_tag"], ...Array<A["_tag"]>]
+}
+
+export type Fields = Record<keyof any, S.Struct.Field>
+
+export type FieldsRecord = Record<string, Fields>
+
+export declare namespace FieldsRecord {
+  export type TaggedMember<T extends FieldsRecord, K extends keyof T = keyof T> = {
+    [K_ in K]: { readonly _tag: K_ } & S.Struct<T[K_]>["Type"]
+  }[K]
 }

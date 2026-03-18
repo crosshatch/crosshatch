@@ -1,8 +1,8 @@
 {
-  "name": "@crosshatch/util",
+  "name": "@crosshatch/state",
   "version": "0.1.0-beta.1",
   "private": true,
-  "description": "Utilities shared between Crosshatch packages.",
+  "description": "State management and event-sourcing utilities shared between Crosshatch packages.",
   "homepage": "https://crosshatch.dev",
   "bugs": {
     "url": "https://github.com/crosshatch/crosshatch/issues"
@@ -11,24 +11,26 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/crosshatch/crosshatch.git",
-    "directory": "@crosshatch/util"
+    "directory": "@crosshatch/state"
   },
   "type": "module",
   "sideEffects": false,
   "exports": {
+    ".": {
+      "types": "./index.ts",
+      "default": "./dist/index.js"
+    },
     "./*": {
       "types": "./*.ts",
       "default": "./dist/*.js"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "peerDependencies": {
+    "@crosshatch/util": "workspace:*",
     "@effect-atom/atom": "catalog:",
-    "@effect-atom/atom-react": "catalog:",
-    "@effect/ai": "catalog:",
     "@effect/experimental": "catalog:",
     "@effect/platform": "catalog:",
-    "@effect/platform-browser": "catalog:",
-    "date-fns": "catalog:",
     "effect": "catalog:"
   }
 }

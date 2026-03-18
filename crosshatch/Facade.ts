@@ -4,11 +4,11 @@ import { Worker, WorkerError } from "@effect/platform"
 import { BrowserWorker, BrowserStream } from "@effect/platform-browser"
 import { Exit, Deferred, Effect, Schema as S, Layer, Stream, Option, Context, PubSub } from "effect"
 
-import { Actions, Listen, Propose, Unlink } from "./actions.ts"
+import { Action, Listen, Propose, Unlink } from "./Action.ts"
 import * as CrosshatchEnv from "./CrosshatchEnv.ts"
 import { Decision } from "./Decision.ts"
-import { EnclaveMessage } from "./events.ts"
 import { LinkChallengeId } from "./LinkChallenge.ts"
+import * as EnclaveMessage from "./Message.ts"
 import { Required } from "./X402/Required.ts"
 
 export class Facade extends Context.Tag("crosshatch/Facade")<
@@ -21,6 +21,12 @@ export class Facade extends Context.Tag("crosshatch/Facade")<
     unlink: Effect.Effect<void, WorkerError.WorkerError>
   }
 >() {}
+
+export const signal = Effect.map(Facade, ({ signal }) => Stream.fromPubSub(signal)).pipe(Stream.unwrap)
+
+export const unlink = Effect.map(Facade, ({ unlink }) => unlink)
+
+export const request = (required: typeof Required.Type) => Effect.flatMap(Facade, ({ request }) => request(required))
 
 export const layer = Effect.gen(function* () {
   const facadeReady = yield* Deferred.make<void>()
@@ -49,7 +55,7 @@ export const layer = Effect.gen(function* () {
   const { port1, port2 } = new MessageChannel()
   context.postMessage(Introduce.make(), "*", [port2])
   const worker = yield* Worker.WorkerManager.pipe(
-    Effect.flatMap((manager) => manager.spawn<typeof Actions.Type, typeof EnclaveMessage.Type, never>({})),
+    Effect.flatMap((manager) => manager.spawn<typeof Action.Type, typeof EnclaveMessage.Message.Type, never>({})),
     Effect.provide(BrowserWorker.layer(() => port1)),
   )
   const signal = yield* PubSub.bounded<void>(1)
