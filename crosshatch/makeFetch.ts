@@ -1,7 +1,10 @@
-import { Effect, Encoding, Exit, flow, Schema as S, Scope, Stream } from "effect"
+import type { ActorClient } from "liminal"
 
-import { DeclinedDecision } from "./Decision.ts"
-import * as Facade from "./Facade.ts"
+import { Schedule, Effect, Encoding, flow, Schema as S, Cause, ParseResult } from "effect"
+
+import { CrosshatchEnv } from "./CrosshatchEnv.ts"
+import { FacadeClient } from "./FacadeClient.ts"
+import { DeclinedDecision } from "./requests/Propose.ts"
 import { managedRuntime } from "./runtime.ts"
 import {
   EscalationWidget,
@@ -10,6 +13,7 @@ import {
   ThawAppWidget,
   RaiseAllowanceWidget,
 } from "./widgets.ts"
+import { Payload } from "./X402/Payload.ts"
 import { Required } from "./X402/Required.ts"
 import { Version } from "./X402/Version.ts"
 
@@ -33,33 +37,22 @@ export const makeFetch =
             Effect.flatMap(S.decodeUnknown(Required)),
             Effect.filterOrFail(({ x402Version }) => x402Version === 1),
           )
-      const facade = yield* Facade.Facade
-      let decision = yield* facade.request(required)
-      while (decision._tag !== "Approved") {
-        const widget = {
-          AppFrozen: ThawAppWidget,
-          AccountFrozen: ThawAccountWidget,
-          Escalation: EscalationWidget,
-          InsufficientFunds: OnrampExplainerWidget,
-          InsufficientAllowanceRemaining: RaiseAllowanceWidget,
-        }[decision._tag]
-        const scope = yield* Scope.make()
-        yield* widget.stream(decision as never).pipe(
-          Stream.runForEach(
-            Effect.fn(function* (item) {
-              if (item._tag === "Finished") {
-                yield* Scope.close(scope, Exit.succeed(undefined))
-              }
-            }),
-          ),
-          Scope.use(scope),
-        )
-        decision = yield* facade.request(required)
-      }
-      if (decision._tag !== "Approved") {
-        throw new CrosshatchFetchError({ decision })
-      }
-      const { payload } = decision
+      const make: Effect.Effect<
+        { readonly payload: typeof Payload.Type },
+        ParseResult.ParseError | Cause.NoSuchElementException | ActorClient.ConnectionError,
+        FacadeClient | CrosshatchEnv
+      > = FacadeClient.request("Propose", { required }).pipe(
+        (x) =>
+          Effect.catchTags(x, {
+            AppFrozen: ThawAppWidget.runDrain,
+            AccountFrozen: ThawAccountWidget.runDrain,
+            InsufficientFunds: OnrampExplainerWidget.runDrain,
+            Escalation: EscalationWidget.runDrain,
+            InsufficientAllowanceRemaining: RaiseAllowanceWidget.runDrain,
+          }).pipe(Effect.andThen(make)),
+        Effect.retry(Schedule.forever),
+      )
+      const { payload } = yield* make
       const version = yield* S.decodeUnknown(Version)(payload.x402Version)
       const value = Encoding.encodeBase64(JSON.stringify(payload))
       switch (version) {

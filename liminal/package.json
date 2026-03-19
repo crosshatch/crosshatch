@@ -1,9 +1,8 @@
 {
-  "name": "@crosshatch/state",
-  "version": "0.1.0-beta.1",
+  "name": "liminal",
+  "version": "0.17.0",
   "private": true,
-  "description": "State management and event-sourcing utilities shared between Crosshatch packages.",
-  "homepage": "https://crosshatch.dev",
+  "description": "Actors x Effects",
   "bugs": {
     "url": "https://github.com/crosshatch/crosshatch/issues"
   },
@@ -11,7 +10,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/crosshatch/crosshatch.git",
-    "directory": "@crosshatch/state"
+    "directory": "liminal"
   },
   "type": "module",
   "sideEffects": false,
@@ -27,8 +26,10 @@
     "./package.json": "./package.json"
   },
   "peerDependencies": {
+    "@cloudflare/workers-types": "catalog:",
     "@crosshatch/util": "workspace:*",
     "@effect-atom/atom": "catalog:",
+    "@effect/ai": "catalog:",
     "@effect/experimental": "catalog:",
     "@effect/platform": "catalog:",
     "effect": "catalog:"

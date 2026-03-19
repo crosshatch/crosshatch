@@ -1,9 +1,16 @@
 import { Schema as S } from "effect"
 
-import { Payload } from "./X402/Payload.ts"
+import { Payload } from "../X402/Payload.ts"
+import { Required } from "../X402/Required.ts"
 
-export class Approved extends S.TaggedClass<Approved>()("Approved", {
-  payload: Payload,
+export class Propose extends S.TaggedRequest<Propose>()("Propose", {
+  payload: {
+    required: Required,
+  },
+  success: S.Struct({
+    payload: Payload,
+  }),
+  failure: S.suspend(() => DeclinedDecision),
 }) {}
 
 export class InsufficientFunds extends S.TaggedClass<InsufficientFunds>()("InsufficientFunds", {}) {}
@@ -26,5 +33,3 @@ export const DeclinedDecision = S.Union(
   AppFrozen,
   Escalation,
 )
-
-export const Decision = S.Union(Approved, DeclinedDecision)

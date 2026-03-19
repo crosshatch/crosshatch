@@ -4,7 +4,7 @@ import { Context, Effect, Schema as S, Layer, Stream, Ref, PubSub } from "effect
 
 import * as Reducer from "./Reducer.ts"
 
-export const TypeId = "~@crosshatch/state/Accumulator" as const
+export const TypeId = "~liminal/Accumulator" as const
 
 export interface StateDefinition<F extends Fields, EventDefinitions extends FieldsRecord> {
   readonly fields: F
@@ -54,8 +54,8 @@ export interface State<
 
   readonly layer: <Reducers extends Reducer.Reducers<F, EventDefinitions>, E, R, E2 = never, R2 = never>(options: {
     readonly reducers: Reducers
-    readonly events: Stream.Stream<FieldsRecord.TaggedMember<EventDefinitions>, E, R>
-    readonly initial: S.Struct<F>["Type"] | Effect.Effect<S.Struct<F>["Type"], E2, R2>
+    readonly source: Stream.Stream<FieldsRecord.TaggedMember<EventDefinitions>, E, R>
+    readonly initial?: S.Struct<F>["Type"] | Effect.Effect<S.Struct<F>["Type"], E2, R2> | undefined
   }) => Layer.Layer<
     Self,
     Effect.Effect.Error<ReturnType<Reducers[keyof Reducers]>> | E2,
@@ -76,20 +76,25 @@ export const Service =
       f: Reducer.Reducer<S.Struct<EventDefinitions[Tag]>["Type"], F, E, R>,
     ): Reducer.Reducer<S.Struct<EventDefinitions[Tag]>["Type"], F, E, R> => f
 
+    const set = Effect.fn(function* () {
+      throw 0
+    })
+
     const update = Effect.fn(function* () {
       throw 0
     })
 
     const stream = <K extends keyof F>(_key: K) => Stream.empty
 
-    const layer = <Reducers extends Reducer.Reducers<F, EventDefinitions>, E = never, R = never>(_options: {
-      readonly initial: S.Struct<F>["Type"] | Effect.Effect<S.Struct<F>["Type"], E, R>
+    const layer = <Reducers extends Reducer.Reducers<F, EventDefinitions>, E, R, E2 = never, R2 = never>(_options: {
       readonly reducers: Reducers
+      readonly source: Stream.Stream<FieldsRecord.TaggedMember<EventDefinitions>, E, R>
+      readonly initial?: S.Struct<F>["Type"] | Effect.Effect<S.Struct<F>["Type"], E2, R2> | undefined
     }): Layer.Layer<
       Self,
-      Effect.Effect.Error<ReturnType<Reducers[keyof Reducers]>> | E,
-      Exclude<Effect.Effect.Context<ReturnType<Reducers[keyof Reducers]>>, Self> | R
+      Effect.Effect.Error<ReturnType<Reducers[keyof Reducers]>> | E2,
+      Exclude<Effect.Effect.Context<ReturnType<Reducers[keyof Reducers]>>, Self> | R2
     > => null!
 
-    return Object.assign(tag, { [TypeId]: TypeId, definition, reducer, update, stream, layer })
+    return Object.assign(tag, { [TypeId]: TypeId, definition, reducer, set, update, stream, layer })
   }

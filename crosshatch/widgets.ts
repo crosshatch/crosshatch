@@ -5,8 +5,14 @@ import { UrlParams } from "@effect/platform"
 import { Effect, flow, Option, Schema as S, Stream } from "effect"
 
 import * as CrosshatchEnv from "./CrosshatchEnv.ts"
-import { AccountFrozen, AppFrozen, Escalation, InsufficientAllowanceRemaining, InsufficientFunds } from "./Decision.ts"
 import { LinkChallengeId } from "./LinkChallenge.ts"
+import {
+  AccountFrozen,
+  AppFrozen,
+  Escalation,
+  InsufficientAllowanceRemaining,
+  InsufficientFunds,
+} from "./requests/Propose.ts"
 
 const widget = <A, I extends UrlParams.Input, A2 = never, I2 = never>({
   pathname,
@@ -17,24 +23,31 @@ const widget = <A, I extends UrlParams.Input, A2 = never, I2 = never>({
   readonly payload: S.Schema<A, I>
   readonly item?: S.Schema<A2, I2> | undefined
 }) => {
+  const stream = flow(
+    S.encode(payload),
+    Effect.flatMap(
+      Effect.fn(function* (v) {
+        return yield* UrlParams.makeUrl(
+          yield* CrosshatchEnv.href(pathname),
+          UrlParams.fromInput(v),
+          Option.none(),
+          // TODO: refactor
+        ).pipe(Effect.orDie)
+      }),
+    ),
+    access("href"),
+    Effect.map((src) => ({
+      item: S.Union(item, Finished),
+      src,
+      className: "crosshatch-widget",
+    })),
+    Effect.map(embed),
+    Stream.unwrap,
+  )
   return {
     payload,
-    stream: flow(
-      S.encode(payload),
-      Effect.flatMap(
-        Effect.fn(function* (v) {
-          return yield* UrlParams.makeUrl(yield* CrosshatchEnv.href(pathname), UrlParams.fromInput(v), Option.none())
-        }),
-      ),
-      access("href"),
-      Effect.map((src) => ({
-        item: S.Union(item, Finished),
-        src,
-        className: "crosshatch-widget",
-      })),
-      Effect.map(embed),
-      Stream.unwrap,
-    ),
+    stream,
+    runDrain: (payload: A) => stream(payload).pipe(Stream.runDrain),
   }
 }
 
