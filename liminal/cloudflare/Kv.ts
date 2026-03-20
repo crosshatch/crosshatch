@@ -4,7 +4,7 @@ import { ParseResult, Effect, Schema as S, Option } from "effect"
 
 import * as Binding from "./Binding.ts"
 
-export const TypeId = "~liminal/Kv" as const
+const TypeId = "~liminal/Kv" as const
 
 export interface KvDefinition<Binding_ extends string, KeyA, ValueA, ValueI> {
   readonly binding: Binding_

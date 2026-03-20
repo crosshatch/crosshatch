@@ -21,18 +21,18 @@ import {
   Duration,
 } from "effect"
 
-import type * as Actor from "./Actor.ts"
+import type * as Actor from "../Actor.ts"
 
+import * as ClientHandle from "../ClientHandle.ts"
+import * as Handler from "../Handler.ts"
+import * as Protocol from "../Protocol.ts"
 import * as Binding from "./Binding.ts"
-import * as ClientHandle from "./ClientHandle.ts"
-import * as Handler from "./Handler.ts"
 import * as Intrinsic from "./Intrinsic.ts"
 import { NativeRequest } from "./NativeRequest.ts"
-import * as Protocol from "./Protocol.ts"
 
-export const TypeId = "~liminal/ActorRunner" as const
+const TypeId = "~liminal/ActorNamespace" as const
 
-export interface ActorRunnerDefinition<
+export interface ActorNamespaceDefinition<
   Binding_ extends string,
   ActorSelf,
   ActorId extends string,
@@ -72,7 +72,7 @@ export interface ActorRunnerDefinition<
   readonly hibernation?: Duration.DurationInput | undefined
 }
 
-export interface ActorRunner<
+export interface ActorNamespace<
   ActorRunnerSelf,
   ActorRunnerId extends string,
   Binding_ extends string,
@@ -93,7 +93,7 @@ export interface ActorRunner<
 
   readonly [TypeId]: typeof TypeId
 
-  readonly definition: ActorRunnerDefinition<
+  readonly definition: ActorNamespaceDefinition<
     Binding_,
     ActorSelf,
     ActorId,
@@ -134,7 +134,7 @@ export const Service =
     HandlerE,
   >(
     id: ActorRunnerId,
-    definition: ActorRunnerDefinition<
+    definition: ActorNamespaceDefinition<
       Binding_,
       ActorSelf,
       ActorId,
@@ -149,7 +149,7 @@ export const Service =
       HandlerROut,
       HandlerE
     >,
-  ): ActorRunner<
+  ): ActorNamespace<
     ActorRunnerSelf,
     ActorRunnerId,
     Binding_,
@@ -264,7 +264,7 @@ export const Service =
           const layer = Layer.succeed(actor, {
             name,
             handles: this.handles,
-            caller,
+            sender: caller,
           })
           const { id, payload } = yield* S.decodeUnknown($m.RequestJson)(
             messageRaw instanceof ArrayBuffer ? new TextDecoder().decode(messageRaw) : messageRaw,

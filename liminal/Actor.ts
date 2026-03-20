@@ -1,7 +1,6 @@
 import type { RequestDefinition, FieldsRecord, Fields } from "@crosshatch/util/schema"
-import type { WorkerRunner } from "@effect/platform"
 
-import { Context, Schema as S, Types, Effect, Scope } from "effect"
+import { Context, Schema as S, Types, Effect } from "effect"
 
 import type * as ActorClient from "./ActorClient.ts"
 import type * as ClientHandle from "./ClientHandle.ts"
@@ -13,7 +12,7 @@ export const TypeId = "~liminal/Actor" as const
 export interface Service<ActorSelf, NameA, AttachmentFields extends Fields, EventDefinitions extends FieldsRecord> {
   readonly name: NameA
 
-  readonly caller: ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions>
+  readonly sender?: ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions> | undefined
 
   readonly handles: ReadonlySet<ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions>>
 }
@@ -62,7 +61,21 @@ export interface Actor<
     EventDefinitions
   >
 
-  readonly announce: ClientHandle.Send<EventDefinitions, ActorSelf>
+  readonly name: Effect.Effect<NameA, never, ActorSelf>
+
+  readonly assertSender: Effect.Effect<
+    ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions>,
+    never,
+    ActorSelf
+  >
+
+  readonly sendAll: ClientHandle.Send<ActorSelf, EventDefinitions>
+
+  readonly directory: Effect.Effect<
+    ReadonlySet<ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions>>,
+    never,
+    ActorSelf
+  >
 
   readonly handler: <K extends Types.Tags<RequestDefinitions[number]>, R>(
     tag: K,
@@ -82,24 +95,3 @@ export declare const Service: <ActorSelf>() => <
   id: ActorId,
   definition: ActorDefinition<NameA, AttachmentFields, ClientSelf, ClientId, RequestDefinitions, EventDefinitions>,
 ) => Actor<ActorSelf, ActorId, NameA, AttachmentFields, ClientSelf, ClientId, RequestDefinitions, EventDefinitions>
-
-export declare const listen: <
-  ActorSelf,
-  ActorId extends string,
-  NameA,
-  AttachmentFields extends Fields,
-  ClientSelf,
-  ClientId extends string,
-  RequestDefinitions extends ReadonlyArray<RequestDefinition>,
-  EventDefinitions extends FieldsRecord,
-  Handlers extends Handler.Handlers<RequestDefinitions, any>,
->(
-  actor: Actor<ActorSelf, ActorId, NameA, AttachmentFields, ClientSelf, ClientId, RequestDefinitions, EventDefinitions>,
-  handlers: Handlers,
-) => Effect.Effect<
-  void,
-  Effect.Effect.Error<ReturnType<Handlers[keyof Handlers]>>,
-  | Exclude<Effect.Effect.Context<ReturnType<Handlers[keyof Handlers]>>, ActorSelf>
-  | Scope.Scope
-  | WorkerRunner.PlatformRunner
->

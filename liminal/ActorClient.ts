@@ -1,10 +1,6 @@
 import type { FieldsRecord, RequestDefinition } from "@crosshatch/util/schema"
 
-import { Socket } from "@effect/platform"
-import { Context, Stream, Effect, Schema as S, Layer, Types, PubSub, Data, Option } from "effect"
-
-import * as Protocol from "./Protocol.ts"
-import * as SocketUtil from "./SocketUtil.ts"
+import { Context, Stream, Effect, Schema as S, Types, PubSub, Data } from "effect"
 
 export const TypeId = "~liminal/ActorClient" as const
 
@@ -117,40 +113,3 @@ export const Service =
       fn,
     })
   }
-
-export const layerSocket = <
-  ActorClientSelf,
-  ActorClientId extends string,
-  RequestDefinitions extends ReadonlyArray<RequestDefinition>,
-  EventDefinitions extends FieldsRecord,
->({
-  client,
-  baseUrl,
-}: {
-  readonly client: ActorClient<ActorClientSelf, ActorClientId, RequestDefinitions, EventDefinitions>
-  readonly baseUrl: string
-}): Layer.Layer<ActorClientSelf, never, Socket.WebSocketConstructor> =>
-  Effect.gen(function* () {
-    const socketConstructor = yield* Socket.WebSocketConstructor
-    const protocols = yield* Effect.serviceOption(SocketUtil.Protocols).pipe(Effect.map(Option.getOrUndefined))
-    const socket = socketConstructor(baseUrl, protocols)
-    const $m = Protocol.messages(client.definition)
-    const eventsPubsub = yield* PubSub.unbounded<FieldsRecord.TaggedMember<EventDefinitions>>()
-    socket.addEventListener("message", function f({ data }) {
-      // TODO: effectify
-      const message = S.decodeUnknownSync($m.ActorMessageJson)(data)
-      console.log(message)
-    })
-    return {
-      eventsPubsub,
-    }
-  }).pipe(Layer.effect(client))
-
-export const layerWorker = <
-  ActorClientSelf,
-  ActorClientId extends string,
-  RequestDefinitions extends ReadonlyArray<RequestDefinition>,
-  EventDefinitions extends FieldsRecord,
->(
-  _client: ActorClient<ActorClientSelf, ActorClientId, RequestDefinitions, EventDefinitions>,
-): Layer.Layer<ActorClientSelf> => null!

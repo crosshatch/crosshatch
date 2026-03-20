@@ -1,36 +1,22 @@
-import type { FieldsRecord, Fields } from "@crosshatch/util/schema"
+import type { Fields, FieldsRecord } from "@crosshatch/util/schema"
 
-import { WebSocket } from "@cloudflare/workers-types"
-import { Headers } from "@effect/platform"
-import { Schema as S, Effect, Ref } from "effect"
+import { Schema as S, Effect } from "effect"
 
 const TypeId = "~liminal/ClientHandle" as const
 
-export type Send<EventDefinitions extends FieldsRecord, ActorSelf> = <Tag extends keyof EventDefinitions>(
-  tag: Tag,
-  payload: S.Struct<EventDefinitions[Tag]>["Type"],
+export type Send<ActorSelf, EventDefinitions extends FieldsRecord> = <K extends keyof EventDefinitions>(
+  tag: K,
+  payload: S.Struct<EventDefinitions[K]>["Type"],
 ) => Effect.Effect<void, never, ActorSelf>
 
 export interface ClientHandle<ActorSelf, AttachmentFields extends Fields, EventDefinitions extends FieldsRecord> {
   readonly [TypeId]: typeof TypeId
 
-  readonly headers: Headers.Headers
+  readonly send: Send<ActorSelf, EventDefinitions>
 
-  readonly attachmentsRef: Ref.Ref<S.Struct<AttachmentFields>["Type"]>
+  readonly attachments: Effect.Effect<S.Struct<AttachmentFields>["Type"], never, ActorSelf>
 
-  readonly send: Send<EventDefinitions, ActorSelf>
+  readonly save: (attachments: S.Struct<AttachmentFields>["Type"]) => Effect.Effect<void, never, ActorSelf>
 
   readonly disconnect: Effect.Effect<void, never, ActorSelf>
 }
-
-export const make =
-  <ActorSelf>() =>
-  <AttachmentsFields extends Fields, EventDefinitions extends FieldsRecord>(_config: {
-    socket: WebSocket
-    headers: Headers.Headers
-    attachments: S.Struct<AttachmentsFields>["Type"]
-    attachmentsSchema: S.Schema<S.Struct<AttachmentsFields>["Type"], S.Struct<AttachmentsFields>["Encoded"]>
-    events: EventDefinitions
-  }): ClientHandle<ActorSelf, AttachmentsFields, EventDefinitions> => {
-    throw 0
-  }

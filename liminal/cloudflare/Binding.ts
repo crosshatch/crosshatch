@@ -1,6 +1,6 @@
 import { Data, Context, Layer, Effect } from "effect"
 
-import { unsafeEnv } from "./internal/binding.ts"
+import { unsafeEnv } from "./unsafeEnv.ts"
 
 export const TypeId = "~liminal/Binding" as const
 
