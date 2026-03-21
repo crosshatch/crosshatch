@@ -1,4 +1,4 @@
-import { Cause, Effect, Types } from "effect"
+import { Cause, Effect, Stream, Types } from "effect"
 
 export const e0 = <A, E, R>(effect: Effect.Effect<Array<A>, E, R>): Effect.Effect<A | undefined, E, R> =>
   Effect.map(effect, ([v]) => v)
@@ -35,3 +35,7 @@ export const nonEmpty = <A, E, R>(
       return [e0, ...rest]
     }),
   )
+
+export const itemsNonNullable = <A, E, R>(
+  stream: Stream.Stream<A, E, R>,
+): Stream.Stream<NonNullable<A>, E | Cause.NoSuchElementException, R> => Stream.mapEffect(stream, Effect.fromNullable)

@@ -11,16 +11,20 @@ export class FacadeAccumulator extends Accumulator.Service<FacadeAccumulator>()(
   events: FacadeClient.definition.events,
 }) {}
 
-export const layer = FacadeAccumulator.layer({
+const Challenged = FacadeAccumulator.reducer("Challenged", ({ challengeId }) =>
+  FacadeAccumulator.set({
+    challengeId: Option.some(challengeId),
+  }),
+)
+
+const Linked = FacadeAccumulator.reducer("Linked", () =>
+  FacadeAccumulator.set({
+    challengeId: Option.none(),
+  }),
+)
+
+export const layer = Accumulator.layer({
+  accumulator: FacadeAccumulator,
   source: FacadeClient.events,
-  reducers: {
-    Challenged: ({ challengeId }) =>
-      FacadeAccumulator.set({
-        challengeId: Option.some(challengeId),
-      }),
-    Linked: () =>
-      FacadeAccumulator.set({
-        challengeId: Option.none(),
-      }),
-  },
+  reducers: { Challenged, Linked },
 })

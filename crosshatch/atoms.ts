@@ -8,7 +8,7 @@ import { FacadeClient } from "./FacadeClient.ts"
 import { atomRuntime } from "./runtime.ts"
 import { EventsWidget, IdWidget, LinkWidget } from "./widgets.ts"
 
-export const challengeIdAtom = atomRuntime.atom(FacadeAccumulator.stream("challengeId"))
+export const challengeIdAtom = atomRuntime.atom(FacadeAccumulator.signal("challengeId"))
 
 export const isLinkedAtom = challengeIdAtom.pipe(Atom.mapResult(Option.isNone))
 

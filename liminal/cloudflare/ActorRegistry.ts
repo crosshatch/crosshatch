@@ -8,7 +8,7 @@ import {
   WebSocket,
   Response,
 } from "@cloudflare/workers-types"
-import { HttpServerResponse, Headers } from "@effect/platform"
+import { HttpServerResponse } from "@effect/platform"
 import {
   Layer,
   Effect,
@@ -30,9 +30,9 @@ import * as Binding from "./Binding.ts"
 import * as Intrinsic from "./Intrinsic.ts"
 import { NativeRequest } from "./NativeRequest.ts"
 
-const TypeId = "~liminal/ActorNamespace" as const
+const TypeId = "~liminal/cloudflare/ActorRegistry" as const
 
-export interface ActorNamespaceDefinition<
+export interface ActorRegistryDefinition<
   Binding_ extends string,
   ActorSelf,
   ActorId extends string,
@@ -72,7 +72,7 @@ export interface ActorNamespaceDefinition<
   readonly hibernation?: Duration.DurationInput | undefined
 }
 
-export interface ActorNamespace<
+export interface ActorRegistry<
   ActorRunnerSelf,
   ActorRunnerId extends string,
   Binding_ extends string,
@@ -93,7 +93,7 @@ export interface ActorNamespace<
 
   readonly [TypeId]: typeof TypeId
 
-  readonly definition: ActorNamespaceDefinition<
+  readonly definition: ActorRegistryDefinition<
     Binding_,
     ActorSelf,
     ActorId,
@@ -134,7 +134,7 @@ export const Service =
     HandlerE,
   >(
     id: ActorRunnerId,
-    definition: ActorNamespaceDefinition<
+    definition: ActorRegistryDefinition<
       Binding_,
       ActorSelf,
       ActorId,
@@ -149,7 +149,7 @@ export const Service =
       HandlerROut,
       HandlerE
     >,
-  ): ActorNamespace<
+  ): ActorRegistry<
     ActorRunnerSelf,
     ActorRunnerId,
     Binding_,
@@ -175,6 +175,8 @@ export const Service =
         },
       },
     } = actor
+
+    console.log(events)
 
     const $m = Protocol.messages(actor.definition.client.definition)
     const $a = Protocol.attachments(actor.definition)
@@ -206,13 +208,8 @@ export const Service =
             const { headers, attachments } = yield* S.decodeUnknown($a.AttachmentsWrapper)(
               socket.deserializeAttachment(),
             )
-            const handle = ClientHandle.make<ActorSelf>()({
-              socket,
-              headers,
-              attachments,
-              attachmentsSchema: $a.Attachments,
-              events,
-            })
+            console.log(headers, attachments)
+            const handle = null! as ClientHandle_
 
             sockets.set(socket, handle)
             handles.add(handle)
@@ -240,14 +237,10 @@ export const Service =
 
           const { 0: client, 1: server } = new WebSocketPair()
           this.state.acceptWebSocket(server)
-          const headers = Headers.fromInput(request.headers)
-          const handle = ClientHandle.make<ActorSelf>()({
-            socket: server,
-            headers,
-            attachments,
-            attachmentsSchema: $a.Attachments,
-            events,
-          })
+
+          const handle = null! as ClientHandle_
+          console.log(attachments)
+
           this.sockets.set(server, handle)
           this.handles.add(handle)
           return new Response(null, {

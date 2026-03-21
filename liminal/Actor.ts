@@ -61,8 +61,6 @@ export interface Actor<
     EventDefinitions
   >
 
-  readonly name: Effect.Effect<NameA, never, ActorSelf>
-
   readonly assertSender: Effect.Effect<
     ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions>,
     never,
