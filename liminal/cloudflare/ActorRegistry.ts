@@ -73,23 +73,23 @@ export interface ActorRegistryDefinition<
 }
 
 export interface ActorRegistry<
-  ActorRunnerSelf,
-  ActorRunnerId extends string,
+  RegistrySelf,
+  RegistryId extends string,
   Binding_ extends string,
   ActorSelf,
   ActorId extends string,
   NameA,
-  Attachments extends Fields,
-  ActorClientSelf,
-  ActorClientId extends string,
+  AttachmentFields extends Fields,
+  ClientSelf,
+  ClientId extends string,
   RequestDefinitions extends ReadonlyArray<RequestDefinition>,
   EventDefinitions extends FieldsRecord,
   PreludeROut,
   PreludeE,
   HandlerROut,
   HandlerE,
-> extends Binding.Binding<ActorRunnerSelf, ActorRunnerId, Binding_, DurableObjectNamespace> {
-  new (state: DurableObjectState<{}>): Context.TagClassShape<ActorRunnerId, DurableObjectNamespace>
+> extends Binding.Binding<RegistrySelf, RegistryId, Binding_, DurableObjectNamespace> {
+  new (state: DurableObjectState<{}>): Context.TagClassShape<RegistryId, DurableObjectNamespace>
 
   readonly [TypeId]: typeof TypeId
 
@@ -98,9 +98,9 @@ export interface ActorRegistry<
     ActorSelf,
     ActorId,
     NameA,
-    Attachments,
-    ActorClientSelf,
-    ActorClientId,
+    AttachmentFields,
+    ClientSelf,
+    ClientId,
     RequestDefinitions,
     EventDefinitions,
     PreludeROut,
@@ -111,21 +111,21 @@ export interface ActorRegistry<
 
   readonly upgrade: (
     name: NameA,
-    attachments: S.Struct<Attachments>["Type"],
-  ) => Effect.Effect<HttpServerResponse.HttpServerResponse, ParseResult.ParseError, ActorRunnerSelf | NativeRequest>
+    attachments: S.Struct<AttachmentFields>["Type"],
+  ) => Effect.Effect<HttpServerResponse.HttpServerResponse, ParseResult.ParseError, RegistrySelf | NativeRequest>
 }
 
 export const Service =
-  <ActorRunnerSelf>() =>
+  <RegistrySelf>() =>
   <
-    ActorRunnerId extends string,
+    RegistryId extends string,
     Binding_ extends string,
     ActorSelf,
     ActorId extends string,
     NameA,
     AttachmentFields extends Fields,
-    ActorClientSelf,
-    ActorClientId extends string,
+    ClientSelf,
+    ClientId extends string,
     RequestDefinitions extends ReadonlyArray<RequestDefinition>,
     EventDefinitions extends FieldsRecord,
     PreludeROut,
@@ -133,15 +133,15 @@ export const Service =
     HandlerROut,
     HandlerE,
   >(
-    id: ActorRunnerId,
+    id: RegistryId,
     definition: ActorRegistryDefinition<
       Binding_,
       ActorSelf,
       ActorId,
       NameA,
       AttachmentFields,
-      ActorClientSelf,
-      ActorClientId,
+      ClientSelf,
+      ClientId,
       RequestDefinitions,
       EventDefinitions,
       PreludeROut,
@@ -150,15 +150,15 @@ export const Service =
       HandlerE
     >,
   ): ActorRegistry<
-    ActorRunnerSelf,
-    ActorRunnerId,
+    RegistrySelf,
+    RegistryId,
     Binding_,
     ActorSelf,
     ActorId,
     NameA,
     AttachmentFields,
-    ActorClientSelf,
-    ActorClientId,
+    ClientSelf,
+    ClientId,
     RequestDefinitions,
     EventDefinitions,
     PreludeROut,
@@ -183,7 +183,7 @@ export const Service =
 
     type ClientHandle_ = ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions>
 
-    class tag extends Binding.Service<ActorRunnerSelf>()(
+    class tag extends Binding.Service<RegistrySelf>()(
       id,
       binding,
       (value): value is DurableObjectNamespace => "getByName" in value,
