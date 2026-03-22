@@ -1,4 +1,4 @@
-import type { RequestDefinition, FieldsRecord, Fields } from "@crosshatch/util/schema"
+import type { FieldsRecord, Fields } from "@crosshatch/util/schema"
 
 import {
   Request,
@@ -22,9 +22,10 @@ import {
 } from "effect"
 
 import type * as Actor from "../Actor.ts"
+import type { MethodDefinition } from "../Method.ts"
 
 import * as ClientHandle from "../ClientHandle.ts"
-import * as Handler from "../Handler.ts"
+import * as Method from "../Method.ts"
 import * as Binding from "./Binding.ts"
 import * as Intrinsic from "./Intrinsic.ts"
 import { NativeRequest } from "./NativeRequest.ts"
@@ -39,7 +40,7 @@ export interface ActorRegistryDefinition<
   AttachmentFields extends Fields,
   ClientSelf,
   ClientId extends string,
-  RequestDefinitions extends ReadonlyArray<RequestDefinition>,
+  MethodDefinitions extends Record<string, MethodDefinition.Any>,
   EventDefinitions extends FieldsRecord,
   PreludeROut,
   PreludeE,
@@ -55,7 +56,7 @@ export interface ActorRegistryDefinition<
     AttachmentFields,
     ClientSelf,
     ClientId,
-    RequestDefinitions,
+    MethodDefinitions,
     EventDefinitions
   >
 
@@ -63,8 +64,8 @@ export interface ActorRegistryDefinition<
 
   readonly requestLayer: Layer.Layer<HandlerROut, HandlerE, ActorSelf | PreludeROut>
 
-  readonly handlers: Handler.Handlers<
-    RequestDefinitions,
+  readonly handlers: Method.Handlers<
+    MethodDefinitions,
     ActorSelf | HandlerROut | Intrinsic.Intrinsic | PreludeROut | Scope.Scope
   >
 
@@ -81,7 +82,7 @@ export interface ActorRegistry<
   AttachmentFields extends Fields,
   ClientSelf,
   ClientId extends string,
-  RequestDefinitions extends ReadonlyArray<RequestDefinition>,
+  MethodDefinitions extends Record<string, MethodDefinition.Any>,
   EventDefinitions extends FieldsRecord,
   PreludeROut,
   PreludeE,
@@ -100,7 +101,7 @@ export interface ActorRegistry<
     AttachmentFields,
     ClientSelf,
     ClientId,
-    RequestDefinitions,
+    MethodDefinitions,
     EventDefinitions,
     PreludeROut,
     PreludeE,
@@ -125,7 +126,7 @@ export const Service =
     AttachmentFields extends Fields,
     ClientSelf,
     ClientId extends string,
-    RequestDefinitions extends ReadonlyArray<RequestDefinition>,
+    MethodDefinitions extends Record<string, MethodDefinition.Any>,
     EventDefinitions extends FieldsRecord,
     PreludeROut,
     PreludeE,
@@ -141,7 +142,7 @@ export const Service =
       AttachmentFields,
       ClientSelf,
       ClientId,
-      RequestDefinitions,
+      MethodDefinitions,
       EventDefinitions,
       PreludeROut,
       PreludeE,
@@ -158,7 +159,7 @@ export const Service =
     AttachmentFields,
     ClientSelf,
     ClientId,
-    RequestDefinitions,
+    MethodDefinitions,
     EventDefinitions,
     PreludeROut,
     PreludeE,
@@ -240,11 +241,11 @@ export const Service =
             handles: this.directory.handles,
             sender: caller,
           })
-          const { id, payload } = yield* S.decodeUnknown(client.requestSchema)(
+          const { id, payload } = yield* S.decodeUnknown(client.callSchema)(
             messageRaw instanceof ArrayBuffer ? new TextDecoder().decode(messageRaw) : messageRaw,
           )
-          const _tag = payload._tag
-          const handler = handlers[_tag as keyof typeof handlers]
+          const { _tag } = payload
+          const handler = handlers[_tag]
           const result = yield* handler(payload).pipe(
             Effect.provide(requestLayer.pipe(Layer.provideMerge(layer))),
             Effect.exit,

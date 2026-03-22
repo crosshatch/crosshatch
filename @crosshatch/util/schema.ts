@@ -2,8 +2,6 @@ import { Schema as S } from "effect"
 
 import { AbsurdError } from "./errors.ts"
 
-export type { AnyTaggedRequestSchema as RequestDefinition } from "@effect/ai/Tool"
-
 export const makeId = <B extends symbol>(brand: B, identifier: string) =>
   S.UUID.pipe(S.brand(brand), S.annotations({ identifier }))
 

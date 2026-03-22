@@ -1,11 +1,12 @@
-import type { RequestDefinition, FieldsRecord, Fields } from "@crosshatch/util/schema"
+import type { FieldsRecord, Fields } from "@crosshatch/util/schema"
 
 import { WorkerRunner } from "@effect/platform"
 import { Layer, Scope, Effect, Schema as S, Context } from "effect"
 
 import type * as Actor from "../Actor.ts"
+import type { MethodDefinition } from "../Method.ts"
 
-import * as Handler from "../Handler.ts"
+import * as Method from "../Method.ts"
 
 const TypeId = "~liminal/browser/ActorRegistry" as const
 
@@ -16,9 +17,9 @@ export interface ActorRegistryDefinition<
   AttachmentFields extends Fields,
   ClientSelf,
   ClientId extends string,
-  RequestDefinitions extends ReadonlyArray<RequestDefinition>,
+  MethodDefinitions extends Record<string, MethodDefinition.Any>,
   EventDefinitions extends FieldsRecord,
-  Handlers extends Handler.Handlers<RequestDefinitions, any>,
+  Handlers extends Method.Handlers<MethodDefinitions, any>,
 > {
   readonly actor: Actor.Actor<
     ActorSelf,
@@ -27,7 +28,7 @@ export interface ActorRegistryDefinition<
     AttachmentFields,
     ClientSelf,
     ClientId,
-    RequestDefinitions,
+    MethodDefinitions,
     EventDefinitions
   >
 
@@ -45,9 +46,9 @@ export interface ActorRegistry<
   AttachmentFields extends Fields,
   ClientSelf,
   ClientId extends string,
-  RequestDefinitions extends ReadonlyArray<RequestDefinition>,
+  MethodDefinitions extends Record<string, MethodDefinition.Any>,
   EventDefinitions extends FieldsRecord,
-  Handlers extends Handler.Handlers<RequestDefinitions, any>,
+  Handlers extends Method.Handlers<MethodDefinitions, any>,
 > extends Context.Tag<RegistrySelf, Service> {
   new (): Context.TagClassShape<RegistryId, Service>
 
@@ -60,7 +61,7 @@ export interface ActorRegistry<
     AttachmentFields,
     ClientSelf,
     ClientId,
-    RequestDefinitions,
+    MethodDefinitions,
     EventDefinitions,
     Handlers
   >
@@ -87,9 +88,9 @@ export const Service =
     AttachmentFields extends Fields,
     ClientSelf,
     ClientId extends string,
-    RequestDefinitions extends ReadonlyArray<RequestDefinition>,
+    MethodDefinitions extends Record<string, MethodDefinition.Any>,
     EventDefinitions extends FieldsRecord,
-    Handlers extends Handler.Handlers<RequestDefinitions, any>,
+    Handlers extends Method.Handlers<MethodDefinitions, any>,
   >(
     id: RegistryId,
     definition: ActorRegistryDefinition<
@@ -99,7 +100,7 @@ export const Service =
       AttachmentFields,
       ClientSelf,
       ClientId,
-      RequestDefinitions,
+      MethodDefinitions,
       EventDefinitions,
       Handlers
     >,
@@ -112,7 +113,7 @@ export const Service =
     AttachmentFields,
     ClientSelf,
     ClientId,
-    RequestDefinitions,
+    MethodDefinitions,
     EventDefinitions,
     Handlers
   > => {

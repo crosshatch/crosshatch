@@ -1,7 +1,9 @@
-import type { Fields, FieldsRecord, RequestDefinition } from "@crosshatch/util/schema"
+import type { Fields, FieldsRecord } from "@crosshatch/util/schema"
 
 import { WebSocket } from "@cloudflare/workers-types"
 import { Schema as S, Effect, Ref, ParseResult } from "effect"
+
+import type { MethodDefinition } from "./Method.ts"
 
 import * as Actor from "./Actor.ts"
 import { DisconnectMessage } from "./Protocol.ts"
@@ -32,7 +34,7 @@ export const makeDirectory = <
   AttachmentFields extends Fields,
   ClientSelf,
   ClientId extends string,
-  RequestDefinitions extends ReadonlyArray<RequestDefinition>,
+  MethodDefinitions extends Record<string, MethodDefinition.Any>,
   EventDefinitions extends FieldsRecord,
 >({
   definition: {
@@ -45,7 +47,7 @@ export const makeDirectory = <
   AttachmentFields,
   ClientSelf,
   ClientId,
-  RequestDefinitions,
+  MethodDefinitions,
   EventDefinitions
 >) => {
   type Handle = ClientHandle<ActorSelf, AttachmentFields, EventDefinitions>

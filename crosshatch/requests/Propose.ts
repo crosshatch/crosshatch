@@ -1,9 +1,10 @@
 import { Schema as S } from "effect"
+import { Method } from "liminal"
 
 import { Payload } from "../X402/Payload.ts"
 import { Required } from "../X402/Required.ts"
 
-export class Propose extends S.TaggedRequest<Propose>()("Propose", {
+export const Propose = Method.make({
   payload: {
     required: Required,
   },
@@ -11,7 +12,7 @@ export class Propose extends S.TaggedRequest<Propose>()("Propose", {
     payload: Payload,
   }),
   failure: S.suspend(() => DeclinedDecision),
-}) {}
+})
 
 export class InsufficientFunds extends S.TaggedClass<InsufficientFunds>()("InsufficientFunds", {}) {}
 

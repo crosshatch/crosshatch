@@ -1,5 +1,5 @@
 export * as Accumulator from "./Accumulator.ts"
 export * as Actor from "./Actor.ts"
 export * as Client from "./Client.ts"
-export * as Handler from "./Handler.ts"
+export * as Method from "./Method.ts"
 export * as Reducer from "./Reducer.ts"

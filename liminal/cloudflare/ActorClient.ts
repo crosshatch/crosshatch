@@ -1,21 +1,23 @@
-import type { FieldsRecord, RequestDefinition } from "@crosshatch/util/schema"
+import type { FieldsRecord } from "@crosshatch/util/schema"
 
 import { Socket } from "@effect/platform"
 import { Effect, Schema as S, Layer, PubSub, ParseResult, Deferred, Exit, Cause } from "effect"
+
+import type { MethodDefinition } from "../Method.ts"
 
 import * as Client from "../Client.ts"
 
 export const layerSocket = <
   ClientSelf,
   ClientId extends string,
-  RequestDefinitions extends ReadonlyArray<RequestDefinition>,
+  MethodDefinitions extends Record<string, MethodDefinition.Any>,
   EventDefinitions extends FieldsRecord,
 >({
   client,
   baseUrl,
   protocols,
 }: {
-  readonly client: Client.Client<ClientSelf, ClientId, RequestDefinitions, EventDefinitions>
+  readonly client: Client.Client<ClientSelf, ClientId, MethodDefinitions, EventDefinitions>
   readonly baseUrl: string
   readonly protocols?: string | Array<string> | undefined
 }): Layer.Layer<
@@ -28,8 +30,9 @@ export const layerSocket = <
     const write = yield* socket.writer
     const eventsPubsub = yield* PubSub.unbounded<FieldsRecord.TaggedMember<EventDefinitions>>()
     let i = 0
-    type Success = RequestDefinitions[number]["success"]["Type"]
-    type Failure = RequestDefinitions[number]["failure"]["Type"]
+    type D = MethodDefinitions[keyof MethodDefinitions]
+    type Success = D["success"]["Type"]
+    type Failure = D["failure"]["Type"]
     const pending: Record<string, Deferred.Deferred<Success, Failure>> = {}
     yield* socket.run(
       Effect.fnUntraced(function* (raw) {
@@ -54,15 +57,15 @@ export const layerSocket = <
         }
       }),
     )
-    const f: Client.F<ClientSelf, RequestDefinitions> = (_tag) =>
-      Effect.fnUntraced(function* (v) {
+    const f: Client.F<ClientSelf, MethodDefinitions> = (_tag) =>
+      Effect.fnUntraced(function* (payload) {
         let id = i++
         const deferred = yield* Deferred.make<Success, Failure>()
         pending[id] = deferred
-        yield* S.encode(client.requestSchema)({
-          _tag: "Request",
+        yield* S.encode(client.callSchema)({
+          _tag: "Call",
           id,
-          payload: v,
+          payload: { _tag, ...payload },
         }).pipe(Effect.andThen(write))
         return yield* Deferred.await(deferred)
       })

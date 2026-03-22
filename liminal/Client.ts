@@ -1,150 +1,118 @@
-import type { FieldsRecord, RequestDefinition } from "@crosshatch/util/schema"
+import type { FieldsRecord } from "@crosshatch/util/schema"
 
-import { Context, Stream, Effect, Schema as S, Types, PubSub, Data } from "effect"
+import { Record, Context, Stream, Effect, Schema as S, PubSub, Data } from "effect"
 
-import { DisconnectMessage } from "./Protocol.ts"
+import type { MethodDefinition } from "./Method.ts"
+
+import * as Protocol from "./Protocol.ts"
 
 export const TypeId = "~liminal/Client" as const
 
 export interface ClientDefinition<
-  RequestDefinitions extends ReadonlyArray<RequestDefinition>,
+  MethodDefinitions extends Record<string, MethodDefinition.Any>,
   EventDefinitions extends FieldsRecord,
 > {
-  readonly requests: RequestDefinitions
+  readonly methods: MethodDefinitions
 
   readonly events: EventDefinitions
 }
 
 export interface Service<
   ClientSelf,
-  RequestDefinitions extends ReadonlyArray<RequestDefinition>,
+  MethodDefinitions extends Record<string, MethodDefinition.Any>,
   EventDefinitions extends FieldsRecord,
 > {
   readonly eventsPubsub: PubSub.PubSub<FieldsRecord.TaggedMember<EventDefinitions>>
-  readonly f: F<ClientSelf, RequestDefinitions>
-}
-
-export interface Spec<
-  RequestDefinitions extends ReadonlyArray<RequestDefinition>,
-  EventDefinitions extends FieldsRecord,
-> {
-  readonly Request: RequestDefinitions[number]["Type"]
-
-  readonly Responses: {
-    [Tag in Types.Tags<RequestDefinitions[number]>]: {
-      Success: Types.ExtractTag<RequestDefinitions[number], Tag>["success"]["Type"]
-      Failure: Types.ExtractTag<RequestDefinitions[number], Tag>["failure"]["Type"]
-    }
-  }
-
-  readonly EventDefinitions: {
-    [Tag in keyof EventDefinitions]: S.Struct<EventDefinitions[Tag]>["Type"]
-  }
+  readonly f: F<ClientSelf, MethodDefinitions>
 }
 
 export class ConnectionError extends Data.TaggedError("ConnectionError")<{}> {}
 
-export type RequestMessage<RequestDefinitions extends ReadonlyArray<RequestDefinition>> = {
-  readonly _tag: "Request"
-  readonly id: number
-  readonly payload: RequestDefinitions[number]["Type"]
-}
-export type SuccessMessage<RequestDefinitions extends ReadonlyArray<RequestDefinition>> = {
-  readonly _tag: "Success"
-  readonly id: number
-  readonly value: RequestDefinitions[number]["success"]["Type"]
-}
-export type FailureMessage<RequestDefinitions extends ReadonlyArray<RequestDefinition>> = {
-  readonly _tag: "Failure"
-  readonly id: number
-  readonly cause: RequestDefinitions[number]["success"]["Type"]
-}
-export type EventMessage<EventDefinitions extends FieldsRecord> = {
-  readonly _tag: "Event"
-  readonly event: FieldsRecord.TaggedMember<EventDefinitions>
-}
-
-export type F<ClientSelf, RequestDefinitions extends ReadonlyArray<RequestDefinition>> = <
-  Method extends Types.Tags<RequestDefinitions[number]>,
+export type F<ClientSelf, MethodDefinitions extends Record<string, MethodDefinition.Any>> = <
+  Method extends keyof MethodDefinitions,
 >(
   method: Method,
 ) => (
-  payload: Omit<S.Struct<Types.ExtractTag<RequestDefinitions[number], Method>["fields"]>["Type"], "_tag">,
+  payload: S.Struct<MethodDefinitions[Method]["payload"]>["Type"],
 ) => Effect.Effect<
-  Types.ExtractTag<RequestDefinitions[number], Method>["success"]["Type"],
-  Types.ExtractTag<RequestDefinitions[number], Method>["failure"]["Type"],
+  MethodDefinitions[Method]["success"]["Type"],
+  MethodDefinitions[Method]["failure"]["Type"] | ConnectionError,
   ClientSelf
 >
 
 export interface Client<
   ClientSelf,
   ClientId extends string,
-  RequestDefinitions extends ReadonlyArray<RequestDefinition>,
+  MethodDefinitions extends Record<string, MethodDefinition.Any>,
   EventDefinitions extends FieldsRecord,
-> extends Context.Tag<ClientSelf, Service<ClientSelf, RequestDefinitions, EventDefinitions>> {
-  new (_: never): Context.TagClassShape<ClientId, Service<ClientSelf, RequestDefinitions, EventDefinitions>>
-
-  readonly "": Spec<RequestDefinitions, EventDefinitions>
+> extends Context.Tag<ClientSelf, Service<ClientSelf, MethodDefinitions, EventDefinitions>> {
+  new (_: never): Context.TagClassShape<ClientId, Service<ClientSelf, MethodDefinitions, EventDefinitions>>
 
   readonly [TypeId]: typeof TypeId
 
-  readonly definition: ClientDefinition<RequestDefinitions, EventDefinitions>
+  readonly definition: ClientDefinition<MethodDefinitions, EventDefinitions>
 
-  readonly requestSchema: S.Schema<RequestMessage<RequestDefinitions>, string>
-  readonly successSchema: S.Schema<SuccessMessage<RequestDefinitions>, string>
-  readonly failureSchema: S.Schema<FailureMessage<RequestDefinitions>, string>
-  readonly eventSchema: S.Schema<EventMessage<EventDefinitions>, string>
+  readonly callSchema: S.Schema<Protocol.CallMessage<MethodDefinitions>, string>
+  readonly successSchema: S.Schema<Protocol.SuccessMessage<MethodDefinitions>, string>
+  readonly failureSchema: S.Schema<Protocol.FailureMessage<MethodDefinitions>, string>
+  readonly eventSchema: S.Schema<Protocol.EventMessage<EventDefinitions>, string>
   readonly actorMessageSchema: S.Schema<
-    | SuccessMessage<RequestDefinitions>
-    | FailureMessage<RequestDefinitions>
-    | EventMessage<EventDefinitions>
-    | typeof DisconnectMessage.Type,
+    | Protocol.SuccessMessage<MethodDefinitions>
+    | Protocol.FailureMessage<MethodDefinitions>
+    | Protocol.EventMessage<EventDefinitions>
+    | typeof Protocol.DisconnectMessage.Type,
     string
   >
 
   readonly events: Stream.Stream<FieldsRecord.TaggedMember<EventDefinitions>, ConnectionError, ClientSelf>
 
-  readonly f: F<ClientSelf, RequestDefinitions>
+  readonly f: F<ClientSelf, MethodDefinitions>
 }
 
 export const Service =
   <ClientSelf>() =>
   <
     ClientId extends string,
-    RequestDefinitions extends ReadonlyArray<RequestDefinition>,
+    MethodDefinitions extends Record<string, MethodDefinition.Any>,
     EventDefinitions extends FieldsRecord,
   >(
     id: ClientId,
-    definition: ClientDefinition<RequestDefinitions, EventDefinitions>,
-  ): Client<ClientSelf, ClientId, RequestDefinitions, EventDefinitions> => {
-    const tag = Context.Tag(id)<ClientSelf, Service<ClientSelf, RequestDefinitions, EventDefinitions>>()
+    definition: ClientDefinition<MethodDefinitions, EventDefinitions>,
+  ): Client<ClientSelf, ClientId, MethodDefinitions, EventDefinitions> => {
+    const tag = Context.Tag(id)<ClientSelf, Service<ClientSelf, MethodDefinitions, EventDefinitions>>()
 
-    const requestSchema = S.parseJson(
-      S.TaggedStruct("Request", {
+    const callSchema: S.Schema<Protocol.CallMessage<MethodDefinitions>, string> = S.parseJson(
+      S.TaggedStruct("Call", {
         id: S.Int,
-        payload: S.Union(...definition.requests),
+        payload: S.Union(
+          ...Object.entries(definition.methods).map(([_tag, { payload }]) => S.TaggedStruct(_tag, payload)),
+        ),
       }),
-    )
-    const successSchema = S.parseJson(
+    ) as never
+
+    const successSchema: S.Schema<Protocol.SuccessMessage<MethodDefinitions>, string> = S.parseJson(
       S.TaggedStruct("Success", {
         id: S.Int,
-        value: S.Union(...definition.requests.map(({ success }) => success)),
+        value: S.Union(...Object.values(definition.methods).map(({ success }) => success)),
       }),
     )
-    const failureSchema = S.parseJson(
+
+    const failureSchema: S.Schema<Protocol.FailureMessage<MethodDefinitions>, string> = S.parseJson(
       S.TaggedStruct("Failure", {
         id: S.Int,
-        value: S.Union(...definition.requests.map(({ failure }) => failure)),
+        cause: S.Union(...Object.values(definition.methods).map(({ failure }) => failure)),
       }),
     )
-    const eventSchema = S.parseJson(
+
+    const eventSchema: S.Schema<Protocol.EventMessage<EventDefinitions>, string> = S.parseJson(
       S.TaggedStruct("Event", {
         event: S.Union(...Object.entries(definition.events).map(([_tag, fields]) => S.TaggedStruct(_tag, fields))),
       }),
-    )
-    const actorMessageSchema = S.Union(successSchema, failureSchema, eventSchema, DisconnectMessage)
+    ) as never
 
-    const f: F<ClientSelf, RequestDefinitions> = (method) =>
+    const actorMessageSchema = S.Union(successSchema, failureSchema, eventSchema, Protocol.DisconnectMessage)
+
+    const f: F<ClientSelf, MethodDefinitions> = (method) =>
       Effect.fnUntraced(function* (payload) {
         const { f } = yield* tag
         return yield* f(method)(payload)
@@ -159,7 +127,7 @@ export const Service =
       "": null!,
       [TypeId]: TypeId,
       definition,
-      requestSchema,
+      callSchema,
       successSchema,
       failureSchema,
       eventSchema,

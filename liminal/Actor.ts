@@ -1,11 +1,12 @@
-import type { RequestDefinition, FieldsRecord, Fields } from "@crosshatch/util/schema"
+import type { FieldsRecord, Fields } from "@crosshatch/util/schema"
 
-import { Context, Schema as S, Types, Effect } from "effect"
+import { Context, Schema as S, Effect } from "effect"
 
 import type * as ActorClient from "./Client.ts"
 import type * as ClientHandle from "./ClientHandle.ts"
+import type { MethodDefinition } from "./Method.ts"
 
-import * as Handler from "./Handler.ts"
+import * as Method from "./Method.ts"
 
 export const TypeId = "~liminal/Actor" as const
 
@@ -22,14 +23,14 @@ export interface ActorDefinition<
   AttachmentFields extends Fields,
   ClientSelf,
   ClientId extends string,
-  RequestDefinitions extends ReadonlyArray<RequestDefinition>,
+  MethodDefinitions extends Record<string, MethodDefinition.Any>,
   EventDefinitions extends FieldsRecord,
 > {
   readonly name: S.Schema<NameA, string>
 
   readonly attachments: AttachmentFields
 
-  readonly client: ActorClient.Client<ClientSelf, ClientId, RequestDefinitions, EventDefinitions>
+  readonly client: ActorClient.Client<ClientSelf, ClientId, MethodDefinitions, EventDefinitions>
 }
 
 export interface Actor<
@@ -39,16 +40,10 @@ export interface Actor<
   AttachmentFields extends Fields,
   ActorClientSelf,
   ActorClientId extends string,
-  RequestDefinitions extends ReadonlyArray<RequestDefinition>,
+  MethodDefinitions extends Record<string, MethodDefinition.Any>,
   EventDefinitions extends FieldsRecord,
 > extends Context.Tag<ActorSelf, Service<ActorSelf, NameA, AttachmentFields, EventDefinitions>> {
   new (_: never): Context.TagClassShape<ActorId, Service<ActorSelf, NameA, AttachmentFields, EventDefinitions>>
-
-  readonly "": ActorClient.Spec<RequestDefinitions, EventDefinitions> & {
-    readonly Name: NameA
-
-    readonly Attachments: S.Struct<AttachmentFields>["Type"]
-  }
 
   readonly [TypeId]: typeof TypeId
 
@@ -57,7 +52,7 @@ export interface Actor<
     AttachmentFields,
     ActorClientSelf,
     ActorClientId,
-    RequestDefinitions,
+    MethodDefinitions,
     EventDefinitions
   >
 
@@ -75,10 +70,10 @@ export interface Actor<
     ActorSelf
   >
 
-  readonly handler: <K extends Types.Tags<RequestDefinitions[number]>, R>(
+  readonly handler: <K extends keyof MethodDefinitions, R>(
     tag: K,
-    f: Handler.Handler<Types.ExtractTag<RequestDefinitions[number], K>, R>,
-  ) => Handler.Handler<Types.ExtractTag<RequestDefinitions[number], K>, R>
+    f: Method.Handler<MethodDefinitions[K], R>,
+  ) => Method.Handler<MethodDefinitions[K], R>
 }
 
 export declare const Service: <ActorSelf>() => <
@@ -87,9 +82,9 @@ export declare const Service: <ActorSelf>() => <
   AttachmentFields extends Fields,
   ClientSelf,
   ClientId extends string,
-  RequestDefinitions extends ReadonlyArray<RequestDefinition>,
+  MethodDefinitions extends Record<string, MethodDefinition.Any>,
   EventDefinitions extends FieldsRecord,
 >(
   id: ActorId,
-  definition: ActorDefinition<NameA, AttachmentFields, ClientSelf, ClientId, RequestDefinitions, EventDefinitions>,
-) => Actor<ActorSelf, ActorId, NameA, AttachmentFields, ClientSelf, ClientId, RequestDefinitions, EventDefinitions>
+  definition: ActorDefinition<NameA, AttachmentFields, ClientSelf, ClientId, MethodDefinitions, EventDefinitions>,
+) => Actor<ActorSelf, ActorId, NameA, AttachmentFields, ClientSelf, ClientId, MethodDefinitions, EventDefinitions>

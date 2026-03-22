@@ -5,7 +5,7 @@ import { Propose } from "./requests/Propose.ts"
 import { Rescind } from "./requests/Rescind.ts"
 
 export class FacadeClient extends Client.Service<FacadeClient>()("crosshatch/FacadeClient", {
-  requests: [Propose, Rescind],
+  methods: { Propose, Rescind },
   events: {
     Challenged: {
       challengeId: LinkChallengeId,
