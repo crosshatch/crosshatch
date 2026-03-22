@@ -1,4 +1,4 @@
-import type { ActorClient } from "liminal"
+import type { Client } from "liminal"
 
 import { Schedule, Effect, Encoding, flow, Schema as S, Cause, ParseResult } from "effect"
 
@@ -39,9 +39,9 @@ export const makeFetch =
           )
       const make: Effect.Effect<
         { readonly payload: typeof Payload.Type },
-        ParseResult.ParseError | Cause.NoSuchElementException | ActorClient.ConnectionError,
+        ParseResult.ParseError | Cause.NoSuchElementException | Client.ConnectionError,
         FacadeClient | CrosshatchEnv
-      > = FacadeClient.request("Propose", { required }).pipe(
+      > = FacadeClient.f("Propose")({ required }).pipe(
         (x) =>
           Effect.catchTags(x, {
             AppFrozen: ThawAppWidget.runDrain,

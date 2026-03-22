@@ -1,14 +1,13 @@
 import type { FieldsRecord, RequestDefinition } from "@crosshatch/util/schema"
 
 import { Socket } from "@effect/platform"
-import { Effect, Schema as S, Layer, PubSub } from "effect"
+import { Effect, Schema as S, Layer, PubSub, ParseResult, Deferred, Exit, Cause } from "effect"
 
-import * as ActorClient from "../ActorClient.ts"
-import * as Protocol from "../Protocol.ts"
+import * as Client from "../Client.ts"
 
 export const layerSocket = <
-  ActorClientSelf,
-  ActorClientId extends string,
+  ClientSelf,
+  ClientId extends string,
   RequestDefinitions extends ReadonlyArray<RequestDefinition>,
   EventDefinitions extends FieldsRecord,
 >({
@@ -16,21 +15,59 @@ export const layerSocket = <
   baseUrl,
   protocols,
 }: {
-  readonly client: ActorClient.ActorClient<ActorClientSelf, ActorClientId, RequestDefinitions, EventDefinitions>
+  readonly client: Client.Client<ClientSelf, ClientId, RequestDefinitions, EventDefinitions>
   readonly baseUrl: string
   readonly protocols?: string | Array<string> | undefined
-}): Layer.Layer<ActorClientSelf, never, Socket.WebSocketConstructor> =>
+}): Layer.Layer<
+  ClientSelf,
+  Socket.SocketError | ParseResult.ParseError | Cause.NoSuchElementException,
+  Socket.WebSocketConstructor
+> =>
   Effect.gen(function* () {
-    const socketConstructor = yield* Socket.WebSocketConstructor
-    const socket = socketConstructor(baseUrl, protocols)
-    const $m = Protocol.messages(client.definition)
+    const socket = yield* Socket.makeWebSocket(baseUrl, { protocols })
+    const write = yield* socket.writer
     const eventsPubsub = yield* PubSub.unbounded<FieldsRecord.TaggedMember<EventDefinitions>>()
-    socket.addEventListener("message", function f({ data }) {
-      // TODO: effectify
-      const message = S.decodeUnknownSync($m.ActorMessageJson)(data)
-      console.log(message)
-    })
+    let i = 0
+    type Success = RequestDefinitions[number]["success"]["Type"]
+    type Failure = RequestDefinitions[number]["failure"]["Type"]
+    const pending: Record<string, Deferred.Deferred<Success, Failure>> = {}
+    yield* socket.run(
+      Effect.fnUntraced(function* (raw) {
+        const message = yield* S.decodeUnknown(client.actorMessageSchema)(new TextDecoder().decode(raw))
+        switch (message._tag) {
+          case "Disconnect": {
+            return yield* write(new Socket.CloseEvent())
+          }
+          case "Event": {
+            return yield* eventsPubsub.publish(message.event)
+          }
+          case "Success": {
+            const { id, value } = message
+            const deferred = yield* Effect.fromNullable(pending[id])
+            return yield* Deferred.done(deferred, Exit.succeed(value))
+          }
+          case "Failure": {
+            const { id, cause } = message
+            const deferred = yield* Effect.fromNullable(pending[id])
+            return yield* Deferred.done(deferred, Exit.succeed(cause))
+          }
+        }
+      }),
+    )
+    const f: Client.F<ClientSelf, RequestDefinitions> = (_tag) =>
+      Effect.fnUntraced(function* (v) {
+        let id = i++
+        const deferred = yield* Deferred.make<Success, Failure>()
+        pending[id] = deferred
+        yield* S.encode(client.requestSchema)({
+          _tag: "Request",
+          id,
+          payload: v,
+        }).pipe(Effect.andThen(write))
+        return yield* Deferred.await(deferred)
+      })
     return {
+      f,
       eventsPubsub,
     }
-  }).pipe(Layer.effect(client))
+  }).pipe(Layer.scoped(client))

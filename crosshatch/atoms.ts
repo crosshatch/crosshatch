@@ -12,9 +12,9 @@ export const challengeIdAtom = atomRuntime.atom(FacadeAccumulator.signal("challe
 
 export const isLinkedAtom = challengeIdAtom.pipe(Atom.mapResult(Option.isNone))
 
-export const rescindAtom = atomRuntime.fn(FacadeClient.fn("Rescind"))
+export const rescindAtom = atomRuntime.fn(FacadeClient.f("Rescind"))
 
-export const proposeAtom = atomRuntime.fn(FacadeClient.fn("Propose"))
+export const proposeAtom = atomRuntime.fn(FacadeClient.f("Propose"))
 
 export const openSessionWidgetAtom = atomRuntime.fn<void>()(
   Effect.fn(function* (_, get) {

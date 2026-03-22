@@ -2,7 +2,7 @@ import type { RequestDefinition, FieldsRecord, Fields } from "@crosshatch/util/s
 
 import { Context, Schema as S, Types, Effect } from "effect"
 
-import type * as ActorClient from "./ActorClient.ts"
+import type * as ActorClient from "./Client.ts"
 import type * as ClientHandle from "./ClientHandle.ts"
 
 import * as Handler from "./Handler.ts"
@@ -29,7 +29,7 @@ export interface ActorDefinition<
 
   readonly attachments: AttachmentFields
 
-  readonly client: ActorClient.ActorClient<ClientSelf, ClientId, RequestDefinitions, EventDefinitions>
+  readonly client: ActorClient.Client<ClientSelf, ClientId, RequestDefinitions, EventDefinitions>
 }
 
 export interface Actor<

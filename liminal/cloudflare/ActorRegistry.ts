@@ -25,7 +25,6 @@ import type * as Actor from "../Actor.ts"
 
 import * as ClientHandle from "../ClientHandle.ts"
 import * as Handler from "../Handler.ts"
-import * as Protocol from "../Protocol.ts"
 import * as Binding from "./Binding.ts"
 import * as Intrinsic from "./Intrinsic.ts"
 import { NativeRequest } from "./NativeRequest.ts"
@@ -168,20 +167,23 @@ export const Service =
   > => {
     const { hibernation, actor, preludeLayer, requestLayer, handlers, binding } = definition
     const {
-      definition: {
-        name: nameSchema,
-        client: {
-          definition: { events },
-        },
-      },
+      definition: { name: nameSchema, attachments: attachmentFields, client },
     } = actor
 
-    console.log(events)
+    const attachmentsSchema = S.Struct(attachmentFields) as never as S.Schema<
+      S.Struct<AttachmentFields>["Type"],
+      S.Struct<AttachmentFields>["Encoded"]
+    >
 
-    const $m = Protocol.messages(actor.definition.client.definition)
-    const $a = Protocol.attachments(actor.definition)
-
-    type ClientHandle_ = ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions>
+    const paramsSchema = S.compose(
+      S.StringFromBase64Url,
+      S.parseJson(
+        S.Struct({
+          name: nameSchema,
+          attachments: attachmentsSchema,
+        }),
+      ),
+    )
 
     class tag extends Binding.Service<RegistrySelf>()(
       id,
@@ -190,8 +192,7 @@ export const Service =
     ) {
       readonly state
       readonly runtime
-      readonly sockets = new Map<WebSocket, ClientHandle_>()
-      readonly handles = new Set<ClientHandle_>()
+      readonly directory = ClientHandle.makeDirectory(actor)
 
       constructor(state: DurableObjectState<{}>, env: unknown) {
         // @ts-ignore
@@ -203,46 +204,26 @@ export const Service =
         }
 
         this.runtime = Effect.gen(this, function* () {
-          const { sockets, handles } = this
           for (const socket of this.state.getWebSockets()) {
-            const { headers, attachments } = yield* S.decodeUnknown($a.AttachmentsWrapper)(
-              socket.deserializeAttachment(),
-            )
-            console.log(headers, attachments)
-            const handle = null! as ClientHandle_
-
-            sockets.set(socket, handle)
-            handles.add(handle)
+            const attachments = yield* S.decodeUnknown(attachmentsSchema)(socket.deserializeAttachment())
+            yield* this.directory.register(socket, attachments)
           }
           return Layer.mergeAll(preludeLayer, Intrinsic.layer, Layer.setConfigProvider(ConfigProvider.fromJson(env)))
         }).pipe(Layer.unwrapEffect, ManagedRuntime.make)
       }
 
-      disconnect = (socket: WebSocket) =>
-        Effect.gen(this, function* () {
-          const handle = yield* Effect.fromNullable(this.sockets.get(socket))
-          this.sockets.delete(socket)
-          this.handles.delete(handle)
-        })
-
       #name?: NameA | undefined
       fetch(request: Request): Promise<Response> {
         return Effect.gen(this, function* () {
           const url = new URL(request.url)
-          const { name, attachments } = yield* S.decodeUnknown($a.Params)(url.searchParams.get("__liminal"))
+          const { name, attachments } = yield* S.decodeUnknown(paramsSchema)(url.searchParams.get("__liminal"))
           if (!this.#name) {
             this.#name = name
             yield* Effect.promise(() => this.state.storage.put("__liminal_name", name))
           }
-
           const { 0: client, 1: server } = new WebSocketPair()
           this.state.acceptWebSocket(server)
-
-          const handle = null! as ClientHandle_
-          console.log(attachments)
-
-          this.sockets.set(server, handle)
-          this.handles.add(handle)
+          yield* this.directory.register(server, attachments)
           return new Response(null, {
             status: 101,
             webSocket: client,
@@ -252,18 +233,17 @@ export const Service =
 
       webSocketMessage(socket: WebSocket, messageRaw: string | ArrayBuffer) {
         Effect.gen(this, function* () {
-          const caller = yield* Effect.fromNullable(this.sockets.get(socket))
+          const caller = yield* this.directory.look(socket)
           const name = yield* Effect.fromNullable(this.#name)
           const layer = Layer.succeed(actor, {
             name,
-            handles: this.handles,
+            handles: this.directory.handles,
             sender: caller,
           })
-          const { id, payload } = yield* S.decodeUnknown($m.RequestJson)(
+          const { id, payload } = yield* S.decodeUnknown(client.requestSchema)(
             messageRaw instanceof ArrayBuffer ? new TextDecoder().decode(messageRaw) : messageRaw,
           )
-          // TODO: fix inference
-          const _tag = (payload as { readonly _tag: string })._tag
+          const _tag = payload._tag
           const handler = handlers[_tag as keyof typeof handlers]
           const result = yield* handler(payload).pipe(
             Effect.provide(requestLayer.pipe(Layer.provideMerge(layer))),
@@ -272,13 +252,13 @@ export const Service =
           switch (result._tag) {
             case "Success": {
               const { value } = result
-              const encoded = yield* S.encode($m.SuccessJson)({ _tag: "Success", id, value })
+              const encoded = yield* S.encode(client.successSchema)({ _tag: "Success", id, value })
               socket.send(encoded)
               break
             }
             case "Failure": {
               const { cause } = result
-              const encoded = yield* S.encode($m.FailureJson)({ _tag: "Failure", id, cause })
+              const encoded = yield* S.encode(client.failureSchema)({ _tag: "Failure", id, cause })
               socket.send(encoded)
               break
             }
@@ -287,25 +267,25 @@ export const Service =
       }
 
       webSocketClose(socket: WebSocket, _code: number, _reason: string, _wasClean: boolean) {
-        this.disconnect(socket).pipe(this.runtime.runFork)
+        this.directory.unregister(socket).pipe(this.runtime.runFork)
       }
 
       webSocketError(socket: WebSocket, cause: unknown) {
-        this.disconnect(socket).pipe(
+        this.directory.unregister(socket).pipe(
           Effect.andThen(() => Effect.fail(cause)),
           this.runtime.runFork,
         )
       }
     }
 
-    const upgrade = Effect.fn(function* (name: NameA, attachments: typeof $a.Attachments.Type) {
+    const upgrade = Effect.fn(function* (name: NameA, attachments: S.Struct<AttachmentFields>["Type"]) {
       const namespace = yield* tag
       const nameEncoded = yield* S.encode(nameSchema)(name)
       const stub = namespace.getByName(nameEncoded)
 
       const request = yield* NativeRequest
       const url = new URL(request.url)
-      const params = yield* S.encode($a.Params)({ name, attachments })
+      const params = yield* S.encode(paramsSchema)({ name, attachments })
       url.searchParams.set("__liminal", params)
 
       return yield* Effect.promise(() => stub.fetch(new Request(url, request as never))).pipe(
