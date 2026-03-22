@@ -1,16 +1,21 @@
-import type { FieldsRecord, Fields } from "@crosshatch/util/schema"
-
 import { Context, Schema as S, Effect } from "effect"
 
+import type { FieldsRecord } from "./_type_util.ts"
 import type * as ActorClient from "./Client.ts"
 import type * as ClientHandle from "./ClientHandle.ts"
 import type { MethodDefinition } from "./Method.ts"
+import type { Send } from "./Send.ts"
 
 import * as Method from "./Method.ts"
 
 export const TypeId = "~liminal/Actor" as const
 
-export interface Service<ActorSelf, NameA, AttachmentFields extends Fields, EventDefinitions extends FieldsRecord> {
+export interface Service<
+  ActorSelf,
+  NameA,
+  AttachmentFields extends S.Struct.Fields,
+  EventDefinitions extends FieldsRecord,
+> {
   readonly name: NameA
 
   readonly sender?: ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions> | undefined
@@ -20,7 +25,7 @@ export interface Service<ActorSelf, NameA, AttachmentFields extends Fields, Even
 
 export interface ActorDefinition<
   NameA,
-  AttachmentFields extends Fields,
+  AttachmentFields extends S.Struct.Fields,
   ClientSelf,
   ClientId extends string,
   MethodDefinitions extends Record<string, MethodDefinition.Any>,
@@ -37,7 +42,7 @@ export interface Actor<
   ActorSelf,
   ActorId extends string,
   NameA,
-  AttachmentFields extends Fields,
+  AttachmentFields extends S.Struct.Fields,
   ActorClientSelf,
   ActorClientId extends string,
   MethodDefinitions extends Record<string, MethodDefinition.Any>,
@@ -62,7 +67,7 @@ export interface Actor<
     ActorSelf
   >
 
-  readonly sendAll: ClientHandle.Send<ActorSelf, EventDefinitions>
+  readonly sendAll: Send<ActorSelf, EventDefinitions>
 
   readonly directory: Effect.Effect<
     ReadonlySet<ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions>>,
@@ -79,7 +84,7 @@ export interface Actor<
 export declare const Service: <ActorSelf>() => <
   ActorId extends string,
   NameA,
-  AttachmentFields extends Fields,
+  AttachmentFields extends S.Struct.Fields,
   ClientSelf,
   ClientId extends string,
   MethodDefinitions extends Record<string, MethodDefinition.Any>,

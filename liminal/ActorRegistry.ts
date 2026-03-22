@@ -1,5 +1,3 @@
-import type { FieldsRecord, Fields } from "@crosshatch/util/schema"
-
 import {
   Request,
   type DurableObjectNamespace,
@@ -8,6 +6,7 @@ import {
   WebSocket,
   Response,
 } from "@cloudflare/workers-types"
+import * as Mutex from "@crosshatch/util/Mutex"
 import { HttpServerResponse } from "@effect/platform"
 import {
   Layer,
@@ -21,26 +20,26 @@ import {
   Duration,
 } from "effect"
 
-import type * as Actor from "../Actor.ts"
-import type { MethodDefinition } from "../Method.ts"
+import type { FieldsRecord } from "./_type_util.ts"
+import type * as Actor from "./Actor.ts"
 
-import * as ClientHandle from "../ClientHandle.ts"
-import * as Method from "../Method.ts"
 import * as Binding from "./Binding.ts"
+import * as ClientDirectory from "./ClientDirectory.ts"
 import * as Intrinsic from "./Intrinsic.ts"
+import * as Method from "./Method.ts"
 import { NativeRequest } from "./NativeRequest.ts"
 
-const TypeId = "~liminal/cloudflare/ActorRegistry" as const
+const TypeId = "~liminal/ActorRegistry" as const
 
 export interface ActorRegistryDefinition<
   Binding_ extends string,
   ActorSelf,
   ActorId extends string,
   NameA,
-  AttachmentFields extends Fields,
+  AttachmentFields extends S.Struct.Fields,
   ClientSelf,
   ClientId extends string,
-  MethodDefinitions extends Record<string, MethodDefinition.Any>,
+  MethodDefinitions extends Record<string, Method.MethodDefinition.Any>,
   EventDefinitions extends FieldsRecord,
   PreludeROut,
   PreludeE,
@@ -79,10 +78,10 @@ export interface ActorRegistry<
   ActorSelf,
   ActorId extends string,
   NameA,
-  AttachmentFields extends Fields,
+  AttachmentFields extends S.Struct.Fields,
   ClientSelf,
   ClientId extends string,
-  MethodDefinitions extends Record<string, MethodDefinition.Any>,
+  MethodDefinitions extends Record<string, Method.MethodDefinition.Any>,
   EventDefinitions extends FieldsRecord,
   PreludeROut,
   PreludeE,
@@ -123,10 +122,10 @@ export const Service =
     ActorSelf,
     ActorId extends string,
     NameA,
-    AttachmentFields extends Fields,
+    AttachmentFields extends S.Struct.Fields,
     ClientSelf,
     ClientId extends string,
-    MethodDefinitions extends Record<string, MethodDefinition.Any>,
+    MethodDefinitions extends Record<string, Method.MethodDefinition.Any>,
     EventDefinitions extends FieldsRecord,
     PreludeROut,
     PreludeE,
@@ -193,7 +192,7 @@ export const Service =
     ) {
       readonly state
       readonly runtime
-      readonly directory = ClientHandle.makeDirectory(actor)
+      readonly directory = ClientDirectory.make(actor)
 
       constructor(state: DurableObjectState<{}>, env: unknown) {
         // @ts-ignore
@@ -209,7 +208,12 @@ export const Service =
             const attachments = yield* S.decodeUnknown(attachmentsSchema)(socket.deserializeAttachment())
             yield* this.directory.register(socket, attachments)
           }
-          return Layer.mergeAll(preludeLayer, Intrinsic.layer, Layer.setConfigProvider(ConfigProvider.fromJson(env)))
+          return Layer.mergeAll(
+            preludeLayer,
+            Intrinsic.layer,
+            Layer.setConfigProvider(ConfigProvider.fromJson(env)),
+            Mutex.layer,
+          )
         }).pipe(Layer.unwrapEffect, ManagedRuntime.make)
       }
 
@@ -241,7 +245,7 @@ export const Service =
             handles: this.directory.handles,
             sender: caller,
           })
-          const { id, payload } = yield* S.decodeUnknown(client.callSchema)(
+          const { id, payload } = yield* S.decodeUnknown(client.schema.call)(
             messageRaw instanceof ArrayBuffer ? new TextDecoder().decode(messageRaw) : messageRaw,
           )
           const { _tag } = payload
@@ -253,18 +257,18 @@ export const Service =
           switch (result._tag) {
             case "Success": {
               const { value } = result
-              const encoded = yield* S.encode(client.successSchema)({ _tag: "Success", id, value })
+              const encoded = yield* S.encode(client.schema.success)({ _tag: "Success", id, value })
               socket.send(encoded)
               break
             }
             case "Failure": {
               const { cause } = result
-              const encoded = yield* S.encode(client.failureSchema)({ _tag: "Failure", id, cause })
+              const encoded = yield* S.encode(client.schema.failure)({ _tag: "Failure", id, cause })
               socket.send(encoded)
               break
             }
           }
-        }).pipe(Effect.scoped, this.runtime.runFork)
+        }).pipe(Mutex.task, Effect.scoped, this.runtime.runFork)
       }
 
       webSocketClose(socket: WebSocket, _code: number, _reason: string, _wasClean: boolean) {

@@ -23,14 +23,6 @@
       "types": "./*.ts",
       "default": "./dist/*.js"
     },
-    "./browser": {
-      "types": "./browser/index.ts",
-      "default": "./dist/browser/index.js"
-    },
-    "./cloudflare": {
-      "types": "./cloudflare/index.ts",
-      "default": "./dist/cloudflare/index.js"
-    },
     "./package.json": "./package.json"
   },
   "peerDependencies": {

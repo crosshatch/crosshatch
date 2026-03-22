@@ -15,7 +15,7 @@ export declare namespace MethodDefinition {
     | MethodDefinition<S.Struct.Fields, any, any, never, never>
 }
 
-export const make = <const P extends S.Struct.Fields, AA, AI, EA, EI>({
+export const define = <const P extends S.Struct.Fields, AA, AI, EA, EI>({
   payload,
   success,
   failure,

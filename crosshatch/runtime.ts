@@ -1,7 +1,7 @@
 import { resolveEnv } from "@crosshatch/util/resolveEnv"
 import { memoMap, runtime } from "@crosshatch/util/runtime"
 import { ConfigProvider, Layer, ManagedRuntime } from "effect"
-import { BrowserActorClient } from "liminal/browser"
+import { Client } from "liminal"
 
 import * as CrosshatchEnv from "./CrosshatchEnv.ts"
 import * as FacadeAccumulator from "./FacadeAccumulator.ts"
@@ -10,7 +10,7 @@ import * as FacadeWorker from "./FacadeWorker.ts"
 
 const CommonLive = Layer.mergeAll(
   FacadeAccumulator.layer.pipe(
-    Layer.provideMerge(BrowserActorClient.layer(FacadeClient).pipe(Layer.provide(FacadeWorker.layer))),
+    Layer.provideMerge(Client.layerPlatform(FacadeClient).pipe(Layer.provide(FacadeWorker.layer))),
   ),
 ).pipe(
   Layer.provideMerge(CrosshatchEnv.layer),

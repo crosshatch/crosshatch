@@ -4,7 +4,7 @@ import { Method } from "liminal"
 import { Payload } from "../X402/Payload.ts"
 import { Required } from "../X402/Required.ts"
 
-export const Propose = Method.make({
+export const Propose = Method.define({
   payload: {
     required: Required,
   },
