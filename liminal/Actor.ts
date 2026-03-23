@@ -18,7 +18,7 @@ export interface Service<
 > {
   readonly name: NameA
 
-  readonly sender?: ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions> | undefined
+  readonly currentHandle?: ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions> | undefined
 
   readonly handles: ReadonlySet<ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions>>
 }
@@ -61,7 +61,7 @@ export interface Actor<
     EventDefinitions
   >
 
-  readonly assertSender: Effect.Effect<
+  readonly assertCurrentClient: Effect.Effect<
     ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions>,
     never,
     ActorSelf

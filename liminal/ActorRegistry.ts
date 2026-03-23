@@ -243,7 +243,7 @@ export const Service =
           const layer = Layer.succeed(actor, {
             name,
             handles: this.directory.handles,
-            sender: caller,
+            currentHandle: caller,
           })
           const { id, payload } = yield* S.decodeUnknown(client.schema.call)(
             messageRaw instanceof ArrayBuffer ? new TextDecoder().decode(messageRaw) : messageRaw,
@@ -252,23 +252,20 @@ export const Service =
           yield* handlers[_tag](payload).pipe(
             Effect.provide(requestLayer.pipe(Layer.provideMerge(layer))),
             Effect.matchEffect({
-              onSuccess: Effect.fnUntraced(function* (value) {
-                const encoded = yield* S.encode(client.schema.success)({
+              onSuccess: (value) =>
+                S.encode(S.parseJson(client.schema.success))({
                   _tag: "Success",
                   id,
                   value,
-                })
-                socket.send(encoded)
-              }),
-              onFailure: Effect.fnUntraced(function* (cause) {
-                const encoded = yield* S.encode(client.schema.failure)({
+                }),
+              onFailure: (cause) =>
+                S.encode(S.parseJson(client.schema.failure))({
                   _tag: "Failure",
                   id,
                   cause,
-                })
-                socket.send(encoded)
-              }),
+                }),
             }),
+            Effect.andThen(socket.send),
           )
         }).pipe(Mutex.task, Effect.scoped, this.runtime.runFork)
       }

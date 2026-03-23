@@ -1,9 +1,6 @@
 import { Schema as S, Effect } from "effect"
 
-const TypeId = "~liminal/MethodDefinition" as const
-
 export interface MethodDefinition<P extends S.Struct.Fields, AA, AI, EA, EI> {
-  readonly [TypeId]: typeof TypeId
   readonly payload: P
   readonly success: S.Schema<AA, AI>
   readonly failure: S.Schema<EA, EI>
@@ -24,7 +21,6 @@ export const define = <const P extends S.Struct.Fields, AA, AI, EA, EI>({
   readonly success: S.Schema<AA, AI>
   readonly failure: S.Schema<EA, EI>
 }): MethodDefinition<P, AA, AI, EA, EI> => ({
-  [TypeId]: TypeId,
   payload,
   success,
   failure,

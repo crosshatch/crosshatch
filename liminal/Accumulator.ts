@@ -143,7 +143,7 @@ export const layer = <
   R,
 >(_options: {
   readonly accumulator: Accumulator<Self, Id, F, EventDefinitions>
-  readonly source: Stream.Stream<FieldsRecord.TaggedMember<EventDefinitions>, E, R>
+  readonly source: Stream.Stream<FieldsRecord.TaggedMember.Type<EventDefinitions>, E, R>
   readonly reducers: Reducers
 }): Layer.Layer<
   Self,

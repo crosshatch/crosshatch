@@ -1,5 +1,5 @@
 import { WorkerRunner } from "@effect/platform"
-import { Stream, Layer, Scope, Effect, Schema as S, PubSub, Ref, ExecutionStrategy, Exit, ParseResult } from "effect"
+import { Layer, Scope, Effect, Schema as S, PubSub, Ref, ExecutionStrategy, Exit, ParseResult } from "effect"
 
 import type { FieldsRecord } from "./_type_util.ts"
 
@@ -37,22 +37,23 @@ export const make = Effect.fnUntraced(function* <
   readonly attachments: S.Struct<AttachmentFields>["Type"]
   readonly handlers: Handlers
 }) {
+  const { schema } = actor.definition.client
+  const handles = new Set<ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions>>()
   const semaphore = yield* Effect.makeSemaphore(1)
   const task = semaphore.withPermits(1)
-  const { call, actor: actorMessage } = actor.definition.client.schema
-  const handles = new Set<ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions>>()
 
   return Effect.gen(function* () {
-    const scope = yield* Scope.fork(yield* Scope.Scope, ExecutionStrategy.sequential)
+    const outerScope = yield* Scope.Scope
+    const scope = yield* Scope.fork(outerScope, ExecutionStrategy.sequential)
     const disconnect = Effect.gen(function* () {
       yield* Scope.close(scope, Exit.void)
       handles.delete(handle)
     })
     const attachmentsRef = yield* Ref.make(attachments)
-    const listener = yield* PubSub.unbounded<typeof actorMessage.Type>()
+    const pubsub = yield* PubSub.unbounded<typeof schema.actor.Type>().pipe(Effect.acquireRelease(PubSub.shutdown))
     const handle = ClientHandle.make<ActorSelf, AttachmentFields, EventDefinitions>({
       send: (_tag, payload) =>
-        listener
+        pubsub
           .publish({
             _tag: "Event",
             event: {
@@ -67,33 +68,31 @@ export const make = Effect.fnUntraced(function* <
     })
     handles.add(handle)
     yield* WorkerRunner.make<
-      0 | typeof call.Type,
+      unknown,
       ParseResult.ParseError,
       Exclude<Effect.Effect.Context<ReturnType<Handlers[keyof Handlers]>>, ActorSelf>,
-      typeof actorMessage.Type | void
-    >((raw: unknown) => {
-      if (raw === 0) {
-        return Stream.fromPubSub(listener)
-      }
-      return Effect.gen(function* () {
-        const { id, payload } = yield* S.decodeUnknown(call)(raw)
-        const handler = handlers[payload._tag]
-        yield* handler(payload).pipe(
-          Effect.matchEffect({
-            onSuccess: (value) => listener.offer({ _tag: "Success" as const, id, value }),
-            onFailure: (cause) => listener.offer({ _tag: "Failure" as const, id, cause }),
-          }),
-        )
-      }).pipe(
+      typeof schema.actor.Type | void
+    >(
+      Effect.fn(
+        function* (raw) {
+          const { id, payload } = yield* S.validate(schema.call)(raw)
+          const handler = handlers[payload._tag]
+          yield* handler(payload).pipe(
+            Effect.matchEffect({
+              onSuccess: (value) => pubsub.offer({ _tag: "Success" as const, id, value }),
+              onFailure: (cause) => pubsub.offer({ _tag: "Failure" as const, id, cause }),
+            }),
+          )
+        },
         task,
         Effect.provide(
           Layer.succeed(actor, {
             name,
             handles,
-            sender: handle,
+            currentHandle: handle,
           }),
         ),
-      )
-    })
+      ),
+    )
   })
 })

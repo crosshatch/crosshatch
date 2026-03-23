@@ -1,18 +1,5 @@
-import { Socket, Worker } from "@effect/platform"
-import {
-  ParseResult,
-  Exit,
-  Deferred,
-  Cause,
-  Layer,
-  Record,
-  Context,
-  Stream,
-  Effect,
-  Schema as S,
-  PubSub,
-  Data,
-} from "effect"
+import { Socket, Worker, WorkerError } from "@effect/platform"
+import { Exit, Deferred, Layer, Record, Context, Stream, Effect, Schema as S, PubSub, Data, Scope } from "effect"
 
 import type { FieldsRecord } from "./_type_util.ts"
 import type { MethodDefinition } from "./Method.ts"
@@ -35,7 +22,7 @@ export interface Service<
   MethodDefinitions extends Record<string, MethodDefinition.Any>,
   EventDefinitions extends FieldsRecord,
 > {
-  readonly eventsPubsub: PubSub.PubSub<FieldsRecord.TaggedMember<EventDefinitions>>
+  readonly eventsPubsub: PubSub.PubSub<FieldsRecord.TaggedMember.Type<EventDefinitions>>
 
   readonly f: F<ClientSelf, MethodDefinitions>
 }
@@ -67,24 +54,33 @@ export interface Client<
   readonly definition: ClientDefinition<MethodDefinitions, EventDefinitions>
 
   readonly schema: {
-    readonly call: S.Schema<Protocol.CallMessage<MethodDefinitions>, string>
+    readonly call: S.Schema<
+      Protocol.CallMessage.Type<MethodDefinitions>,
+      Protocol.CallMessage.Encoded<MethodDefinitions>
+    >
 
-    readonly success: S.Schema<Protocol.SuccessMessage<MethodDefinitions>, string>
+    readonly success: S.Schema<
+      Protocol.SuccessMessage.Type<MethodDefinitions>,
+      Protocol.SuccessMessage.Encoded<MethodDefinitions>
+    >
 
-    readonly failure: S.Schema<Protocol.FailureMessage<MethodDefinitions>, string>
+    readonly failure: S.Schema<
+      Protocol.FailureMessage.Type<MethodDefinitions>,
+      Protocol.FailureMessage.Encoded<MethodDefinitions>
+    >
 
-    readonly event: S.Schema<Protocol.EventMessage<EventDefinitions>, string>
+    readonly event: S.Schema<
+      Protocol.EventMessage.Type<EventDefinitions>,
+      Protocol.EventMessage.Encoded<EventDefinitions>
+    >
 
     readonly actor: S.Schema<
-      | Protocol.SuccessMessage<MethodDefinitions>
-      | Protocol.FailureMessage<MethodDefinitions>
-      | Protocol.EventMessage<EventDefinitions>
-      | typeof Protocol.DisconnectMessage.Type,
-      string
+      Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions> | typeof Protocol.DisconnectMessage.Type,
+      Protocol.ActorMessage.Encoded<MethodDefinitions, EventDefinitions> | typeof Protocol.DisconnectMessage.Encoded
     >
   }
 
-  readonly events: Stream.Stream<FieldsRecord.TaggedMember<EventDefinitions>, ConnectionError, ClientSelf>
+  readonly events: Stream.Stream<FieldsRecord.TaggedMember.Type<EventDefinitions>, ConnectionError, ClientSelf>
 
   readonly f: F<ClientSelf, MethodDefinitions>
 }
@@ -101,34 +97,38 @@ export const Service =
   ): Client<ClientSelf, ClientId, MethodDefinitions, EventDefinitions> => {
     const tag = Context.Tag(id)<ClientSelf, Service<ClientSelf, MethodDefinitions, EventDefinitions>>()
 
-    const call: S.Schema<Protocol.CallMessage<MethodDefinitions>, string> = S.parseJson(
-      S.TaggedStruct("Call", {
-        id: S.Int,
-        payload: S.Union(
-          ...Object.entries(definition.methods).map(([_tag, { payload }]) => S.TaggedStruct(_tag, payload)),
-        ),
-      }),
-    ) as never
+    const call: S.Schema<
+      Protocol.CallMessage.Type<MethodDefinitions>,
+      Protocol.CallMessage.Encoded<MethodDefinitions>
+    > = S.TaggedStruct("Call", {
+      id: S.Int,
+      payload: S.Union(
+        ...Object.entries(definition.methods).map(([_tag, { payload }]) => S.TaggedStruct(_tag, payload)),
+      ),
+    }) as never
 
-    const success: S.Schema<Protocol.SuccessMessage<MethodDefinitions>, string> = S.parseJson(
-      S.TaggedStruct("Success", {
-        id: S.Int,
-        value: S.Union(...Object.values(definition.methods).map(({ success }) => success)),
-      }),
-    )
+    const success: S.Schema<
+      Protocol.SuccessMessage.Type<MethodDefinitions>,
+      Protocol.SuccessMessage.Encoded<MethodDefinitions>
+    > = S.TaggedStruct("Success", {
+      id: S.Int,
+      value: S.Union(...Object.values(definition.methods).map(({ success }) => success)),
+    })
 
-    const failure: S.Schema<Protocol.FailureMessage<MethodDefinitions>, string> = S.parseJson(
-      S.TaggedStruct("Failure", {
-        id: S.Int,
-        cause: S.Union(...Object.values(definition.methods).map(({ failure }) => failure)),
-      }),
-    )
+    const failure: S.Schema<
+      Protocol.FailureMessage.Type<MethodDefinitions>,
+      Protocol.FailureMessage.Encoded<MethodDefinitions>
+    > = S.TaggedStruct("Failure", {
+      id: S.Int,
+      cause: S.Union(...Object.values(definition.methods).map(({ failure }) => failure)),
+    })
 
-    const event: S.Schema<Protocol.EventMessage<EventDefinitions>, string> = S.parseJson(
-      S.TaggedStruct("Event", {
-        event: S.Union(...Object.entries(definition.events).map(([_tag, fields]) => S.TaggedStruct(_tag, fields))),
-      }),
-    ) as never
+    const event: S.Schema<
+      Protocol.EventMessage.Type<EventDefinitions>,
+      Protocol.EventMessage.Encoded<EventDefinitions>
+    > = S.TaggedStruct("Event", {
+      event: S.Union(...Object.entries(definition.events).map(([_tag, fields]) => S.TaggedStruct(_tag, fields))),
+    }) as never
 
     const actor = S.Union(success, failure, event, Protocol.DisconnectMessage)
 
@@ -152,6 +152,77 @@ export const Service =
     })
   }
 
+const listen = Effect.fnUntraced(function* <
+  ClientSelf,
+  ClientId extends string,
+  MethodDefinitions extends Record<string, MethodDefinition.Any>,
+  EventDefinitions extends FieldsRecord,
+>({
+  client: { schema },
+  messages,
+  send,
+}: {
+  readonly client: Client<ClientSelf, ClientId, MethodDefinitions, EventDefinitions>
+  readonly messages: Stream.Stream<
+    Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions> | typeof Protocol.DisconnectMessage.Type,
+    ConnectionError
+  >
+  readonly send: (message: Protocol.CallMessage.Type<MethodDefinitions>) => Effect.Effect<void, ConnectionError>
+}) {
+  const eventsPubsub = yield* PubSub.unbounded<FieldsRecord.TaggedMember.Type<EventDefinitions>>()
+  let i = 0
+
+  type D = MethodDefinitions[keyof MethodDefinitions]
+  type Success = D["success"]["Type"]
+  type Failure = D["failure"]["Type"]
+
+  const pending: Record<string, Deferred.Deferred<Success, Failure>> = {}
+  const scope = yield* Scope.make()
+  yield* messages.pipe(
+    Stream.runForEach(
+      Effect.fnUntraced(function* (raw) {
+        const message = yield* S.decodeUnknown(schema.actor)(raw)
+        switch (message._tag) {
+          case "Disconnect": {
+            return yield* Scope.close(scope, Exit.void)
+          }
+          case "Event": {
+            return yield* eventsPubsub.publish(message.event)
+          }
+          case "Success": {
+            const { id, value } = message
+            const deferred = yield* Effect.fromNullable(pending[id])
+            delete pending[id]
+            return yield* Deferred.done(deferred, Exit.succeed(value))
+          }
+          case "Failure": {
+            const { id, cause } = message
+            const deferred = yield* Effect.fromNullable(pending[id])
+            return yield* Deferred.done(deferred, Exit.succeed(cause))
+          }
+        }
+      }),
+    ),
+    Effect.forkScoped,
+    Scope.use(scope),
+  )
+
+  const f: F<ClientSelf, MethodDefinitions> = (_tag) =>
+    Effect.fnUntraced(function* (payload) {
+      let id = i++
+      const deferred = yield* Deferred.make<Success, Failure>()
+      pending[id] = deferred
+      yield* send({
+        _tag: "Call",
+        id,
+        payload: { _tag, ...payload },
+      })
+      return yield* Deferred.await(deferred)
+    })
+
+  return { f, eventsPubsub }
+})
+
 export const layerSocket = <
   ClientSelf,
   ClientId extends string,
@@ -165,56 +236,32 @@ export const layerSocket = <
   readonly client: Client<ClientSelf, ClientId, MethodDefinitions, EventDefinitions>
   readonly baseUrl: string
   readonly protocols?: string | Array<string> | undefined
-}): Layer.Layer<
-  ClientSelf,
-  Socket.SocketError | ParseResult.ParseError | Cause.NoSuchElementException,
-  Socket.WebSocketConstructor
-> =>
+}): Layer.Layer<ClientSelf, ConnectionError, Socket.WebSocketConstructor> =>
   Effect.gen(function* () {
     const socket = yield* Socket.makeWebSocket(baseUrl, { protocols })
     const write = yield* socket.writer
-    const eventsPubsub = yield* PubSub.unbounded<FieldsRecord.TaggedMember<EventDefinitions>>()
-    let i = 0
-    type D = MethodDefinitions[keyof MethodDefinitions]
-    type Success = D["success"]["Type"]
-    type Failure = D["failure"]["Type"]
-    const pending: Record<string, Deferred.Deferred<Success, Failure>> = {}
-    yield* socket.run(
-      Effect.fnUntraced(function* (raw) {
-        const message = yield* S.decodeUnknown(client.schema.actor)(new TextDecoder().decode(raw))
-        switch (message._tag) {
-          case "Disconnect": {
-            return yield* write(new Socket.CloseEvent())
-          }
-          case "Event": {
-            return yield* eventsPubsub.publish(message.event)
-          }
-          case "Success": {
-            const { id, value } = message
-            const deferred = yield* Effect.fromNullable(pending[id])
-            return yield* Deferred.done(deferred, Exit.succeed(value))
-          }
-          case "Failure": {
-            const { id, cause } = message
-            const deferred = yield* Effect.fromNullable(pending[id])
-            return yield* Deferred.done(deferred, Exit.succeed(cause))
-          }
-        }
-      }),
+    const messages = Stream.asyncEffect<
+      Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions> | typeof Protocol.DisconnectMessage.Type,
+      ConnectionError
+    >(
+      Effect.fnUntraced(
+        function* (emit) {
+          yield* socket.run(
+            Effect.fnUntraced(function* (raw) {
+              const parsed = yield* S.decodeUnknown(S.parseJson(client.schema.actor))(raw)
+              yield* Effect.promise(() => emit.single(parsed))
+            }),
+          )
+        },
+        Effect.mapError(() => new ConnectionError()),
+      ),
     )
-    const f: F<ClientSelf, MethodDefinitions> = (_tag) =>
-      Effect.fnUntraced(function* (payload) {
-        let id = i++
-        const deferred = yield* Deferred.make<Success, Failure>()
-        pending[id] = deferred
-        yield* S.encode(client.schema.call)({
-          _tag: "Call",
-          id,
-          payload: { _tag, ...payload },
-        }).pipe(Effect.andThen(write))
-        return yield* Deferred.await(deferred)
-      })
-    return { f, eventsPubsub }
+    return yield* listen({
+      client,
+      messages,
+      send: (message) =>
+        write(JSON.stringify(message)).pipe(Effect.catchTag("SocketError", () => new ConnectionError())),
+    })
   }).pipe(Layer.scoped(client))
 
 export const layerPlatform = <
@@ -223,5 +270,20 @@ export const layerPlatform = <
   MethodDefinitions extends Record<string, MethodDefinition.Any>,
   EventDefinitions extends FieldsRecord,
 >(
-  _client: Client<ClientSelf, ClientId, MethodDefinitions, EventDefinitions>,
-): Layer.Layer<ClientSelf, never, Worker.PlatformWorker | Worker.Spawner> => null!
+  client: Client<ClientSelf, ClientId, MethodDefinitions, EventDefinitions>,
+): Layer.Layer<ClientSelf, WorkerError.WorkerError, Worker.PlatformWorker | Worker.Spawner> =>
+  Effect.gen(function* () {
+    const manager = yield* Worker.makeManager
+    const pubsub = yield* PubSub.unbounded<Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions>>()
+    const worker = yield* manager.spawn<
+      typeof Protocol.ConnectMessage.Type | Protocol.CallMessage.Type<MethodDefinitions>,
+      Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions>,
+      never
+    >({})
+    yield* worker.execute(Protocol.ConnectMessage.make()).pipe(Stream.runForEach(pubsub.offer), Effect.forkScoped)
+    return yield* listen({
+      client,
+      messages: Stream.fromPubSub(pubsub),
+      send: (message) => worker.executeEffect(message).pipe(Effect.catchAll(() => new ConnectionError())),
+    })
+  }).pipe(Layer.scoped(client))

@@ -6,6 +6,7 @@ import type { MethodDefinition } from "./Method.ts"
 
 import * as Actor from "./Actor.ts"
 import * as ClientHandle from "./ClientHandle.ts"
+import * as Protocol from "./Protocol.ts"
 import { DisconnectMessage } from "./Protocol.ts"
 
 export interface ClientDirectory<
@@ -75,12 +76,14 @@ export const make = <
         socket.serializeAttachment(value)
       }),
       send: (_tag, payload) =>
-        S.encode(event)({
+        S.encode(S.parseJson(event))({
           _tag: "Event",
           event: { _tag, ...payload },
         }).pipe(Effect.andThen(socket.send)),
       disconnect: Effect.gen(function* () {
-        yield* S.encode(DisconnectMessage)({ _tag: "Disconnect" }).pipe(Effect.andThen(socket.send))
+        yield* S.encode(S.parseJson(DisconnectMessage))(Protocol.DisconnectMessage.make()).pipe(
+          Effect.andThen(socket.send),
+        )
         sockets.delete(socket)
         handles.delete(handle)
       }),
