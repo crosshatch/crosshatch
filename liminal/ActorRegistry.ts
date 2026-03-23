@@ -249,25 +249,27 @@ export const Service =
             messageRaw instanceof ArrayBuffer ? new TextDecoder().decode(messageRaw) : messageRaw,
           )
           const { _tag } = payload
-          const handler = handlers[_tag]
-          const result = yield* handler(payload).pipe(
+          yield* handlers[_tag](payload).pipe(
             Effect.provide(requestLayer.pipe(Layer.provideMerge(layer))),
-            Effect.exit,
+            Effect.matchEffect({
+              onSuccess: Effect.fnUntraced(function* (value) {
+                const encoded = yield* S.encode(client.schema.success)({
+                  _tag: "Success",
+                  id,
+                  value,
+                })
+                socket.send(encoded)
+              }),
+              onFailure: Effect.fnUntraced(function* (cause) {
+                const encoded = yield* S.encode(client.schema.failure)({
+                  _tag: "Failure",
+                  id,
+                  cause,
+                })
+                socket.send(encoded)
+              }),
+            }),
           )
-          switch (result._tag) {
-            case "Success": {
-              const { value } = result
-              const encoded = yield* S.encode(client.schema.success)({ _tag: "Success", id, value })
-              socket.send(encoded)
-              break
-            }
-            case "Failure": {
-              const { cause } = result
-              const encoded = yield* S.encode(client.schema.failure)({ _tag: "Failure", id, cause })
-              socket.send(encoded)
-              break
-            }
-          }
         }).pipe(Mutex.task, Effect.scoped, this.runtime.runFork)
       }
 
