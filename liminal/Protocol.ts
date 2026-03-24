@@ -79,9 +79,6 @@ export declare namespace EventMessage {
   }
 }
 
-export const ConnectMessage = S.TaggedStruct("Connect", {})
-export const DisconnectMessage = S.TaggedStruct("Disconnect", {})
-
 export declare namespace ActorMessage {
   export type Type<
     MethodDefinitions extends Record<string, MethodDefinition.Any>,
@@ -90,6 +87,7 @@ export declare namespace ActorMessage {
     | SuccessMessage.Type<MethodDefinitions>
     | FailureMessage.Type<MethodDefinitions>
     | EventMessage.Type<EventDefinitions>
+    | 1
 
   export type Encoded<
     MethodDefinitions extends Record<string, MethodDefinition.Any>,
@@ -98,4 +96,14 @@ export declare namespace ActorMessage {
     | SuccessMessage.Encoded<MethodDefinitions>
     | FailureMessage.Encoded<MethodDefinitions>
     | EventMessage.Encoded<EventDefinitions>
+    | 1
+}
+
+export declare namespace ClientMessage {
+  export type Type<MethodDefinitions extends Record<string, MethodDefinition.Any>> =
+    | 0
+    | CallMessage.Type<MethodDefinitions>
+  export type Encoded<MethodDefinitions extends Record<string, MethodDefinition.Any>> =
+    | 0
+    | CallMessage.Encoded<MethodDefinitions>
 }

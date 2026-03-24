@@ -245,9 +245,13 @@ export const Service =
             handles: this.directory.handles,
             currentHandle: caller,
           })
-          const { id, payload } = yield* S.decodeUnknown(client.schema.call)(
+          const message = yield* S.decodeUnknown(client.schema.client)(
             messageRaw instanceof ArrayBuffer ? new TextDecoder().decode(messageRaw) : messageRaw,
           )
+          if (message === 0) {
+            return yield* Effect.die(void 0)
+          }
+          const { id, payload } = message
           const { _tag } = payload
           yield* handlers[_tag](payload).pipe(
             Effect.provide(requestLayer.pipe(Layer.provideMerge(layer))),

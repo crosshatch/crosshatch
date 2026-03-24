@@ -1,5 +1,18 @@
 import { Socket, Worker, WorkerError } from "@effect/platform"
-import { Exit, Deferred, Layer, Record, Context, Stream, Effect, Schema as S, PubSub, Data, Scope } from "effect"
+import {
+  Exit,
+  Deferred,
+  Layer,
+  Record,
+  Context,
+  Stream,
+  Effect,
+  Schema as S,
+  PubSub,
+  Data,
+  Scope,
+  ExecutionStrategy,
+} from "effect"
 
 import type { FieldsRecord } from "./_type_util.ts"
 import type { MethodDefinition } from "./Method.ts"
@@ -59,6 +72,11 @@ export interface Client<
       Protocol.CallMessage.Encoded<MethodDefinitions>
     >
 
+    readonly client: S.Schema<
+      Protocol.ClientMessage.Type<MethodDefinitions>,
+      Protocol.ClientMessage.Encoded<MethodDefinitions>
+    >
+
     readonly success: S.Schema<
       Protocol.SuccessMessage.Type<MethodDefinitions>,
       Protocol.SuccessMessage.Encoded<MethodDefinitions>
@@ -75,8 +93,8 @@ export interface Client<
     >
 
     readonly actor: S.Schema<
-      Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions> | typeof Protocol.DisconnectMessage.Type,
-      Protocol.ActorMessage.Encoded<MethodDefinitions, EventDefinitions> | typeof Protocol.DisconnectMessage.Encoded
+      Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions>,
+      Protocol.ActorMessage.Encoded<MethodDefinitions, EventDefinitions>
     >
   }
 
@@ -107,6 +125,11 @@ export const Service =
       ),
     }) as never
 
+    const client: S.Schema<
+      Protocol.ClientMessage.Type<MethodDefinitions>,
+      Protocol.ClientMessage.Encoded<MethodDefinitions>
+    > = S.Union(call, S.Literal(0))
+
     const success: S.Schema<
       Protocol.SuccessMessage.Type<MethodDefinitions>,
       Protocol.SuccessMessage.Encoded<MethodDefinitions>
@@ -130,7 +153,7 @@ export const Service =
       event: S.Union(...Object.entries(definition.events).map(([_tag, fields]) => S.TaggedStruct(_tag, fields))),
     }) as never
 
-    const actor = S.Union(success, failure, event, Protocol.DisconnectMessage)
+    const actor = S.Union(success, failure, event, S.Literal(1))
 
     const f: F<ClientSelf, MethodDefinitions> = (method) =>
       Effect.fnUntraced(function* (payload) {
@@ -146,7 +169,7 @@ export const Service =
     return Object.assign(tag, {
       [TypeId]: TypeId,
       definition,
-      schema: { call, success, failure, event, actor },
+      schema: { call, client, success, failure, event, actor },
       events,
       f,
     })
@@ -163,10 +186,7 @@ const listen = Effect.fnUntraced(function* <
   send,
 }: {
   readonly client: Client<ClientSelf, ClientId, MethodDefinitions, EventDefinitions>
-  readonly messages: Stream.Stream<
-    Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions> | typeof Protocol.DisconnectMessage.Type,
-    ConnectionError
-  >
+  readonly messages: Stream.Stream<Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions>, ConnectionError>
   readonly send: (message: Protocol.CallMessage.Type<MethodDefinitions>) => Effect.Effect<void, ConnectionError>
 }) {
   const eventsPubsub = yield* PubSub.unbounded<FieldsRecord.TaggedMember.Type<EventDefinitions>>()
@@ -177,15 +197,15 @@ const listen = Effect.fnUntraced(function* <
   type Failure = D["failure"]["Type"]
 
   const pending: Record<string, Deferred.Deferred<Success, Failure>> = {}
-  const scope = yield* Scope.make()
+  const scope = yield* Scope.Scope
   yield* messages.pipe(
     Stream.runForEach(
       Effect.fnUntraced(function* (raw) {
         const message = yield* S.decodeUnknown(schema.actor)(raw)
+        if (message === 1) {
+          return yield* Scope.close(scope, Exit.void)
+        }
         switch (message._tag) {
-          case "Disconnect": {
-            return yield* Scope.close(scope, Exit.void)
-          }
           case "Event": {
             return yield* eventsPubsub.publish(message.event)
           }
@@ -204,7 +224,7 @@ const listen = Effect.fnUntraced(function* <
       }),
     ),
     Effect.forkScoped,
-    Scope.use(scope),
+    Scope.extend(scope),
   )
 
   const f: F<ClientSelf, MethodDefinitions> = (_tag) =>
@@ -241,7 +261,7 @@ export const layerSocket = <
     const socket = yield* Socket.makeWebSocket(baseUrl, { protocols })
     const write = yield* socket.writer
     const messages = Stream.asyncEffect<
-      Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions> | typeof Protocol.DisconnectMessage.Type,
+      Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions>,
       ConnectionError
     >(
       Effect.fnUntraced(
@@ -260,7 +280,10 @@ export const layerSocket = <
       client,
       messages,
       send: (message) =>
-        write(JSON.stringify(message)).pipe(Effect.catchTag("SocketError", () => new ConnectionError())),
+        S.encode(S.parseJson(client.schema.call))(message).pipe(
+          Effect.flatMap(write),
+          Effect.catchAll(() => new ConnectionError()),
+        ),
     })
   }).pipe(Layer.scoped(client))
 
@@ -276,11 +299,11 @@ export const layerPlatform = <
     const manager = yield* Worker.makeManager
     const pubsub = yield* PubSub.unbounded<Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions>>()
     const worker = yield* manager.spawn<
-      typeof Protocol.ConnectMessage.Type | Protocol.CallMessage.Type<MethodDefinitions>,
+      Protocol.ClientMessage.Type<MethodDefinitions>,
       Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions>,
       never
     >({})
-    yield* worker.execute(Protocol.ConnectMessage.make()).pipe(Stream.runForEach(pubsub.offer), Effect.forkScoped)
+    yield* worker.execute(0).pipe(Stream.runForEach(pubsub.offer), Effect.forkScoped)
     return yield* listen({
       client,
       messages: Stream.fromPubSub(pubsub),
