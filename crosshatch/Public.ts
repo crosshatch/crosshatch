@@ -3,4 +3,4 @@ import { X402 } from "crosshatch"
 
 export class Public extends HttpApi_.make("crosshatch")
   .add(X402.Facilitator.Facilitator)
-  .annotate(OpenApi.Title, "x.crosshatch.dev") {}
+  .annotate(OpenApi.Title, "crosshatch.dev") {}

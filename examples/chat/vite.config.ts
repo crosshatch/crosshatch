@@ -31,10 +31,7 @@ export default defineConfig({
       "@electric-sql/pglite/worker",
       "tiktoken/lite",
     ],
-    include: [
-      "@effect-atom/atom",
-      "@effect-atom/atom-react",
-    ],
+    include: ["@effect-atom/atom", "@effect-atom/atom-react"],
   },
   plugins: [
     migrations(),
