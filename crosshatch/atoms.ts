@@ -17,7 +17,7 @@ export const rescindAtom = atomRuntime.fn(FacadeClient.f("Rescind"))
 export const proposeAtom = atomRuntime.fn(FacadeClient.f("Propose"))
 
 export const openSessionWidgetAtom = atomRuntime.fn<void>()(
-  Effect.fn(function* (_, get) {
+  Effect.fnUntraced(function* (_, get) {
     const isCrosshatch = yield* CrosshatchEnv.isCrosshatch(origin)
     const challengeId = yield* get.result(challengeIdAtom)
     const common = { referrer: location.href }

@@ -18,7 +18,7 @@ export const layerFs = Layer.effect(
     const path = yield* Path.Path
     const fs = yield* FileSystem.FileSystem
 
-    const load = Effect.fn(function* (url: string) {
+    const load = Effect.fnUntraced(function* (url: string) {
       const { dir, name } = path.parse(new URL(url).pathname)
       const templatePathname = path.join(dir, `${name}.md`)
       if (yield* fs.exists(templatePathname).pipe(Effect.mapError(() => new LoaderError({ url })))) {

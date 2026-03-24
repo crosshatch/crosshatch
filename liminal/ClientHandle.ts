@@ -16,7 +16,7 @@ export interface ClientHandle<
 
   readonly attachments: Effect.Effect<S.Struct<AttachmentFields>["Type"]>
 
-  readonly save: (attachments: S.Struct<AttachmentFields>["Type"]) => Effect.Effect<void>
+  readonly save: (attachments: S.Struct<AttachmentFields>["Type"]) => Effect.Effect<void, ParseResult.ParseError>
 
   readonly disconnect: Effect.Effect<void, ParseResult.ParseError, ActorSelf>
 }
@@ -31,7 +31,7 @@ export const make = <ActorSelf, AttachmentFields extends S.Struct.Fields, EventD
 
   readonly attachments: Effect.Effect<S.Struct<AttachmentFields>["Type"]>
 
-  readonly save: (attachments: S.Struct<AttachmentFields>["Type"]) => Effect.Effect<void>
+  readonly save: (attachments: S.Struct<AttachmentFields>["Type"]) => Effect.Effect<void, ParseResult.ParseError>
 
   readonly disconnect: Effect.Effect<void, ParseResult.ParseError, ActorSelf>
 }) => ({

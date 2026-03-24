@@ -1,18 +1,5 @@
 import { Socket, Worker, WorkerError } from "@effect/platform"
-import {
-  Exit,
-  Deferred,
-  Layer,
-  Record,
-  Context,
-  Stream,
-  Effect,
-  Schema as S,
-  PubSub,
-  Data,
-  Scope,
-  ExecutionStrategy,
-} from "effect"
+import { Exit, Deferred, Layer, Record, Context, Stream, Effect, Schema as S, PubSub, Data } from "effect"
 
 import type { FieldsRecord } from "./_type_util.ts"
 import type { MethodDefinition } from "./Method.ts"
@@ -181,13 +168,12 @@ const listen = Effect.fnUntraced(function* <
   MethodDefinitions extends Record<string, MethodDefinition.Any>,
   EventDefinitions extends FieldsRecord,
 >({
-  client: { schema },
   messages,
   send,
 }: {
   readonly client: Client<ClientSelf, ClientId, MethodDefinitions, EventDefinitions>
   readonly messages: Stream.Stream<Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions>, ConnectionError>
-  readonly send: (message: Protocol.CallMessage.Type<MethodDefinitions>) => Effect.Effect<void, ConnectionError>
+  readonly send: (message: Protocol.ClientMessage.Type<MethodDefinitions>) => Effect.Effect<void, ConnectionError>
 }) {
   const eventsPubsub = yield* PubSub.unbounded<FieldsRecord.TaggedMember.Type<EventDefinitions>>()
   let i = 0
@@ -197,39 +183,41 @@ const listen = Effect.fnUntraced(function* <
   type Failure = D["failure"]["Type"]
 
   const pending: Record<string, Deferred.Deferred<Success, Failure>> = {}
-  const scope = yield* Scope.Scope
   yield* messages.pipe(
+    Stream.takeWhile((v) => v !== 1),
     Stream.runForEach(
-      Effect.fnUntraced(function* (raw) {
-        const message = yield* S.decodeUnknown(schema.actor)(raw)
-        if (message === 1) {
-          return yield* Scope.close(scope, Exit.void)
-        }
+      Effect.fnUntraced(function* (message) {
         switch (message._tag) {
           case "Event": {
-            return yield* eventsPubsub.publish(message.event)
+            yield* eventsPubsub.publish(message.event)
+            break
           }
           case "Success": {
             const { id, value } = message
             const deferred = yield* Effect.fromNullable(pending[id])
             delete pending[id]
-            return yield* Deferred.done(deferred, Exit.succeed(value))
+            yield* Deferred.done(deferred, Exit.succeed(value))
+            break
           }
           case "Failure": {
             const { id, cause } = message
             const deferred = yield* Effect.fromNullable(pending[id])
-            return yield* Deferred.done(deferred, Exit.succeed(cause))
+            delete pending[id]
+            yield* Deferred.done(deferred, Exit.fail(cause))
+            break
           }
         }
       }),
     ),
+    Effect.ensuring(
+      Effect.forEach(Object.values(pending), (deferred) => Deferred.done(deferred, Exit.fail(new ConnectionError()))),
+    ),
     Effect.forkScoped,
-    Scope.extend(scope),
   )
-
+  yield* send(0)
   const f: F<ClientSelf, MethodDefinitions> = (_tag) =>
     Effect.fnUntraced(function* (payload) {
-      let id = i++
+      const id = i++
       const deferred = yield* Deferred.make<Success, Failure>()
       pending[id] = deferred
       yield* send({
@@ -268,8 +256,10 @@ export const layerSocket = <
         function* (emit) {
           yield* socket.run(
             Effect.fnUntraced(function* (raw) {
-              const parsed = yield* S.decodeUnknown(S.parseJson(client.schema.actor))(raw)
-              yield* Effect.promise(() => emit.single(parsed))
+              const message = yield* S.decodeUnknown(S.parseJson(client.schema.actor))(
+                raw instanceof Uint8Array ? new TextDecoder().decode(raw) : raw,
+              )
+              yield* Effect.tryPromise(() => emit.single(message))
             }),
           )
         },
@@ -280,7 +270,7 @@ export const layerSocket = <
       client,
       messages,
       send: (message) =>
-        S.encode(S.parseJson(client.schema.call))(message).pipe(
+        S.encode(S.parseJson(client.schema.client))(message).pipe(
           Effect.flatMap(write),
           Effect.catchAll(() => new ConnectionError()),
         ),
@@ -294,19 +284,17 @@ export const layerPlatform = <
   EventDefinitions extends FieldsRecord,
 >(
   client: Client<ClientSelf, ClientId, MethodDefinitions, EventDefinitions>,
-): Layer.Layer<ClientSelf, WorkerError.WorkerError, Worker.PlatformWorker | Worker.Spawner> =>
+): Layer.Layer<ClientSelf, WorkerError.WorkerError | ConnectionError, Worker.PlatformWorker | Worker.Spawner> =>
   Effect.gen(function* () {
     const manager = yield* Worker.makeManager
-    const pubsub = yield* PubSub.unbounded<Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions>>()
     const worker = yield* manager.spawn<
       Protocol.ClientMessage.Type<MethodDefinitions>,
       Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions>,
       never
     >({})
-    yield* worker.execute(0).pipe(Stream.runForEach(pubsub.offer), Effect.forkScoped)
     return yield* listen({
       client,
-      messages: Stream.fromPubSub(pubsub),
+      messages: worker.execute(0).pipe(Stream.mapError(() => new ConnectionError())),
       send: (message) => worker.executeEffect(message).pipe(Effect.catchAll(() => new ConnectionError())),
     })
   }).pipe(Layer.scoped(client))

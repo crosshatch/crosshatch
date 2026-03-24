@@ -68,6 +68,12 @@ export interface ActorRegistryDefinition<
     ActorSelf | HandlerROut | Intrinsic.Intrinsic | PreludeROut | Scope.Scope
   >
 
+  readonly onConnect: Effect.Effect<
+    void,
+    never,
+    ActorSelf | HandlerROut | Intrinsic.Intrinsic | PreludeROut | Scope.Scope
+  >
+
   readonly hibernation?: Duration.DurationInput | undefined
 }
 
@@ -165,7 +171,7 @@ export const Service =
     HandlerROut,
     HandlerE
   > => {
-    const { hibernation, actor, preludeLayer, requestLayer, handlers, binding } = definition
+    const { hibernation, actor, preludeLayer, requestLayer, handlers, binding, onConnect } = definition
     const {
       definition: { name: nameSchema, attachments: attachmentFields, client },
     } = actor
@@ -204,6 +210,11 @@ export const Service =
         }
 
         this.runtime = Effect.gen(this, function* () {
+          this.#name = yield* Effect.tryPromise(() => this.state.storage.get("__liminal_name")).pipe(
+            Effect.flatMap((v) =>
+              typeof v === "string" ? S.decode(actor.definition.name)(v) : Effect.succeed(undefined),
+            ),
+          )
           for (const socket of this.state.getWebSockets()) {
             const attachments = yield* S.decodeUnknown(attachmentsSchema)(socket.deserializeAttachment())
             yield* this.directory.register(socket, attachments)
@@ -224,7 +235,8 @@ export const Service =
           const { name, attachments } = yield* S.decodeUnknown(paramsSchema)(url.searchParams.get("__liminal"))
           if (!this.#name) {
             this.#name = name
-            yield* Effect.promise(() => this.state.storage.put("__liminal_name", name))
+            const encoded = yield* S.encode(nameSchema)(name)
+            yield* Effect.promise(() => this.state.storage.put("__liminal_name", encoded))
           }
           const { 0: client, 1: server } = new WebSocketPair()
           this.state.acceptWebSocket(server)
@@ -242,14 +254,14 @@ export const Service =
           const name = yield* Effect.fromNullable(this.#name)
           const layer = Layer.succeed(actor, {
             name,
-            handles: this.directory.handles,
-            currentHandle: caller,
+            clients: this.directory.handles,
+            currentClient: caller,
           })
-          const message = yield* S.decodeUnknown(client.schema.client)(
+          const message = yield* S.decodeUnknown(S.parseJson(client.schema.client))(
             messageRaw instanceof ArrayBuffer ? new TextDecoder().decode(messageRaw) : messageRaw,
           )
           if (message === 0) {
-            return yield* Effect.die(void 0)
+            return yield* onConnect.pipe(Effect.provide(requestLayer.pipe(Layer.provideMerge(layer))))
           }
           const { id, payload } = message
           const { _tag } = payload
@@ -286,7 +298,7 @@ export const Service =
       }
     }
 
-    const upgrade = Effect.fn(function* (name: NameA, attachments: S.Struct<AttachmentFields>["Type"]) {
+    const upgrade = Effect.fnUntraced(function* (name: NameA, attachments: S.Struct<AttachmentFields>["Type"]) {
       const namespace = yield* tag
       const nameEncoded = yield* S.encode(nameSchema)(name)
       const stub = namespace.getByName(nameEncoded)

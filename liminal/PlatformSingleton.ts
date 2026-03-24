@@ -90,8 +90,8 @@ export const make = Effect.fnUntraced(function* <
         Effect.provide(
           Layer.succeed(actor, {
             name,
-            handles,
-            currentHandle: handle,
+            clients: handles,
+            currentClient: handle,
           }),
         ),
         Scope.extend(inner),

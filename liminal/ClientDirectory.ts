@@ -1,5 +1,5 @@
 import { WebSocket } from "@cloudflare/workers-types"
-import { Schema as S, Effect, Ref, Cause } from "effect"
+import { Schema as S, Effect, Ref, Cause, ParseResult } from "effect"
 
 import type { FieldsRecord } from "./_type_util.ts"
 import type { MethodDefinition } from "./Method.ts"
@@ -19,7 +19,7 @@ export interface ClientDirectory<
   readonly register: (
     socket: WebSocket,
     attachments: { [K in keyof S.Struct.Type<AttachmentFields>]: S.Struct.Type<AttachmentFields>[K] },
-  ) => Effect.Effect<this["Handle"], never, never>
+  ) => Effect.Effect<this["Handle"], ParseResult.ParseError, never>
 
   readonly look: (socket: WebSocket) => Effect.Effect<this["Handle"], Cause.NoSuchElementException, never>
 
@@ -49,6 +49,7 @@ export const make = <
 ): ClientDirectory<ActorSelf, AttachmentFields, EventDefinitions> => {
   const {
     definition: {
+      attachments,
       client: {
         schema: { event },
       },
@@ -59,31 +60,37 @@ export const make = <
 
   const sockets = new Map<WebSocket, Handle>()
   const handles = new Set<Handle>()
+  const attachmentsSchema: S.Schema<S.Struct<AttachmentFields>["Type"], S.Struct<AttachmentFields>["Encoded"]> =
+    S.Struct(attachments) as never
 
   const look = (socket: WebSocket) => Effect.fromNullable(sockets.get(socket))
 
   const register = Effect.fnUntraced(function* (
     socket: WebSocket,
     attachments: S.Struct<AttachmentFields>["Type"],
-  ): Effect.fn.Return<Handle> {
+  ): Effect.fn.Return<Handle, ParseResult.ParseError> {
+    const encoded = yield* S.encode(attachmentsSchema)(attachments)
+    socket.serializeAttachment(encoded)
     const attachmentsRef = yield* Ref.make(attachments)
     const handle = ClientHandle.make<ActorSelf, AttachmentFields, EventDefinitions>({
       attachments: Ref.get(attachmentsRef),
       save: Effect.fnUntraced(function* (value) {
         yield* Ref.set(attachmentsRef, value)
-        socket.serializeAttachment(value)
+        socket.serializeAttachment(yield* S.encode(attachmentsSchema)(value))
       }),
       send: (_tag, payload) =>
         S.encode(S.parseJson(event))({
           _tag: "Event",
           event: { _tag, ...payload },
         }).pipe(Effect.andThen(socket.send)),
-      disconnect: Effect.gen(function* () {
+      disconnect: Effect.sync(() => {
         socket.send("1")
         sockets.delete(socket)
         handles.delete(handle)
       }),
     })
+    sockets.set(socket, handle)
+    handles.add(handle)
     return handle
   })
 

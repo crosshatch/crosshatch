@@ -1,4 +1,4 @@
-import { Context, Schema as S, Effect } from "effect"
+import { Context, Schema as S, Effect, Cause } from "effect"
 
 import type { FieldsRecord } from "./_type_util.ts"
 import type * as ActorClient from "./Client.ts"
@@ -18,9 +18,9 @@ export interface Service<
 > {
   readonly name: NameA
 
-  readonly currentHandle?: ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions> | undefined
+  readonly currentClient?: ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions> | undefined
 
-  readonly handles: ReadonlySet<ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions>>
+  readonly clients: ReadonlySet<ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions>>
 }
 
 export interface ActorDefinition<
@@ -63,17 +63,11 @@ export interface Actor<
 
   readonly assertCurrentClient: Effect.Effect<
     ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions>,
-    never,
+    Cause.NoSuchElementException,
     ActorSelf
   >
 
   readonly sendAll: Send<ActorSelf, EventDefinitions>
-
-  readonly directory: Effect.Effect<
-    ReadonlySet<ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions>>,
-    never,
-    ActorSelf
-  >
 
   readonly handler: <K extends keyof MethodDefinitions, R>(
     tag: K,
@@ -81,15 +75,44 @@ export interface Actor<
   ) => Method.Handler<MethodDefinitions[K], R>
 }
 
-export declare const Service: <ActorSelf>() => <
-  ActorId extends string,
-  NameA,
-  AttachmentFields extends S.Struct.Fields,
-  ClientSelf,
-  ClientId extends string,
-  MethodDefinitions extends Record<string, MethodDefinition.Any>,
-  EventDefinitions extends FieldsRecord,
->(
-  id: ActorId,
-  definition: ActorDefinition<NameA, AttachmentFields, ClientSelf, ClientId, MethodDefinitions, EventDefinitions>,
-) => Actor<ActorSelf, ActorId, NameA, AttachmentFields, ClientSelf, ClientId, MethodDefinitions, EventDefinitions>
+export const Service =
+  <ActorSelf>() =>
+  <
+    ActorId extends string,
+    NameA,
+    AttachmentFields extends S.Struct.Fields,
+    ClientSelf,
+    ClientId extends string,
+    MethodDefinitions extends Record<string, MethodDefinition.Any>,
+    EventDefinitions extends FieldsRecord,
+  >(
+    id: ActorId,
+    definition: ActorDefinition<NameA, AttachmentFields, ClientSelf, ClientId, MethodDefinitions, EventDefinitions>,
+  ): Actor<ActorSelf, ActorId, NameA, AttachmentFields, ClientSelf, ClientId, MethodDefinitions, EventDefinitions> => {
+    const tag = Context.Tag(id)<ActorSelf, Service<ActorSelf, NameA, AttachmentFields, EventDefinitions>>()
+
+    const assertCurrentClient = Effect.gen(function* () {
+      const { currentClient } = yield* tag
+      return yield* Effect.fromNullable(currentClient)
+    })
+
+    const sendAll: Send<ActorSelf, EventDefinitions> = Effect.fnUntraced(function* (key, payload) {
+      const { clients } = yield* tag
+      for (const client of clients) {
+        yield* client.send(key, payload)
+      }
+    })
+
+    const handler = <K extends keyof MethodDefinitions, R>(
+      _tag: K,
+      f: Method.Handler<MethodDefinitions[K], R>,
+    ): Method.Handler<MethodDefinitions[K], R> => f
+
+    return Object.assign(tag, {
+      [TypeId]: TypeId,
+      definition,
+      assertCurrentClient,
+      sendAll,
+      handler,
+    })
+  }
