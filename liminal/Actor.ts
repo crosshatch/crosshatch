@@ -1,6 +1,6 @@
 import { Context, Schema as S, Effect, Cause } from "effect"
 
-import type { FieldsRecord } from "./_type_util.ts"
+import type { FieldsRecord, Fields } from "./_types.ts"
 import type * as ActorClient from "./Client.ts"
 import type * as ClientHandle from "./ClientHandle.ts"
 import type { MethodDefinition } from "./Method.ts"
@@ -10,12 +10,7 @@ import * as Method from "./Method.ts"
 
 export const TypeId = "~liminal/Actor" as const
 
-export interface Service<
-  ActorSelf,
-  NameA,
-  AttachmentFields extends S.Struct.Fields,
-  EventDefinitions extends FieldsRecord,
-> {
+export interface Service<ActorSelf, NameA, AttachmentFields extends Fields, EventDefinitions extends FieldsRecord> {
   readonly name: NameA
 
   readonly currentClient?: ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions> | undefined
@@ -25,7 +20,7 @@ export interface Service<
 
 export interface ActorDefinition<
   NameA,
-  AttachmentFields extends S.Struct.Fields,
+  AttachmentFields extends Fields,
   ClientSelf,
   ClientId extends string,
   MethodDefinitions extends Record<string, MethodDefinition.Any>,
@@ -42,7 +37,7 @@ export interface Actor<
   ActorSelf,
   ActorId extends string,
   NameA,
-  AttachmentFields extends S.Struct.Fields,
+  AttachmentFields extends Fields,
   ActorClientSelf,
   ActorClientId extends string,
   MethodDefinitions extends Record<string, MethodDefinition.Any>,
@@ -80,7 +75,7 @@ export const Service =
   <
     ActorId extends string,
     NameA,
-    AttachmentFields extends S.Struct.Fields,
+    AttachmentFields extends Fields,
     ClientSelf,
     ClientId extends string,
     MethodDefinitions extends Record<string, MethodDefinition.Any>,

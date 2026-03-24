@@ -1,6 +1,6 @@
 import { Schema as S, ParseResult, Effect } from "effect"
 
-import type { FieldsRecord } from "./_type_util.ts"
+import type { FieldsRecord } from "./_types.ts"
 
 export type Send<ActorSelf, EventDefinitions extends FieldsRecord> = <K extends keyof EventDefinitions>(
   tag: K,

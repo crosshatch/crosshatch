@@ -1,5 +1,3 @@
-import type { KVNamespace } from "@cloudflare/workers-types"
-
 import { ParseResult, Effect, Schema as S, Option } from "effect"
 
 import * as Binding from "./Binding.ts"

@@ -1,15 +1,11 @@
 import { Schema as S, Effect, ParseResult } from "effect"
 
-import type { FieldsRecord } from "./_type_util.ts"
+import type { Fields, FieldsRecord } from "./_types.ts"
 import type { Send } from "./Send.ts"
 
 const TypeId = "~liminal/ClientHandle" as const
 
-export interface ClientHandle<
-  ActorSelf,
-  AttachmentFields extends S.Struct.Fields,
-  EventDefinitions extends FieldsRecord,
-> {
+export interface ClientHandle<ActorSelf, AttachmentFields extends Fields, EventDefinitions extends FieldsRecord> {
   readonly [TypeId]: typeof TypeId
 
   readonly send: Send<ActorSelf, EventDefinitions>
@@ -21,7 +17,7 @@ export interface ClientHandle<
   readonly disconnect: Effect.Effect<void, ParseResult.ParseError, ActorSelf>
 }
 
-export const make = <ActorSelf, AttachmentFields extends S.Struct.Fields, EventDefinitions extends FieldsRecord>({
+export const make = <ActorSelf, AttachmentFields extends Fields, EventDefinitions extends FieldsRecord>({
   send,
   attachments,
   save,

@@ -1,18 +1,18 @@
 import { Schema as S, Effect } from "effect"
 
-export interface MethodDefinition<P extends S.Struct.Fields, AA, AI, EA, EI> {
+import type { Fields } from "./_types.ts"
+
+export interface MethodDefinition<P extends Fields, AA, AI, EA, EI> {
   readonly payload: P
   readonly success: S.Schema<AA, AI>
   readonly failure: S.Schema<EA, EI>
 }
 
 export declare namespace MethodDefinition {
-  export type Any =
-    | MethodDefinition<S.Struct.Fields, any, any, any, any>
-    | MethodDefinition<S.Struct.Fields, any, any, never, never>
+  export type Any = MethodDefinition<Fields, any, any, any, any> | MethodDefinition<Fields, any, any, never, never>
 }
 
-export const define = <const P extends S.Struct.Fields, AA, AI, EA, EI>({
+export const define = <const P extends Fields, AA, AI, EA, EI>({
   payload,
   success,
   failure,

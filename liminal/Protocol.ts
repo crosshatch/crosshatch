@@ -1,6 +1,6 @@
 import { Schema as S } from "effect"
 
-import type { FieldsRecord } from "./_type_util.ts"
+import type { FieldsRecord } from "./_types.ts"
 import type { MethodDefinition } from "./Method.ts"
 
 export declare namespace CallMessage {

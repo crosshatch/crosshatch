@@ -1,11 +1,5 @@
-import {
-  Request,
-  type DurableObjectNamespace,
-  type DurableObjectState,
-  WebSocketPair,
-  WebSocket,
-  Response,
-} from "@cloudflare/workers-types"
+import type { _types, Actor, Method } from "liminal"
+
 import * as Mutex from "@crosshatch/util/Mutex"
 import { HttpServerResponse } from "@effect/platform"
 import {
@@ -20,13 +14,9 @@ import {
   Duration,
 } from "effect"
 
-import type { FieldsRecord } from "./_type_util.ts"
-import type * as Actor from "./Actor.ts"
-
 import * as Binding from "./Binding.ts"
 import * as ClientDirectory from "./ClientDirectory.ts"
 import * as Intrinsic from "./Intrinsic.ts"
-import * as Method from "./Method.ts"
 import { NativeRequest } from "./NativeRequest.ts"
 
 const TypeId = "~liminal/ActorRegistry" as const
@@ -36,11 +26,11 @@ export interface ActorRegistryDefinition<
   ActorSelf,
   ActorId extends string,
   NameA,
-  AttachmentFields extends S.Struct.Fields,
+  AttachmentFields extends _types.Fields,
   ClientSelf,
   ClientId extends string,
   MethodDefinitions extends Record<string, Method.MethodDefinition.Any>,
-  EventDefinitions extends FieldsRecord,
+  EventDefinitions extends _types.FieldsRecord,
   PreludeROut,
   PreludeE,
   HandlerROut,
@@ -84,11 +74,11 @@ export interface ActorRegistry<
   ActorSelf,
   ActorId extends string,
   NameA,
-  AttachmentFields extends S.Struct.Fields,
+  AttachmentFields extends _types.Fields,
   ClientSelf,
   ClientId extends string,
   MethodDefinitions extends Record<string, Method.MethodDefinition.Any>,
-  EventDefinitions extends FieldsRecord,
+  EventDefinitions extends _types.FieldsRecord,
   PreludeROut,
   PreludeE,
   HandlerROut,
@@ -128,11 +118,11 @@ export const Service =
     ActorSelf,
     ActorId extends string,
     NameA,
-    AttachmentFields extends S.Struct.Fields,
+    AttachmentFields extends _types.Fields,
     ClientSelf,
     ClientId extends string,
     MethodDefinitions extends Record<string, Method.MethodDefinition.Any>,
-    EventDefinitions extends FieldsRecord,
+    EventDefinitions extends _types.FieldsRecord,
     PreludeROut,
     PreludeE,
     HandlerROut,
@@ -176,10 +166,8 @@ export const Service =
       definition: { name: nameSchema, attachments: attachmentFields, client },
     } = actor
 
-    const attachmentsSchema = S.Struct(attachmentFields) as never as S.Schema<
-      S.Struct<AttachmentFields>["Type"],
-      S.Struct<AttachmentFields>["Encoded"]
-    >
+    const attachmentsSchema: S.Schema<S.Struct<AttachmentFields>["Type"], S.Struct<AttachmentFields>["Encoded"]> =
+      S.Struct(attachmentFields) as never
 
     const paramsSchema = S.compose(
       S.StringFromBase64Url,

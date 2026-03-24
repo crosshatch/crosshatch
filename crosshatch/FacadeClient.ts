@@ -1,6 +1,6 @@
-import { LinkChallengeId } from "crosshatch"
 import { Client } from "liminal"
 
+import { LinkChallengeId } from "./LinkChallenge.ts"
 import { Propose } from "./requests/Propose.ts"
 import { Rescind } from "./requests/Rescind.ts"
 

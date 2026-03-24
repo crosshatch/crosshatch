@@ -8,6 +8,7 @@
     { "path": "./crosshatch" },
     { "path": "./docs" },
     { "path": "./examples/chat" },
-    { "path": "./liminal" }
+    { "path": "./liminal" },
+    { "path": "./liminal-cloudflare" }
   ]
 }

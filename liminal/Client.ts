@@ -1,7 +1,7 @@
 import { Socket, Worker, WorkerError } from "@effect/platform"
 import { Exit, Deferred, Layer, Record, Context, Stream, Effect, Schema as S, PubSub, Data } from "effect"
 
-import type { FieldsRecord } from "./_type_util.ts"
+import type { FieldsRecord } from "./_types.ts"
 import type { MethodDefinition } from "./Method.ts"
 
 import * as Protocol from "./Protocol.ts"

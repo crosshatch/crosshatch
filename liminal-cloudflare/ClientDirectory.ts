@@ -1,16 +1,10 @@
-import { WebSocket } from "@cloudflare/workers-types"
 import { Schema as S, Effect, Ref, Cause, ParseResult } from "effect"
-
-import type { FieldsRecord } from "./_type_util.ts"
-import type { MethodDefinition } from "./Method.ts"
-
-import * as Actor from "./Actor.ts"
-import * as ClientHandle from "./ClientHandle.ts"
+import { _types, Method, Actor, ClientHandle } from "liminal"
 
 export interface ClientDirectory<
   ActorSelf,
-  AttachmentFields extends S.Struct.Fields,
-  EventDefinitions extends FieldsRecord,
+  AttachmentFields extends _types.Fields,
+  EventDefinitions extends _types.FieldsRecord,
 > {
   readonly Handle: ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions>
 
@@ -30,11 +24,11 @@ export const make = <
   ActorSelf,
   ActorId extends string,
   NameA,
-  AttachmentFields extends S.Struct.Fields,
+  AttachmentFields extends _types.Fields,
   ClientSelf,
   ClientId extends string,
-  MethodDefinitions extends Record<string, MethodDefinition.Any>,
-  EventDefinitions extends FieldsRecord,
+  MethodDefinitions extends Record<string, Method.MethodDefinition.Any>,
+  EventDefinitions extends _types.FieldsRecord,
 >(
   actor: Actor.Actor<
     ActorSelf,

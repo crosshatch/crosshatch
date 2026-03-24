@@ -1,7 +1,7 @@
 import { WorkerRunner } from "@effect/platform"
 import { Layer, Scope, Effect, Schema as S, PubSub, Ref, ExecutionStrategy, Exit, ParseResult, Stream } from "effect"
 
-import type { FieldsRecord } from "./_type_util.ts"
+import type { FieldsRecord, Fields } from "./_types.ts"
 
 import * as Actor from "./Actor.ts"
 import * as ClientHandle from "./ClientHandle.ts"
@@ -11,7 +11,7 @@ export const make = Effect.fnUntraced(function* <
   ActorSelf,
   ActorId extends string,
   NameA,
-  AttachmentFields extends S.Struct.Fields,
+  AttachmentFields extends Fields,
   ClientSelf,
   ClientId extends string,
   MethodDefinitions extends Record<string, Method.MethodDefinition.Any>,

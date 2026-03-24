@@ -27,4 +27,7 @@ export const layer = Accumulator.layer({
   accumulator: FacadeAccumulator,
   source: FacadeClient.events,
   reducers: { Challenged, Linked },
+  initial: {
+    challengeId: Option.none(),
+  },
 })
