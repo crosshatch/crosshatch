@@ -45,7 +45,7 @@ without additional prompts. Program dynamic micropayments from the user's wallet
 Crosshatch's `fetch` wraps `globalThis.fetch` so that 402s are intercepted and retried automatically.
 
 ```ts
-import { fetch } from "crosshatch/x402"
+import { fetch } from "crosshatch/X402"
 ```
 
 ## Socket Client Example
@@ -56,7 +56,7 @@ The following shows how a client can listen to a socket server that requires pay
 
 ```ts
 import { propose } from "crosshatch"
-import { Required, Requirements } from "crosshatch/x402"
+import { Required, Requirements } from "crosshatch/X402"
 
 const socket = new WebSocket("wss://your-socket-server.com")
 

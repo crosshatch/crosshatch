@@ -1,6 +1,6 @@
 import { access } from "@crosshatch/util/unwrapping"
-import { embed } from "@crosshatch/util/widget/embed"
-import { Finished } from "@crosshatch/util/widget/self"
+import { embed } from "@crosshatch/widget/embed"
+import { Finished } from "@crosshatch/widget/self"
 import { UrlParams } from "@effect/platform"
 import { Effect, flow, Option, Schema as S, Stream } from "effect"
 
@@ -12,7 +12,7 @@ import {
   Escalation,
   InsufficientAllowanceRemaining,
   InsufficientFunds,
-} from "./requests/Propose.ts"
+} from "./methods/Propose.ts"
 
 const widget = <A, I extends UrlParams.Input, A2 = never, I2 = never>({
   pathname,

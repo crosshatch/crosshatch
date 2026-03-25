@@ -2,20 +2,20 @@ import type { Client } from "liminal"
 
 import { Schedule, Effect, Encoding, flow, Schema as S, Cause, ParseResult } from "effect"
 
-import { CrosshatchEnv } from "./CrosshatchEnv.ts"
-import { FacadeClient } from "./FacadeClient.ts"
-import { DeclinedDecision } from "./requests/Propose.ts"
-import { managedRuntime } from "./runtime.ts"
+import { CrosshatchEnv } from "../CrosshatchEnv.ts"
+import { FacadeClient } from "../FacadeClient.ts"
+import { DeclinedDecision } from "../methods/Propose.ts"
+import { managedRuntime } from "../runtime.ts"
 import {
   EscalationWidget,
   OnrampExplainerWidget,
   ThawAccountWidget,
   ThawAppWidget,
   RaiseAllowanceWidget,
-} from "./widgets.ts"
-import { Payload } from "./X402/Payload.ts"
-import { Required } from "./X402/Required.ts"
-import { Version } from "./X402/Version.ts"
+} from "../widgets.ts"
+import { Payload } from "./Payload.ts"
+import { Required } from "./Required.ts"
+import { Version } from "./Version.ts"
 
 export class CrosshatchFetchError extends S.TaggedError<CrosshatchFetchError>()("CrosshatchFetchError", {
   decision: DeclinedDecision,

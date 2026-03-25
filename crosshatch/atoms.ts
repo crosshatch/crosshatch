@@ -1,4 +1,4 @@
-import { Finished } from "@crosshatch/util/widget/self"
+import { Finished } from "@crosshatch/widget/self"
 import { Atom } from "@effect-atom/atom"
 import { Effect, Stream, Option, Schema as S } from "effect"
 

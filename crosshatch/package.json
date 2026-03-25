@@ -25,13 +25,14 @@
       "default": "./dist/*.js"
     },
     "./package.json": "./package.json",
-    "./x402": {
-      "types": "./x402/index.ts",
-      "default": "./dist/x402/index.js"
+    "./X402": {
+      "types": "./X402/index.ts",
+      "default": "./dist/X402/index.js"
     }
   },
   "peerDependencies": {
     "@crosshatch/util": "workspace:*",
+    "@crosshatch/widget": "workspace:*",
     "@effect-atom/atom": "catalog:",
     "@effect/ai": "catalog:",
     "@effect/platform": "catalog:",

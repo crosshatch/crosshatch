@@ -1,7 +1,7 @@
 import { LoggerLive } from "@crosshatch/util/LoggerLive"
 import { Atom } from "@effect-atom/atom-react"
 import { OpenAiClient, OpenAiEmbeddingModel } from "@effect/ai-openai"
-import { CrosshatchHttpClient } from "crosshatch"
+import { HttpClient } from "crosshatch/X402"
 import { ConfigProvider, Effect, Layer, Redacted, Config } from "effect"
 
 import { Drizzle, PgliteClient } from "./Drizzle"
@@ -26,7 +26,7 @@ export const runtime = Atom.runtime(
         Layer.unwrapEffect,
       ),
     ),
-    Layer.provideMerge(CrosshatchHttpClient),
+    Layer.provideMerge(HttpClient),
     Layer.provideMerge(
       LoggerLive.pipe(Layer.provideMerge(Layer.setConfigProvider(ConfigProvider.fromJson(import.meta.env)))),
     ),

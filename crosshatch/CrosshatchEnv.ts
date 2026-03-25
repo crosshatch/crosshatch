@@ -10,7 +10,6 @@ export declare namespace CrosshatchEnv {
 
 export class CrosshatchEnv extends Context.Tag("CrosshatchEnv")<CrosshatchEnv, CrosshatchEnv.Service>() {}
 
-// TODO: move to internal util
 export const isCrosshatch = (origin: string) => CrosshatchEnv.pipe(Effect.map(({ url }) => origin === url))
 
 export const layer = Effect.gen(function* () {

@@ -1,8 +1,8 @@
 import { Schema as S } from "effect"
 import { Method } from "liminal"
 
-import { Payload } from "../x402/Payload.ts"
-import { Required } from "../x402/Required.ts"
+import { Payload } from "../X402/Payload.ts"
+import { Required } from "../X402/Required.ts"
 
 export const Propose = Method.define({
   payload: {
