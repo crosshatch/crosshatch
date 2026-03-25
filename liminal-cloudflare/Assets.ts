@@ -7,7 +7,7 @@ import type { NativeRequest } from "./NativeRequest.ts"
 import * as Binding from "./Binding.ts"
 
 export class Assets extends Binding.Service<Assets>()(
-  "Assets",
+  "liminal/cloudflare/Assets",
   "ASSETS",
   (value): value is { fetch: typeof fetch } => "fetch" in value,
 ) {

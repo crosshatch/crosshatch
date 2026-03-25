@@ -1,0 +1,14 @@
+{
+	local_certs
+	admin off
+	storage file_system {
+		root .caddy
+	}
+}
+
+local.lmnl.im {
+	reverse_proxy http://127.0.0.1:7775 {
+		lb_try_duration 30s
+		lb_try_interval 1s
+	}
+}

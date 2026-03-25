@@ -8,7 +8,8 @@
     { "path": "./@crosshatch/widget" },
     { "path": "./crosshatch" },
     { "path": "./docs" },
-    { "path": "./examples/chat" },
+    { "path": "./examples/lmnl.im/api" },
+    { "path": "./examples/lmnl.im/app" },
     { "path": "./liminal" },
     { "path": "./liminal-cloudflare" }
   ]

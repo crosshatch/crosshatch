@@ -1,11 +1,9 @@
-import { Schema as S, Effect, Ref, Cause, ParseResult } from "effect"
-import { _types, Method, Actor, ClientHandle } from "liminal"
+import type { Fields, FieldsRecord } from "liminal/_types"
 
-export interface ClientDirectory<
-  ActorSelf,
-  AttachmentFields extends _types.Fields,
-  EventDefinitions extends _types.FieldsRecord,
-> {
+import { Schema as S, Effect, Ref, Cause, ParseResult } from "effect"
+import { Method, Actor, ClientHandle } from "liminal"
+
+export interface ClientDirectory<ActorSelf, AttachmentFields extends Fields, EventDefinitions extends FieldsRecord> {
   readonly Handle: ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions>
 
   readonly handles: ReadonlySet<this["Handle"]>
@@ -24,11 +22,11 @@ export const make = <
   ActorSelf,
   ActorId extends string,
   NameA,
-  AttachmentFields extends _types.Fields,
+  AttachmentFields extends Fields,
   ClientSelf,
   ClientId extends string,
   MethodDefinitions extends Record<string, Method.MethodDefinition.Any>,
-  EventDefinitions extends _types.FieldsRecord,
+  EventDefinitions extends FieldsRecord,
 >(
   actor: Actor.Actor<
     ActorSelf,

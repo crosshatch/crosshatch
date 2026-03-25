@@ -1,4 +1,5 @@
-import type { _types, Actor, Method } from "liminal"
+import type { Actor, Method } from "liminal"
+import type { Fields, FieldsRecord } from "liminal/_types"
 
 import { HttpServerResponse } from "@effect/platform"
 import {
@@ -12,25 +13,25 @@ import {
   ConfigProvider,
   Duration,
 } from "effect"
+import * as Mutex from "liminal/_util/Mutex"
 
 import * as Binding from "./Binding.ts"
 import * as ClientDirectory from "./ClientDirectory.ts"
 import * as Intrinsic from "./Intrinsic.ts"
-import * as Mutex from "./Mutex.ts"
 import { NativeRequest } from "./NativeRequest.ts"
 
-const TypeId = "~liminal/ActorRegistry" as const
+const TypeId = "~liminal/cloudflare/ActorRegistry" as const
 
 export interface ActorRegistryDefinition<
   Binding_ extends string,
   ActorSelf,
   ActorId extends string,
   NameA,
-  AttachmentFields extends _types.Fields,
+  AttachmentFields extends Fields,
   ClientSelf,
   ClientId extends string,
   MethodDefinitions extends Record<string, Method.MethodDefinition.Any>,
-  EventDefinitions extends _types.FieldsRecord,
+  EventDefinitions extends FieldsRecord,
   PreludeROut,
   PreludeE,
   HandlerROut,
@@ -74,11 +75,11 @@ export interface ActorRegistry<
   ActorSelf,
   ActorId extends string,
   NameA,
-  AttachmentFields extends _types.Fields,
+  AttachmentFields extends Fields,
   ClientSelf,
   ClientId extends string,
   MethodDefinitions extends Record<string, Method.MethodDefinition.Any>,
-  EventDefinitions extends _types.FieldsRecord,
+  EventDefinitions extends FieldsRecord,
   PreludeROut,
   PreludeE,
   HandlerROut,
@@ -118,11 +119,11 @@ export const Service =
     ActorSelf,
     ActorId extends string,
     NameA,
-    AttachmentFields extends _types.Fields,
+    AttachmentFields extends Fields,
     ClientSelf,
     ClientId extends string,
     MethodDefinitions extends Record<string, Method.MethodDefinition.Any>,
-    EventDefinitions extends _types.FieldsRecord,
+    EventDefinitions extends FieldsRecord,
     PreludeROut,
     PreludeE,
     HandlerROut,

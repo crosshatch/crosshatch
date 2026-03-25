@@ -1,6 +1,6 @@
 import { Context, Effect, Layer } from "effect"
 
-export class Mutex extends Context.Tag("liminal-cloudflare/Mutex")<
+export class Mutex extends Context.Tag("liminal/Mutex")<
   Mutex,
   <A, E, R>(effect: Effect.Effect<A, E, R>) => Effect.Effect<A, E, R>
 >() {}

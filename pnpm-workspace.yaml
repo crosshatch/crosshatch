@@ -2,7 +2,7 @@ packages:
   - "@crosshatch/*"
   - crosshatch
   - docs
-  - examples/*
+  - examples/*/*
   - liminal
   - liminal-cloudflare
 

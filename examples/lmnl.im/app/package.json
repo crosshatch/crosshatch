@@ -1,5 +1,5 @@
 {
-  "name": "crosshatch.chat",
+  "name": "lmnl-im",
   "version": "0.1.0-beta.1",
   "private": true,
   "type": "module",
@@ -34,6 +34,7 @@
     "dedent": "catalog:",
     "drizzle-orm": "catalog:",
     "effect": "catalog:",
+    "lmnl-im-api": "workspace:*",
     "lucide-react": "catalog:",
     "next-themes": "catalog:",
     "react": "catalog:",

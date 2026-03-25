@@ -2,7 +2,7 @@ import { Data, Context, Layer, Effect } from "effect"
 
 import { unsafeEnv } from "./unsafeEnv.ts"
 
-export const TypeId = "~liminal/Binding" as const
+export const TypeId = "~liminal/cloudflare/Binding" as const
 
 export type BindingError = BindingNotFoundError | BindingValidationError
 
