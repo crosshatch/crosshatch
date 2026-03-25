@@ -24,7 +24,11 @@
       "types": "./*.ts",
       "default": "./dist/*.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./x402": {
+      "types": "./x402.ts",
+      "default": "./dist/x402.js"
+    }
   },
   "peerDependencies": {
     "@crosshatch/util": "workspace:*",

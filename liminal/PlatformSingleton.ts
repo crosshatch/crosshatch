@@ -7,6 +7,7 @@ import * as Actor from "./Actor.ts"
 import * as ClientHandle from "./ClientHandle.ts"
 import * as Method from "./Method.ts"
 
+// TODO: use fiber map?
 export const make = Effect.fnUntraced(function* <
   ActorSelf,
   ActorId extends string,
@@ -17,11 +18,15 @@ export const make = Effect.fnUntraced(function* <
   MethodDefinitions extends Record<string, Method.MethodDefinition.Any>,
   EventDefinitions extends FieldsRecord,
   Handlers extends Method.Handlers<MethodDefinitions, any>,
+  A,
+  E,
+  R,
 >({
   actor,
   name,
   attachments,
   handlers,
+  onConnect,
 }: {
   readonly actor: Actor.Actor<
     ActorSelf,
@@ -36,6 +41,7 @@ export const make = Effect.fnUntraced(function* <
   readonly name: NameA
   readonly attachments: S.Struct<AttachmentFields>["Type"]
   readonly handlers: Handlers
+  readonly onConnect: Effect.Effect<A, E, R>
 }) {
   const { schema } = actor.definition.client
   const handles = new Set<ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions>>()
@@ -68,12 +74,12 @@ export const make = Effect.fnUntraced(function* <
     handles.add(handle)
     yield* WorkerRunner.make<
       unknown,
-      ParseResult.ParseError,
-      Exclude<Effect.Effect.Context<ReturnType<Handlers[keyof Handlers]>>, ActorSelf>,
+      ParseResult.ParseError | E,
+      Exclude<Effect.Effect.Context<ReturnType<Handlers[keyof Handlers]>>, ActorSelf> | R,
       typeof schema.actor.Type | void
     >((raw) => {
       if (raw === 0) {
-        return Stream.fromPubSub(pubsub)
+        return onConnect.pipe(task, Effect.andThen(Effect.succeed(Stream.fromPubSub(pubsub))), Stream.unwrap)
       }
       return Effect.gen(function* () {
         const message = yield* S.validate(schema.call)(raw)
@@ -85,17 +91,16 @@ export const make = Effect.fnUntraced(function* <
             onFailure: (cause) => pubsub.offer({ _tag: "Failure" as const, id, cause }),
           }),
         )
-      }).pipe(
-        task,
-        Effect.provide(
-          Layer.succeed(actor, {
-            name,
-            clients: handles,
-            currentClient: handle,
-          }),
-        ),
-        Scope.extend(inner),
-      )
-    })
+      }).pipe(task)
+    }).pipe(
+      Effect.provide(
+        Layer.succeed(actor, {
+          name,
+          clients: handles,
+          currentClient: handle,
+        }),
+      ),
+      Scope.extend(inner),
+    )
   })
 })

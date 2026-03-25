@@ -1,5 +1,7 @@
 import { Schema as S, flow, Option } from "effect"
 
+// TODO: the following feels wrong... perhaps there's
+// an existing standard brewing?
 export const StandardExtra = S.Union(
   S.TaggedStruct("Response", {
     proposal: S.Struct({

@@ -14,7 +14,7 @@ export const runtime = Atom.runtime(
     Layer.provideMerge(
       Config.boolean("DEV").pipe(
         Config.withDefault(true),
-        Effect.map((dev) => `https://${dev ? "local." : ""}shapes.sh`),
+        Effect.map((dev) => `https://${dev ? "local." : ""}lmnl.im`),
         Effect.map((shapesUrl) =>
           Layer.mergeAll(
             OpenAiClient.layer({

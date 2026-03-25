@@ -1,6 +1,5 @@
 import type { _types, Actor, Method } from "liminal"
 
-import * as Mutex from "@crosshatch/util/Mutex"
 import { HttpServerResponse } from "@effect/platform"
 import {
   Layer,
@@ -17,6 +16,7 @@ import {
 import * as Binding from "./Binding.ts"
 import * as ClientDirectory from "./ClientDirectory.ts"
 import * as Intrinsic from "./Intrinsic.ts"
+import * as Mutex from "./Mutex.ts"
 import { NativeRequest } from "./NativeRequest.ts"
 
 const TypeId = "~liminal/ActorRegistry" as const
