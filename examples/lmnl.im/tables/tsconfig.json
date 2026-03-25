@@ -1,0 +1,15 @@
+{
+  "extends": "../../../tsconfig.base",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "dist"
+  },
+  "include": ["."],
+  "exclude": ["dist"],
+  "references": [
+    { "path": "../../../@crosshatch/drizzle" },
+    { "path": "../../../@crosshatch/util" },
+    { "path": "../../../crosshatch" },
+    { "path": "../models" }
+  ]
+}

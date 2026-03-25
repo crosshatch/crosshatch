@@ -1,0 +1,34 @@
+{
+  "name": "lmnl-im-tables",
+  "version": "0.1.0-beta.1",
+  "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./index.ts",
+    "./*": "./*.ts"
+  },
+  "scripts": {
+    "dev": "node --watch --env-file ../app/.dev.vars ./_dev.ts",
+    "generate": "drizzle-kit generate",
+    "migrate": "drizzle-kit migrate",
+    "push": "drizzle-kit push",
+    "studio": "drizzle-kit studio"
+  },
+  "devDependencies": {
+    "@dotenvx/dotenvx": "catalog:",
+    "@effect/sql": "catalog:",
+    "@effect/sql-pg": "catalog:",
+    "drizzle-kit": "catalog:"
+  },
+  "peerDependencies": {
+    "@crosshatch/drizzle": "workspace:*",
+    "@crosshatch/util": "workspace:*",
+    "@effect/platform": "catalog:",
+    "crosshatch": "workspace:*",
+    "drizzle-orm": "catalog:",
+    "effect": "catalog:",
+    "lmnl-im-models": "workspace:*"
+  }
+}

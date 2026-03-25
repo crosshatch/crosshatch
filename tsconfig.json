@@ -10,6 +10,8 @@
     { "path": "./docs" },
     { "path": "./examples/lmnl.im/api" },
     { "path": "./examples/lmnl.im/app" },
+    { "path": "./examples/lmnl.im/models" },
+    { "path": "./examples/lmnl.im/tables" },
     { "path": "./liminal" },
     { "path": "./liminal-cloudflare" }
   ]
