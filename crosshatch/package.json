@@ -26,8 +26,8 @@
     },
     "./package.json": "./package.json",
     "./x402": {
-      "types": "./x402.ts",
-      "default": "./dist/x402.js"
+      "types": "./x402/index.ts",
+      "default": "./dist/x402/index.js"
     }
   },
   "peerDependencies": {

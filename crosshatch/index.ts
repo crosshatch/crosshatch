@@ -1,8 +1,5 @@
-export * as Action from "./requests/Rescind.ts"
 export * as CrosshatchEnv from "./CrosshatchEnv.ts"
 export * from "./FacadeClient.ts"
-export * from "./CrosshatchHttpClient.ts"
-export * from "./requests/Propose.ts"
 export * from "./FacadeWorker.ts"
 export * from "./LinkChallenge.ts"
 export * from "./Public.ts"

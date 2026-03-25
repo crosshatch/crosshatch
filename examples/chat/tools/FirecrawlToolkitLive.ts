@@ -1,5 +1,5 @@
 import { HttpBody, HttpClient, HttpClientRequest, HttpClientResponse } from "@effect/platform"
-import { CrosshatchHttpClient } from "crosshatch"
+import * as X402 from "crosshatch/X402"
 import { Config, Effect, flow, Layer, Redacted, Schema as S } from "effect"
 
 import { FirecrawlToolkit } from "./FirecrawlToolkit"
@@ -19,7 +19,7 @@ const FirecrawlScrapeResponse = S.Struct({
 })
 
 class FirecrawlClient extends Effect.Service<FirecrawlClient>()("FirecrawlClient", {
-  dependencies: [CrosshatchHttpClient],
+  dependencies: [X402.HttpClient],
   effect: Effect.gen(function* () {
     const apiKey = yield* Config.redacted("VITE_PUBLIC_FIRECRAWL_API_KEY")
     const httpClient = yield* HttpClient.HttpClient
