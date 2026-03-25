@@ -30,7 +30,7 @@ export const make = <ActorSelf, AttachmentFields extends Fields, EventDefinition
   readonly save: (attachments: S.Struct<AttachmentFields>["Type"]) => Effect.Effect<void, ParseResult.ParseError>
 
   readonly disconnect: Effect.Effect<void, ParseResult.ParseError, ActorSelf>
-}) => ({
+}): ClientHandle<ActorSelf, AttachmentFields, EventDefinitions> => ({
   [TypeId]: TypeId,
   send,
   attachments,
