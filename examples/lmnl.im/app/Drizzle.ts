@@ -3,7 +3,7 @@ import type { AnyPgAsyncRelationalQuery, AnyPgAsyncSelect } from "drizzle-orm/pg
 import { live } from "@electric-sql/pglite/live"
 import { PGliteWorker } from "@electric-sql/pglite/worker"
 import { drizzle } from "drizzle-orm/pglite"
-import { Effect, Stream, Data } from "effect"
+import { Cause, Effect, Stream } from "effect"
 
 // oxlint-disable-next-line import/default
 import PgWorker from "./PgWorker.ts?worker"
@@ -32,10 +32,6 @@ export class Drizzle extends Effect.Service<Drizzle>()("Drizzle", {
 
 type Preparable = AnyPgAsyncRelationalQuery | AnyPgAsyncSelect
 
-export class LatestError extends Data.TaggedError("LatestError")<{
-  cause: unknown
-}> {}
-
 export const latest = <T extends Partial<Preparable> & Pick<Preparable, "prepare" | "_">>(
   f: (_: Drizzle) => T,
 ): Stream.Stream<T["_"]["result"]> =>
@@ -46,12 +42,9 @@ export const latest = <T extends Partial<Preparable> & Pick<Preparable, "prepare
     const { sql, params } = built.toSQL!()
     return Effect.gen(function* () {
       const pg = yield* PgliteClient
-      return Stream.asyncScoped<Array<{ [key: string]: any }>, LatestError>(
+      return Stream.asyncScoped<Array<{ [key: string]: any }>, Cause.UnknownException>(
         Effect.fn(function* (emit) {
-          const query = yield* Effect.tryPromise({
-            catch: (cause) => new LatestError({ cause }),
-            try: () => pg.live.query(sql, params, ({ rows }) => emit.single(rows)),
-          })
+          const query = yield* Effect.tryPromise(() => pg.live.query(sql, params, ({ rows }) => emit.single(rows)))
           yield* Effect.addFinalizer(() => Effect.promise(() => query.unsubscribe()))
         }),
       )

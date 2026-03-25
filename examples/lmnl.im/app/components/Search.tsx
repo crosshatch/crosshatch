@@ -16,9 +16,9 @@ import { router } from "@/router"
 import { runtime } from "@/runtime"
 import { chatItems, chats, embeddings } from "@/schema"
 
-export const searchInputAtom = Atom.make("").pipe(Atom.keepAlive)
+const searchInputAtom = Atom.make("").pipe(Atom.keepAlive)
 
-export const searchOpenAtom = Atom.make(false).pipe(Atom.keepAlive)
+const searchOpenAtom = Atom.make(false).pipe(Atom.keepAlive)
 
 const searchInitAtom = Atom.make((get) => {
   get.addFinalizer(

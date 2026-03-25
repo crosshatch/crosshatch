@@ -74,7 +74,7 @@ export const ChatControls = () => {
   )
 }
 
-export const sendMessageAtom = runtime.fn<typeof ChatId.Type | undefined>()(
+const sendMessageAtom = runtime.fn<typeof ChatId.Type | undefined>()(
   Effect.fn(
     function* (chatId, get) {
       const isLinked = yield* get.result(isLinkedAtom)

@@ -61,7 +61,7 @@ export const MessageList = () => {
   )
 }
 
-export const ChatEventCard = ({
+const ChatEventCard = ({
   children,
   className,
   actions,
