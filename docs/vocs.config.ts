@@ -1,8 +1,18 @@
 import PackageJson from "crosshatch/package.json" with { type: "json" }
 import rehypeMermaid from "rehype-mermaid"
+import mkcert from "vite-plugin-mkcert"
 import { defineConfig } from "vocs"
 
+const ORIGIN = "local.docs.crosshatch.dev"
+
 export default defineConfig({
+  vite: {
+    plugins: [mkcert({ hosts: [ORIGIN] })],
+    server: {
+      allowedHosts: [ORIGIN],
+      host: "127.0.0.1",
+    },
+  },
   markdown: {
     rehypePlugins: [[rehypeMermaid, { strategy: "inline-svg" }]],
   },

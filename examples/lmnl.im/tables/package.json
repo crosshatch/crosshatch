@@ -10,7 +10,6 @@
     "./*": "./*.ts"
   },
   "scripts": {
-    "dev": "node --watch --env-file ../app/.dev.vars ./_dev.ts",
     "generate": "drizzle-kit generate",
     "migrate": "drizzle-kit migrate",
     "push": "drizzle-kit push",

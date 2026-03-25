@@ -3,9 +3,6 @@
   "version": "0.1.0-beta.1",
   "private": true,
   "type": "module",
-  "scripts": {
-    "dev": "wrangler dev --port 7775"
-  },
   "dependencies": {
     "@cloudflare/vitest-pool-workers": "catalog:",
     "@cloudflare/workers-types": "catalog:",
