@@ -10,7 +10,7 @@ const ApiLive = Layer.mergeAll(
   HttpLayerRouter.cors({
     allowedHeaders: ["*"],
     allowedMethods: ["*"],
-    allowedOrigins: ["https://crosshatch.chat", "https://local.crosshatch.chat"],
+    allowedOrigins: ["https://lmnl.im", "https://local.lmnl.im"],
     exposedHeaders: ["PAYMENT-REQUIRED"],
   }),
 )

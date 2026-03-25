@@ -46,7 +46,7 @@ export default defineConfig({
       projects: ["tsconfig.json"],
     }),
     mkcert({
-      hosts: ["local.crosshatch.chat"],
+      hosts: ["local.lmnl.im"],
     }),
     react({
       babel: {
@@ -71,7 +71,7 @@ export default defineConfig({
     ],
   },
   server: {
-    allowedHosts: ["local.crosshatch.chat", "local.crosshatch.dev"],
+    allowedHosts: ["local.lmnl.im", "local.crosshatch.dev"],
     fs: { strict: false },
     host: "127.0.0.1",
     port: 7779,

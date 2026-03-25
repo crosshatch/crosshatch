@@ -238,15 +238,15 @@ export const layerSocket = <
   EventDefinitions extends FieldsRecord,
 >({
   client,
-  baseUrl,
+  url,
   protocols,
 }: {
   readonly client: Client<ClientSelf, ClientId, MethodDefinitions, EventDefinitions>
-  readonly baseUrl: string
+  readonly url: string
   readonly protocols?: string | Array<string> | undefined
 }): Layer.Layer<ClientSelf, ConnectionError, Socket.WebSocketConstructor> =>
   Effect.gen(function* () {
-    const socket = yield* Socket.makeWebSocket(baseUrl, { protocols })
+    const socket = yield* Socket.makeWebSocket(url, { protocols })
     const write = yield* socket.writer
     const messages = Stream.asyncEffect<
       Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions>,

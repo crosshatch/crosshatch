@@ -1,4 +1,4 @@
-import { LoggerLive } from "@crosshatch/util/LoggerLive"
+import { withLogging } from "@crosshatch/util/LoggerLive"
 import { Atom } from "@effect-atom/atom-react"
 import { OpenAiClient, OpenAiEmbeddingModel } from "@effect/ai-openai"
 import { HttpClient } from "crosshatch/X402"
@@ -27,8 +27,7 @@ export const runtime = Atom.runtime(
       ),
     ),
     Layer.provideMerge(HttpClient),
-    Layer.provideMerge(
-      LoggerLive.pipe(Layer.provideMerge(Layer.setConfigProvider(ConfigProvider.fromJson(import.meta.env)))),
-    ),
+    Layer.provide(Layer.setConfigProvider(ConfigProvider.fromJson(import.meta.env))),
+    withLogging,
   ),
 )
