@@ -20,6 +20,10 @@ import * as ClientDirectory from "./ClientDirectory.ts"
 import * as Intrinsic from "./Intrinsic.ts"
 import { NativeRequest } from "./NativeRequest.ts"
 
+export const SecWebSocketProtocol = "Sec-WebSocket-Protocol" as const
+
+const FirstProtocol = S.split(",").pipe(S.headOrElse(), S.compose(S.Trim))
+
 const TypeId = "~liminal/cloudflare/ActorRegistry" as const
 
 export interface ActorRegistryDefinition<
@@ -230,9 +234,13 @@ export const Service =
           const { 0: client, 1: server } = new WebSocketPair()
           this.state.acceptWebSocket(server)
           yield* this.directory.register(server, attachments)
+          const protocolsRaw = request.headers.get(SecWebSocketProtocol)
           return new Response(null, {
             status: 101,
             webSocket: client,
+            headers: protocolsRaw
+              ? { [SecWebSocketProtocol]: yield* S.decodeUnknown(FirstProtocol)(protocolsRaw) }
+              : {},
           })
         }).pipe(this.runtime.runPromise)
       }
@@ -297,8 +305,8 @@ export const Service =
       const params = yield* S.encode(paramsSchema)({ name, attachments })
       url.searchParams.set("__liminal", params)
 
-      return yield* Effect.promise(() => stub.fetch(new Request(url, request as never))).pipe(
-        Effect.flatMap((v) => HttpServerResponse.fromWeb(v as never as globalThis.Response)),
+      return yield* Effect.promise(() => stub.fetch(new Request(url, request))).pipe(
+        Effect.map((v) => HttpServerResponse.raw(v)),
       )
     })
 

@@ -56,7 +56,7 @@ export const Service =
     const get = Effect.fnUntraced(function* (key: KeyA) {
       const kv = yield* tag
       const keyEncoded = yield* encodeKey(key)
-      const valueEncoded = Effect.promise(() => kv.get(keyEncoded))
+      const valueEncoded = yield* Effect.promise(() => kv.get(keyEncoded))
       if (valueEncoded) {
         return yield* decodeValue(valueEncoded).pipe(Effect.map(Option.some))
       }
