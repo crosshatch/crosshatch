@@ -278,7 +278,7 @@ export const Service =
                   cause,
                 }),
             }),
-            Effect.andThen(socket.send),
+            Effect.andThen((v) => Effect.sync(() => socket.send(v))),
           )
         }).pipe(Mutex.task, Effect.scoped, this.runtime.runFork)
       }

@@ -74,7 +74,7 @@ export const make = <
         S.encode(S.parseJson(event))({
           _tag: "Event",
           event: { _tag, ...payload },
-        }).pipe(Effect.andThen(socket.send)),
+        }).pipe(Effect.andThen((v) => Effect.sync(() => socket.send(v)))),
       disconnect: Effect.sync(() => {
         socket.send("1")
         sockets.delete(socket)
