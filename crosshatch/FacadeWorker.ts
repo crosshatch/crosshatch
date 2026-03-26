@@ -1,15 +1,15 @@
 import { BrowserWorker, BrowserStream } from "@effect/platform-browser"
-import { Effect, Fiber, Layer, Stream } from "effect"
+import { Effect, Fiber, Layer, Stream, Schema as S } from "effect"
 
 import * as CrosshatchEnv from "./CrosshatchEnv.ts"
-import { HostIntroduction } from "./facade_handshake.ts"
+import { HostIntroduction, RequestHostIntroduction } from "./facade_handshake.ts"
 
 export const layer = Effect.gen(function* () {
   const fiber = yield* BrowserStream.fromEventListenerWindow("message").pipe(
     Stream.takeUntilEffect(
       Effect.fnUntraced(function* ({ data, origin }) {
         const isCrosshatch = yield* CrosshatchEnv.isCrosshatch(origin)
-        return isCrosshatch && data?._tag === "RequestHostIntroduction"
+        return isCrosshatch && S.is(RequestHostIntroduction)(data)
       }),
     ),
     Stream.runDrain,
