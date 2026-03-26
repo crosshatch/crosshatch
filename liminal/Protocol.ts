@@ -98,12 +98,3 @@ export declare namespace ActorMessage {
     | EventMessage.Encoded<EventDefinitions>
     | 1
 }
-
-export declare namespace ClientMessage {
-  export type Type<MethodDefinitions extends Record<string, MethodDefinition.Any>> =
-    | 0
-    | CallMessage.Type<MethodDefinitions>
-  export type Encoded<MethodDefinitions extends Record<string, MethodDefinition.Any>> =
-    | 0
-    | CallMessage.Encoded<MethodDefinitions>
-}

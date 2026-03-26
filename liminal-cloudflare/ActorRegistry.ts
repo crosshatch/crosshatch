@@ -231,7 +231,13 @@ export const Service =
           }
           const { 0: client, 1: server } = new WebSocketPair()
           this.state.acceptWebSocket(server)
-          yield* this.directory.register(server, attachments)
+          const caller = yield* this.directory.register(server, attachments)
+          const layer = Layer.succeed(actor, {
+            name,
+            clients: this.directory.handles,
+            currentClient: caller,
+          })
+          yield* onConnect.pipe(Effect.scoped, Effect.provide([layer, requestLayer.pipe(Layer.provideMerge(layer))]))
           const protocolsRaw = request.headers.get(SecWebSocketProtocol)
           return new Response(null, {
             status: 101,
@@ -252,12 +258,9 @@ export const Service =
             clients: this.directory.handles,
             currentClient: caller,
           })
-          const message = yield* S.decodeUnknown(S.parseJson(client.schema.client))(
+          const message = yield* S.decodeUnknown(S.parseJson(client.schema.call))(
             messageRaw instanceof ArrayBuffer ? new TextDecoder().decode(messageRaw) : messageRaw,
           )
-          if (message === 0) {
-            return yield* onConnect.pipe(Effect.provide(requestLayer.pipe(Layer.provideMerge(layer))))
-          }
           const { id, payload } = message
           const { _tag } = payload
           yield* handlers[_tag](payload).pipe(

@@ -59,11 +59,6 @@ export interface Client<
       Protocol.CallMessage.Encoded<MethodDefinitions>
     >
 
-    readonly client: S.Schema<
-      Protocol.ClientMessage.Type<MethodDefinitions>,
-      Protocol.ClientMessage.Encoded<MethodDefinitions>
-    >
-
     readonly success: S.Schema<
       Protocol.SuccessMessage.Type<MethodDefinitions>,
       Protocol.SuccessMessage.Encoded<MethodDefinitions>
@@ -112,11 +107,6 @@ export const Service =
       ),
     }) as never
 
-    const client: S.Schema<
-      Protocol.ClientMessage.Type<MethodDefinitions>,
-      Protocol.ClientMessage.Encoded<MethodDefinitions>
-    > = S.Union(call, S.Literal(0))
-
     const success: S.Schema<
       Protocol.SuccessMessage.Type<MethodDefinitions>,
       Protocol.SuccessMessage.Encoded<MethodDefinitions>
@@ -157,7 +147,7 @@ export const Service =
     return Object.assign(tag, {
       [TypeId]: TypeId,
       definition,
-      schema: { call, client, success, failure, event, actor },
+      schema: { call, success, failure, event, actor },
       events,
       f,
     })
@@ -240,11 +230,6 @@ export const layerSocket = <
           )
           .pipe(Effect.ensuring(PubSub.shutdown(pubsub)), Effect.forkScoped)
 
-        yield* S.encode(S.parseJson(client.schema.client))(0).pipe(
-          Effect.flatMap(write),
-          Effect.catchAll(() => Effect.void),
-        )
-
         return pubsub
       }).pipe(Effect.mapError(() => new ConnectionError())),
     })
@@ -255,7 +240,7 @@ export const layerSocket = <
         const id = nextId++
         const deferred = yield* Deferred.make<Success, Failure>()
         pending[id] = deferred
-        yield* S.encode(S.parseJson(client.schema.client))({
+        yield* S.encode(S.parseJson(client.schema.call))({
           _tag: "Call",
           id,
           payload: { _tag, ...payload },
@@ -283,7 +268,7 @@ export const layerPlatform = <
     type Failure = D["failure"]["Type"]
 
     let send:
-      | ((message: Protocol.ClientMessage.Type<MethodDefinitions>) => Effect.Effect<void, ConnectionError>)
+      | ((message: Protocol.CallMessage.Type<MethodDefinitions>) => Effect.Effect<void, ConnectionError>)
       | undefined = undefined
     let pending: Record<string, Deferred.Deferred<Success, Failure>> = {}
     let nextId = 0
@@ -292,7 +277,7 @@ export const layerPlatform = <
       acquire: Effect.gen(function* () {
         const manager = yield* Worker.makeManager
         const worker = yield* manager.spawn<
-          Protocol.ClientMessage.Type<MethodDefinitions>,
+          Protocol.CallMessage.Type<MethodDefinitions> | 0,
           Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions>,
           never
         >({})

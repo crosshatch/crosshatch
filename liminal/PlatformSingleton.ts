@@ -79,7 +79,12 @@ export const make = Effect.fnUntraced(function* <
       typeof schema.actor.Type | void
     >((raw) => {
       if (raw === 0) {
-        return onConnect.pipe(task, Effect.andThen(Effect.succeed(Stream.fromPubSub(pubsub))), Stream.unwrap)
+        return Stream.unwrapScoped(
+          PubSub.subscribe(pubsub).pipe(
+            Effect.tap(() => task(onConnect)),
+            Effect.map(Stream.fromQueue),
+          ),
+        )
       }
       return Effect.gen(function* () {
         const message = yield* S.validate(schema.call)(raw)

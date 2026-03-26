@@ -9,15 +9,14 @@ import * as FacadeAccumulator from "./FacadeAccumulator.ts"
 import { FacadeClient } from "./FacadeClient.ts"
 import * as FacadeWorker from "./FacadeWorker.ts"
 
-const CommonLive = withLogging(
-  Layer.mergeAll(
-    FacadeAccumulator.layer.pipe(
-      Layer.provideMerge(Client.layerPlatform(FacadeClient).pipe(Layer.provide(FacadeWorker.layer))),
-    ),
-  ).pipe(
-    Layer.provideMerge(CrosshatchEnv.layer),
-    Layer.provide(Layer.setConfigProvider(ConfigProvider.fromJson(resolveEnv()))),
+const CommonLive = Layer.mergeAll(
+  FacadeAccumulator.layer.pipe(
+    Layer.provideMerge(Client.layerPlatform(FacadeClient).pipe(Layer.provide(FacadeWorker.layer))),
   ),
+).pipe(
+  Layer.provideMerge(CrosshatchEnv.layer),
+  Layer.provide(Layer.setConfigProvider(ConfigProvider.fromJson(resolveEnv()))),
+  withLogging,
 )
 export const atomRuntime = runtime(CommonLive)
 export const managedRuntime = ManagedRuntime.make(CommonLive, memoMap)
