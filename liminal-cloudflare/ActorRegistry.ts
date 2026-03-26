@@ -168,18 +168,16 @@ export const Service =
   > => {
     const { hibernation, actor, preludeLayer, requestLayer, handlers, binding, onConnect } = definition
     const {
-      definition: { name: nameSchema, attachments: attachmentFields, client },
+      definition: { name: nameSchema, client },
+      schema,
     } = actor
-
-    const attachmentsSchema: S.Schema<S.Struct<AttachmentFields>["Type"], S.Struct<AttachmentFields>["Encoded"]> =
-      S.Struct(attachmentFields) as never
 
     const paramsSchema = S.compose(
       S.StringFromBase64Url,
       S.parseJson(
         S.Struct({
           name: nameSchema,
-          attachments: attachmentsSchema,
+          attachments: schema.attachments,
         }),
       ),
     )
@@ -209,7 +207,7 @@ export const Service =
             ),
           )
           for (const socket of this.state.getWebSockets()) {
-            const attachments = yield* S.decodeUnknown(attachmentsSchema)(socket.deserializeAttachment())
+            const attachments = yield* S.decodeUnknown(schema.attachments)(socket.deserializeAttachment())
             yield* this.directory.register(socket, attachments)
           }
           return Layer.mergeAll(

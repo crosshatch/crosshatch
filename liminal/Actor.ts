@@ -56,6 +56,10 @@ export interface Actor<
     EventDefinitions
   >
 
+  readonly schema: {
+    readonly attachments: S.Schema<S.Struct<AttachmentFields>["Type"], S.Struct<AttachmentFields>["Encoded"]>
+  }
+
   readonly assertCurrentClient: Effect.Effect<
     ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions>,
     Cause.NoSuchElementException,
@@ -106,6 +110,9 @@ export const Service =
     return Object.assign(tag, {
       [TypeId]: TypeId,
       definition,
+      schema: {
+        attachments: S.Struct(definition.attachments) as never,
+      },
       assertCurrentClient,
       sendAll,
       handler,

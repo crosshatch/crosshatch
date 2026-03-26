@@ -13,7 +13,7 @@ export interface AccumulatorDefinition<F extends Fields, EventDefinitions extend
 }
 
 export interface Service<F extends Fields> {
-  readonly accumulator: Ref.Ref<S.Struct<F>["Type"]>
+  readonly ref: Ref.Ref<S.Struct<F>["Type"]>
 
   readonly signals: {
     readonly [K in keyof F]: PubSub.PubSub<S.Schema.Type<F[K]>>
@@ -95,7 +95,7 @@ export const Service =
     const tag = Context.Tag(id)<Self, Service<F>>()
 
     const state = Effect.gen(function* () {
-      const { accumulator } = yield* tag
+      const { ref: accumulator } = yield* tag
       return yield* Ref.get(accumulator)
     })
 
@@ -105,7 +105,7 @@ export const Service =
     ): Reducer.Reducer<S.Struct<EventDefinitions[Tag]>["Type"], F, E, R> => f
 
     const set: AccumulatorSet<Self, F> = Effect.fnUntraced(function* (setter) {
-      const { accumulator, signals } = yield* tag
+      const { ref: accumulator, signals } = yield* tag
       let current = yield* Ref.get(accumulator)
       current = yield* apply(current, setter)
       yield* Ref.set(accumulator, current)
@@ -115,7 +115,7 @@ export const Service =
     })
 
     const update: AccumulatorUpdate<Self, F> = Effect.fnUntraced(function* (key, setter) {
-      const { accumulator, signals } = yield* tag
+      const { ref: accumulator, signals } = yield* tag
       let { [key]: current } = yield* Ref.get(accumulator)
 
       // TODO: is there a way to get this inferred correctly?
@@ -142,7 +142,7 @@ export const layer = <
   E,
   R,
 >({
-  accumulator: accumulatorTag,
+  accumulator,
   source,
   reducers,
   initial,
@@ -158,8 +158,8 @@ export const layer = <
 > =>
   Effect.gen(function* () {
     const mutex = yield* Effect.makeSemaphore(1)
-    const accumulator = yield* Ref.make(initial)
-    const { fields } = accumulatorTag.definition
+    const ref = yield* Ref.make(initial)
+    const { fields } = accumulator.definition
     const signals: {
       readonly [K in keyof F]: PubSub.PubSub<S.Schema.Type<F[K]>>
     } = (yield* Effect.all(
@@ -167,16 +167,18 @@ export const layer = <
         PubSub.unbounded({ replay: 1 }).pipe(Effect.map((pubsub) => [key, pubsub] as const)),
       ),
     ).pipe(Effect.map(Record.fromEntries))) as never
+    const service: Service<F> = { ref, signals }
     yield* source.pipe(
       Stream.runForEach(
         Effect.fnUntraced(function* (event) {
           const { _tag, ...payload } = event
           const reducer = reducers[_tag]!
-          const resolved = yield* Ref.get(accumulator)
+          const resolved = yield* Ref.get(ref)
           yield* reducer(payload as never, resolved)
         }, mutex.withPermits(1)),
       ),
+      Effect.provideService(accumulator, service),
       Effect.forkScoped,
     )
-    return { accumulator, signals }
-  }).pipe(Layer.scoped(accumulatorTag))
+    return service
+  }).pipe(Layer.scoped(accumulator))

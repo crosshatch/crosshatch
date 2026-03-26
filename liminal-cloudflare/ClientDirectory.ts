@@ -41,19 +41,17 @@ export const make = <
 ): ClientDirectory<ActorSelf, AttachmentFields, EventDefinitions> => {
   const {
     definition: {
-      attachments,
       client: {
         schema: { event },
       },
     },
+    schema,
   } = actor
 
   type Handle = ClientHandle.ClientHandle<ActorSelf, AttachmentFields, EventDefinitions>
 
   const sockets = new Map<WebSocket, Handle>()
   const handles = new Set<Handle>()
-  const attachmentsSchema: S.Schema<S.Struct<AttachmentFields>["Type"], S.Struct<AttachmentFields>["Encoded"]> =
-    S.Struct(attachments) as never
 
   const look = (socket: WebSocket) => Effect.fromNullable(sockets.get(socket))
 
@@ -61,14 +59,14 @@ export const make = <
     socket: WebSocket,
     attachments: S.Struct<AttachmentFields>["Type"],
   ): Effect.fn.Return<Handle, ParseResult.ParseError> {
-    const encoded = yield* S.encode(attachmentsSchema)(attachments)
+    const encoded = yield* S.encode(schema.attachments)(attachments)
     socket.serializeAttachment(encoded)
     const attachmentsRef = yield* Ref.make(attachments)
     const handle = ClientHandle.make<ActorSelf, AttachmentFields, EventDefinitions>({
       attachments: Ref.get(attachmentsRef),
       save: Effect.fnUntraced(function* (value) {
         yield* Ref.set(attachmentsRef, value)
-        socket.serializeAttachment(yield* S.encode(attachmentsSchema)(value))
+        socket.serializeAttachment(yield* S.encode(schema.attachments)(value))
       }),
       send: (_tag, payload) =>
         S.encode(S.parseJson(event))({
