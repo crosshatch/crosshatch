@@ -15,7 +15,7 @@ export interface ClientDirectory<ActorSelf, AttachmentFields extends Fields, Eve
 
   readonly look: (socket: WebSocket) => Effect.Effect<this["Handle"], Cause.NoSuchElementException, never>
 
-  readonly unregister: (socket: WebSocket) => Effect.Effect<void, Cause.NoSuchElementException, never>
+  readonly unregister: (socket: WebSocket) => Effect.Effect<void>
 }
 
 export const make = <
@@ -84,11 +84,14 @@ export const make = <
     return handle
   })
 
-  const unregister = Effect.fnUntraced(function* (socket: WebSocket) {
-    const handle = yield* look(socket)
-    sockets.delete(socket)
-    handles.delete(handle)
-  })
+  const unregister = (socket: WebSocket) =>
+    Effect.sync(() => {
+      const handle = sockets.get(socket)
+      if (handle) {
+        sockets.delete(socket)
+        handles.delete(handle)
+      }
+    })
 
   return {
     Handle: null!,

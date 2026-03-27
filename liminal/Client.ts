@@ -1,5 +1,5 @@
 import { Socket, Worker } from "@effect/platform"
-import { Exit, Deferred, Layer, Record, Context, Stream, Effect, Schema as S, PubSub, Data, RcRef } from "effect"
+import { Encoding, Deferred, Layer, Record, Context, Stream, Effect, Schema as S, PubSub, Data, RcRef } from "effect"
 
 import type { FieldsRecord } from "./_types.ts"
 import type { MethodDefinition } from "./Method.ts"
@@ -17,15 +17,18 @@ export interface ClientDefinition<
   readonly events: EventDefinitions
 }
 
-export interface Service<
+export type Service<
   ClientSelf,
   MethodDefinitions extends Record<string, MethodDefinition.Any>,
   EventDefinitions extends FieldsRecord,
-> {
-  readonly pubsubRc: RcRef.RcRef<PubSub.PubSub<FieldsRecord.TaggedMember.Type<EventDefinitions>>, ConnectionError>
+> = RcRef.RcRef<
+  {
+    readonly pubsub: PubSub.PubSub<FieldsRecord.TaggedMember.Type<EventDefinitions>>
 
-  readonly f: F<ClientSelf, MethodDefinitions>
-}
+    readonly f: F<ClientSelf, MethodDefinitions>
+  },
+  ConnectionError
+>
 
 export class ConnectionError extends Data.TaggedError("ConnectionError")<{}> {}
 
@@ -130,17 +133,22 @@ export const Service =
       event: S.Union(...Object.entries(definition.events).map(([_tag, fields]) => S.TaggedStruct(_tag, fields))),
     }) as never
 
-    const actor = S.Union(success, failure, event, S.Literal(1))
+    const actor = S.Union(success, failure, event, Protocol.AuditionErrorMessage, S.Literal(1))
 
     const f: F<ClientSelf, MethodDefinitions> = (method) =>
       Effect.fnUntraced(function* (payload) {
-        const { f } = yield* tag
-        return yield* f(method)(payload)
+        const rc = yield* tag
+        return yield* Effect.scoped(
+          Effect.gen(function* () {
+            const { f } = yield* RcRef.get(rc)
+            return yield* f(method)(payload)
+          }),
+        )
       })
 
     const events = tag.pipe(
-      Effect.flatMap(({ pubsubRc }) => RcRef.get(pubsubRc)),
-      Effect.map((pubsub) => Stream.fromPubSub(pubsub)),
+      Effect.flatMap(RcRef.get),
+      Effect.map(({ pubsub }) => Stream.fromPubSub(pubsub)),
       Stream.unwrapScoped,
     )
 
@@ -167,91 +175,92 @@ export const layerSocket = <
   readonly url: string
   readonly protocols?: string | Array<string> | undefined
 }): Layer.Layer<ClientSelf, never, Socket.WebSocketConstructor> =>
-  Effect.gen(function* () {
-    type D = MethodDefinitions[keyof MethodDefinitions]
-    type Success = D["success"]["Type"]
-    type Failure = D["failure"]["Type"]
+  RcRef.make({
+    acquire: Effect.gen(function* () {
+      type D = MethodDefinitions[keyof MethodDefinitions]
+      type Success = D["success"]["Type"]
+      type Failure = D["failure"]["Type"]
 
-    let write:
-      | ((data: string | Uint8Array | Socket.CloseEvent) => Effect.Effect<void, Socket.SocketError>)
-      | undefined = undefined
-    let pending: Record<string, Deferred.Deferred<Success, Failure>> = {}
-    let nextId = 0
+      const socket = yield* Socket.makeWebSocket(url, {
+        protocols: [
+          "liminal",
+          Encoding.encodeBase64Url(client.key),
+          ...(protocols ? (Array.isArray(protocols) ? protocols : [protocols]) : []),
+        ],
+      })
+      const write = yield* socket.writer
+      const pubsub = yield* PubSub.unbounded<FieldsRecord.TaggedMember.Type<EventDefinitions>>()
 
-    const pubsubRc = yield* RcRef.make({
-      acquire: Effect.gen(function* () {
-        const socket = yield* Socket.makeWebSocket(url, { protocols })
-        write = yield* socket.writer
-        const pubsub = yield* PubSub.unbounded<FieldsRecord.TaggedMember.Type<EventDefinitions>>()
+      const pending: Record<string, Deferred.Deferred<Success, Failure>> = {}
+      let nextId = 0
+      const auditioned = yield* Deferred.make<void, ConnectionError>()
 
-        pending = {}
-        nextId = 0
+      yield* Effect.addFinalizer(() =>
+        Effect.forEach(Object.values(pending), (deferred) => Deferred.fail(deferred, new ConnectionError()), {
+          concurrency: "unbounded",
+        }).pipe(Effect.andThen(PubSub.shutdown(pubsub))),
+      )
 
-        yield* Effect.addFinalizer(() =>
-          Effect.gen(function* () {
-            write = undefined
-            yield* Effect.forEach(Object.values(pending), (deferred) =>
-              Deferred.done(deferred, Exit.fail(new ConnectionError())),
+      yield* socket
+        .runRaw(
+          Effect.fnUntraced(function* (raw) {
+            const message = yield* S.decodeUnknown(S.parseJson(client.schema.actor))(
+              raw instanceof Uint8Array ? new TextDecoder().decode(raw) : raw,
             )
-            pending = {}
+            if (message === 1) {
+              return yield* write(new Socket.CloseEvent(1000))
+            }
+            if (S.is(Protocol.AuditionErrorMessage)(message)) {
+              yield* Deferred.fail(auditioned, new ConnectionError())
+              return yield* write(new Socket.CloseEvent(1000))
+            }
+            yield* Deferred.succeed(auditioned, void 0)
+            switch (message._tag) {
+              case "Event": {
+                yield* pubsub.publish(message.event)
+                break
+              }
+              case "Success": {
+                const deferred = pending[message.id]
+                if (deferred) {
+                  delete pending[message.id]
+                  yield* Deferred.succeed(deferred, message.value)
+                }
+                break
+              }
+              case "Failure": {
+                const deferred = pending[message.id]
+                if (deferred) {
+                  delete pending[message.id]
+                  yield* Deferred.fail(deferred, message.cause)
+                }
+                break
+              }
+            }
           }),
         )
+        .pipe(Effect.forkScoped)
 
-        yield* socket
-          .run(
-            Effect.fnUntraced(function* (raw) {
-              const message = yield* S.decodeUnknown(S.parseJson(client.schema.actor))(
-                raw instanceof Uint8Array ? new TextDecoder().decode(raw) : raw,
-              )
-              if (message === 1) return
-              switch (message._tag) {
-                case "Event": {
-                  yield* pubsub.publish(message.event)
-                  break
-                }
-                case "Success": {
-                  const deferred = pending[message.id]
-                  if (deferred) {
-                    delete pending[message.id]
-                    yield* Deferred.done(deferred, Exit.succeed(message.value))
-                  }
-                  break
-                }
-                case "Failure": {
-                  const deferred = pending[message.id]
-                  if (deferred) {
-                    delete pending[message.id]
-                    yield* Deferred.done(deferred, Exit.fail(message.cause))
-                  }
-                  break
-                }
-              }
-            }),
+      yield* Deferred.await(auditioned)
+
+      const f: F<ClientSelf, MethodDefinitions> = (_tag) =>
+        Effect.fnUntraced(function* (payload) {
+          const id = nextId++
+          const deferred = yield* Deferred.make<Success, Failure>()
+          pending[id] = deferred
+          yield* S.encode(S.parseJson(client.schema.call))({
+            _tag: "Call",
+            id,
+            payload: { _tag, ...payload },
+          }).pipe(
+            Effect.flatMap(write),
+            Effect.catchAll(() => new ConnectionError()),
           )
-          .pipe(Effect.ensuring(PubSub.shutdown(pubsub)), Effect.forkScoped)
+          return yield* Deferred.await(deferred)
+        })
 
-        return pubsub
-      }).pipe(Effect.mapError(() => new ConnectionError())),
-    })
-
-    const f: F<ClientSelf, MethodDefinitions> = (_tag) =>
-      Effect.fnUntraced(function* (payload) {
-        if (!write) return yield* new ConnectionError()
-        const id = nextId++
-        const deferred = yield* Deferred.make<Success, Failure>()
-        pending[id] = deferred
-        yield* S.encode(S.parseJson(client.schema.call))({
-          _tag: "Call",
-          id,
-          payload: { _tag, ...payload },
-        }).pipe(
-          Effect.flatMap(write),
-          Effect.catchAll(() => new ConnectionError()),
-        )
-        return yield* Deferred.await(deferred)
-      })
-
-    return { pubsubRc, f }
+      return { pubsub, f }
+    }),
   }).pipe(Layer.scoped(client))
 
 export const layerPlatform = <
@@ -262,90 +271,85 @@ export const layerPlatform = <
 >(
   client: Client<ClientSelf, ClientId, MethodDefinitions, EventDefinitions>,
 ): Layer.Layer<ClientSelf, never, Worker.PlatformWorker | Worker.Spawner> =>
-  Effect.gen(function* () {
-    type D = MethodDefinitions[keyof MethodDefinitions]
-    type Success = D["success"]["Type"]
-    type Failure = D["failure"]["Type"]
+  RcRef.make({
+    acquire: Effect.gen(function* () {
+      type D = MethodDefinitions[keyof MethodDefinitions]
+      type Success = D["success"]["Type"]
+      type Failure = D["failure"]["Type"]
 
-    let send:
-      | ((message: Protocol.CallMessage.Type<MethodDefinitions>) => Effect.Effect<void, ConnectionError>)
-      | undefined = undefined
-    let pending: Record<string, Deferred.Deferred<Success, Failure>> = {}
-    let nextId = 0
-
-    const pubsubRc = yield* RcRef.make({
-      acquire: Effect.gen(function* () {
-        const manager = yield* Worker.makeManager
-        const worker = yield* manager.spawn<
-          Protocol.CallMessage.Type<MethodDefinitions> | 0,
+      const manager = yield* Worker.makeManager
+      const worker = yield* manager
+        .spawn<
+          Protocol.CallMessage.Type<MethodDefinitions> | typeof Protocol.AuditionMessage.Type,
           Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions>,
           never
         >({})
-        const pubsub = yield* PubSub.unbounded<FieldsRecord.TaggedMember.Type<EventDefinitions>>()
+        .pipe(Effect.catchTag("WorkerError", () => new ConnectionError()))
+      const pubsub = yield* PubSub.unbounded<FieldsRecord.TaggedMember.Type<EventDefinitions>>()
 
-        pending = {}
-        nextId = 0
-        send = (message) => worker.executeEffect(message).pipe(Effect.catchAll(() => new ConnectionError()))
+      const pending: Record<string, Deferred.Deferred<Success, Failure>> = {}
+      let nextId = 0
+      const send = (message: Protocol.CallMessage.Type<MethodDefinitions>) =>
+        worker.executeEffect(message).pipe(Effect.catchAll(() => new ConnectionError()))
+      const auditioned = yield* Deferred.make<void, ConnectionError>()
 
-        yield* Effect.addFinalizer(() =>
-          Effect.gen(function* () {
-            send = undefined
-            yield* Effect.forEach(Object.values(pending), (deferred) =>
-              Deferred.done(deferred, Exit.fail(new ConnectionError())),
-            )
-            pending = {}
-          }),
-        )
+      yield* Effect.addFinalizer(() =>
+        Effect.forEach(Object.values(pending), (deferred) => Deferred.fail(deferred, new ConnectionError()), {
+          concurrency: "unbounded",
+        }).pipe(Effect.andThen(PubSub.shutdown(pubsub))),
+      )
 
-        yield* worker.execute(0).pipe(
-          Stream.takeWhile((v) => v !== 1),
-          Stream.runForEach(
-            Effect.fnUntraced(function* (message) {
-              switch (message._tag) {
-                case "Event": {
-                  yield* pubsub.publish(message.event)
-                  break
-                }
-                case "Success": {
-                  const deferred = pending[message.id]
-                  if (deferred) {
-                    delete pending[message.id]
-                    yield* Deferred.done(deferred, Exit.succeed(message.value))
-                  }
-                  break
-                }
-                case "Failure": {
-                  const deferred = pending[message.id]
-                  if (deferred) {
-                    delete pending[message.id]
-                    yield* Deferred.done(deferred, Exit.fail(message.cause))
-                  }
-                  break
-                }
+      yield* worker.execute(Protocol.AuditionMessage.make({ clientId: client.key })).pipe(
+        Stream.takeWhile((v) => v !== 1),
+        Stream.runForEach(
+          Effect.fnUntraced(function* (message) {
+            if (message._tag === "AuditionError") {
+              yield* Deferred.fail(auditioned, new ConnectionError())
+              return
+            }
+            yield* Deferred.succeed(auditioned, void 0)
+            switch (message._tag) {
+              case "Event": {
+                yield* pubsub.publish(message.event)
+                break
               }
-            }),
-          ),
-          Effect.ensuring(PubSub.shutdown(pubsub)),
-          Effect.forkScoped,
-        )
+              case "Success": {
+                const deferred = pending[message.id]
+                if (deferred) {
+                  delete pending[message.id]
+                  yield* Deferred.succeed(deferred, message.value)
+                }
+                break
+              }
+              case "Failure": {
+                const deferred = pending[message.id]
+                if (deferred) {
+                  delete pending[message.id]
+                  yield* Deferred.fail(deferred, message.cause)
+                }
+                break
+              }
+            }
+          }),
+        ),
+        Effect.forkScoped,
+      )
 
-        return pubsub
-      }).pipe(Effect.mapError(() => new ConnectionError())),
-    })
+      yield* Deferred.await(auditioned)
 
-    const f: F<ClientSelf, MethodDefinitions> = (_tag) =>
-      Effect.fnUntraced(function* (payload) {
-        if (!send) return yield* new ConnectionError()
-        const id = nextId++
-        const deferred = yield* Deferred.make<Success, Failure>()
-        pending[id] = deferred
-        yield* send({
-          _tag: "Call",
-          id,
-          payload: { _tag, ...payload },
+      const f: F<ClientSelf, MethodDefinitions> = (_tag) =>
+        Effect.fnUntraced(function* (payload) {
+          const id = nextId++
+          const deferred = yield* Deferred.make<Success, Failure>()
+          pending[id] = deferred
+          yield* send({
+            _tag: "Call",
+            id,
+            payload: { _tag, ...payload },
+          })
+          return yield* Deferred.await(deferred)
         })
-        return yield* Deferred.await(deferred)
-      })
 
-    return { pubsubRc, f }
+      return { pubsub, f }
+    }),
   }).pipe(Layer.scoped(client))

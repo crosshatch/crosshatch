@@ -33,7 +33,7 @@ const apply = Effect.fnUntraced(function* <A, E = never, R = never>(
     }
     return applied
   }
-  return value
+  return setter
 })
 
 type AccumulatorSet<Self, F extends Fields> = <E = never, R = never>(

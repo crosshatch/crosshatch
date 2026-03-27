@@ -1,6 +1,6 @@
-import type { Actor, Method } from "liminal"
 import type { Fields, FieldsRecord } from "liminal/_types"
 
+import { nonNullable } from "@crosshatch/util/unwrapping"
 import { HttpServerResponse } from "@effect/platform"
 import {
   Layer,
@@ -12,7 +12,12 @@ import {
   ManagedRuntime,
   ConfigProvider,
   Duration,
+  flow,
+  String,
+  Array,
+  Encoding,
 } from "effect"
+import { Protocol, type Actor, type Method } from "liminal"
 import * as Mutex from "liminal/_util/Mutex"
 
 import * as Binding from "./Binding.ts"
@@ -21,8 +26,6 @@ import * as Intrinsic from "./Intrinsic.ts"
 import { NativeRequest } from "./NativeRequest.ts"
 
 export const SecWebSocketProtocol = "Sec-WebSocket-Protocol" as const
-
-const FirstProtocol = S.split(",").pipe(S.headOrElse(), S.compose(S.Trim))
 
 const TypeId = "~liminal/cloudflare/ActorRegistry" as const
 
@@ -229,27 +232,37 @@ export const Service =
             const encoded = yield* S.encode(nameSchema)(name)
             yield* Effect.promise(() => this.state.storage.put("__liminal_name", encoded))
           }
-          const { 0: client, 1: server } = new WebSocketPair()
+          const { 0: webSocket, 1: server } = new WebSocketPair()
           this.state.acceptWebSocket(server)
-          const caller = yield* this.directory.register(server, attachments)
-          const layer = Layer.succeed(actor, {
-            name,
-            clients: this.directory.handles,
-            currentClient: caller,
-          })
-          yield* onConnect.pipe(Effect.scoped, Effect.provide([layer, requestLayer.pipe(Layer.provideMerge(layer))]))
-          const protocolsRaw = request.headers.get(SecWebSocketProtocol)
+          const auditionId = yield* Effect.fromNullable(request.headers.get(SecWebSocketProtocol)).pipe(
+            Effect.map(flow(String.split(","), Array.map(String.trim), ([_0, actorId]) => actorId)),
+            nonNullable,
+            Effect.flatMap(Encoding.decodeBase64UrlString),
+          )
+          if (auditionId !== client.key) {
+            server.send(JSON.stringify(Protocol.AuditionErrorMessage.make()))
+            server.close()
+          } else {
+            const caller = yield* this.directory.register(server, attachments)
+            const ActorLive = Layer.succeed(actor, {
+              name,
+              clients: this.directory.handles,
+              currentClient: caller,
+            })
+            yield* onConnect.pipe(
+              Effect.scoped,
+              Effect.provide([ActorLive, requestLayer.pipe(Layer.provideMerge(ActorLive))]),
+            )
+          }
           return new Response(null, {
             status: 101,
-            webSocket: client,
-            headers: protocolsRaw
-              ? { [SecWebSocketProtocol]: yield* S.decodeUnknown(FirstProtocol)(protocolsRaw) }
-              : {},
+            webSocket,
+            headers: { [SecWebSocketProtocol]: "liminal" },
           })
         }).pipe(this.runtime.runPromise)
       }
 
-      webSocketMessage(socket: WebSocket, messageRaw: string | ArrayBuffer) {
+      webSocketMessage(socket: WebSocket, raw: string | ArrayBuffer) {
         Effect.gen(this, function* () {
           const caller = yield* this.directory.look(socket)
           const name = yield* Effect.fromNullable(this.#name)
@@ -259,7 +272,7 @@ export const Service =
             currentClient: caller,
           })
           const message = yield* S.decodeUnknown(S.parseJson(client.schema.call))(
-            messageRaw instanceof ArrayBuffer ? new TextDecoder().decode(messageRaw) : messageRaw,
+            raw instanceof ArrayBuffer ? new TextDecoder().decode(raw) : raw,
           )
           const { id, payload } = message
           const { _tag } = payload

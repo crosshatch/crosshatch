@@ -23,6 +23,7 @@ const widget = <A, I extends UrlParams.Input, A2 = never, I2 = never>({
   readonly payload: S.Schema<A, I>
   readonly item?: S.Schema<A2, I2> | undefined
 }) => {
+  // TODO: refactor
   const stream = flow(
     S.encode(payload),
     Effect.flatMap(
@@ -31,7 +32,6 @@ const widget = <A, I extends UrlParams.Input, A2 = never, I2 = never>({
           yield* CrosshatchEnv.href(pathname),
           UrlParams.fromInput(v),
           Option.none(),
-          // TODO: refactor
         ).pipe(Effect.orDie)
       }),
     ),
