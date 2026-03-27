@@ -6,6 +6,7 @@ import type { FieldsRecord, Fields } from "./_types.ts"
 import * as Actor from "./Actor.ts"
 import * as ClientHandle from "./ClientHandle.ts"
 import * as Method from "./Method.ts"
+import * as Protocol from "./Protocol.ts"
 
 // TODO: use fiber map?
 export const make = Effect.fnUntraced(function* <
@@ -78,7 +79,7 @@ export const make = Effect.fnUntraced(function* <
       Exclude<Effect.Effect.Context<ReturnType<Handlers[keyof Handlers]>>, ActorSelf> | R,
       typeof schema.actor.Type | void
     >((raw) => {
-      if (raw === 0) {
+      if (S.is(Protocol.AuditionMessage)(raw)) {
         return Stream.unwrapScoped(
           PubSub.subscribe(pubsub).pipe(
             Effect.tap(() => task(onConnect)),

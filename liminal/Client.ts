@@ -1,5 +1,19 @@
 import { Socket, Worker } from "@effect/platform"
-import { Encoding, Deferred, Layer, Record, Context, Stream, Effect, Schema as S, PubSub, Data, RcRef } from "effect"
+import {
+  Encoding,
+  Deferred,
+  Layer,
+  Record,
+  Context,
+  Stream,
+  Effect,
+  Schema as S,
+  PubSub,
+  Queue,
+  Chunk,
+  Data,
+  RcRef,
+} from "effect"
 
 import type { FieldsRecord } from "./_types.ts"
 import type { MethodDefinition } from "./Method.ts"
@@ -24,6 +38,8 @@ export type Service<
 > = RcRef.RcRef<
   {
     readonly pubsub: PubSub.PubSub<FieldsRecord.TaggedMember.Type<EventDefinitions>>
+
+    readonly replay: Queue.Dequeue<FieldsRecord.TaggedMember.Type<EventDefinitions>>
 
     readonly f: F<ClientSelf, MethodDefinitions>
   },
@@ -148,7 +164,20 @@ export const Service =
 
     const events = tag.pipe(
       Effect.flatMap(RcRef.get),
-      Effect.map(({ pubsub }) => Stream.fromPubSub(pubsub)),
+      Effect.flatMap(({ pubsub, replay }) =>
+        PubSub.subscribe(pubsub).pipe(
+          Effect.flatMap((queue) =>
+            Queue.takeAll(replay).pipe(
+              Effect.tap(() => Queue.shutdown(replay)),
+              Effect.map((initial) =>
+                Chunk.isEmpty(initial)
+                  ? Stream.fromQueue(queue)
+                  : Stream.fromChunk(initial).pipe(Stream.concat(Stream.fromQueue(queue))),
+              ),
+            ),
+          ),
+        ),
+      ),
       Stream.unwrapScoped,
     )
 
@@ -190,6 +219,7 @@ export const layerSocket = <
       })
       const write = yield* socket.writer
       const pubsub = yield* PubSub.unbounded<FieldsRecord.TaggedMember.Type<EventDefinitions>>()
+      const replay = yield* PubSub.subscribe(pubsub)
 
       const pending: Record<string, Deferred.Deferred<Success, Failure>> = {}
       let nextId = 0
@@ -259,7 +289,7 @@ export const layerSocket = <
           return yield* Deferred.await(deferred)
         })
 
-      return { pubsub, f }
+      return { pubsub, replay, f }
     }),
   }).pipe(Layer.scoped(client))
 
@@ -286,6 +316,7 @@ export const layerPlatform = <
         >({})
         .pipe(Effect.catchTag("WorkerError", () => new ConnectionError()))
       const pubsub = yield* PubSub.unbounded<FieldsRecord.TaggedMember.Type<EventDefinitions>>()
+      const replay = yield* PubSub.subscribe(pubsub)
 
       const pending: Record<string, Deferred.Deferred<Success, Failure>> = {}
       let nextId = 0
@@ -350,6 +381,6 @@ export const layerPlatform = <
           return yield* Deferred.await(deferred)
         })
 
-      return { pubsub, f }
+      return { pubsub, replay, f }
     }),
   }).pipe(Layer.scoped(client))
