@@ -1,6 +1,5 @@
 import type { Fields, FieldsRecord } from "liminal/_types"
 
-import { nonNullable } from "@crosshatch/util/unwrapping"
 import { HttpServerResponse } from "@effect/platform"
 import {
   Layer,
@@ -234,12 +233,14 @@ export const Service =
           }
           const { 0: webSocket, 1: server } = new WebSocketPair()
           this.state.acceptWebSocket(server)
-          const auditionId = yield* Effect.fromNullable(request.headers.get(SecWebSocketProtocol)).pipe(
-            Effect.map(flow(String.split(","), Array.map(String.trim), ([_0, actorId]) => actorId)),
-            nonNullable,
+          const protocols = yield* Effect.fromNullable(request.headers.get(SecWebSocketProtocol)).pipe(
+            Effect.map(flow(String.split(","), Array.map(String.trim))),
+          )
+          const liminalProtocolI = yield* Array.findFirstIndex(protocols, (v) => v === "liminal")
+          const liminalProtocol = yield* Effect.fromNullable(protocols[liminalProtocolI + 1]).pipe(
             Effect.flatMap(Encoding.decodeBase64UrlString),
           )
-          if (auditionId !== client.key) {
+          if (liminalProtocol !== client.key) {
             server.send(JSON.stringify(Protocol.AuditionErrorMessage.make()))
             server.close()
           } else {
