@@ -72,6 +72,8 @@ export interface ActorRegistryDefinition<
   >
 
   readonly hibernation?: Duration.DurationInput | undefined
+
+  readonly disableLogging?: boolean
 }
 
 export interface ActorRegistry<
@@ -168,7 +170,7 @@ export const Service =
     HandlerROut,
     HandlerE
   > => {
-    const { hibernation, actor, preludeLayer, requestLayer, handlers, binding, onConnect } = definition
+    const { hibernation, actor, preludeLayer, requestLayer, handlers, binding, onConnect, disableLogging } = definition
     const {
       definition: { name: nameSchema, client },
       schema,
@@ -275,6 +277,9 @@ export const Service =
           const message = yield* S.decodeUnknown(S.parseJson(client.schema.call))(
             raw instanceof ArrayBuffer ? new TextDecoder().decode(raw) : raw,
           )
+          if (disableLogging === undefined || !disableLogging) {
+            yield* Effect.log(message)
+          }
           const { id, payload } = message
           const { _tag } = payload
           yield* handlers[_tag](payload).pipe(
