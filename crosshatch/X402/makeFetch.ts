@@ -1,4 +1,4 @@
-import type { Client } from "liminal"
+import type { ClientError, ClosedBeforeResolvedError } from "liminal"
 
 import { Schedule, Effect, Encoding, flow, Schema as S, Cause, ParseResult } from "effect"
 
@@ -39,7 +39,7 @@ export const makeFetch =
           )
       const make: Effect.Effect<
         { readonly payload: typeof Payload.Type },
-        ParseResult.ParseError | Cause.NoSuchElementException | Client.ConnectionError,
+        ParseResult.ParseError | Cause.NoSuchElementException | ClientError | ClosedBeforeResolvedError,
         FacadeClient | CrosshatchEnv
       > = FacadeClient.f("Propose")({ required }).pipe(
         (x) =>

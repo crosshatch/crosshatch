@@ -74,16 +74,26 @@ export interface Accumulator<
     f: Reducer.Reducer<S.Struct<EventDefinitions[Tag]>["Type"], F, E, R>,
   ) => Reducer.Reducer<S.Struct<EventDefinitions[Tag]>["Type"], F, E, R>
 
-  readonly set: <E = never, R = never>(
+  readonly update: <E = never, R = never>(
     setter:
       | S.Struct<F>["Type"]
       | Effect.Effect<S.Struct<F>["Type"], E, R>
       | ((value: S.Struct<F>["Type"]) => S.Struct<F>["Type"] | Effect.Effect<S.Struct<F>["Type"], E, R>),
   ) => Effect.Effect<void, E, R | Self>
 
-  readonly update: AccumulatorUpdate<Self, F>
+  readonly updateField: AccumulatorUpdate<Self, F>
 
   readonly signal: AccumulatorSignal<Self, F>
+
+  readonly layer: <Reducers extends Reducer.Reducers<F, EventDefinitions>, E, R>(config: {
+    readonly source: Stream.Stream<FieldsRecord.TaggedMember.Type<EventDefinitions>, E, R>
+    readonly reducers: Reducers
+    readonly initial: S.Struct<F>["Type"]
+  }) => Layer.Layer<
+    Self,
+    E | Effect.Effect.Error<ReturnType<Reducers[keyof Reducers]>>,
+    Exclude<R | Stream.Stream.Context<ReturnType<Reducers[keyof Reducers]>>, Self>
+  >
 }
 
 export const Service =
@@ -104,7 +114,7 @@ export const Service =
       f: Reducer.Reducer<S.Struct<EventDefinitions[Tag]>["Type"], F, E, R>,
     ): Reducer.Reducer<S.Struct<EventDefinitions[Tag]>["Type"], F, E, R> => f
 
-    const set: AccumulatorSet<Self, F> = Effect.fnUntraced(function* (setter) {
+    const update: AccumulatorSet<Self, F> = Effect.fnUntraced(function* (setter) {
       const { ref: accumulator, signals } = yield* tag
       let current = yield* Ref.get(accumulator)
       current = yield* apply(current, setter)
@@ -114,7 +124,7 @@ export const Service =
       }
     })
 
-    const update: AccumulatorUpdate<Self, F> = Effect.fnUntraced(function* (key, setter) {
+    const updateField: AccumulatorUpdate<Self, F> = Effect.fnUntraced(function* (key, setter) {
       const { ref: accumulator, signals } = yield* tag
       let { [key]: current } = yield* Ref.get(accumulator)
 
@@ -130,55 +140,57 @@ export const Service =
         return Stream.fromPubSub(signal)
       }).pipe(Stream.unwrap)
 
-    return Object.assign(tag, { [TypeId]: TypeId, state, definition, reducer, set, update, signal })
-  }
+    const layer = <Reducers extends Reducer.Reducers<F, EventDefinitions>, E, R>({
+      source,
+      reducers,
+      initial,
+    }: {
+      readonly source: Stream.Stream<FieldsRecord.TaggedMember.Type<EventDefinitions>, E, R>
+      readonly reducers: Reducers
+      readonly initial: S.Struct<F>["Type"]
+    }): Layer.Layer<
+      Self,
+      E | Effect.Effect.Error<ReturnType<Reducers[keyof Reducers]>>,
+      Exclude<R | Stream.Stream.Context<ReturnType<Reducers[keyof Reducers]>>, Self>
+    > =>
+      Effect.gen(function* () {
+        const mutex = yield* Effect.makeSemaphore(1)
+        const ref = yield* Ref.make(initial)
+        const signals: {
+          readonly [K in keyof F]: PubSub.PubSub<S.Schema.Type<F[K]>>
+        } = (yield* Effect.all(
+          Record.keys(definition.fields).map(
+            Effect.fnUntraced(function* (key) {
+              const pubsub = yield* PubSub.unbounded({ replay: 1 })
+              yield* pubsub.publish(initial[key as never] as never)
+              return [key, pubsub] as const
+            }),
+          ),
+        ).pipe(Effect.map(Record.fromEntries))) as never
+        const service: Service<F> = { ref, signals }
+        yield* source.pipe(
+          Stream.runForEach(
+            Effect.fnUntraced(function* (event) {
+              const { _tag, ...payload } = event
+              const reducer = reducers[_tag]!
+              const resolved = yield* Ref.get(ref)
+              yield* reducer(payload as never, resolved)
+            }, mutex.withPermits(1)),
+          ),
+          Effect.provideService(tag, service),
+          Effect.forkScoped,
+        )
+        return service
+      }).pipe(Layer.scoped(tag))
 
-export const layer = <
-  Self,
-  Id extends string,
-  F extends Fields,
-  EventDefinitions extends FieldsRecord,
-  Reducers extends Reducer.Reducers<F, EventDefinitions>,
-  E,
-  R,
->({
-  accumulator,
-  source,
-  reducers,
-  initial,
-}: {
-  readonly accumulator: Accumulator<Self, Id, F, EventDefinitions>
-  readonly source: Stream.Stream<FieldsRecord.TaggedMember.Type<EventDefinitions>, E, R>
-  readonly reducers: Reducers
-  readonly initial: S.Struct<F>["Type"]
-}): Layer.Layer<
-  Self,
-  E | Effect.Effect.Error<ReturnType<Reducers[keyof Reducers]>>,
-  Exclude<R | Stream.Stream.Context<ReturnType<Reducers[keyof Reducers]>>, Self>
-> =>
-  Effect.gen(function* () {
-    const mutex = yield* Effect.makeSemaphore(1)
-    const ref = yield* Ref.make(initial)
-    const { fields } = accumulator.definition
-    const signals: {
-      readonly [K in keyof F]: PubSub.PubSub<S.Schema.Type<F[K]>>
-    } = (yield* Effect.all(
-      Record.keys(fields).map((key) =>
-        PubSub.unbounded({ replay: 1 }).pipe(Effect.map((pubsub) => [key, pubsub] as const)),
-      ),
-    ).pipe(Effect.map(Record.fromEntries))) as never
-    const service: Service<F> = { ref, signals }
-    yield* source.pipe(
-      Stream.runForEach(
-        Effect.fnUntraced(function* (event) {
-          const { _tag, ...payload } = event
-          const reducer = reducers[_tag]!
-          const resolved = yield* Ref.get(ref)
-          yield* reducer(payload as never, resolved)
-        }, mutex.withPermits(1)),
-      ),
-      Effect.provideService(accumulator, service),
-      Effect.forkScoped,
-    )
-    return service
-  }).pipe(Layer.scoped(accumulator))
+    return Object.assign(tag, {
+      [TypeId]: TypeId,
+      state,
+      definition,
+      reducer,
+      update,
+      updateField,
+      signal,
+      layer,
+    })
+  }

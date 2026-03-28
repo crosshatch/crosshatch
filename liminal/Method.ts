@@ -10,6 +10,12 @@ export interface MethodDefinition<P extends Fields, AA, AI, EA, EI> {
 
 export declare namespace MethodDefinition {
   export type Any = MethodDefinition<Fields, any, any, any, any> | MethodDefinition<Fields, any, any, never, never>
+
+  export type Merge<T, U> = [T] extends [never]
+    ? U
+    : {
+        [K in keyof T & keyof U]: T[K] extends U[K] ? (U[K] extends T[K] ? T[K] : never) : never
+      }
 }
 
 export const define = <const P extends Fields, AA, AI, EA, EI>({

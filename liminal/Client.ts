@@ -1,23 +1,11 @@
 import { Socket, Worker } from "@effect/platform"
-import {
-  Encoding,
-  Deferred,
-  Layer,
-  Record,
-  Context,
-  Stream,
-  Effect,
-  Schema as S,
-  PubSub,
-  Queue,
-  Chunk,
-  Data,
-  RcRef,
-} from "effect"
+import { Encoding, Deferred, Layer, Record, Context, Stream, Effect, Schema as S, PubSub, Queue, RcRef } from "effect"
 
 import type { FieldsRecord } from "./_types.ts"
+import type { F } from "./F.ts"
 import type { MethodDefinition } from "./Method.ts"
 
+import { type ClientError, AuditionError, ClosedBeforeResolvedError, ConnectionError } from "./errors.ts"
 import * as Protocol from "./Protocol.ts"
 
 export const TypeId = "~liminal/Client" as const
@@ -43,21 +31,7 @@ export type Service<
 
     readonly f: F<ClientSelf, MethodDefinitions>
   },
-  ConnectionError
->
-
-export class ConnectionError extends Data.TaggedError("ConnectionError")<{}> {}
-
-export type F<ClientSelf, MethodDefinitions extends Record<string, MethodDefinition.Any>> = <
-  Method extends keyof MethodDefinitions,
->(
-  method: Method,
-) => (
-  payload: S.Struct<MethodDefinitions[Method]["payload"]>["Type"],
-) => Effect.Effect<
-  MethodDefinitions[Method]["success"]["Type"],
-  MethodDefinitions[Method]["failure"]["Type"] | ConnectionError,
-  ClientSelf
+  ClientError
 >
 
 export interface Client<
@@ -99,7 +73,7 @@ export interface Client<
     >
   }
 
-  readonly events: Stream.Stream<FieldsRecord.TaggedMember.Type<EventDefinitions>, ConnectionError, ClientSelf>
+  readonly events: Stream.Stream<FieldsRecord.TaggedMember.Type<EventDefinitions>, ClientError, ClientSelf>
 
   readonly f: F<ClientSelf, MethodDefinitions>
 }
@@ -162,24 +136,14 @@ export const Service =
         )
       })
 
-    const events = tag.pipe(
-      Effect.flatMap(RcRef.get),
-      Effect.flatMap(({ pubsub, replay }) =>
-        PubSub.subscribe(pubsub).pipe(
-          Effect.flatMap((queue) =>
-            Queue.takeAll(replay).pipe(
-              Effect.tap(() => Queue.shutdown(replay)),
-              Effect.map((initial) =>
-                Chunk.isEmpty(initial)
-                  ? Stream.fromQueue(queue)
-                  : Stream.fromChunk(initial).pipe(Stream.concat(Stream.fromQueue(queue))),
-              ),
-            ),
-          ),
-        ),
-      ),
-      Stream.unwrapScoped,
-    )
+    const events = Effect.gen(function* () {
+      const rc = yield* tag
+      const { pubsub, replay } = yield* RcRef.get(rc)
+      const queue = yield* PubSub.subscribe(pubsub)
+      const initial = yield* Queue.takeAll(replay)
+      yield* Queue.shutdown(replay)
+      return Stream.fromChunk(initial).pipe(Stream.concat(Stream.fromQueue(queue)))
+    }).pipe(Stream.unwrapScoped)
 
     return Object.assign(tag, {
       [TypeId]: TypeId,
@@ -223,12 +187,14 @@ export const layerSocket = <
 
       const pending: Record<string, Deferred.Deferred<Success, Failure>> = {}
       let nextId = 0
-      const auditioned = yield* Deferred.make<void, ConnectionError>()
+      const auditioned = yield* Deferred.make<void, AuditionError>()
 
       yield* Effect.addFinalizer(() =>
-        Effect.forEach(Object.values(pending), (deferred) => Deferred.fail(deferred, new ConnectionError()), {
-          concurrency: "unbounded",
-        }).pipe(Effect.andThen(PubSub.shutdown(pubsub))),
+        Effect.forEach(
+          Object.values(pending),
+          (deferred) => Deferred.fail(deferred, ClosedBeforeResolvedError.make()),
+          { concurrency: "unbounded" },
+        ).pipe(Effect.andThen(PubSub.shutdown(pubsub))),
       )
 
       yield* socket
@@ -241,7 +207,7 @@ export const layerSocket = <
               return yield* write(new Socket.CloseEvent(1000))
             }
             if (S.is(Protocol.AuditionErrorMessage)(message)) {
-              yield* Deferred.fail(auditioned, new ConnectionError())
+              yield* Deferred.fail(auditioned, AuditionError.make())
               return yield* write(new Socket.CloseEvent(1000))
             }
             yield* Deferred.succeed(auditioned, void 0)
@@ -282,10 +248,7 @@ export const layerSocket = <
             _tag: "Call",
             id,
             payload: { _tag, ...payload },
-          }).pipe(
-            Effect.flatMap(write),
-            Effect.catchAll(() => new ConnectionError()),
-          )
+          }).pipe(Effect.flatMap(write))
           return yield* Deferred.await(deferred)
         })
 
@@ -314,28 +277,32 @@ export const layerPlatform = <
           Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions>,
           never
         >({})
-        .pipe(Effect.catchTag("WorkerError", () => new ConnectionError()))
+        .pipe(Effect.catchTag("WorkerError", (cause) => ConnectionError.make({ cause })))
+
       const pubsub = yield* PubSub.unbounded<FieldsRecord.TaggedMember.Type<EventDefinitions>>()
       const replay = yield* PubSub.subscribe(pubsub)
 
       const pending: Record<string, Deferred.Deferred<Success, Failure>> = {}
       let nextId = 0
-      const send = (message: Protocol.CallMessage.Type<MethodDefinitions>) =>
-        worker.executeEffect(message).pipe(Effect.catchAll(() => new ConnectionError()))
-      const auditioned = yield* Deferred.make<void, ConnectionError>()
+      const send = (message: Protocol.CallMessage.Type<MethodDefinitions>) => worker.executeEffect(message)
+      const auditioned = yield* Deferred.make<void, AuditionError>()
 
       yield* Effect.addFinalizer(() =>
-        Effect.forEach(Object.values(pending), (deferred) => Deferred.fail(deferred, new ConnectionError()), {
-          concurrency: "unbounded",
-        }).pipe(Effect.andThen(PubSub.shutdown(pubsub))),
+        Effect.forEach(
+          Object.values(pending),
+          (deferred) => Deferred.fail(deferred, ClosedBeforeResolvedError.make()),
+          { concurrency: "unbounded" },
+        ).pipe(Effect.andThen(PubSub.shutdown(pubsub))),
       )
 
-      yield* worker.execute(Protocol.AuditionMessage.make({ clientId: client.key })).pipe(
+      const clientId = client.key
+      yield* worker.execute(Protocol.AuditionMessage.make({ clientId })).pipe(
+        Stream.catchTag("WorkerError", (cause) => ConnectionError.make({ cause })),
         Stream.takeWhile((v) => v !== 1),
         Stream.runForEach(
           Effect.fnUntraced(function* (message) {
             if (message._tag === "AuditionError") {
-              yield* Deferred.fail(auditioned, new ConnectionError())
+              yield* Deferred.fail(auditioned, AuditionError.make())
               return
             }
             yield* Deferred.succeed(auditioned, void 0)
@@ -377,7 +344,7 @@ export const layerPlatform = <
             _tag: "Call",
             id,
             payload: { _tag, ...payload },
-          })
+          }).pipe(Effect.catchTag("WorkerError", (cause) => ConnectionError.make({ cause })))
           return yield* Deferred.await(deferred)
         })
 
