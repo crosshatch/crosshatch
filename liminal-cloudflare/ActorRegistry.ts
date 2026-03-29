@@ -267,7 +267,7 @@ export const Service =
 
       webSocketMessage(socket: WebSocket, raw: string | ArrayBuffer) {
         Effect.gen(this, function* () {
-          const caller = yield* this.directory.look(socket)
+          const caller = yield* this.directory.get(socket)
           const name = yield* Effect.fromNullable(this.#name)
           const layer = Layer.succeed(actor, {
             name,

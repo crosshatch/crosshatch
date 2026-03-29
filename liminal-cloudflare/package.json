@@ -4,12 +4,12 @@
   "private": true,
   "description": "Actors x Effects on Cloudflare",
   "bugs": {
-    "url": "https://github.com/crosshatch/crosshatch/issues"
+    "url": "https://github.com/crosshatch/liminal/issues"
   },
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/crosshatch/crosshatch.git",
+    "url": "https://github.com/crosshatch/liminal.git",
     "directory": "liminal-cloudflare"
   },
   "type": "module",

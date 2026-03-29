@@ -5,7 +5,9 @@ import { branch } from "./branch.ts"
 type LayerRecord = Record<string, Layer.Layer.Any>
 
 export type MatrixEffect<A, E, R, Layers extends LayerRecord> = Effect.Effect<
-  { [K in keyof Layers]: A },
+  {
+    readonly [K in keyof Layers]: A
+  },
   E | Layer.Layer.Error<Layers[keyof Layers]>,
   R | Layer.Layer.Context<Layers[keyof Layers]>
 >

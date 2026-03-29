@@ -34,7 +34,9 @@ export type ColumnsConfig<A, E> = {
 }
 
 type SupersetKey<U extends { _tag: string }> = Exclude<
-  { [K in Types.Tags<U>]: keyof Types.ExtractTag<U, K> }[Types.Tags<U>],
+  {
+    readonly [K in Types.Tags<U>]: keyof Types.ExtractTag<U, K>
+  }[Types.Tags<U>],
   "_tag"
 >
 type Superset<U extends { _tag: string }> = {

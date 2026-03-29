@@ -10,10 +10,12 @@ export interface ClientDirectory<ActorSelf, AttachmentFields extends Fields, Eve
 
   readonly register: (
     socket: WebSocket,
-    attachments: { [K in keyof S.Struct.Type<AttachmentFields>]: S.Struct.Type<AttachmentFields>[K] },
+    attachments: {
+      readonly [K in keyof S.Struct.Type<AttachmentFields>]: S.Struct.Type<AttachmentFields>[K]
+    },
   ) => Effect.Effect<this["Handle"], ParseResult.ParseError, never>
 
-  readonly look: (socket: WebSocket) => Effect.Effect<this["Handle"], Cause.NoSuchElementException, never>
+  readonly get: (socket: WebSocket) => Effect.Effect<this["Handle"], Cause.NoSuchElementException, never>
 
   readonly unregister: (socket: WebSocket) => Effect.Effect<void>
 }
@@ -53,7 +55,7 @@ export const make = <
   const sockets = new Map<WebSocket, Handle>()
   const handles = new Set<Handle>()
 
-  const look = (socket: WebSocket) => Effect.fromNullable(sockets.get(socket))
+  const get = (socket: WebSocket) => Effect.fromNullable(sockets.get(socket))
 
   const register = Effect.fnUntraced(function* (
     socket: WebSocket,
@@ -97,7 +99,7 @@ export const make = <
     Handle: null!,
     handles,
     register,
-    look,
+    get,
     unregister,
   }
 }

@@ -85,6 +85,8 @@ export interface Accumulator<
 
   readonly signal: AccumulatorSignal<Self, F>
 
+  readonly current: Effect.Effect<S.Struct<F>["Type"], never, Self>
+
   readonly layer: <Reducers extends Reducer.Reducers<F, EventDefinitions>, E, R>(config: {
     readonly source: Stream.Stream<FieldsRecord.TaggedMember.Type<EventDefinitions>, E, R>
     readonly reducers: Reducers
@@ -140,6 +142,8 @@ export const Service =
         return Stream.fromPubSub(signal)
       }).pipe(Stream.unwrap)
 
+    const current = tag.pipe(Effect.flatMap(({ ref }) => Ref.get(ref)))
+
     const layer = <Reducers extends Reducer.Reducers<F, EventDefinitions>, E, R>({
       source,
       reducers,
@@ -191,6 +195,7 @@ export const Service =
       update,
       updateField,
       signal,
+      current,
       layer,
     })
   }
