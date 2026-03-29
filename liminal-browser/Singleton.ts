@@ -86,11 +86,22 @@ export const make = Effect.fnUntraced(function* <
       return Effect.gen(function* () {
         const message = yield* S.validate(schema.call)(raw)
         const { id, payload } = message
-        const handler = handlers[payload._tag]
+        const { _tag } = payload
+        const handler = handlers[_tag]
         yield* handler(payload).pipe(
           Effect.matchEffect({
-            onSuccess: (value) => pubsub.offer({ _tag: "Success" as const, id, value }),
-            onFailure: (cause) => pubsub.offer({ _tag: "Failure" as const, id, cause }),
+            onSuccess: (value) =>
+              pubsub.offer({
+                _tag: "Success" as const,
+                id,
+                value: { _tag, value },
+              }),
+            onFailure: (value) =>
+              pubsub.offer({
+                _tag: "Failure" as const,
+                id,
+                cause: { _tag, value },
+              }),
           }),
         )
       }).pipe(task)

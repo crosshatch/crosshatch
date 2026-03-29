@@ -35,7 +35,12 @@ export declare namespace SuccessMessage {
 
     readonly id: number
 
-    readonly value: MethodDefinitions[keyof MethodDefinitions]["success"]["Type"]
+    readonly value: {
+      readonly [K in keyof MethodDefinitions]: {
+        readonly _tag: K
+        readonly value: MethodDefinitions[K]["success"]["Type"]
+      }
+    }[keyof MethodDefinitions]
   }
 
   export type Encoded<MethodDefinitions extends Record<string, MethodDefinition.Any>> = {
@@ -43,7 +48,12 @@ export declare namespace SuccessMessage {
 
     readonly id: number
 
-    readonly value: MethodDefinitions[keyof MethodDefinitions]["success"]["Encoded"]
+    readonly value: {
+      readonly [K in keyof MethodDefinitions]: {
+        readonly _tag: K
+        readonly value: MethodDefinitions[K]["success"]["Encoded"]
+      }
+    }[keyof MethodDefinitions]
   }
 }
 
@@ -53,7 +63,12 @@ export declare namespace FailureMessage {
 
     readonly id: number
 
-    readonly cause: MethodDefinitions[keyof MethodDefinitions]["failure"]["Type"]
+    readonly cause: {
+      readonly [K in keyof MethodDefinitions]: {
+        readonly _tag: K
+        readonly value: MethodDefinitions[K]["failure"]["Type"]
+      }
+    }[keyof MethodDefinitions]
   }
 
   export type Encoded<MethodDefinitions extends Record<string, MethodDefinition.Any>> = {
@@ -61,7 +76,12 @@ export declare namespace FailureMessage {
 
     readonly id: number
 
-    readonly cause: MethodDefinitions[keyof MethodDefinitions]["failure"]["Encoded"]
+    readonly cause: {
+      readonly [K in keyof MethodDefinitions]: {
+        readonly _tag: K
+        readonly value: MethodDefinitions[K]["failure"]["Encoded"]
+      }
+    }[keyof MethodDefinitions]
   }
 }
 

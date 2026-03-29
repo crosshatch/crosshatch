@@ -289,13 +289,13 @@ export const Service =
                 S.encode(S.parseJson(client.schema.success))({
                   _tag: "Success",
                   id,
-                  value,
+                  value: { _tag, value },
                 }),
-              onFailure: (cause) =>
+              onFailure: (value) =>
                 S.encode(S.parseJson(client.schema.failure))({
                   _tag: "Failure",
                   id,
-                  cause,
+                  cause: { _tag, value },
                 }),
             }),
             Effect.andThen((v) => Effect.sync(() => socket.send(v))),

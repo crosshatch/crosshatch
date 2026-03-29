@@ -105,16 +105,20 @@ export const Service =
       Protocol.SuccessMessage.Encoded<MethodDefinitions>
     > = S.TaggedStruct("Success", {
       id: S.Int,
-      value: S.Union(...Object.values(definition.methods).map(({ success }) => success)),
-    })
+      value: S.Union(
+        ...Record.toEntries(definition.methods).map(([_tag, { success: value }]) => S.TaggedStruct(_tag, { value })),
+      ),
+    }) as never
 
     const failure: S.Schema<
       Protocol.FailureMessage.Type<MethodDefinitions>,
       Protocol.FailureMessage.Encoded<MethodDefinitions>
     > = S.TaggedStruct("Failure", {
       id: S.Int,
-      cause: S.Union(...Object.values(definition.methods).map(({ failure }) => failure)),
-    })
+      cause: S.Union(
+        ...Record.toEntries(definition.methods).map(([_tag, { failure: value }]) => S.TaggedStruct(_tag, { value })),
+      ),
+    }) as never
 
     const event: S.Schema<
       Protocol.EventMessage.Type<EventDefinitions>,
@@ -220,7 +224,7 @@ export const layerSocket = <
                 const deferred = pending[message.id]
                 if (deferred) {
                   delete pending[message.id]
-                  yield* Deferred.succeed(deferred, message.value)
+                  yield* Deferred.succeed(deferred, message.value.value)
                 }
                 break
               }
@@ -228,7 +232,7 @@ export const layerSocket = <
                 const deferred = pending[message.id]
                 if (deferred) {
                   delete pending[message.id]
-                  yield* Deferred.fail(deferred, message.cause)
+                  yield* Deferred.fail(deferred, message.cause.value)
                 }
                 break
               }
@@ -315,7 +319,7 @@ export const layerPlatform = <
                 const deferred = pending[message.id]
                 if (deferred) {
                   delete pending[message.id]
-                  yield* Deferred.succeed(deferred, message.value)
+                  yield* Deferred.succeed(deferred, message.value.value)
                 }
                 break
               }
@@ -323,7 +327,7 @@ export const layerPlatform = <
                 const deferred = pending[message.id]
                 if (deferred) {
                   delete pending[message.id]
-                  yield* Deferred.fail(deferred, message.cause)
+                  yield* Deferred.fail(deferred, message.cause.value)
                 }
                 break
               }
