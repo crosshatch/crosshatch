@@ -4,7 +4,7 @@ import { Schedule, Effect, Encoding, flow, Schema as S, Cause, ParseResult } fro
 
 import { CrosshatchEnv } from "../CrosshatchEnv.ts"
 import { FacadeClient } from "../FacadeClient.ts"
-import { DeclinedDecision } from "../methods/Propose.ts"
+import { AllowanceDenial, DeclinedDecision } from "../methods/Propose.ts"
 import { managedRuntime } from "../runtime.ts"
 import {
   EscalationWidget,
@@ -39,7 +39,11 @@ export const makeFetch =
           )
       const make: Effect.Effect<
         { readonly payload: typeof Payload.Type },
-        ParseResult.ParseError | Cause.NoSuchElementException | ClientError | ClosedBeforeResolvedError,
+        | ParseResult.ParseError
+        | Cause.NoSuchElementException
+        | ClientError
+        | ClosedBeforeResolvedError
+        | AllowanceDenial,
         FacadeClient | CrosshatchEnv
       > = FacadeClient.f("Propose")({ required }).pipe(
         (x) =>

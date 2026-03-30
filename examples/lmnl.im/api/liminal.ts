@@ -1,6 +1,6 @@
 import { HttpLayerRouter, HttpServer, HttpServerResponse } from "@effect/platform"
 import { Layer, Effect } from "effect"
-import { Entry } from "liminal-cloudflare"
+import { Assets, Entry } from "liminal-cloudflare"
 
 import { OpenaiProxy } from "./OpenaiProxy.ts"
 
@@ -13,6 +13,7 @@ const ApiLive = Layer.mergeAll(
     allowedOrigins: ["https://lmnl.im", "https://local.lmnl.im"],
     exposedHeaders: ["PAYMENT-REQUIRED"],
   }),
+  HttpLayerRouter.add("*", "/*", Assets.forward),
 )
 
 export default ApiLive.pipe(

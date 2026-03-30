@@ -14,6 +14,8 @@ export const Propose = Method.define({
   failure: S.suspend(() => DeclinedDecision),
 })
 
+export class AllowanceDenial extends S.TaggedClass<AllowanceDenial>()("AllowanceDenial", {}) {}
+
 export class InsufficientFunds extends S.TaggedClass<InsufficientFunds>()("InsufficientFunds", {}) {}
 
 export class InsufficientAllowanceRemaining extends S.TaggedClass<InsufficientAllowanceRemaining>()(
@@ -28,6 +30,7 @@ export class AppFrozen extends S.TaggedClass<AppFrozen>()("AppFrozen", {}) {}
 export class Escalation extends S.TaggedClass<Escalation>()("Escalation", {}) {}
 
 export const DeclinedDecision = S.Union(
+  AllowanceDenial,
   InsufficientFunds,
   InsufficientAllowanceRemaining,
   AccountFrozen,

@@ -68,6 +68,8 @@ export interface Actor<
 
   readonly sendAll: Send<ActorSelf, EventDefinitions>
 
+  readonly evict: Effect.Effect<void, never, ActorSelf>
+
   readonly handler: <K extends keyof MethodDefinitions, R>(
     tag: K,
     f: Method.Handler<MethodDefinitions[K], R>,
@@ -102,6 +104,14 @@ export const Service =
       }
     })
 
+    // TODO: more eviction
+    const evict = Effect.gen(function* () {
+      const { clients } = yield* tag
+      for (const client of clients) {
+        yield* client.disconnect
+      }
+    })
+
     const handler = <K extends keyof MethodDefinitions, R>(
       _tag: K,
       f: Method.Handler<MethodDefinitions[K], R>,
@@ -115,6 +125,7 @@ export const Service =
       },
       assertCurrentClient,
       sendAll,
+      evict,
       handler,
     })
   }
