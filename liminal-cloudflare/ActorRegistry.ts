@@ -26,6 +26,16 @@ import { NativeRequest } from "./NativeRequest.ts"
 
 export const SecWebSocketProtocol = "Sec-WebSocket-Protocol" as const
 
+const extractProtocol = Effect.fnUntraced(function* (headers: Headers) {
+  const protocols = yield* Effect.fromNullable(headers.get(SecWebSocketProtocol)).pipe(
+    Effect.map(flow(String.split(","), Array.map(String.trim))),
+  )
+  const liminalProtocolI = yield* Array.findFirstIndex(protocols, (v) => v === "liminal")
+  return yield* Effect.fromNullable(protocols[liminalProtocolI + 1]).pipe(
+    Effect.flatMap(Encoding.decodeBase64UrlString),
+  )
+})
+
 const TypeId = "~liminal/cloudflare/ActorRegistry" as const
 
 export interface ActorRegistryDefinition<
@@ -235,28 +245,17 @@ export const Service =
           }
           const { 0: webSocket, 1: server } = new WebSocketPair()
           this.state.acceptWebSocket(server)
-          const protocols = yield* Effect.fromNullable(request.headers.get(SecWebSocketProtocol)).pipe(
-            Effect.map(flow(String.split(","), Array.map(String.trim))),
+          const caller = yield* this.directory.register(server, attachments)
+          const ActorLive = Layer.succeed(actor, {
+            name,
+            clients: this.directory.handles,
+            currentClient: caller,
+          })
+          yield* onConnect.pipe(
+            Effect.scoped,
+            Effect.provide([ActorLive, requestLayer.pipe(Layer.provideMerge(ActorLive))]),
           )
-          const liminalProtocolI = yield* Array.findFirstIndex(protocols, (v) => v === "liminal")
-          const liminalProtocol = yield* Effect.fromNullable(protocols[liminalProtocolI + 1]).pipe(
-            Effect.flatMap(Encoding.decodeBase64UrlString),
-          )
-          if (liminalProtocol !== client.key) {
-            server.send(JSON.stringify(Protocol.AuditionErrorMessage.make()))
-            server.close()
-          } else {
-            const caller = yield* this.directory.register(server, attachments)
-            const ActorLive = Layer.succeed(actor, {
-              name,
-              clients: this.directory.handles,
-              currentClient: caller,
-            })
-            yield* onConnect.pipe(
-              Effect.scoped,
-              Effect.provide([ActorLive, requestLayer.pipe(Layer.provideMerge(ActorLive))]),
-            )
-          }
+          yield* this.directory.flush
           return new Response(null, {
             status: 101,
             webSocket,
@@ -267,6 +266,7 @@ export const Service =
 
       webSocketMessage(socket: WebSocket, raw: string | ArrayBuffer) {
         Effect.gen(this, function* () {
+          yield* Effect.addFinalizer(() => this.directory.flush)
           const caller = yield* this.directory.get(socket)
           const name = yield* Effect.fromNullable(this.#name)
           const layer = Layer.succeed(actor, {
@@ -319,12 +319,27 @@ export const Service =
       const namespace = yield* tag
       const nameEncoded = yield* S.encode(nameSchema)(name)
       const stub = namespace.getByName(nameEncoded)
-
       const request = yield* NativeRequest
+      const actual = yield* extractProtocol(request.headers)
+      const expected = client.key
+      if (actual !== expected) {
+        const { 0: client, 1: server } = new WebSocketPair()
+        server.accept()
+        server.close(
+          4003,
+          yield* S.encode(S.parseJson(Protocol.AuditionFailure))(Protocol.AuditionFailure.make({ expected, actual })),
+        )
+        return yield* HttpServerResponse.raw(
+          new Response(null, {
+            status: 101,
+            webSocket: client,
+            headers: { [SecWebSocketProtocol]: "liminal" },
+          }),
+        )
+      }
       const url = new URL(request.url)
       const params = yield* S.encode(paramsSchema)({ name, attachments })
       url.searchParams.set("__liminal", params)
-
       return yield* Effect.promise(() => stub.fetch(new Request(url, request))).pipe(
         Effect.map((v) => HttpServerResponse.raw(v)),
       )

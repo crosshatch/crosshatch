@@ -103,7 +103,10 @@ export const AuditionMessage = S.TaggedStruct("Audition", {
   clientId: S.String,
 })
 
-export const AuditionErrorMessage = S.TaggedStruct("AuditionError", {})
+export class AuditionFailure extends S.TaggedError<AuditionFailure>()("AuditionFailure", {
+  expected: S.String,
+  actual: S.String,
+}) {}
 
 export declare namespace ActorMessage {
   export type Type<
@@ -113,8 +116,6 @@ export declare namespace ActorMessage {
     | SuccessMessage.Type<MethodDefinitions>
     | FailureMessage.Type<MethodDefinitions>
     | EventMessage.Type<EventDefinitions>
-    | typeof AuditionErrorMessage.Type
-    | 1
 
   export type Encoded<
     MethodDefinitions extends Record<string, MethodDefinition.Any>,
@@ -123,6 +124,4 @@ export declare namespace ActorMessage {
     | SuccessMessage.Encoded<MethodDefinitions>
     | FailureMessage.Encoded<MethodDefinitions>
     | EventMessage.Encoded<EventDefinitions>
-    | typeof AuditionErrorMessage.Type
-    | 1
 }

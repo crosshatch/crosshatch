@@ -25,6 +25,11 @@ export const makeFetch =
           Layer.succeed(NativeRequest, request),
           Layer.succeed(HttpServerRequest.HttpServerRequest, HttpServerRequest.fromWeb(request)),
         ]),
+        // Solves crashes between HMRs.
+        // Without this, in-flight requests use an old memoMap; new requests use a new one.
+        // Aka. cross-contamination.
+        // TODO: investigate whether better-solved by https://github.com/dmmulroy/effect-cloudflare/blob/main/src/internal/wrangler.ts
+        Effect.provideService(Layer.CurrentMemoMap, runtime.memoMap),
         runtime.runPromise,
       )
   }

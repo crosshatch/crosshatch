@@ -18,6 +18,8 @@ export interface ClientDirectory<ActorSelf, AttachmentFields extends Fields, Eve
   readonly get: (socket: WebSocket) => Effect.Effect<this["Handle"], Cause.NoSuchElementException, never>
 
   readonly unregister: (socket: WebSocket) => Effect.Effect<void>
+
+  readonly flush: Effect.Effect<void>
 }
 
 export const make = <
@@ -54,6 +56,7 @@ export const make = <
 
   const sockets = new Map<WebSocket, Handle>()
   const handles = new Set<Handle>()
+  const pendingDisconnects = new Set<WebSocket>()
 
   const get = (socket: WebSocket) => Effect.fromNullable(sockets.get(socket))
 
@@ -76,7 +79,7 @@ export const make = <
           event: { _tag, ...payload },
         }).pipe(Effect.andThen((v) => Effect.sync(() => socket.send(v)))),
       disconnect: Effect.sync(() => {
-        socket.send("1")
+        pendingDisconnects.add(socket)
         sockets.delete(socket)
         handles.delete(handle)
       }),
@@ -95,11 +98,19 @@ export const make = <
       }
     })
 
+  const flush = Effect.sync(() => {
+    for (const ws of pendingDisconnects) {
+      ws.close(1000)
+    }
+    pendingDisconnects.clear()
+  })
+
   return {
     Handle: null!,
     handles,
     register,
     get,
     unregister,
+    flush,
   }
 }
