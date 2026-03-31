@@ -124,7 +124,7 @@ export declare namespace ActorMessage {
     EventDefinitions extends FieldsRecord,
   > =
     | typeof AuditionSuccessMessage.Encoded
-    | typeof AuditionFailureMessage.Type
+    | typeof AuditionFailureMessage.Encoded
     | SuccessMessage.Encoded<MethodDefinitions>
     | FailureMessage.Encoded<MethodDefinitions>
     | EventMessage.Encoded<EventDefinitions>
