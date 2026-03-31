@@ -75,20 +75,37 @@ export const make = Effect.fnUntraced(function* <
       Exclude<Effect.Effect.Context<ReturnType<Handlers[keyof Handlers]>>, ActorSelf> | R,
       typeof schema.actor.Type | void
     >((raw) => {
-      if (S.is(Protocol.AuditionMessage)(raw)) {
-        return Stream.unwrapScoped(
-          PubSub.subscribe(pubsub).pipe(
-            Effect.tap(() => task(onConnect)),
-            Effect.map(Stream.fromQueue),
+      if (typeof raw === "string") {
+        const expected = actor.definition.client.key
+        if (raw !== expected) {
+          return Stream.succeed(
+            Protocol.AuditionFailureMessage.make({
+              _tag: "AuditionFailure",
+              actual: raw,
+              expected,
+            }),
+          )
+        }
+        return Stream.succeed(
+          Protocol.AuditionSuccessMessage.make({
+            _tag: "AuditionSucceeded",
+          }),
+        ).pipe(
+          Stream.concat(
+            PubSub.subscribe(pubsub).pipe(
+              Effect.tap(() => task(onConnect)),
+              Effect.map(Stream.fromQueue),
+              Stream.unwrapScoped,
+            ),
           ),
         )
       }
       return Effect.gen(function* () {
         const message = yield* S.validate(schema.call)(raw)
         const { id, payload } = message
-        const { _tag } = payload
+        const { _tag, value } = payload
         const handler = handlers[_tag]
-        yield* handler(payload).pipe(
+        yield* handler(value).pipe(
           Effect.matchEffect({
             onSuccess: (value) =>
               pubsub.offer({

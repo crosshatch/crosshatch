@@ -111,7 +111,9 @@ export const Service =
     > = S.TaggedStruct("Call", {
       id: S.Int,
       payload: S.Union(
-        ...Object.entries(definition.methods).map(([_tag, { payload }]) => S.TaggedStruct(_tag, payload)),
+        ...Record.toEntries(definition.methods).map(([_tag, { payload }]) =>
+          S.TaggedStruct(_tag, { value: S.Struct(payload) }),
+        ),
       ),
     }) as never
 
@@ -333,6 +335,9 @@ export const layerSocket = <
                     }
                     case 1000: {
                       return // graceful close
+                    }
+                    default: {
+                      return yield* ConnectionError.make({ cause })
                     }
                   }
                 }),
