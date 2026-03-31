@@ -286,8 +286,8 @@ export const Service =
             yield* Effect.log(message)
           }
           const { id, payload } = message
-          const { _tag } = payload
-          yield* handlers[_tag](payload).pipe(
+          const { _tag, value } = payload
+          yield* handlers[_tag](value).pipe(
             Effect.provide(requestLayer.pipe(Layer.provideMerge(layer))),
             Effect.matchEffect({
               onSuccess: (value) =>
