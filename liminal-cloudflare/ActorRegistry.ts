@@ -245,6 +245,11 @@ export const Service =
           }
           const { 0: webSocket, 1: server } = new WebSocketPair()
           this.state.acceptWebSocket(server)
+          server.send(
+            yield* S.encode(S.parseJson(Protocol.AuditionSuccessMessage))({
+              _tag: "AuditionSucceeded",
+            }),
+          )
           const caller = yield* this.directory.register(server, attachments)
           const ActorLive = Layer.succeed(actor, {
             name,
@@ -300,6 +305,7 @@ export const Service =
             }),
             Effect.andThen((v) => Effect.sync(() => socket.send(v))),
           )
+          yield* this.directory.flush
         }).pipe(Mutex.task, Effect.scoped, this.runtime.runFork)
       }
 
@@ -327,7 +333,9 @@ export const Service =
         server.accept()
         server.close(
           4003,
-          yield* S.encode(S.parseJson(Protocol.AuditionFailure))(Protocol.AuditionFailure.make({ expected, actual })),
+          yield* S.encode(S.parseJson(Protocol.AuditionFailureMessage))(
+            Protocol.AuditionFailureMessage.make({ expected, actual }),
+          ),
         )
         return yield* HttpServerResponse.raw(
           new Response(null, {

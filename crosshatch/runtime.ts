@@ -11,7 +11,7 @@ import * as FacadeWorker from "./FacadeWorker.ts"
 
 const CommonLive = Layer.mergeAll(
   FacadeAccumulator.layer.pipe(
-    Layer.provideMerge(Client.layerPlatform(FacadeClient).pipe(Layer.provide(FacadeWorker.layer))),
+    Layer.provideMerge(Client.layerWorker(FacadeClient).pipe(Layer.provide(FacadeWorker.layer))),
   ),
 ).pipe(
   Layer.provideMerge(CrosshatchEnv.layer),

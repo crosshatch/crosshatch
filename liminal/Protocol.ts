@@ -12,7 +12,8 @@ export declare namespace CallMessage {
     readonly payload: {
       [K in keyof MethodDefinitions]: {
         readonly _tag: K
-      } & S.Struct<MethodDefinitions[K]["payload"]>["Type"]
+        readonly value: S.Struct<MethodDefinitions[K]["payload"]>["Type"]
+      }
     }[keyof MethodDefinitions]
   }
 
@@ -24,7 +25,8 @@ export declare namespace CallMessage {
     readonly payload: {
       [K in keyof MethodDefinitions]: {
         readonly _tag: K
-      } & S.Struct<MethodDefinitions[K]["payload"]>["Encoded"]
+        readonly value: S.Struct<MethodDefinitions[K]["payload"]>["Encoded"]
+      }
     }[keyof MethodDefinitions]
   }
 }
@@ -99,20 +101,20 @@ export declare namespace EventMessage {
   }
 }
 
-export const AuditionMessage = S.TaggedStruct("Audition", {
-  clientId: S.String,
-})
+export const AuditionSuccessMessage = S.TaggedStruct("AuditionSucceeded", {})
 
-export class AuditionFailure extends S.TaggedError<AuditionFailure>()("AuditionFailure", {
+export const AuditionFailureMessage = S.TaggedStruct("AuditionFailure", {
   expected: S.String,
   actual: S.String,
-}) {}
+})
 
 export declare namespace ActorMessage {
   export type Type<
     MethodDefinitions extends Record<string, MethodDefinition.Any>,
     EventDefinitions extends FieldsRecord,
   > =
+    | typeof AuditionSuccessMessage.Type
+    | typeof AuditionFailureMessage.Type
     | SuccessMessage.Type<MethodDefinitions>
     | FailureMessage.Type<MethodDefinitions>
     | EventMessage.Type<EventDefinitions>
@@ -121,6 +123,8 @@ export declare namespace ActorMessage {
     MethodDefinitions extends Record<string, MethodDefinition.Any>,
     EventDefinitions extends FieldsRecord,
   > =
+    | typeof AuditionSuccessMessage.Encoded
+    | typeof AuditionFailureMessage.Type
     | SuccessMessage.Encoded<MethodDefinitions>
     | FailureMessage.Encoded<MethodDefinitions>
     | EventMessage.Encoded<EventDefinitions>

@@ -1,6 +1,9 @@
 import { Schema as S } from "effect"
 
-export class AuditionError extends S.TaggedError<AuditionError>()("AuditionError", {}) {}
+export class AuditionError extends S.TaggedError<AuditionError>()("AuditionError", {
+  actual: S.String,
+  expected: S.String,
+}) {}
 
 export class ConnectionError extends S.TaggedError<ConnectionError>()("ConnectionError", {
   cause: S.Unknown,
