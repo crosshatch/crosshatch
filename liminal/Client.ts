@@ -1,18 +1,22 @@
 import { Socket, Worker } from "@effect/platform"
 import {
+  Cause,
+  Context,
   Encoding,
   Deferred,
-  Layer,
-  Record,
-  Context,
-  Stream,
   Effect,
-  Schema as S,
+  Exit,
+  Layer,
+  Option,
+  ParseResult,
   PubSub,
   RcRef,
+  Record,
   Ref,
   Scope,
-  ParseResult,
+  Stream,
+  Take,
+  Schema as S,
 } from "effect"
 
 import type { FieldsRecord, Value } from "./_types.ts"
@@ -38,7 +42,7 @@ interface ServiceSession<
   MethodDefinitions extends Record<string, MethodDefinition.Any>,
   EventDefinitions extends FieldsRecord,
 > {
-  readonly pubsub: PubSub.PubSub<FieldsRecord.TaggedMember.Type<EventDefinitions>>
+  readonly pubsub: PubSub.PubSub<Take.Take<FieldsRecord.TaggedMember.Type<EventDefinitions>, ClientError>>
 
   readonly f: F<ClientSelf, MethodDefinitions>
 }
@@ -148,7 +152,8 @@ export const Service =
 
     const events = Effect.gen(function* () {
       const { pubsub } = yield* clientTag.pipe(Effect.flatMap(RcRef.get))
-      return yield* PubSub.subscribe(pubsub)
+      const queue = yield* PubSub.subscribe(pubsub)
+      return Stream.fromQueue(queue).pipe(Stream.flattenTake)
     }).pipe(Stream.unwrapScoped)
 
     const f: F<ClientSelf, MethodDefinitions> = (_tag) =>
@@ -166,7 +171,7 @@ export const Service =
     })
   }
 
-interface Transport<
+export interface Transport<
   MethodDefinitions extends Record<string, MethodDefinition.Any>,
   EventDefinitions extends FieldsRecord,
 > {
@@ -208,8 +213,38 @@ const make = <
         > = {}
 
         const nextId = yield* Ref.make(0)
-        const pubsub = yield* PubSub.unbounded<FieldsRecord.TaggedMember.Type<EventDefinitions>>()
-        const audition = yield* Deferred.make<void, AuditionError>()
+        const pubsub =
+          yield* PubSub.unbounded<Take.Take<FieldsRecord.TaggedMember.Type<EventDefinitions>, ClientError>>()
+        const audition = yield* Deferred.make<void, ClientError>()
+
+        const normalizeError = (cause: Cause.Cause<ClientError | ParseResult.ParseError>): ClientError =>
+          Option.match(Cause.failureOption(cause), {
+            onSome: (cause) => {
+              switch (cause._tag) {
+                case "AuditionError":
+                case "ConnectionError": {
+                  return cause
+                }
+              }
+              return ConnectionError.make({ cause })
+            },
+            onNone: () => ConnectionError.make({ cause }),
+          })
+
+        const teardown = (
+          terminal: Take.Take<FieldsRecord.TaggedMember.Type<EventDefinitions>, ClientError>,
+          auditionError: Option.Option<ClientError>,
+        ) =>
+          Effect.all([
+            Effect.forEach(Object.values(inflights), (v) => Deferred.fail(v, ClosedBeforeResolvedError.make()), {
+              concurrency: "unbounded",
+            }),
+            pubsub.publish(terminal).pipe(Effect.andThen(PubSub.shutdown(pubsub))),
+            Option.match(auditionError, {
+              onSome: (error) => Deferred.fail(audition, error),
+              onNone: () => Effect.void,
+            }),
+          ]).pipe(Effect.andThen(RcRef.invalidate(rcr)))
 
         yield* listen(
           Effect.fnUntraced(function* (message) {
@@ -222,7 +257,7 @@ const make = <
               }
               case "Event": {
                 const { event } = message
-                return yield* pubsub.publish(event)
+                return yield* pubsub.publish(Take.of(event))
               }
               case "Success":
               case "Failure": {
@@ -246,13 +281,25 @@ const make = <
             }
           }),
         ).pipe(
-          Effect.ensuring(
-            Effect.all([
-              Effect.forEach(Object.values(inflights), (v) => Deferred.fail(v, ClosedBeforeResolvedError.make()), {
-                concurrency: "unbounded",
-              }),
-              PubSub.shutdown(pubsub),
-            ]).pipe(Effect.andThen(RcRef.invalidate(rcr))),
+          Effect.onExit((exit) =>
+            Exit.matchEffect(exit, {
+              onSuccess: () =>
+                teardown(
+                  Take.end,
+                  Option.some(
+                    ConnectionError.make({
+                      cause: "connection closed before audition succeeded",
+                    }),
+                  ),
+                ),
+              onFailure: (cause) => {
+                if (Cause.isInterruptedOnly(cause)) {
+                  return teardown(Take.end, Option.none())
+                }
+                const error = normalizeError(cause)
+                return teardown(Take.fail(error), Option.some(error))
+              },
+            }),
           ),
           Effect.forkScoped,
         )
@@ -320,16 +367,17 @@ export const layerSocket = <
               Effect.catchTag(
                 "SocketError",
                 Effect.fnUntraced(function* (cause) {
-                  const { code, message } = yield* S.decodeUnknown(
+                  const { code, closeReason } = yield* S.decodeUnknown(
                     S.Struct({
                       code: S.Int.pipe(S.optional),
-                      message: S.String,
+                      closeReason: S.String,
                     }),
                   )(cause)
                   switch (code) {
                     case 4003: {
+                      console.log("REASON")
                       const { actual, expected } = yield* S.decodeUnknown(S.parseJson(Protocol.AuditionFailureMessage))(
-                        message,
+                        closeReason,
                       )
                       return yield* AuditionError.make({ actual, expected })
                     }
@@ -381,7 +429,7 @@ export const layerWorker = <
         listen: Effect.fnUntraced(function* (publish) {
           yield* worker.execute(client.key).pipe(
             Stream.catchTag("WorkerError", (cause) => ConnectionError.make({ cause })),
-            Stream.takeUntil((message) => message === 1 || message._tag === "AuditionFailure"),
+            Stream.takeUntil((message) => message === 1),
             Stream.runForEach((message) => {
               if (message === 1) {
                 return Effect.void
