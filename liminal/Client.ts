@@ -1,14 +1,11 @@
 import { Socket, Worker } from "@effect/platform"
 import {
-  Cause,
   Context,
   Encoding,
   Deferred,
   Effect,
-  Exit,
   Layer,
   Option,
-  ParseResult,
   PubSub,
   RcRef,
   Record,
@@ -20,17 +17,11 @@ import {
   Array,
 } from "effect"
 
-import type { FieldsRecord, Value } from "./_types.ts"
-import type { F } from "./F.ts"
+import type { FieldsRecord } from "./_types.ts"
 import type { MethodDefinition } from "./Method.ts"
 
-import {
-  type ClientError,
-  AuditionError,
-  ClosedBeforeResolvedError,
-  ConnectionError,
-  StartupClosedError,
-} from "./errors.ts"
+import { type ClientError, AuditionError, ConnectionError } from "./errors.ts"
+import { type F, type FError, UnresolvedError } from "./F.ts"
 import * as Protocol from "./Protocol.ts"
 
 export const TypeId = "~liminal/Client" as const
@@ -44,22 +35,19 @@ export interface ClientDefinition<
   readonly events: EventDefinitions
 }
 
-export interface ReplayEventsOptions {
+export interface ReplayConfig {
   readonly mode: "startup" | "all-subscribers"
+
   readonly limit?: number | undefined
 }
 
-interface EventEnvelope<Event, Error> {
+interface EventTake<A, E> {
   readonly seq: number
-  readonly take: Take.Take<Event, Error>
+
+  readonly take: Take.Take<A, E>
 }
 
-interface ReplayState<Event, Error> {
-  readonly startupOpen: boolean
-  readonly buffer: ReadonlyArray<EventEnvelope<Event, Error>>
-}
-
-interface ServiceSession<
+export interface TransportSession<
   ClientSelf,
   MethodDefinitions extends Record<string, MethodDefinition.Any>,
   EventDefinitions extends FieldsRecord,
@@ -73,7 +61,18 @@ export type Service<
   ClientSelf,
   MethodDefinitions extends Record<string, MethodDefinition.Any>,
   EventDefinitions extends FieldsRecord,
-> = RcRef.RcRef<ServiceSession<ClientSelf, MethodDefinitions, EventDefinitions>, ClientError>
+> = RcRef.RcRef<TransportSession<ClientSelf, MethodDefinitions, EventDefinitions>, ClientError>
+
+export interface Spec<
+  MethodDefinitions extends Record<string, MethodDefinition.Any>,
+  EventDefinitions extends FieldsRecord,
+> {
+  Call: Protocol.CallMessage.Type<MethodDefinitions>
+  Success: Protocol.SuccessMessage.Type<MethodDefinitions>
+  Failure: Protocol.FailureMessage.Type<MethodDefinitions>
+  Event: FieldsRecord.TaggedMember.Type<EventDefinitions>
+  Actor: Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions>
+}
 
 export interface Client<
   ClientSelf,
@@ -170,7 +169,17 @@ export const Service =
       event: S.Union(...Object.entries(definition.events).map(([_tag, fields]) => S.TaggedStruct(_tag, fields))),
     }) as never
 
-    const actor = S.Union(success, failure, event, Protocol.AuditionSuccessMessage, Protocol.AuditionFailureMessage)
+    const actor: S.Schema<
+      Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions>,
+      Protocol.ActorMessage.Encoded<MethodDefinitions, EventDefinitions>
+    > = S.Union(
+      success,
+      failure,
+      event,
+      Protocol.AuditionSuccessMessage,
+      Protocol.AuditionFailureMessage,
+      Protocol.DisconnectMessage,
+    )
 
     const events: Stream.Stream<FieldsRecord.TaggedMember.Type<EventDefinitions>, ClientError, ClientSelf> = Effect.gen(
       function* () {
@@ -200,13 +209,13 @@ export interface Transport<
 > {
   readonly listen: (
     publish: (
-      message: Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions>,
-    ) => Effect.Effect<void, ConnectionError>,
-  ) => Effect.Effect<void, ClientError | ParseResult.ParseError, Scope.Scope>
+      message:
+        | Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions>
+        | typeof Protocol.TransportFailureMessage.Type,
+    ) => Effect.Effect<void, never>,
+  ) => Effect.Effect<void, never, Scope.Scope>
 
-  readonly send: (
-    v: Protocol.CallMessage.Type<MethodDefinitions>,
-  ) => Effect.Effect<void, ClientError | ParseResult.ParseError, never>
+  readonly send: (v: Protocol.CallMessage.Type<MethodDefinitions>) => Effect.Effect<void, ConnectionError, never>
 }
 
 const make = <
@@ -218,67 +227,41 @@ const make = <
 >(
   client: Client<ClientSelf, ClientId, MethodDefinitions, EventDefinitions>,
   build: Effect.Effect<Transport<MethodDefinitions, EventDefinitions>, ClientError, R | Scope.Scope>,
-  replay?: ReplayEventsOptions | undefined,
+  replay?: ReplayConfig | undefined,
 ) =>
   Effect.gen(function* () {
+    type _ = Spec<MethodDefinitions, EventDefinitions>
+
     const rcr: RcRef.RcRef<
-      ServiceSession<ClientSelf, MethodDefinitions, EventDefinitions>,
+      TransportSession<ClientSelf, MethodDefinitions, EventDefinitions>,
       ClientError
     > = yield* RcRef.make({
       acquire: Effect.gen(function* () {
         const { listen, send } = yield* build
 
-        const inflights: Record<
-          string,
-          Deferred.Deferred<
-            Value<MethodDefinitions>["failure"]["Type"],
-            Value<MethodDefinitions>["failure"]["Type"] | ClientError | ClosedBeforeResolvedError
-          >
-        > = {}
-
+        const inflights: Record<string, Deferred.Deferred<_["Success"], FError<MethodDefinitions>>> = {}
         const callId = yield* Ref.make(0)
         const takeCount = yield* Ref.make(0)
-        const pubsub =
-          yield* PubSub.unbounded<EventEnvelope<FieldsRecord.TaggedMember.Type<EventDefinitions>, ClientError>>()
+        const pubsub = yield* PubSub.unbounded<EventTake<_["Event"], ClientError>>()
         const audition = yield* Deferred.make<void, ClientError>()
+        const replayState = yield* Ref.make<{
+          readonly startupOpen: boolean
+          readonly buffer: ReadonlyArray<EventTake<_["Event"], ClientError>>
+        }>({
+          startupOpen: true,
+          buffer: [],
+        })
+        const terminated = yield* Ref.make(false)
 
-        const replayState = yield* Ref.make<ReplayState<FieldsRecord.TaggedMember.Type<EventDefinitions>, ClientError>>(
-          {
-            startupOpen: true,
-            buffer: [],
-          },
-        )
-
-        const clientErrorFromCause = (cause: Cause.Cause<ClientError | ParseResult.ParseError>): ClientError =>
-          Option.match(Cause.failureOption(cause), {
-            onSome: (cause) => {
-              switch (cause._tag) {
-                case "AuditionError":
-                case "ConnectionError": {
-                  return cause
-                }
-                case "StartupClosedError": {
-                  return cause
-                }
-              }
-              return ConnectionError.make({ cause })
-            },
-            onNone: () => ConnectionError.make({ cause }),
-          })
-
-        const publishTake = (
-          take: Take.Take<FieldsRecord.TaggedMember.Type<EventDefinitions>, ClientError>,
-          options?: { readonly replay?: boolean | undefined },
-        ) =>
+        const publishTake = (take: Take.Take<_["Event"], ClientError>, replayable?: boolean | undefined) =>
           Effect.gen(function* () {
             const seq = yield* Ref.getAndUpdate(takeCount, (v) => v + 1)
-            const envelope: EventEnvelope<FieldsRecord.TaggedMember.Type<EventDefinitions>, ClientError> = { seq, take }
-            if (replay && options?.replay) {
+            const envelope: EventTake<_["Event"], ClientError> = { seq, take }
+            if (replay && replayable) {
               yield* Ref.update(replayState, (state) => {
                 if (replay.mode === "startup" && !state.startupOpen) {
                   return state
                 }
-
                 const buffer =
                   replay.limit === undefined
                     ? [...state.buffer, envelope]
@@ -293,105 +276,101 @@ const make = <
             yield* PubSub.publish(pubsub, envelope)
           })
 
-        const events: Stream.Stream<FieldsRecord.TaggedMember.Type<EventDefinitions>, ClientError> = Effect.gen(
-          function* () {
-            const queue = yield* PubSub.subscribe(pubsub)
-            const live = (
-              replayCount: number,
-            ): Stream.Stream<FieldsRecord.TaggedMember.Type<EventDefinitions>, ClientError> =>
-              Stream.fromQueue(queue).pipe(
-                Stream.filter((entry) => entry.seq > replayCount),
-                Stream.map((entry) => entry.take),
-                Stream.flattenTake,
-              )
-            if (!replay) {
-              return live(-1)
-            }
-            const buffer =
-              replay.mode === "all-subscribers"
-                ? (yield* Ref.get(replayState)).buffer
-                : yield* Ref.modify(replayState, (state) =>
-                    state.startupOpen
-                      ? [
-                          state.buffer,
-                          {
-                            startupOpen: false,
-                            buffer: [],
-                          },
-                        ]
-                      : [[], state],
-                  )
-            const replayCount = Array.get(buffer, buffer.length - 1).pipe(
-              Option.map(({ seq }) => seq),
-              Option.getOrElse(() => -1),
+        const events: Stream.Stream<_["Event"], ClientError> = Effect.gen(function* () {
+          const queue = yield* PubSub.subscribe(pubsub)
+          const live = (replayCount: number): Stream.Stream<_["Event"], ClientError> =>
+            Stream.fromQueue(queue).pipe(
+              Stream.filter((entry) => entry.seq > replayCount),
+              Stream.map((entry) => entry.take),
+              Stream.flattenTake,
             )
-            const liveStream = live(replayCount)
-            return buffer.length === 0
-              ? liveStream
-              : Stream.concat(
-                  Stream.fromIterable(buffer).pipe(
-                    Stream.map((entry) => entry.take),
-                    Stream.flattenTake,
-                  ),
-                  liveStream,
+          if (!replay) {
+            return live(-1)
+          }
+          const buffer =
+            replay.mode === "all-subscribers"
+              ? (yield* Ref.get(replayState)).buffer
+              : yield* Ref.modify(replayState, (state) =>
+                  state.startupOpen
+                    ? [
+                        state.buffer,
+                        {
+                          startupOpen: false,
+                          buffer: [],
+                        },
+                      ]
+                    : [[], state],
                 )
-          },
-        ).pipe(Stream.unwrapScoped)
+          const replayCount = Array.get(buffer, buffer.length - 1).pipe(
+            Option.map(({ seq }) => seq),
+            Option.getOrElse(() => -1),
+          )
+          return buffer.length === 0
+            ? live(replayCount)
+            : Stream.concat(
+                Stream.fromIterable(buffer).pipe(
+                  Stream.map((entry) => entry.take),
+                  Stream.flattenTake,
+                ),
+                live(replayCount),
+              )
+        }).pipe(Stream.unwrapScoped)
 
-        const closeInflights = () =>
-          Effect.forEach(Object.values(inflights), (v) => Deferred.fail(v, ClosedBeforeResolvedError.make()), {
-            concurrency: "unbounded",
-          }).pipe(Effect.asVoid)
-
-        const closeEvents = (terminal: Take.Take<FieldsRecord.TaggedMember.Type<EventDefinitions>, ClientError>) =>
-          publishTake(terminal).pipe(Effect.andThen(PubSub.shutdown(pubsub)))
-
-        const failStartupIfPending = (error: ClientError) => Deferred.fail(audition, error).pipe(Effect.asVoid)
-
-        const teardownFromListenerExit = (exit: Exit.Exit<void, ClientError | ParseResult.ParseError>) => {
-          const { terminal, startupFailure } = Exit.match(exit, {
-            onSuccess: () => ({
-              terminal: Take.end,
-              startupFailure: Option.some<ClientError>(StartupClosedError.make()),
-            }),
-            onFailure: (cause) => {
-              if (Cause.isInterruptedOnly(cause)) {
-                return {
-                  terminal: Take.end,
-                  startupFailure: Option.none<ClientError>(),
-                }
-              }
-              const error = clientErrorFromCause(cause)
-              return {
-                terminal: Take.fail(error),
-                startupFailure: Option.some<ClientError>(error),
-              }
-            },
+        const finalize = ({
+          take,
+          auditionError,
+        }: {
+          readonly take?: Take.Take<_["Event"], ClientError> | undefined
+          readonly auditionError?: ClientError | undefined
+        }) =>
+          Effect.gen(function* () {
+            const alreadyTerminated = yield* Ref.getAndSet(terminated, true)
+            if (alreadyTerminated) {
+              return
+            }
+            if (auditionError) {
+              yield* Deferred.fail(audition, auditionError)
+            }
+            if (take) {
+              yield* publishTake(take)
+            }
+            yield* Effect.forEach(
+              Record.values(inflights),
+              (deferred) => Deferred.fail(deferred, UnresolvedError.make()),
+              { concurrency: "unbounded" },
+            )
           })
 
-          return Effect.all([
-            closeInflights(),
-            closeEvents(terminal),
-            Option.match(startupFailure, {
-              onSome: failStartupIfPending,
-              onNone: () => Effect.void,
-            }),
-          ]).pipe(Effect.andThen(RcRef.invalidate(rcr)))
-        }
+        const cleanup = Effect.gen(function* () {
+          if (!(yield* Ref.get(terminated))) {
+            yield* finalize({
+              take: Take.end,
+              auditionError: ConnectionError.make({
+                cause: "Listener terminated before audition completed",
+              }),
+            })
+          }
+          yield* PubSub.shutdown(pubsub)
+          yield* RcRef.invalidate(rcr)
+        })
 
         yield* listen(
           Effect.fnUntraced(function* (message) {
             switch (message._tag) {
               case "AuditionSucceeded": {
-                return yield* Deferred.succeed(audition, void 0)
+                yield* Deferred.succeed(audition, void 0)
+                return
               }
               case "AuditionFailure": {
                 const { actual, expected } = message
-                return yield* Deferred.fail(audition, AuditionError.make({ value: { actual, expected } }))
+                yield* finalize({
+                  auditionError: AuditionError.make({ value: { actual, expected } }),
+                })
+                return
               }
               case "Event": {
                 const { event } = message
-                return yield* publishTake(Take.of(event), { replay: true })
+                return yield* publishTake(Take.of(event), true)
               }
               case "Success":
               case "Failure": {
@@ -412,19 +391,41 @@ const make = <
                 }
                 return
               }
+              case "Disconnect": {
+                yield* finalize({
+                  take: Take.end,
+                  auditionError: ConnectionError.make({ cause: message }),
+                })
+                return
+              }
+              case "TransportFailure": {
+                const { cause } = message
+                const error = ConnectionError.make({ cause })
+                yield* finalize({
+                  take: Take.fail(error),
+                  auditionError: error,
+                })
+                return
+              }
             }
           }),
-        ).pipe(Effect.onExit(teardownFromListenerExit), Effect.forkScoped)
+        ).pipe(
+          Effect.tapError((error) =>
+            finalize({
+              take: Take.fail(error),
+              auditionError: error,
+            }),
+          ),
+          Effect.ensuring(cleanup),
+          Effect.forkScoped,
+        )
 
         yield* Deferred.await(audition)
 
         const f: F<ClientSelf, MethodDefinitions> = (_tag) =>
           Effect.fnUntraced(function* (value) {
             const id = yield* Ref.getAndUpdate(callId, (v) => v + 1)
-            const inflight = yield* Deferred.make<
-              Value<MethodDefinitions>["success"]["Type"],
-              Value<MethodDefinitions>["failure"]["Type"]
-            >()
+            const inflight = yield* Deferred.make<_["Success"], FError<MethodDefinitions>>()
             inflights[id] = inflight
             yield* send({
               _tag: "Call",
@@ -434,7 +435,7 @@ const make = <
             return yield* Deferred.await(inflight)
           }, Effect.scoped)
 
-        return { events, f } satisfies ServiceSession<ClientSelf, MethodDefinitions, EventDefinitions>
+        return { events, f }
       }),
     })
     return rcr
@@ -454,7 +455,7 @@ export const layerSocket = <
   readonly client: Client<ClientSelf, ClientId, MethodDefinitions, EventDefinitions>
   readonly url: string
   readonly protocols?: string | Array<string> | undefined
-  readonly replay?: ReplayEventsOptions | undefined
+  readonly replay?: ReplayConfig | undefined
 }): Layer.Layer<ClientSelf, never, Socket.WebSocketConstructor> =>
   make<ClientSelf, ClientId, MethodDefinitions, EventDefinitions, Socket.WebSocketConstructor>(
     client,
@@ -473,6 +474,10 @@ export const layerSocket = <
               Effect.fnUntraced(function* (raw) {
                 const message = yield* S.decodeUnknown(S.parseJson(client.schema.actor))(
                   raw instanceof Uint8Array ? new TextDecoder().decode(raw) : raw,
+                ).pipe(
+                  Effect.catchTag("ParseError", (cause) =>
+                    Effect.succeed(Protocol.TransportFailureMessage.make({ _tag: "TransportFailure", cause })),
+                  ),
                 )
                 yield* publish(message)
               }),
@@ -481,24 +486,37 @@ export const layerSocket = <
               Effect.catchTag(
                 "SocketError",
                 Effect.fnUntraced(function* (cause) {
-                  const { code, closeReason } = yield* S.decodeUnknown(
-                    S.Struct({
-                      code: S.Int.pipe(S.optional),
-                      closeReason: S.String,
-                    }),
-                  )(cause)
-                  switch (code) {
-                    case 4003: {
-                      const { actual, expected } = yield* S.decodeUnknown(S.parseJson(Protocol.AuditionFailureMessage))(
-                        closeReason,
-                      )
-                      return yield* AuditionError.make({ value: { actual, expected } })
+                  switch (cause.reason) {
+                    case "Read":
+                    case "Write":
+                    case "Open":
+                    case "OpenTimeout": {
+                      // TODO
+                      console.log(cause)
+                      return yield* publish({ _tag: "TransportFailure", cause })
                     }
-                    case 1000: {
-                      return // graceful close
-                    }
-                    default: {
-                      return yield* ConnectionError.make({ cause })
+                    case "Close": {
+                      const { code, closeReason } = cause
+                      switch (code) {
+                        case 1000: {
+                          return yield* publish({ _tag: "Disconnect" })
+                        }
+                        case 4003: {
+                          const parsed = S.decodeUnknownOption(S.parseJson(Protocol.AuditionFailureMessage))(
+                            closeReason,
+                          )
+                          if (parsed._tag === "None") {
+                            return yield* publish({ _tag: "TransportFailure", cause })
+                          }
+                          const { actual, expected } = parsed.value
+                          return yield* publish({
+                            _tag: "AuditionFailure",
+                            actual,
+                            expected,
+                          })
+                        }
+                      }
+                      return yield* publish({ _tag: "TransportFailure", cause })
                     }
                   }
                 }),
@@ -507,10 +525,10 @@ export const layerSocket = <
         }),
         send: Effect.fnUntraced(function* (v) {
           const write = yield* socket.writer
-          yield* S.encode(S.parseJson(client.schema.call))(v).pipe(
-            Effect.flatMap(write),
-            Effect.catchTag("SocketError", (cause) => ConnectionError.make({ cause })),
+          const message = yield* S.encode(S.parseJson(client.schema.call))(v).pipe(
+            Effect.mapError((cause) => ConnectionError.make({ cause })),
           )
+          yield* write(message).pipe(Effect.catchTag("SocketError", (cause) => ConnectionError.make({ cause })))
         }, Effect.scoped),
       }
     }),
@@ -527,7 +545,7 @@ export const layerWorker = <
   replay,
 }: {
   readonly client: Client<ClientSelf, ClientId, MethodDefinitions, EventDefinitions>
-  readonly replay?: ReplayEventsOptions | undefined
+  readonly replay?: ReplayConfig | undefined
 }): Layer.Layer<ClientSelf, never, Worker.PlatformWorker | Worker.Spawner> =>
   make<ClientSelf, ClientId, MethodDefinitions, EventDefinitions, Worker.PlatformWorker | Worker.Spawner>(
     client,
@@ -536,25 +554,25 @@ export const layerWorker = <
       const worker = yield* manager
         .spawn<
           Protocol.CallMessage.Type<MethodDefinitions> | string,
-          Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions> | 1,
+          Protocol.ActorMessage.Type<MethodDefinitions, EventDefinitions>,
           never
         >({})
         .pipe(Effect.catchTag("WorkerError", (cause) => ConnectionError.make({ cause })))
 
       const send = (message: Protocol.CallMessage.Type<MethodDefinitions>) =>
-        worker.executeEffect(message).pipe(Effect.catchAll((cause) => new ConnectionError({ cause })))
+        worker.executeEffect(message).pipe(Effect.catchTag("WorkerError", (cause) => ConnectionError.make({ cause })))
 
       return {
         listen: Effect.fnUntraced(function* (publish) {
           yield* worker.execute(client.key).pipe(
-            Stream.catchTag("WorkerError", (cause) => ConnectionError.make({ cause })),
-            Stream.takeUntil((message) => message === 1),
-            Stream.runForEach((message) => {
-              if (message === 1) {
-                return Effect.void
-              }
-              return publish(message)
-            }),
+            Stream.catchTag("WorkerError", (cause) =>
+              Effect.gen(function* () {
+                yield* publish({ _tag: "TransportFailure", cause })
+                return Stream.empty
+              }).pipe(Stream.unwrap),
+            ),
+            Stream.takeUntil((message) => message._tag === "Disconnect" || message._tag === "AuditionFailure"),
+            Stream.runForEach(publish),
           )
         }),
         send,

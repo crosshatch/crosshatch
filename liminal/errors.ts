@@ -11,11 +11,4 @@ export class ConnectionError extends S.TaggedError<ConnectionError>()("Connectio
   cause: S.Unknown,
 }) {}
 
-export class StartupClosedError extends S.TaggedError<StartupClosedError>()("StartupClosedError", {}) {}
-
-export type ClientError = AuditionError | ConnectionError | StartupClosedError
-
-export class ClosedBeforeResolvedError extends S.TaggedError<ClosedBeforeResolvedError>()(
-  "ClosedBeforeResolvedError",
-  {},
-) {}
+export type ClientError = AuditionError | ConnectionError

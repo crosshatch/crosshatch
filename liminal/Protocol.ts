@@ -108,6 +108,12 @@ export const AuditionFailureMessage = S.TaggedStruct("AuditionFailure", {
   actual: S.String,
 })
 
+export const DisconnectMessage = S.TaggedStruct("Disconnect", {})
+
+export const TransportFailureMessage = S.TaggedStruct("TransportFailure", {
+  cause: S.Unknown,
+})
+
 export declare namespace ActorMessage {
   export type Type<
     MethodDefinitions extends Record<string, MethodDefinition.Any>,
@@ -118,6 +124,7 @@ export declare namespace ActorMessage {
     | SuccessMessage.Type<MethodDefinitions>
     | FailureMessage.Type<MethodDefinitions>
     | EventMessage.Type<EventDefinitions>
+    | typeof DisconnectMessage.Type
 
   export type Encoded<
     MethodDefinitions extends Record<string, MethodDefinition.Any>,
@@ -128,4 +135,5 @@ export declare namespace ActorMessage {
     | SuccessMessage.Encoded<MethodDefinitions>
     | FailureMessage.Encoded<MethodDefinitions>
     | EventMessage.Encoded<EventDefinitions>
+    | typeof DisconnectMessage.Type
 }

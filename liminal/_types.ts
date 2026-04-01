@@ -25,5 +25,3 @@ export declare namespace FieldsRecord {
     }[K]
   }
 }
-
-export type Value<T> = T[keyof T]
