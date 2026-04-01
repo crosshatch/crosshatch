@@ -15,6 +15,9 @@ import {
   Take,
   Schema as S,
   Array,
+  Struct,
+  ExecutionStrategy,
+  Exit,
 } from "effect"
 
 import type { FieldsRecord } from "./_types.ts"
@@ -181,12 +184,11 @@ export const Service =
       Protocol.DisconnectMessage,
     )
 
-    const events: Stream.Stream<FieldsRecord.TaggedMember.Type<EventDefinitions>, ClientError, ClientSelf> = Effect.gen(
-      function* () {
-        const { events } = yield* clientTag.pipe(Effect.flatMap(RcRef.get))
-        return events
-      },
-    ).pipe(Stream.unwrapScoped)
+    const events: Stream.Stream<
+      FieldsRecord.TaggedMember.Type<EventDefinitions>,
+      ClientError,
+      ClientSelf
+    > = clientTag.pipe(Effect.flatMap(RcRef.get), Effect.map(Struct.get("events")), Stream.unwrapScoped)
 
     const f: F<ClientSelf, MethodDefinitions> = (_tag) =>
       Effect.fnUntraced(function* (value) {
@@ -240,8 +242,8 @@ const make = <
         const { listen, send } = yield* build
 
         const inflights: Record<string, Deferred.Deferred<_["Success"], FError<MethodDefinitions>>> = {}
-        const callId = yield* Ref.make(0)
-        const takeCount = yield* Ref.make(0)
+        let callId = 0
+        let takeCount = 0
         const pubsub = yield* PubSub.unbounded<EventTake<_["Event"], ClientError>>()
         const audition = yield* Deferred.make<void, ClientError>()
         const replayState = yield* Ref.make<{
@@ -251,12 +253,13 @@ const make = <
           startupOpen: true,
           buffer: [],
         })
-        const terminated = yield* Ref.make(false)
 
         const publishTake = (take: Take.Take<_["Event"], ClientError>, replayable?: boolean | undefined) =>
           Effect.gen(function* () {
-            const seq = yield* Ref.getAndUpdate(takeCount, (v) => v + 1)
-            const envelope: EventTake<_["Event"], ClientError> = { seq, take }
+            const eventTake: EventTake<_["Event"], ClientError> = {
+              seq: takeCount++,
+              take,
+            }
             if (replay && replayable) {
               yield* Ref.update(replayState, (state) => {
                 if (replay.mode === "startup" && !state.startupOpen) {
@@ -264,16 +267,15 @@ const make = <
                 }
                 const buffer =
                   replay.limit === undefined
-                    ? [...state.buffer, envelope]
-                    : [...(state.buffer.length >= replay.limit ? state.buffer.slice(1) : state.buffer), envelope]
-
+                    ? [...state.buffer, eventTake]
+                    : [...(state.buffer.length >= replay.limit ? state.buffer.slice(1) : state.buffer), eventTake]
                 return {
                   startupOpen: state.startupOpen,
                   buffer,
                 }
               })
             }
-            yield* PubSub.publish(pubsub, envelope)
+            yield* PubSub.publish(pubsub, eventTake)
           })
 
         const events: Stream.Stream<_["Event"], ClientError> = Effect.gen(function* () {
@@ -316,57 +318,16 @@ const make = <
               )
         }).pipe(Stream.unwrapScoped)
 
-        const finalize = ({
-          take,
-          auditionError,
-        }: {
-          readonly take?: Take.Take<_["Event"], ClientError> | undefined
-          readonly auditionError?: ClientError | undefined
-        }) =>
-          Effect.gen(function* () {
-            const alreadyTerminated = yield* Ref.getAndSet(terminated, true)
-            if (alreadyTerminated) {
-              return
-            }
-            if (auditionError) {
-              yield* Deferred.fail(audition, auditionError)
-            }
-            if (take) {
-              yield* publishTake(take)
-            }
-            yield* Effect.forEach(
-              Record.values(inflights),
-              (deferred) => Deferred.fail(deferred, UnresolvedError.make()),
-              { concurrency: "unbounded" },
-            )
-          })
-
-        const cleanup = Effect.gen(function* () {
-          if (!(yield* Ref.get(terminated))) {
-            yield* finalize({
-              take: Take.end,
-              auditionError: ConnectionError.make({
-                cause: "Listener terminated before audition completed",
-              }),
-            })
-          }
-          yield* PubSub.shutdown(pubsub)
-          yield* RcRef.invalidate(rcr)
-        })
+        const parentScope = yield* Scope.Scope
+        const scope = yield* Scope.fork(parentScope, ExecutionStrategy.sequential)
+        const publishFinalTake = (take: Take.Take<_["Event"], ClientError>) =>
+          publishTake(take).pipe(Effect.andThen(Scope.close(scope, Exit.void)))
 
         yield* listen(
           Effect.fnUntraced(function* (message) {
             switch (message._tag) {
               case "AuditionSucceeded": {
-                yield* Deferred.succeed(audition, void 0)
-                return
-              }
-              case "AuditionFailure": {
-                const { actual, expected } = message
-                yield* finalize({
-                  auditionError: AuditionError.make({ value: { actual, expected } }),
-                })
-                return
+                return yield* Deferred.succeed(audition, void 0)
               }
               case "Event": {
                 const { event } = message
@@ -391,40 +352,56 @@ const make = <
                 }
                 return
               }
-              case "Disconnect": {
-                yield* finalize({
-                  take: Take.end,
-                  auditionError: ConnectionError.make({ cause: message }),
-                })
-                return
+              case "AuditionFailure": {
+                const { actual, expected } = message
+                return yield* publishFinalTake(
+                  Take.fail(
+                    AuditionError.make({
+                      value: { actual, expected },
+                    }),
+                  ),
+                )
               }
+              case "Disconnect":
               case "TransportFailure": {
-                const { cause } = message
-                const error = ConnectionError.make({ cause })
-                yield* finalize({
-                  take: Take.fail(error),
-                  auditionError: error,
-                })
-                return
+                yield* Deferred.succeed(audition, void 0)
+                switch (message._tag) {
+                  case "Disconnect": {
+                    return yield* publishFinalTake(Take.end)
+                  }
+                  case "TransportFailure": {
+                    const { cause } = message
+                    return yield* publishFinalTake(Take.fail(ConnectionError.make({ cause })))
+                  }
+                }
               }
             }
           }),
         ).pipe(
-          Effect.tapError((error) =>
-            finalize({
-              take: Take.fail(error),
-              auditionError: error,
-            }),
+          Effect.ensuring(
+            Effect.all(
+              [
+                PubSub.shutdown(pubsub),
+                // TODO: last take error if present
+                Effect.forEach(
+                  Record.values(inflights),
+                  (deferred) => Deferred.fail(deferred, UnresolvedError.make()),
+                  { concurrency: "unbounded" },
+                ),
+                RcRef.invalidate(rcr),
+              ],
+              { concurrency: "unbounded" },
+            ),
           ),
-          Effect.ensuring(cleanup),
           Effect.forkScoped,
+          Scope.extend(scope),
         )
 
         yield* Deferred.await(audition)
 
         const f: F<ClientSelf, MethodDefinitions> = (_tag) =>
           Effect.fnUntraced(function* (value) {
-            const id = yield* Ref.getAndUpdate(callId, (v) => v + 1)
+            const id = callId++
             const inflight = yield* Deferred.make<_["Success"], FError<MethodDefinitions>>()
             inflights[id] = inflight
             yield* send({

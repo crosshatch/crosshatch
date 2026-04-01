@@ -26,11 +26,7 @@ export const define = <const P extends Fields, AA, AI, EA, EI>({
   readonly payload: P
   readonly success: S.Schema<AA, AI>
   readonly failure: S.Schema<EA, EI>
-}): MethodDefinition<P, AA, AI, EA, EI> => ({
-  payload,
-  success,
-  failure,
-})
+}): MethodDefinition<P, AA, AI, EA, EI> => ({ payload, success, failure })
 
 export type Handler<MethodDefinition extends MethodDefinition.Any, R> = (
   payload: S.Struct<MethodDefinition["payload"]>["Type"],
