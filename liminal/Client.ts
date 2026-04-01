@@ -507,7 +507,8 @@ export const layerSocket = <
         }),
         send: Effect.fnUntraced(function* (v) {
           const write = yield* socket.writer
-          yield* write(JSON.stringify(v)).pipe(
+          yield* S.encode(S.parseJson(client.schema.call))(v).pipe(
+            Effect.flatMap(write),
             Effect.catchTag("SocketError", (cause) => ConnectionError.make({ cause })),
           )
         }, Effect.scoped),

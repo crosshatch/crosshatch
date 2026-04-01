@@ -117,21 +117,21 @@ export const Service =
     ): Reducer.Reducer<S.Struct<EventDefinitions[Tag]>["Type"], F, E, R> => f
 
     const update: AccumulatorSet<Self, F> = Effect.fnUntraced(function* (setter) {
-      const { ref: accumulator, signals } = yield* tag
-      let current = yield* Ref.get(accumulator)
+      const { ref, signals } = yield* tag
+      let current = yield* Ref.get(ref)
       current = yield* apply(current, setter)
-      yield* Ref.set(accumulator, current)
+      yield* Ref.set(ref, current)
       for (let [key, signal] of Record.toEntries(signals)) {
         yield* signal.publish(current[key as keyof typeof current] as never)
       }
     })
 
     const updateField: AccumulatorUpdate<Self, F> = Effect.fnUntraced(function* (key, setter) {
-      const { ref: accumulator, signals } = yield* tag
-      let { [key]: current } = yield* Ref.get(accumulator)
-
-      // TODO: is there a way to get this inferred correctly?
+      const { ref, signals } = yield* tag
+      const previous = yield* Ref.get(ref)
+      let current = previous[key as keyof typeof previous]
       current = yield* apply(current as never, setter)
+      yield* Ref.set(ref, { ...previous, [key]: current })
       yield* signals[key].publish(current as never)
     })
 

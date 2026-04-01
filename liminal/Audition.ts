@@ -6,6 +6,7 @@ import type * as Method from "./Method.ts"
 
 import * as Client from "./Client.ts"
 import { type ClientError, AuditionError } from "./errors.ts"
+
 const TypeId = "~liminal/Audition" as const
 
 export interface Audition<ClientSelf, MethodDefinitions extends Record<string, Method.MethodDefinition.Any>, Event>
