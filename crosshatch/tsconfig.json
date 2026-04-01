@@ -6,5 +6,9 @@
   },
   "include": ["."],
   "exclude": ["dist"],
-  "references": [{ "path": "../@crosshatch/util" }, { "path": "../@crosshatch/widget" }, { "path": "../liminal" }]
+  "references": [
+    { "path": "../@crosshatch/util" },
+    { "path": "../@crosshatch/widget" },
+    { "path": "../liminal/liminal" }
+  ]
 }

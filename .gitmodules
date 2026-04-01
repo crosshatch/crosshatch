@@ -1,0 +1,3 @@
+[submodule "liminal"]
+	path = liminal
+	url = git@github.com:harrysolovay/liminal.git

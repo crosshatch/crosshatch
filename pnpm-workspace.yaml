@@ -4,8 +4,6 @@ packages:
   - docs
   - examples/*/*
   - liminal
-  - liminal-browser
-  - liminal-cloudflare
 
 catalog:
   "@cloudflare/vite-plugin": ^1.25.0

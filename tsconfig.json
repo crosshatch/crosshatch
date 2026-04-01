@@ -12,8 +12,6 @@
     { "path": "./examples/lmnl.im/app" },
     { "path": "./examples/lmnl.im/models" },
     { "path": "./examples/lmnl.im/tables" },
-    { "path": "./liminal" },
-    { "path": "./liminal-browser" },
-    { "path": "./liminal-cloudflare" }
+    { "path": "./liminal" }
   ]
 }

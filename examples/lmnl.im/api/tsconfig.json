@@ -4,7 +4,7 @@
   "references": [
     { "path": "../../../@crosshatch/util" },
     { "path": "../../../crosshatch" },
-    { "path": "../../../liminal" },
-    { "path": "../../../liminal-cloudflare" }
+    { "path": "../../../liminal/liminal" },
+    { "path": "../../../liminal/liminal-cloudflare" }
   ]
 }
