@@ -16,14 +16,3 @@ local.docs.crosshatch.dev {
 		}
 	}
 }
-
-local.lmnl.im {
-	reverse_proxy https://127.0.0.1:7779 {
-		header_up Host {host}
-		lb_try_duration 30s
-		lb_try_interval 1s
-		transport http {
-			tls_server_name local.lmnl.im
-		}
-	}
-}

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "portless lmnl.im --app-port 7779 -- vite dev",
     "build": "vite build && tsc",
     "serve": "vite preview",
     "generate": "drizzle-kit generate"
@@ -49,7 +49,6 @@
     "babel-plugin-react-compiler": "catalog:",
     "drizzle-kit": "catalog:",
     "vite": "catalog:",
-    "vite-plugin-mkcert": "catalog:",
     "vite-tsconfig-paths": "catalog:",
     "vitest": "catalog:"
   }

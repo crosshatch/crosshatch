@@ -4,18 +4,9 @@ import { tanstackRouter } from "@tanstack/router-plugin/vite"
 import react from "@vitejs/plugin-react"
 import { fileURLToPath, URL } from "node:url"
 import { defineConfig } from "vite"
-import mkcert from "vite-plugin-mkcert"
 import tsconfigPaths from "vite-tsconfig-paths"
 
 import migrations from "./plugin.ts"
-
-// proxy: {
-//   "/v1/traces": {
-//     target: "http://localhost:4318",
-//     changeOrigin: true,
-//     secure: false,
-//   },
-// },
 
 export default defineConfig({
   envDir: "../../..",
@@ -45,9 +36,6 @@ export default defineConfig({
     tsconfigPaths({
       projects: ["tsconfig.json"],
     }),
-    mkcert({
-      hosts: ["local.lmnl.im"],
-    }),
     react({
       babel: {
         plugins: ["babel-plugin-react-compiler"],
@@ -71,7 +59,7 @@ export default defineConfig({
     ],
   },
   server: {
-    allowedHosts: ["local.lmnl.im", "local.crosshatch.dev"],
+    allowedHosts: [".localhost"],
     fs: { strict: false },
     host: "127.0.0.1",
     port: 7779,

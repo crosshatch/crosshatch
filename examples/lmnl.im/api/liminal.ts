@@ -10,7 +10,7 @@ const ApiLive = Layer.mergeAll(
   HttpLayerRouter.cors({
     allowedHeaders: ["*"],
     allowedMethods: ["*"],
-    allowedOrigins: ["https://lmnl.im", "https://local.lmnl.im"],
+    allowedOrigins: ["https://lmnl.im", "https://lmnl.im.localhost"],
     exposedHeaders: ["PAYMENT-REQUIRED"],
   }),
   HttpLayerRouter.add("*", "/*", Assets.forward),
