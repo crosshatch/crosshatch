@@ -1,16 +1,14 @@
 import PackageJson from "crosshatch/package.json" with { type: "json" }
 import rehypeMermaid from "rehype-mermaid"
-import mkcert from "vite-plugin-mkcert"
 import { defineConfig } from "vocs"
-
-const ORIGIN = "local.docs.crosshatch.dev"
 
 export default defineConfig({
   vite: {
-    plugins: [mkcert({ hosts: [ORIGIN] })],
     server: {
-      allowedHosts: [ORIGIN],
       host: "127.0.0.1",
+      port: 7776,
+      strictPort: true,
+      allowedHosts: [".localhost"],
     },
   },
   markdown: {
@@ -27,7 +25,6 @@ export default defineConfig({
   },
   blogDir: "./pages/articles",
   baseUrl: "https://docs.crosshatch.dev",
-
   description: PackageJson.description,
   editLink: {
     pattern: "https://github.com/crosshatch/crosshatch/edit/main/docs/pages/:path",

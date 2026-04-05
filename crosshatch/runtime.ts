@@ -5,15 +5,11 @@ import { ConfigProvider, Layer, ManagedRuntime } from "effect"
 import { Client } from "liminal"
 
 import * as CrosshatchEnv from "./CrosshatchEnv.ts"
-import * as FacadeAccumulator from "./FacadeAccumulator.ts"
 import { FacadeClient } from "./FacadeClient.ts"
 import * as FacadeWorker from "./FacadeWorker.ts"
 
-const CommonLive = Layer.mergeAll(
-  FacadeAccumulator.layer.pipe(
-    Layer.provideMerge(Client.layerWorker({ client: FacadeClient }).pipe(Layer.provide(FacadeWorker.layer))),
-  ),
-).pipe(
+const CommonLive = Client.layerWorker({ client: FacadeClient }).pipe(
+  Layer.provide(FacadeWorker.layer),
   Layer.provideMerge(CrosshatchEnv.layer),
   Layer.provide(Layer.setConfigProvider(ConfigProvider.fromJson(resolveEnv()))),
   withLogging,

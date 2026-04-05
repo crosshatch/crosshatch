@@ -14,7 +14,7 @@ export const isCrosshatch = (origin: string) => CrosshatchEnv.pipe(Effect.map(({
 
 export const layer = Effect.gen(function* () {
   const dev = yield* Config.boolean("DEV").pipe(Config.withDefault(true))
-  const domain = `${dev ? "local." : ""}crosshatch.dev`
+  const domain = `crosshatch.dev${dev ? ".localhost" : ""}`
   const url = `https://${domain}`
   return { dev, domain, url } as const
 }).pipe(Layer.effect(CrosshatchEnv))
