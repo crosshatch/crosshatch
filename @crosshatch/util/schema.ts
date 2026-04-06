@@ -1,4 +1,4 @@
-import { Schema as S } from "effect"
+import { Schema as S, Array } from "effect"
 
 import { AbsurdError } from "./errors.ts"
 
@@ -37,5 +37,5 @@ export const taggedLiterals = <A extends { _tag: string }, I, R>(schema: S.Schem
       throw new AbsurdError()
     }
     return tagPropertySignature.literal
-  }) as never as [A["_tag"], ...Array<A["_tag"]>]
+  }) as never as Array.NonEmptyReadonlyArray<A["_tag"]>
 }

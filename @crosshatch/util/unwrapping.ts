@@ -1,4 +1,4 @@
-import { Cause, Effect, Stream, Types } from "effect"
+import { Array, Cause, Effect, Stream, Types } from "effect"
 
 export const e0 = <A, E, R>(effect: Effect.Effect<Array<A>, E, R>): Effect.Effect<A | undefined, E, R> =>
   Effect.map(effect, ([v]) => v)
@@ -27,7 +27,7 @@ export const nullableError =
 
 export const nonEmpty = <A, E, R>(
   effect: Effect.Effect<Array<A>, E, R>,
-): Effect.Effect<[A, ...Array<A>], Cause.NoSuchElementException | E, R> =>
+): Effect.Effect<Array.NonEmptyReadonlyArray<A>, Cause.NoSuchElementException | E, R> =>
   Effect.flatMap(
     effect,
     Effect.fn(function* ([e0_, ...rest]) {
@@ -39,3 +39,13 @@ export const nonEmpty = <A, E, R>(
 export const itemsNonNullable = <A, E, R>(
   stream: Stream.Stream<A, E, R>,
 ): Stream.Stream<NonNullable<A>, E | Cause.NoSuchElementException, R> => Stream.mapEffect(stream, Effect.fromNullable)
+
+export const validateTag =
+  <T extends { readonly _tag: string }, K extends Types.Tags<T>>(_tag: K) =>
+  (value: T) =>
+    Effect.succeed(value).pipe(
+      Effect.filterOrFail(
+        (v): v is Types.ExtractTag<T, K> => v._tag === _tag,
+        () => new Cause.NoSuchElementException(),
+      ),
+    )

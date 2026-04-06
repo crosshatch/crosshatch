@@ -1,22 +1,21 @@
-import { Match, Context, Effect, Ref, Data, Stream, flow } from "effect"
-import { Reducer } from "liminal"
+import { Option, Match, Effect, Data, Stream, flow } from "effect"
+import { Accumulator } from "liminal"
 
 import { FacadeClient } from "./FacadeClient.ts"
 import { LinkChallengeId } from "./LinkChallenge.ts"
 
 type State = Data.TaggedEnum<{
-  Initial: {}
   Challenged: {
     challengeId: typeof LinkChallengeId.Type
   }
   Linked: {}
 }>
 
-export class Accumulator extends Context.Tag("crosshatch/Accumulator")<Accumulator, Ref.Ref<State>>() {}
+export class FacadeAccumulator extends Accumulator.Service<FacadeAccumulator, State>()("crosshatch/Accumulator") {}
 
 type Item = Stream.Stream.Success<typeof FacadeClient.events>
 
-const arm = Reducer.arm<State, Item>()
+const arm = FacadeAccumulator.reducer<Item>()
 
 const Challenged = arm(
   "Challenged",
@@ -27,19 +26,9 @@ const Challenged = arm(
 
 const Linked = arm("Linked", () => () => Effect.succeed({ _tag: "Linked" }))
 
-const reduce: Reducer.Reduce<State, Item> = flow(
-  Match.value<Item>,
-  Match.tagsExhaustive({
-    Challenged,
-    Linked,
-  }),
-)
-
-export const stream = FacadeClient.events.pipe(
-  Stream.scanEffect(
-    {
-      _tag: "Initial",
-    } as State,
-    (accumulator, item) => reduce(item)(accumulator),
-  ),
-)
+export const layer = FacadeAccumulator.layer({
+  source: FacadeClient.events,
+  reduce: flow(Match.value, Match.tagsExhaustive({ Challenged, Linked })),
+  initial: (item) =>
+    Effect.succeed(item._tag === "Challenged" || item._tag === "Linked" ? Option.some(item) : Option.none()),
+})

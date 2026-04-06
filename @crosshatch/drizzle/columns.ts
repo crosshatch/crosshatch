@@ -1,7 +1,7 @@
 import type { PgEnum } from "drizzle-orm/pg-core"
 import type { PgArrayDimension, PgColumnBuilderBrand, AnyPgColumnBuilder } from "drizzle-orm/pg-core"
 
-import { Types } from "effect"
+import { Types, Array } from "effect"
 
 type Increment<N extends PgArrayDimension> = N extends 0
   ? 1
@@ -50,7 +50,7 @@ export const columnsFactory = <Common extends Record<string, AnyPgColumnBuilder>
   taggedUnion:
     <A extends { readonly _tag: string }>() =>
     <C extends ColumnsConfig<Superset<A>, Extract<keyof Common, string> | "_tag">>(
-      tagEnum: PgEnum<[A["_tag"], ...Array<A["_tag"]>]>,
+      tagEnum: PgEnum<Array.NonEmptyArray<A["_tag"]>>,
       columns: C,
     ) => ({
       _tag: tagEnum("_tag").notNull(),

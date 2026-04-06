@@ -5,7 +5,7 @@ import { Requirements } from "./Requirements.ts"
 import { ResourceInfo } from "./ResourceInfo.ts"
 import { Version } from "./Version.ts"
 
-export const Accepts = S.Tuple([Requirements], Requirements)
+export const Accepts = S.NonEmptyArray(Requirements)
 
 export const Required = S.Struct({
   accepts: Accepts,
