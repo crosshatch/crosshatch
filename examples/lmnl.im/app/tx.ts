@@ -1,10 +1,8 @@
 import type { PgAsyncTransaction, PgQueryResultHKT } from "drizzle-orm/pg-core"
-
 import { Effect, Fiber } from "effect"
 
-import type { relations } from "./relations"
-
 import { Drizzle } from "./Drizzle"
+import type { relations } from "./relations"
 import * as schema from "./schema"
 
 export const tx = Effect.fn(function* <A, E, R>(

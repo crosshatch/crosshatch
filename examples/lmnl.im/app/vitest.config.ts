@@ -1,6 +1,7 @@
 import Path from "node:path"
-import { defaultExclude, type ViteUserConfig } from "vitest/config"
+
 import tsconfigPaths from "vite-tsconfig-paths"
+import { defaultExclude, type ViteUserConfig } from "vitest/config"
 
 export default {
   esbuild: { target: "es2020" },

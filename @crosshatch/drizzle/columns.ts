@@ -1,6 +1,5 @@
 import type { PgEnum } from "drizzle-orm/pg-core"
 import type { PgArrayDimension, PgColumnBuilderBrand, AnyPgColumnBuilder } from "drizzle-orm/pg-core"
-
 import { Types, Array } from "effect"
 
 type Increment<N extends PgArrayDimension> = N extends 0

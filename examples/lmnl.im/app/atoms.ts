@@ -4,9 +4,8 @@ import { BrowserKeyValueStore } from "@effect/platform-browser"
 import { desc, eq, sql } from "drizzle-orm"
 import { Effect, Schema as S } from "effect"
 
-import type { ChatId } from "@/ids"
-
 import { Drizzle, latest } from "@/Drizzle"
+import type { ChatId } from "@/ids"
 import { runtime } from "@/runtime"
 import { chats } from "@/schema"
 

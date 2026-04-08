@@ -1,9 +1,8 @@
-import type { AnyRelations, SQLWrapper } from "drizzle-orm"
-
 import { NodeContext } from "@effect/platform-node"
 import { SqlClient } from "@effect/sql"
 import { PgClient } from "@effect/sql-pg"
 import { pushSchema } from "drizzle-kit/api-postgres"
+import type { AnyRelations, SQLWrapper } from "drizzle-orm"
 import { DefaultServices, make } from "drizzle-orm/effect-postgres"
 import { Config, Console, Effect, Schedule } from "effect"
 
