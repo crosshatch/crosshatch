@@ -29,5 +29,6 @@ export const runtime = Atom.runtime(
     Layer.provideMerge(HttpClient),
     Layer.provide(Layer.setConfigProvider(ConfigProvider.fromJson(import.meta.env))),
     withLogging,
+    Layer.annotateLogs("context", "lmnl.im"),
   ),
 )

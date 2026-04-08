@@ -14,6 +14,7 @@ const CommonLive = Accumulator.layer.pipe(
   Layer.provideMerge(CrosshatchEnv.layer),
   Layer.provide(Layer.setConfigProvider(ConfigProvider.fromJson(resolveEnv()))),
   withLogging,
+  Layer.annotateLogs("context", "crosshatch"),
 )
 export const atomRuntime = runtime(CommonLive)
 export const managedRuntime = ManagedRuntime.make(CommonLive, memoMap)

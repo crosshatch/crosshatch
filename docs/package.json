@@ -17,6 +17,7 @@
   "devDependencies": {
     "@types/react": "catalog:",
     "crosshatch": "workspace:*",
+    "effect": "catalog:",
     "rehype": "^13.0.2",
     "rehype-mermaid": "latest",
     "typescript": "catalog:",
