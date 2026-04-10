@@ -1,15 +1,17 @@
+import * as Host from "@crosshatch/widget/Host"
 import { BrowserWorker, BrowserStream } from "@effect/platform-browser"
 import { Effect, Fiber, Layer, Stream, Schema as S } from "effect"
 
 import * as CrosshatchEnv from "./CrosshatchEnv.ts"
-import { HostIntroduction, RequestHostIntroduction } from "./facade_handshake.ts"
+import { FacadeIntroduction, RequestFacadeIntroduction } from "./facade_handshake.ts"
 
 export const layer = Effect.gen(function* () {
+  yield* Host.hostListener.pipe(Effect.forkScoped)
   const fiber = yield* BrowserStream.fromEventListenerWindow("message").pipe(
     Stream.takeUntilEffect(
       Effect.fnUntraced(function* ({ data, origin }) {
         const isCrosshatch = yield* CrosshatchEnv.isCrosshatch(origin)
-        return isCrosshatch && S.is(RequestHostIntroduction)(data)
+        return isCrosshatch && S.is(RequestFacadeIntroduction)(data)
       }),
     ),
     Stream.runDrain,
@@ -28,7 +30,7 @@ export const layer = Effect.gen(function* () {
   yield* Fiber.join(fiber)
   const context = yield* Effect.fromNullable(iframe.contentWindow)
   const { port1, port2 } = new MessageChannel()
-  context.postMessage(HostIntroduction.make(), "*", [port2])
+  context.postMessage(FacadeIntroduction.make(), "*", [port2])
   return BrowserWorker.layerPlatform(() => port1)
 }).pipe(Layer.unwrapScoped)
 

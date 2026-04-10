@@ -70,7 +70,7 @@ export default defineConfig({
   socials: [
     {
       icon: "discord",
-      link: "https://discord.gg/8AKkcWhE",
+      link: "https://discord.gg/CSXCRUKjh9",
     },
     {
       icon: "github",

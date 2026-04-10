@@ -4,9 +4,9 @@ import { memoMap, runtime } from "@crosshatch/util/runtime"
 import { ConfigProvider, Layer, ManagedRuntime } from "effect"
 import { Client } from "liminal"
 
-import * as Accumulator from "./Accumulator.ts"
 import * as CrosshatchEnv from "./CrosshatchEnv.ts"
 import { FacadeClient } from "./FacadeClient.ts"
+import * as Accumulator from "./FacadeState.ts"
 import * as FacadeWorker from "./FacadeWorker.ts"
 
 const CommonLive = Accumulator.layer.pipe(

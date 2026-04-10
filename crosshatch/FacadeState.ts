@@ -11,11 +11,11 @@ type State = Data.TaggedEnum<{
   Linked: {}
 }>
 
-export class FacadeAccumulator extends Accumulator.Service<FacadeAccumulator, State>()("crosshatch/Accumulator") {}
+export class FacadeState extends Accumulator.Service<FacadeState, State>()("crosshatch/Accumulator") {}
 
 type Item = Stream.Stream.Success<typeof FacadeClient.events>
 
-const arm = FacadeAccumulator.reducer<Item>()
+const arm = FacadeState.reducer<Item>()
 
 const Challenged = arm(
   "Challenged",
@@ -26,7 +26,7 @@ const Challenged = arm(
 
 const Linked = arm("Linked", () => () => Effect.succeed({ _tag: "Linked" }))
 
-export const layer = FacadeAccumulator.layer({
+export const layer = FacadeState.layer({
   source: FacadeClient.events,
   reduce: flow(Match.value, Match.tagsExhaustive({ Challenged, Linked })),
   initial: (item) =>

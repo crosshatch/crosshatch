@@ -2,13 +2,13 @@ import { Finished } from "@crosshatch/widget/self"
 import { Atom } from "@effect-atom/atom"
 import { Effect, Stream, Match, Schema as S, Cause } from "effect"
 
-import { FacadeAccumulator } from "./Accumulator.ts"
 import * as CrosshatchEnv from "./CrosshatchEnv.ts"
 import { FacadeClient } from "./FacadeClient.ts"
+import { FacadeState } from "./FacadeState.ts"
 import { atomRuntime } from "./runtime.ts"
 import { EventsWidget, IdWidget, LinkWidget } from "./widgets.ts"
 
-export const stateAtom = atomRuntime.atom(FacadeAccumulator.stream)
+export const stateAtom = atomRuntime.atom(FacadeState.stream)
 
 export const isLinkedAtom = stateAtom.pipe(Atom.mapResult((v) => v._tag === "Linked"))
 

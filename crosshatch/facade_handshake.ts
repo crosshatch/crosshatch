@@ -1,5 +1,5 @@
 import { Schema as S } from "effect"
 
-export const RequestHostIntroduction = S.TaggedStruct("RequestHostIntroduction", {})
+export const RequestFacadeIntroduction = S.TaggedStruct("RequestFacadeIntroduction", {})
 
-export const HostIntroduction = S.TaggedStruct("HostIntroduction", {})
+export const FacadeIntroduction = S.TaggedStruct("FacadeIntroduction", {})
