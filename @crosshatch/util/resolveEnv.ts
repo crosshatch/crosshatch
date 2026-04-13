@@ -1,5 +1,9 @@
 export type EnvLike = Record<string, string | undefined>
 
+declare global {
+  const process: undefined | { readonly env?: unknown }
+}
+
 export const resolveEnv = (): EnvLike => {
   try {
     const env = (import.meta as any).env

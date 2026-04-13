@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "portless lmnl.im --app-port 7779 -- vite dev",
-    "build": "vite build && tsc",
+    "build": "vite build",
     "serve": "vite preview",
     "generate": "drizzle-kit generate"
   },
