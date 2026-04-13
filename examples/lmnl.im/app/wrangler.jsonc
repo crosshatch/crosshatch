@@ -1,7 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "lmnl-im",
-  "main": "../api/liminal.ts",
+  "main": "../api/main.ts",
   "compatibility_date": "2026-02-05",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "keep_vars": true,
