@@ -1,6 +1,6 @@
 import { Finished } from "@crosshatch/widget/self"
-import { Atom } from "@effect-atom/atom"
 import { Effect, Stream, Match, Schema as S, Cause } from "effect"
+import { Atom } from "effect/unstable/reactivity"
 
 import * as CrosshatchEnv from "./CrosshatchEnv.ts"
 import { FacadeClient } from "./FacadeClient.ts"
@@ -16,7 +16,7 @@ export const challengedAtom = atomRuntime.atom((ctx) =>
   ctx.result(stateAtom).pipe(
     Effect.filterOrFail(
       (v) => v._tag === "Challenged",
-      () => new Cause.NoSuchElementException(),
+      () => new Cause.NoSuchElementError(),
     ),
   ),
 )

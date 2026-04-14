@@ -1,4 +1,4 @@
-import type { Prompt } from "@effect/ai"
+import type { Prompt } from "effect/unstable/ai"
 
 // TODO
 export const Message = ({ message }: { message: Prompt.Message }) => {

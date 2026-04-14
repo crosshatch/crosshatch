@@ -5,14 +5,13 @@ import { Struct } from "effect"
 import { useEffect } from "react"
 
 import { MessageList } from "@/components/MessageList"
-import { ChatId } from "@/ids"
 import { router } from "@/router"
 
 export const Route = createFileRoute("/{-$chatId}")({
   component: RouteComponent,
   params: {
     parse: Struct.evolve({
-      chatId: (v) => (v ? ChatId.make(v) : undefined),
+      chatId: (v) => v ?? undefined,
     }),
   },
 })

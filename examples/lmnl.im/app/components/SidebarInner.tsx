@@ -24,7 +24,7 @@ import {
   SidebarMenuItem,
 } from "@crosshatch/ui/components/Sidebar"
 import { registerCommand } from "@crosshatch/util/registerCommand"
-import { useAtomSet, useAtomSuspense } from "@effect-atom/atom-react"
+import { useAtomSet, useAtomSuspense } from "@effect/atom-react"
 import { Link } from "@tanstack/react-router"
 import { MoreHorizontal, PencilLine, Plus, Trash2 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"

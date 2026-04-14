@@ -9,7 +9,8 @@ import {
   CommandList,
 } from "@crosshatch/ui/components/Command"
 import { Popover, PopoverContent, PopoverTrigger } from "@crosshatch/ui/components/Popover"
-import { Result, useAtom, useAtomValue } from "@effect-atom/atom-react"
+import { useAtom, useAtomValue } from "@effect/atom-react"
+import { AsyncResult } from "effect/unstable/reactivity"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { useState } from "react"
 
@@ -23,7 +24,7 @@ export const ModelSelect = () => {
     <Popover {...{ onOpenChange, open }}>
       <PopoverTrigger asChild>
         <Button variant="outline" role="combobox" aria-expanded={open} className="justify-between rounded-full">
-          {Result.builder(modelIdsResult)
+          {AsyncResult.builder(modelIdsResult)
             .onSuccess((models) => models.find((model) => model === selected))
             .onInitialOrWaiting(() => "Loading models...")
             .orElse(() => "Failed to load models")}
@@ -36,7 +37,7 @@ export const ModelSelect = () => {
           <CommandList>
             <CommandEmpty>No models found.</CommandEmpty>
             <CommandGroup>
-              {Result.builder(modelIdsResult)
+              {AsyncResult.builder(modelIdsResult)
                 .onSuccess((models) =>
                   models.map((model) => (
                     <CommandItem

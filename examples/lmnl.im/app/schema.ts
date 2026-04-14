@@ -1,15 +1,12 @@
 import { added, ordinal, ref, updated } from "@crosshatch/drizzle"
-import { Prompt } from "@effect/ai"
 import { customType, index, pgTable, text, vector, uuid } from "drizzle-orm/pg-core"
-import { Schema as S, Brand } from "effect"
+import { Schema as S } from "effect"
+import { Prompt } from "effect/unstable/ai"
 
-import type { ChatIdTypeId, ChatItemIdTypeId, EmbeddingIdTypeId } from "./ids"
-
-const brandedId = <B extends symbol>() =>
-  uuid("id").primaryKey().notNull().defaultRandom().$type<string & Brand.Brand<B>>()
+const id = uuid("id").primaryKey().notNull().defaultRandom()
 
 export const chats = pgTable("chats", {
-  id: brandedId<typeof ChatIdTypeId>(),
+  id,
   ordinal,
   title: text("title"),
   updated,
@@ -18,7 +15,7 @@ export const chats = pgTable("chats", {
 export const chatItems = pgTable("chat_items", {
   added,
   chatId: ref("chat_id", () => chats.id, { onDelete: "cascade" }).notNull(),
-  id: brandedId<typeof ChatItemIdTypeId>(),
+  id,
   message: customType<{
     data: Prompt.Message
     driverData: typeof Prompt.Message.Encoded
@@ -34,8 +31,8 @@ export const embeddings = pgTable(
   "embeddings",
   {
     chatItemId: ref("chat_item_id", () => chatItems.id, { onDelete: "cascade" }).notNull(),
-    embedding: vector("embedding", { dimensions: 1536 }),
-    id: brandedId<typeof EmbeddingIdTypeId>(),
+    embedding: vector("embedding", { dimensions: 1536 }).$type<ReadonlyArray<number>>(),
+    id,
   },
   (_) => [index("embeddings_embedding_index").using("hnsw", _.embedding.op("vector_cosine_ops"))],
 )

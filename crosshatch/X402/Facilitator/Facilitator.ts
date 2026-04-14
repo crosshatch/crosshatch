@@ -1,4 +1,4 @@
-import { HttpApiGroup } from "@effect/platform"
+import { HttpApiGroup } from "effect/unstable/httpapi"
 
 import { Settle } from "./Settle.ts"
 import { Supported } from "./Supported.ts"

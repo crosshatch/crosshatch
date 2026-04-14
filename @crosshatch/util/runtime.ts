@@ -1,5 +1,5 @@
-import { Atom } from "@effect-atom/atom"
 import { Effect, Layer } from "effect"
+import { Atom } from "effect/unstable/reactivity"
 
 export const memoMap = Layer.makeMemoMap.pipe(Effect.runSync)
 

@@ -7,7 +7,6 @@
     "@cloudflare/vitest-pool-workers": "catalog:",
     "@cloudflare/workers-types": "catalog:",
     "@crosshatch/util": "workspace:*",
-    "@effect/platform": "catalog:",
     "crosshatch": "workspace:*",
     "dedent": "catalog:",
     "effect": "catalog:",

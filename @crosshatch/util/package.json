@@ -22,11 +22,7 @@
     }
   },
   "peerDependencies": {
-    "@effect-atom/atom": "catalog:",
-    "@effect-atom/atom-react": "catalog:",
-    "@effect/ai": "catalog:",
-    "@effect/experimental": "catalog:",
-    "@effect/platform": "catalog:",
+    "@effect/atom-react": "catalog:",
     "@effect/platform-browser": "catalog:",
     "date-fns": "catalog:",
     "effect": "catalog:"

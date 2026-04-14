@@ -1,9 +1,9 @@
-import { AtomHttpApi } from "@effect-atom/atom"
-import { FetchHttpClient } from "@effect/platform"
+import { FetchHttpClient } from "effect/unstable/http"
+import { AtomHttpApi } from "effect/unstable/reactivity"
 
 import { Public } from "./Public.ts"
 
-export class PublicClient extends AtomHttpApi.Tag<PublicClient>()("crosshatch/PublicClient", {
+export class PublicClient extends AtomHttpApi.Service<PublicClient>()("crosshatch/PublicClient", {
   api: Public,
   httpClient: FetchHttpClient.layer,
 }) {}

@@ -1,34 +1,36 @@
 import { withLogging } from "@crosshatch/util/LoggerLive"
-import { Atom } from "@effect-atom/atom-react"
 import { OpenAiClient, OpenAiEmbeddingModel } from "@effect/ai-openai"
 import { HttpClient } from "crosshatch/X402"
-import { ConfigProvider, Effect, Layer, Redacted, Config } from "effect"
+import { Effect, Layer, Redacted, Config } from "effect"
+import { Atom } from "effect/unstable/reactivity"
 
 import { Drizzle, PgliteClient } from "./Drizzle"
 
-export const runtime = Atom.runtime(
-  Layer.mergeAll(
-    Drizzle.Default.pipe(Layer.provideMerge(PgliteClient.Default)),
-    OpenAiEmbeddingModel.model("text-embedding-ada-002", { mode: "batched" }),
-  ).pipe(
-    Layer.provideMerge(
-      Config.boolean("DEV").pipe(
-        Config.withDefault(true),
+export const runtime = Layer.mergeAll(
+  Drizzle.layer.pipe(Layer.provideMerge(PgliteClient.layer)),
+  OpenAiEmbeddingModel.model("text-embedding-ada-002", { dimensions: 1536 }),
+).pipe(
+  Layer.provideMerge(
+    Config.boolean("DEV")
+      .pipe(Config.withDefault(true))
+      .asEffect()
+      .pipe(
         Effect.map((dev) => `https://lmnl.im${dev ? ".localhost" : ""}`),
-        Effect.map((shapesUrl) =>
+        Effect.map((lmnlimUrl) =>
           Layer.mergeAll(
             OpenAiClient.layer({
               apiKey: Redacted.make(""),
-              apiUrl: `${shapesUrl}/openai`,
+              apiUrl: `${lmnlimUrl}/openai`,
             }),
           ),
         ),
-        Layer.unwrapEffect,
+        Layer.unwrap,
       ),
-    ),
-    Layer.provideMerge(HttpClient),
-    Layer.provide(Layer.setConfigProvider(ConfigProvider.fromJson(import.meta.env))),
-    withLogging,
-    Layer.annotateLogs("context", "lmnl.im"),
   ),
+  Layer.provideMerge(HttpClient),
+  Effect.succeed,
+  Effect.annotateLogs("context", "lmnl.im"),
+  Layer.unwrap,
+  withLogging,
+  Atom.runtime,
 )

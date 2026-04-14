@@ -37,7 +37,7 @@ export const updated = timestamp("updated", {
   .defaultNow()
   .$onUpdateFn(() => new Date())
 
-export const id = <A extends string, E, R>(_id: S.Schema<A, E, R>) => ({
+export const id = <A extends string, E>(_id: S.Codec<A, E>) => ({
   id: uuid("id").primaryKey().notNull().defaultRandom().$type<A>(),
 })
 

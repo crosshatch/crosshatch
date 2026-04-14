@@ -8,9 +8,9 @@ export declare namespace CrosshatchEnv {
   }
 }
 
-export class CrosshatchEnv extends Context.Tag("CrosshatchEnv")<CrosshatchEnv, CrosshatchEnv.Service>() {}
+export class CrosshatchEnv extends Context.Service<CrosshatchEnv, CrosshatchEnv.Service>()("CrosshatchEnv") {}
 
-export const isCrosshatch = (origin: string) => CrosshatchEnv.pipe(Effect.map(({ url }) => origin === url))
+export const isCrosshatch = (origin: string) => CrosshatchEnv.asEffect().pipe(Effect.map(({ url }) => origin === url))
 
 export const layer = Effect.gen(function* () {
   const dev = yield* Config.boolean("DEV").pipe(Config.withDefault(true))
@@ -19,4 +19,4 @@ export const layer = Effect.gen(function* () {
   return { dev, domain, url } as const
 }).pipe(Layer.effect(CrosshatchEnv))
 
-export const href = (subpath: string) => CrosshatchEnv.pipe(Effect.map(({ url }) => `${url}/${subpath}`))
+export const href = (subpath: string) => CrosshatchEnv.asEffect().pipe(Effect.map(({ url }) => `${url}/${subpath}`))

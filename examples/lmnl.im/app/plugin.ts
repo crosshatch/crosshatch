@@ -1,9 +1,8 @@
-import { cwd } from "node:process"
-
-import { FileSystem, Path } from "@effect/platform"
-import { NodeContext } from "@effect/platform-node"
-import { Array as EArray, Effect, Encoding, flow, Option, pipe, String as EString } from "effect"
 import type { Plugin } from "vite"
+
+import { NodeServices } from "@effect/platform-node"
+import { FileSystem, Path, Array as EArray, Effect, Encoding, flow, pipe, String as EString, Result } from "effect"
+import { cwd } from "node:process"
 
 import type { Migration } from "./Migration.ts"
 
@@ -44,8 +43,8 @@ export default (): Plugin => {
             flow(
               EArray.filterMap((name) =>
                 name === "meta"
-                  ? Option.none()
-                  : Option.some({
+                  ? Result.failVoid
+                  : Result.succeed({
                       name,
                       path: join(migrationsDir, name, "migration.sql"),
                     }),
@@ -79,7 +78,7 @@ export default (): Plugin => {
 
           contents.push({ hash, idx, sql, tag: name, when })
         }
-      }).pipe(Effect.provide(NodeContext.layer), Effect.runPromise),
+      }).pipe(Effect.provide(NodeServices.layer), Effect.runPromise),
     load(id) {
       if (id !== RESOLVED_ID) {
         return null

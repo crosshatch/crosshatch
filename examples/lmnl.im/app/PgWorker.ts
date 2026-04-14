@@ -79,7 +79,7 @@ worker_({
           }
         }
         yield* Effect.tryPromise(() => client.exec("COMMIT"))
-      }).pipe(Effect.tapErrorTag("UnknownException", () => Effect.tryPromise(() => client.exec("ROLLBACK"))))
+      }).pipe(Effect.tapErrorTag("UnknownError", () => Effect.tryPromise(() => client.exec("ROLLBACK"))))
 
       return client
     }).pipe(Effect.runPromise),

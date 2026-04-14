@@ -21,8 +21,6 @@
   },
   "peerDependencies": {
     "@crosshatch/util": "workspace:*",
-    "@effect/ai": "catalog:",
-    "@effect/sql": "catalog:",
     "@effect/sql-pg": "catalog:",
     "drizzle-kit": "catalog:",
     "drizzle-orm": "catalog:",

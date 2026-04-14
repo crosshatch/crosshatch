@@ -1,22 +1,23 @@
-import { Headers as Headers_, HttpServerRequest, HttpServerResponse } from "@effect/platform"
 import { Requirements, Required, Address } from "crosshatch/X402"
 import { Config, Effect, Encoding, flow, Option, Redacted, Schema as S, Stream } from "effect"
+import { Headers, HttpServerRequest, HttpServerResponse } from "effect/unstable/http"
 
 export const OpenaiProxy = Effect.gen(function* () {
   const { headers: initialHeaders, url, method, stream } = yield* HttpServerRequest.HttpServerRequest
   if (url === "/embeddings" || url === "/responses") {
-    const maybePayloadHeader = Option.firstSomeOf([
-      Headers_.get(initialHeaders, "X-PAYMENT"),
-      Headers_.get(initialHeaders, "PAYMENT-SIGNATURE"),
-    ])
+    const maybePayloadHeader = Headers.get(initialHeaders, "X-PAYMENT").pipe(
+      Option.orElse(() => Headers.get(initialHeaders, "PAYMENT-SIGNATURE")),
+    )
     if (Option.isNone(maybePayloadHeader)) {
       const _tag = url === "/embeddings" ? "Embedding" : "Response"
-      const requirementHeader = yield* S.validate(Required.Required)(
+      const requirementHeader = yield* S.decodeUnknownEffect(S.toType(Required.Required))(
         Required.make({
           accepts: [
             Requirements.make({
               amount: `${Math.floor(Math.random() * 100000)}`,
-              recipient: yield* Config.string("PAY_TO_EVM").pipe(Effect.flatMap(S.decodeUnknown(Address.EvmAddress))),
+              recipient: yield* Config.string("PAY_TO_EVM")
+                .asEffect()
+                .pipe(Effect.flatMap(S.decodeUnknownEffect(Address.EvmAddress))),
             }),
           ],
           resource: {
@@ -26,15 +27,14 @@ export const OpenaiProxy = Effect.gen(function* () {
           },
         }),
       ).pipe(Effect.map(flow(JSON.stringify, Encoding.encodeBase64)))
-      return yield* HttpServerResponse.raw(undefined, {
+      return HttpServerResponse.raw(undefined, {
         headers: { "PAYMENT-REQUIRED": requirementHeader },
         status: 402,
       })
     }
     // TODO: verify payment
   }
-  const runtime = yield* Effect.runtime<never>()
-  const headers = new Headers(initialHeaders)
+  const headers = new globalThis.Headers(initialHeaders)
   headers.delete("connection")
   headers.delete("content-encoding")
   headers.delete("content-length")
@@ -50,7 +50,7 @@ export const OpenaiProxy = Effect.gen(function* () {
   headers.set("Authorization", `Bearer ${Redacted.value(yield* Config.redacted("OPENAI_API_KEY"))}`)
   const init: RequestInit = { headers, method }
   if (!["GET", "HEAD"].includes(method)) {
-    init.body = Stream.toReadableStreamRuntime(stream, runtime)
+    init.body = yield* Stream.toReadableStreamEffect(stream)
     ;(init as any).duplex = "half"
   }
   const upstream = yield* Effect.tryPromise(() =>
@@ -59,12 +59,12 @@ export const OpenaiProxy = Effect.gen(function* () {
   if (upstream.status === 400) {
     console.log(yield* Effect.tryPromise(() => upstream.text()))
   }
-  const responseHeaders = new Headers(upstream.headers)
+  const responseHeaders = new globalThis.Headers(upstream.headers)
   responseHeaders.delete("content-encoding")
   responseHeaders.delete("content-length")
   responseHeaders.delete("transfer-encoding")
   responseHeaders.delete("connection")
-  return yield* HttpServerResponse.fromWeb(
+  return HttpServerResponse.fromWeb(
     new Response(upstream.body, {
       headers: responseHeaders,
       status: upstream.status,

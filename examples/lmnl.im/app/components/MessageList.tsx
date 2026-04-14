@@ -2,17 +2,16 @@ import { cn } from "@crosshatch/ui/cn"
 import { Message } from "@crosshatch/ui/components/Message"
 import { Section, SectionInner } from "@crosshatch/ui/components/Section"
 import { Skeleton } from "@crosshatch/ui/components/Skeleton"
-import { useAtomSuspense, useAtomValue } from "@effect-atom/atom-react"
+import { useAtomSuspense, useAtomValue } from "@effect/atom-react"
 import { Fragment, useEffect } from "react"
 
 import { chatAtom, chatItemsAtom } from "@/atoms"
-import { ChatId } from "@/ids"
 import { Route } from "@/routes/{-$chatId}"
 
 export const MessageList = () => {
   const { chatId } = Route.useParams()
   const { inflight } = useAtomValue(chatAtom(chatId))
-  const { value: items } = useAtomSuspense(chatItemsAtom(chatId ? ChatId.make(chatId) : undefined))
+  const { value: items } = useAtomSuspense(chatItemsAtom((chatId ?? undefined) as never))
 
   useEffect(() => {
     scrollTo({

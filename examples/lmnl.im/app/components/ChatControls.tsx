@@ -4,20 +4,18 @@ import { Section, SectionInner } from "@crosshatch/ui/components/Section"
 import { Sus } from "@crosshatch/ui/components/Sus"
 import { Textarea } from "@crosshatch/ui/components/Textarea"
 import { e0, nonNullable } from "@crosshatch/util/unwrapping"
-import { useAtom, useAtomSet, useAtomValue } from "@effect-atom/atom-react"
-import { AiError, EmbeddingModel, LanguageModel, Prompt } from "@effect/ai"
 import { OpenAiLanguageModel } from "@effect/ai-openai"
+import { useAtom, useAtomSet, useAtomValue } from "@effect/atom-react"
 import { isLinkedAtom, openSessionWidgetAtom } from "crosshatch"
 import { eq } from "drizzle-orm"
 import { Cause, Effect, Fiber } from "effect"
+import { AiError, EmbeddingModel, LanguageModel, Prompt } from "effect/unstable/ai"
 import { ArrowUp } from "lucide-react"
 import { useEffect, useRef } from "react"
 
-import { currentModelIdAtom } from "@/atoms"
-import { modelIdsAtom, chatAtom, chatItemsAtom } from "@/atoms"
+import { currentModelIdAtom, modelIdsAtom, chatAtom, chatItemsAtom } from "@/atoms"
 import { ModelSelect } from "@/components/ModelSelect"
 import { Drizzle } from "@/Drizzle"
-import { ChatId } from "@/ids"
 import { router } from "@/router"
 import { Route } from "@/routes/{-$chatId}"
 import { runtime } from "@/runtime"
@@ -74,7 +72,7 @@ export const ChatControls = () => {
   )
 }
 
-const sendMessageAtom = runtime.fn<typeof ChatId.Type | undefined>()(
+const sendMessageAtom = runtime.fn<string | undefined>()(
   Effect.fn(
     function* (chatId, get) {
       const isLinked = yield* get.result(isLinkedAtom)
@@ -86,9 +84,9 @@ const sendMessageAtom = runtime.fn<typeof ChatId.Type | undefined>()(
       text = text.trim()
       if (!text) return
       const _ = yield* Drizzle
-      let titleFiber: Fiber.RuntimeFiber<void, Cause.UnknownException | AiError.AiError> | undefined
+      let titleFiber: Fiber.Fiber<void, Cause.UnknownError | AiError.AiError> | undefined
       if (!chatId) {
-        const id = ChatId.make(crypto.randomUUID())
+        const id = crypto.randomUUID()
         chatId = id
         AtomUtil.assign(get)(chatAtom(undefined), { text: "" })
         yield* Effect.tryPromise(() =>
@@ -101,11 +99,11 @@ const sendMessageAtom = runtime.fn<typeof ChatId.Type | undefined>()(
         titleFiber = yield* Effect.gen(function* () {
           const { text: title } = yield* LanguageModel.generateText({
             prompt: `
-          I'm about to provide you with a message. Create a concise title for the message.
-          Don't place the title inside of quotes. Provide just a few words in title case.
-          ---
-          ${text}
-        `,
+              I'm about to provide you with a message. Create a concise title for the message.
+              Don't place the title inside of quotes. Provide just a few words in title case.
+              ---
+              ${text}
+            `,
           }).pipe(
             Effect.provide(
               OpenAiLanguageModel.layer({
@@ -114,7 +112,7 @@ const sendMessageAtom = runtime.fn<typeof ChatId.Type | undefined>()(
             ),
           )
           yield* Effect.tryPromise(() => _.update(chats).set({ title }).where(eq(chats.id, id)))
-        }).pipe(Effect.fork)
+        }).pipe(Effect.forkChild)
       }
       const userMessage = Prompt.userMessage({
         content: [Prompt.makePart("text", { text })],
@@ -130,18 +128,12 @@ const sendMessageAtom = runtime.fn<typeof ChatId.Type | undefined>()(
                 message: userMessage,
               })
               .returning(),
-          ).pipe(
-            e0,
-            nonNullable,
-            Effect.zipLeft(
-              Effect.promise(() => _.update(chats).set({ updated: new Date() }).where(eq(chats.id, chatId))),
-              { concurrent: true },
-            ),
-          )
+          ).pipe(e0, nonNullable)
+          yield* Effect.promise(() => _.update(chats).set({ updated: new Date() }).where(eq(chats.id, chatId)))
           yield* Effect.promise(() =>
             _.insert(embeddings).values({
               chatItemId,
-              embedding: userMessageEmbedding,
+              embedding: userMessageEmbedding.vector,
             }),
           )
         }),
@@ -158,7 +150,7 @@ const sendMessageAtom = runtime.fn<typeof ChatId.Type | undefined>()(
       })
       // TODO: save tool calls in database
       while (generated.toolCalls.length > 0) {
-        prompt = Prompt.merge(prompt, Prompt.fromResponseParts(generated.content))
+        prompt = Prompt.concat(prompt, Prompt.fromResponseParts(generated.content))
         generated = yield* LanguageModel.generateText({
           prompt,
           // toolkit: FirecrawlToolkit,
@@ -187,7 +179,7 @@ const sendMessageAtom = runtime.fn<typeof ChatId.Type | undefined>()(
           yield* Effect.tryPromise(() =>
             _.insert(embeddings).values({
               chatItemId,
-              embedding: assistantMessageEmbedding,
+              embedding: assistantMessageEmbedding.vector,
             }),
           )
         }),

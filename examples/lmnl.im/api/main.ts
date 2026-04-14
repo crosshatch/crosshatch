@@ -1,25 +1,25 @@
-import { HttpLayerRouter, HttpServer, HttpServerResponse } from "@effect/platform"
 import { Layer, Effect } from "effect"
+import { HttpRouter, HttpServer, HttpServerResponse } from "effect/unstable/http"
 import { Assets, Entry } from "liminal-cloudflare"
 
 import { OpenaiProxy } from "./OpenaiProxy.ts"
 
 const ApiLive = Layer.mergeAll(
-  HttpLayerRouter.add("GET", "/", Effect.succeed(HttpServerResponse.text("ok"))),
-  HttpLayerRouter.use((router) => router.prefixed("/openai").add("*", "/*", OpenaiProxy)),
-  HttpLayerRouter.cors({
+  HttpRouter.add("GET", "/", Effect.succeed(HttpServerResponse.text("ok"))),
+  HttpRouter.use((router) => router.prefixed("/openai").add("*", "/*", OpenaiProxy)),
+  HttpRouter.cors({
     allowedHeaders: ["*"],
     allowedMethods: ["*"],
     allowedOrigins: ["https://lmnl.im", "https://lmnl.im.localhost"],
     exposedHeaders: ["PAYMENT-REQUIRED"],
   }),
-  HttpLayerRouter.add("*", "/*", Assets.forward),
+  HttpRouter.add("*", "/*", Assets.forward),
 )
 
 export default ApiLive.pipe(
-  Layer.provide(HttpServer.layerContext),
-  HttpLayerRouter.toHttpEffect,
+  Layer.provide(HttpServer.layerServices),
+  HttpRouter.toHttpEffect,
   Effect.flatMap((v) => v),
-  Effect.catchAll(() => HttpServerResponse.empty({ status: 500 })),
+  Effect.catchCause(() => Effect.succeed(HttpServerResponse.empty({ status: 500 }))),
   Entry.make(Layer.empty),
 )

@@ -1,6 +1,6 @@
-import { Tool, Toolkit } from "@effect/ai"
 import dedent from "dedent"
 import { Schema as S } from "effect"
+import { Tool, Toolkit } from "effect/unstable/ai"
 
 export const FirecrawlToolkit = Toolkit.make(
   Tool.make("FirecrawlSearch", {
@@ -9,10 +9,10 @@ export const FirecrawlToolkit = Toolkit.make(
       Use FirecrawlScrape to get the full markdown content of a specific URL.
       Use a limit of 5 unless otherwise specified.
     `,
-    parameters: {
+    parameters: S.Struct({
       limit: S.Number,
       query: S.String,
-    },
+    }),
     success: S.Struct({
       results: S.Array(
         S.Struct({
@@ -25,7 +25,7 @@ export const FirecrawlToolkit = Toolkit.make(
   }),
   Tool.make("FirecrawlScrape", {
     description: "Scrape a URL and return its content as clean markdown.",
-    parameters: { url: S.String },
+    parameters: S.Struct({ url: S.String }),
     success: S.Struct({
       markdown: S.String,
       url: S.String,

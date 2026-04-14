@@ -1,17 +1,16 @@
-import { Atom } from "@effect-atom/atom-react"
 import { OpenAiClient } from "@effect/ai-openai"
 import { BrowserKeyValueStore } from "@effect/platform-browser"
 import { desc, eq, sql } from "drizzle-orm"
 import { Effect, Schema as S } from "effect"
+import { Atom } from "effect/unstable/reactivity"
 
 import { Drizzle, latest } from "@/Drizzle"
-import type { ChatId } from "@/ids"
 import { runtime } from "@/runtime"
 import { chats } from "@/schema"
 
 export const modelIdsAtom = runtime.atom(
-  OpenAiClient.OpenAiClient.pipe(
-    Effect.flatMap((v) => v.client.listModels()),
+  OpenAiClient.OpenAiClient.asEffect().pipe(
+    Effect.flatMap((v) => v.client.listModels({})),
     Effect.map(({ data }) => data.map((v) => v.id)),
   ),
 )
@@ -37,7 +36,7 @@ export const chatsAtom = runtime
   .atom(latest((_) => _.select().from(chats).orderBy(desc(chats.updated))))
   .pipe(Atom.keepAlive)
 
-export const deleteChatAtom = runtime.fn<typeof ChatId.Type>()(
+export const deleteChatAtom = runtime.fn<string>()(
   Effect.fn(function* (chatId) {
     const _ = yield* Drizzle
     return yield* Effect.tryPromise(() => _.delete(chats).where(eq(chats.id, chatId)))
@@ -45,7 +44,7 @@ export const deleteChatAtom = runtime.fn<typeof ChatId.Type>()(
 )
 
 export const renameChatAtom = runtime.fn<{
-  id: typeof ChatId.Type
+  id: string
   title: string
 }>()(
   Effect.fn(function* ({ id, title }) {
@@ -54,7 +53,7 @@ export const renameChatAtom = runtime.fn<{
   }),
 )
 
-export const chatItemsAtom = Atom.family((chatId?: typeof ChatId.Type | undefined) =>
+export const chatItemsAtom = Atom.family((chatId?: string | undefined) =>
   runtime
     .atom(
       latest((_) =>

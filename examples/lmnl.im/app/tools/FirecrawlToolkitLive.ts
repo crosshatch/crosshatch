@@ -1,6 +1,5 @@
-import { HttpBody, HttpClient, HttpClientRequest, HttpClientResponse } from "@effect/platform"
-import * as X402 from "crosshatch/X402"
-import { Config, Effect, flow, Layer, Redacted, Schema as S } from "effect"
+import { Context, Config, Effect, flow, Layer, Redacted, Schema as S } from "effect"
+import { HttpBody, HttpClient, HttpClientRequest, HttpClientResponse } from "effect/unstable/http"
 
 import { FirecrawlToolkit } from "./FirecrawlToolkit"
 
@@ -18,9 +17,8 @@ const FirecrawlScrapeResponse = S.Struct({
   data: S.Struct({ markdown: S.String }),
 })
 
-class FirecrawlClient extends Effect.Service<FirecrawlClient>()("FirecrawlClient", {
-  dependencies: [X402.HttpClient],
-  effect: Effect.gen(function* () {
+class FirecrawlClient extends Context.Service<FirecrawlClient>()("FirecrawlClient", {
+  make: Effect.gen(function* () {
     const apiKey = yield* Config.redacted("VITE_PUBLIC_FIRECRAWL_API_KEY")
     const httpClient = yield* HttpClient.HttpClient
     const client = httpClient.pipe(
@@ -33,7 +31,9 @@ class FirecrawlClient extends Effect.Service<FirecrawlClient>()("FirecrawlClient
     )
     return { client } as const
   }),
-}) {}
+}) {
+  static readonly layer = Layer.effect(FirecrawlClient, FirecrawlClient.make)
+}
 
 export const FirecrawlToolkitLive = FirecrawlToolkit.toLayer(
   Effect.gen(function* () {
@@ -72,4 +72,4 @@ export const FirecrawlToolkitLive = FirecrawlToolkit.toLayer(
       }, Effect.orDie),
     }
   }),
-).pipe(Layer.provide(FirecrawlClient.Default))
+).pipe(Layer.provide(FirecrawlClient.layer))

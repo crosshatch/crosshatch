@@ -1,6 +1,6 @@
 import { Button } from "@crosshatch/ui/components/Button"
 import { Sidebar, SidebarInset, SidebarProvider, useSidebar } from "@crosshatch/ui/components/Sidebar"
-import { useAtomSet } from "@effect-atom/atom-react"
+import { useAtomSet } from "@effect/atom-react"
 import { createRootRoute, Outlet } from "@tanstack/react-router"
 import { openSessionWidgetAtom } from "crosshatch"
 import { PanelLeftIcon, WalletMinimal } from "lucide-react"

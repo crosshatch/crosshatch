@@ -5,10 +5,11 @@ import { Message } from "@crosshatch/ui/components/Message"
 import { Separator } from "@crosshatch/ui/components/Separator"
 import { Sus } from "@crosshatch/ui/components/Sus"
 import { registerCommand } from "@crosshatch/util/registerCommand"
-import { Atom, useAtom, useAtomMount, useAtomSet, useAtomSuspense } from "@effect-atom/atom-react"
-import { EmbeddingModel } from "@effect/ai"
+import { useAtom, useAtomMount, useAtomSet, useAtomSuspense } from "@effect/atom-react"
 import { cosineDistance, eq } from "drizzle-orm"
 import { Effect } from "effect"
+import { EmbeddingModel } from "effect/unstable/ai"
+import { Atom } from "effect/unstable/reactivity"
 import { Search as SearchIcon } from "lucide-react"
 
 import { Drizzle } from "@/Drizzle"
@@ -73,7 +74,7 @@ const searchResultsAtom = runtime
       const em = yield* EmbeddingModel.EmbeddingModel
       const embedding = yield* em.embed(text)
       const _ = yield* Drizzle
-      const distance = cosineDistance(embeddings.embedding, embedding)
+      const distance = cosineDistance(embeddings.embedding, embedding.vector as Array<number>)
       return yield* Effect.tryPromise(() =>
         _.select({
           chatId: chatItems.chatId,

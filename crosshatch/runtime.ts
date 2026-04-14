@@ -1,7 +1,6 @@
 import { withLogging } from "@crosshatch/util/LoggerLive"
-import { resolveEnv } from "@crosshatch/util/resolveEnv"
 import { memoMap, runtime } from "@crosshatch/util/runtime"
-import { ConfigProvider, Layer, ManagedRuntime } from "effect"
+import { Layer, ManagedRuntime, Effect } from "effect"
 import { Client } from "liminal"
 
 import * as CrosshatchEnv from "./CrosshatchEnv.ts"
@@ -12,9 +11,10 @@ import * as FacadeWorker from "./FacadeWorker.ts"
 const CommonLive = Accumulator.layer.pipe(
   Layer.provideMerge(Client.layerWorker({ client: FacadeClient }).pipe(Layer.provide(FacadeWorker.layer))),
   Layer.provideMerge(CrosshatchEnv.layer),
-  Layer.provide(Layer.setConfigProvider(ConfigProvider.fromJson(resolveEnv()))),
+  Effect.succeed,
+  Effect.annotateLogs("context", "crosshatch"),
+  Layer.unwrap,
   withLogging,
-  Layer.annotateLogs("context", "crosshatch"),
 )
 export const atomRuntime = runtime(CommonLive)
-export const managedRuntime = ManagedRuntime.make(CommonLive, memoMap)
+export const managedRuntime = ManagedRuntime.make(CommonLive, { memoMap })

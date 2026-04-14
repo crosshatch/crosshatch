@@ -1,25 +1,28 @@
+import type { AnyPgAsyncRelationalQuery, AnyPgAsyncSelect } from "drizzle-orm/pg-core"
+
 import { live } from "@electric-sql/pglite/live"
 import { PGliteWorker } from "@electric-sql/pglite/worker"
-import type { AnyPgAsyncRelationalQuery, AnyPgAsyncSelect } from "drizzle-orm/pg-core"
 import { drizzle } from "drizzle-orm/pglite"
-import { Cause, Effect, Stream } from "effect"
+import { Cause, Effect, Stream, Context, Layer, Queue } from "effect"
 
 // oxlint-disable-next-line import/default
 import PgWorker from "./PgWorker.ts?worker"
 import { relations } from "./relations.ts"
 import * as schema from "./schema.ts"
 
-export class PgliteClient extends Effect.Service<PgliteClient>()("PgliteClient", {
-  scoped: Effect.gen(function* () {
+export class PgliteClient extends Context.Service<PgliteClient>()("PgliteClient", {
+  make: Effect.gen(function* () {
     const client = yield* Effect.tryPromise(() => PGliteWorker.create(new PgWorker(), { extensions: { live } }))
     yield* Effect.addFinalizer(() => Effect.promise(() => client.close()))
     yield* Effect.tryPromise(() => client.waitReady)
     return client
   }),
-}) {}
+}) {
+  static readonly layer = Layer.effect(PgliteClient, PgliteClient.make)
+}
 
-export class Drizzle extends Effect.Service<Drizzle>()("Drizzle", {
-  scoped: Effect.gen(function* () {
+export class Drizzle extends Context.Service<Drizzle>()("Drizzle", {
+  make: Effect.gen(function* () {
     const pg = yield* PgliteClient
     return drizzle({
       client: pg as never,
@@ -27,13 +30,15 @@ export class Drizzle extends Effect.Service<Drizzle>()("Drizzle", {
       schema,
     })
   }),
-}) {}
+}) {
+  static readonly layer = Layer.effect(Drizzle, Drizzle.make)
+}
 
 type Preparable = AnyPgAsyncRelationalQuery | AnyPgAsyncSelect
 
 export const latest = <T extends Partial<Preparable> & Pick<Preparable, "prepare" | "_">>(
-  f: (_: Drizzle) => T,
-): Stream.Stream<T["_"]["result"]> =>
+  f: (_: Drizzle["Service"]) => T,
+): Stream.Stream<T["_"]["result"], Cause.UnknownError, Drizzle | PgliteClient> =>
   Effect.gen(function* () {
     const _ = yield* Drizzle
     const built = f(_)
@@ -41,14 +46,16 @@ export const latest = <T extends Partial<Preparable> & Pick<Preparable, "prepare
     const { sql, params } = built.toSQL!()
     return Effect.gen(function* () {
       const pg = yield* PgliteClient
-      return Stream.asyncScoped<Array<{ [key: string]: any }>, Cause.UnknownException>(
-        Effect.fn(function* (emit) {
-          const query = yield* Effect.tryPromise(() => pg.live.query(sql, params, ({ rows }) => emit.single(rows)))
+      return Stream.callback<Array<{ [key: string]: any }>, Cause.UnknownError>(
+        Effect.fn(function* (queue) {
+          const query = yield* Effect.tryPromise(() =>
+            pg.live.query(sql, params, ({ rows }) => Queue.offerUnsafe(queue, rows)),
+          )
           yield* Effect.addFinalizer(() => Effect.promise(() => query.unsubscribe()))
         }),
       )
     }).pipe(
-      Stream.unwrapScoped,
+      Stream.unwrap,
       Stream.map((rows) => prepared.mapResult(rows)),
     )
-  }).pipe(Stream.unwrap) as never
+  }).pipe(Stream.unwrap)

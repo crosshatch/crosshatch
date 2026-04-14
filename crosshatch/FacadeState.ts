@@ -13,7 +13,7 @@ type State = Data.TaggedEnum<{
 
 export class FacadeState extends Accumulator.Service<FacadeState, State>()("crosshatch/Accumulator") {}
 
-type Item = Stream.Stream.Success<typeof FacadeClient.events>
+type Item = Stream.Success<typeof FacadeClient.events>
 
 const arm = FacadeState.reducer<Item>()
 

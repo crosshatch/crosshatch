@@ -1,5 +1,5 @@
 import { BrowserStream } from "@effect/platform-browser"
-import { Cause, Effect, Schema as S, Stream } from "effect"
+import { Cause, Effect, Queue, Schema as S, Stream } from "effect"
 
 import type { WidgetConfig } from "./self.ts"
 
@@ -34,14 +34,14 @@ export const embed = <A, I>({
 }: WidgetConfig<A, I> & {
   readonly className?: string | undefined
 }) =>
-  Stream.asyncScoped<A, Cause.NoSuchElementException>(
-    Effect.fn(function* (emit) {
+  Stream.callback<A, Cause.NoSuchElementError>(
+    Effect.fn(function* (queue) {
       yield* BrowserStream.fromEventListenerWindow("message").pipe(
         Stream.runForEach(
           Effect.fn(function* ({ data, source }) {
-            const context = yield* Effect.fromNullable(iframe.contentWindow)
+            const context = yield* Effect.fromNullishOr(iframe.contentWindow)
             if (source === context && S.is(item)(data)) {
-              emit.single(data)
+              yield* Queue.offer(queue, data)
             }
           }),
         ),

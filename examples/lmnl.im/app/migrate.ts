@@ -1,4 +1,5 @@
 import type { PGlite } from "@electric-sql/pglite"
+
 import { Effect } from "effect"
 
 import { Migration } from "./Migration.ts"
@@ -68,5 +69,5 @@ export const migrate = Effect.fn(function* ({
       }
     }
     yield* Effect.tryPromise(() => _.exec("COMMIT"))
-  }).pipe(Effect.tapErrorTag("UnknownException", () => Effect.tryPromise(() => _.exec("ROLLBACK"))))
+  }).pipe(Effect.tapErrorTag("UnknownError", () => Effect.tryPromise(() => _.exec("ROLLBACK"))))
 })

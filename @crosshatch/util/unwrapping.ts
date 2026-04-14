@@ -13,7 +13,7 @@ export const slice =
   <A, E, R>(effect: Effect.Effect<Array<A>, E, R>): Effect.Effect<Types.TupleOf<N, A> | undefined, E, R> =>
     Effect.map(effect, (v) => (v.length >= n ? (v.slice(0, n) as never) : undefined))
 
-export const nonNullable = <A, E, R>(effect: Effect.Effect<A, E, R>) => Effect.flatMap(effect, Effect.fromNullable)
+export const nonNullable = <A, E, R>(effect: Effect.Effect<A, E, R>) => Effect.flatMap(effect, Effect.fromNullishOr)
 
 export const nullable = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
   Effect.catchTags(effect, {
@@ -22,23 +22,23 @@ export const nullable = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
 
 export const nullableError =
   <C>(c: new () => C) =>
-  <A, E, R>(effect: Effect.Effect<A, E | Cause.NoSuchElementException, R>) =>
-    Effect.catchTag(effect, "NoSuchElementException", () => Effect.fail(new c()))
+  <A, E, R>(effect: Effect.Effect<A, E | Cause.NoSuchElementError, R>) =>
+    Effect.catchTag(effect, "NoSuchElementError", () => Effect.fail(new c()))
 
 export const nonEmpty = <A, E, R>(
   effect: Effect.Effect<Array<A>, E, R>,
-): Effect.Effect<Array.NonEmptyReadonlyArray<A>, Cause.NoSuchElementException | E, R> =>
+): Effect.Effect<Array.NonEmptyReadonlyArray<A>, Cause.NoSuchElementError | E, R> =>
   Effect.flatMap(
     effect,
     Effect.fn(function* ([e0_, ...rest]) {
-      const e0 = yield* Effect.fromNullable(e0_)
+      const e0 = yield* Effect.fromNullishOr(e0_)
       return [e0, ...rest]
     }),
   )
 
 export const itemsNonNullable = <A, E, R>(
   stream: Stream.Stream<A, E, R>,
-): Stream.Stream<NonNullable<A>, E | Cause.NoSuchElementException, R> => Stream.mapEffect(stream, Effect.fromNullable)
+): Stream.Stream<NonNullable<A>, E | Cause.NoSuchElementError, R> => Stream.mapEffect(stream, Effect.fromNullishOr)
 
 export const validateTag =
   <T extends { readonly _tag: string }, K extends Types.Tags<T>>(_tag: K) =>
@@ -46,6 +46,6 @@ export const validateTag =
     Effect.succeed(value).pipe(
       Effect.filterOrFail(
         (v): v is Types.ExtractTag<T, K> => v._tag === _tag,
-        () => new Cause.NoSuchElementException(),
+        () => new Cause.NoSuchElementError(),
       ),
     )

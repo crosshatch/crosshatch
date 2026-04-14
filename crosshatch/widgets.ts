@@ -1,8 +1,8 @@
 import { access } from "@crosshatch/util/unwrapping"
 import { embed } from "@crosshatch/widget/embed"
 import { Finished } from "@crosshatch/widget/self"
-import { UrlParams } from "@effect/platform"
-import { Effect, flow, Option, Schema as S, Stream } from "effect"
+import { Effect, flow, Schema as S, Stream } from "effect"
+import { UrlParams } from "effect/unstable/http"
 
 import * as CrosshatchEnv from "./CrosshatchEnv.ts"
 import { LinkChallengeId } from "./LinkChallenge.ts"
@@ -20,24 +20,24 @@ const widget = <A, I extends UrlParams.Input, A2 = never, I2 = never>({
   item = S.Never as never,
 }: {
   readonly pathname: string
-  readonly payload: S.Schema<A, I>
-  readonly item?: S.Schema<A2, I2> | undefined
+  readonly payload: S.Codec<A, I>
+  readonly item?: S.Codec<A2, I2> | undefined
 }) => {
   // TODO: refactor
   const stream = flow(
-    S.encode(payload),
+    S.encodeEffect(payload),
     Effect.flatMap(
       Effect.fn(function* (v) {
         return yield* UrlParams.makeUrl(
           yield* CrosshatchEnv.href(pathname),
           UrlParams.fromInput(v),
-          Option.none(),
-        ).pipe(Effect.orDie)
+          undefined,
+        ).asEffect()
       }),
     ),
     access("href"),
     Effect.map((src) => ({
-      item: S.Union(item, Finished),
+      item: S.Union([item, Finished]),
       src,
       className: "crosshatch-widget",
     })),
@@ -60,7 +60,7 @@ export const EventsWidget = widget({
   payload: Common,
 })
 
-export const AllowanceWindow = S.Literal("Day", "Week", "Month", "Year", "Ever")
+export const AllowanceWindow = S.Literals(["Day", "Week", "Month", "Year", "Ever"])
 export const Allowance = S.Struct({
   amount: S.Number,
   window: AllowanceWindow,
@@ -70,7 +70,9 @@ export const LinkWidget = widget({
   pathname: "link",
   payload: S.Struct({
     challengeId: LinkChallengeId,
-  }).pipe(S.extend(Common), S.extend(Allowance)),
+    ...Common.fields,
+    ...Allowance.fields,
+  }),
 })
 
 export const EscalationWidget = widget({

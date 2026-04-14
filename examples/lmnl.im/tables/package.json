@@ -17,14 +17,12 @@
   },
   "devDependencies": {
     "@dotenvx/dotenvx": "catalog:",
-    "@effect/sql": "catalog:",
     "@effect/sql-pg": "catalog:",
     "drizzle-kit": "catalog:"
   },
   "peerDependencies": {
     "@crosshatch/drizzle": "workspace:*",
     "@crosshatch/util": "workspace:*",
-    "@effect/platform": "catalog:",
     "crosshatch": "workspace:*",
     "drizzle-orm": "catalog:",
     "effect": "catalog:",

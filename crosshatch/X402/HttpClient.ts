@@ -1,5 +1,5 @@
-import { FetchHttpClient } from "@effect/platform"
 import { Layer } from "effect"
+import { FetchHttpClient } from "effect/unstable/http"
 
 import { makeFetch } from "./makeFetch.ts"
 

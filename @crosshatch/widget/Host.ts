@@ -3,7 +3,7 @@ import { Exit, Schema as S, Context, Stream, Effect, Scope, Deferred, Layer } fr
 
 import { parent } from "./self.ts"
 
-export class Host extends Context.Tag("@crosshatch/widget/Host")<Host, string>() {}
+export class Host extends Context.Service<Host, string>()("@crosshatch/widget/Host") {}
 
 export const RequestHostIntroduction = S.TaggedStruct("RequestHostIntroduction", {})
 
@@ -14,7 +14,7 @@ export const hostListener = Effect.suspend(() =>
     Stream.runForEach(
       Effect.fnUntraced(function* ({ data, origin, source }) {
         if (S.is(RequestHostIntroduction)(data)) {
-          source?.postMessage(HostIntroduction.make(), { targetOrigin: origin })
+          source?.postMessage(HostIntroduction.make({}), { targetOrigin: origin })
         }
       }),
     ),
@@ -34,8 +34,8 @@ export const layer = Effect.gen(function* () {
       }),
     ),
     Effect.forkScoped,
-    Scope.extend(scope),
+    Scope.provide(scope),
   )
-  parent.postMessage(RequestHostIntroduction.make(), "*")
+  parent.postMessage(RequestHostIntroduction.make({}), "*")
   return yield* Deferred.await(deferred)
-}).pipe(Layer.scoped(Host))
+}).pipe(Layer.effect(Host))

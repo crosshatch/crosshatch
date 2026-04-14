@@ -1,10 +1,11 @@
-import { NodeContext } from "@effect/platform-node"
-import { SqlClient } from "@effect/sql"
+import type { AnyRelations, SQLWrapper } from "drizzle-orm"
+
+import { NodeServices } from "@effect/platform-node"
 import { PgClient } from "@effect/sql-pg"
 import { pushSchema } from "drizzle-kit/api-postgres"
-import type { AnyRelations, SQLWrapper } from "drizzle-orm"
 import { DefaultServices, make } from "drizzle-orm/effect-postgres"
 import { Config, Console, Effect, Schedule } from "effect"
+import { SqlClient } from "effect/unstable/sql"
 
 export const dev = <TSchema extends Record<string, unknown>, TRelationConfigs extends AnyRelations>({
   relations,
@@ -19,7 +20,7 @@ export const dev = <TSchema extends Record<string, unknown>, TRelationConfigs ex
     yield* Console.log("[migrator] wait for db")
     yield* sql`select 1`.pipe(
       Effect.tapError((error) => Console.error("[migrator] db check failed", error)),
-      Effect.retry(Schedule.spaced("500 millis").pipe(Schedule.intersect(Schedule.recurs(60)))),
+      Effect.retry(Schedule.spaced("500 millis").pipe(Schedule.both(Schedule.recurs(60)))),
     )
     yield* Console.log("[migrator] db ready")
     yield* sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`
@@ -56,7 +57,7 @@ export const dev = <TSchema extends Record<string, unknown>, TRelationConfigs ex
       PgClient.layerConfig({
         url: Config.redacted("DATABASE_URL"),
       }),
-      NodeContext.layer,
+      NodeServices.layer,
     ]),
     Effect.runFork,
   )

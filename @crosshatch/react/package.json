@@ -28,13 +28,9 @@
   "peerDependencies": {
     "@crosshatch/ui": "workspace:*",
     "@crosshatch/util": "workspace:*",
-    "@effect-atom/atom": "catalog:",
-    "@effect-atom/atom-react": "catalog:",
-    "@effect/platform": "catalog:",
-    "@effect/rpc": "catalog:",
+    "@effect/atom-react": "catalog:",
     "crosshatch": "workspace:*",
     "effect": "catalog:",
-    "lucide-react": "catalog:",
     "react": "catalog:"
   }
 }

@@ -28,11 +28,11 @@ export const layer = Effect.gen(function* () {
   Object.assign(iframe.style, { cssText })
   document.body.appendChild(iframe)
   yield* Fiber.join(fiber)
-  const context = yield* Effect.fromNullable(iframe.contentWindow)
+  const context = yield* Effect.fromNullishOr(iframe.contentWindow)
   const { port1, port2 } = new MessageChannel()
-  context.postMessage(FacadeIntroduction.make(), "*", [port2])
-  return BrowserWorker.layerPlatform(() => port1)
-}).pipe(Layer.unwrapScoped)
+  context.postMessage(FacadeIntroduction.make({}), "*", [port2])
+  return BrowserWorker.layer(() => port1)
+}).pipe(Layer.unwrap)
 
 const cssText = Object.entries({
   border: 0,

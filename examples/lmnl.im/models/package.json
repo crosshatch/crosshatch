@@ -10,7 +10,6 @@
   },
   "peerDependencies": {
     "@crosshatch/util": "workspace:*",
-    "@effect/platform": "catalog:",
     "crosshatch": "workspace:*",
     "effect": "catalog:"
   }
