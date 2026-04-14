@@ -18,7 +18,7 @@ export class PgliteClient extends Context.Service<PgliteClient>()("PgliteClient"
     return client
   }),
 }) {
-  static readonly layer = Layer.effect(PgliteClient, PgliteClient.make)
+  static readonly layer = Layer.effect(this, this.make)
 }
 
 export class Drizzle extends Context.Service<Drizzle>()("Drizzle", {
@@ -31,7 +31,7 @@ export class Drizzle extends Context.Service<Drizzle>()("Drizzle", {
     })
   }),
 }) {
-  static readonly layer = Layer.effect(Drizzle, Drizzle.make)
+  static readonly layer = Layer.effect(this, this.make)
 }
 
 type Preparable = AnyPgAsyncRelationalQuery | AnyPgAsyncSelect

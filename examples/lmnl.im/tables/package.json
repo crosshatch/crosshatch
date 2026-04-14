@@ -16,7 +16,6 @@
     "studio": "drizzle-kit studio"
   },
   "devDependencies": {
-    "@dotenvx/dotenvx": "catalog:",
     "@effect/sql-pg": "catalog:",
     "drizzle-kit": "catalog:"
   },
