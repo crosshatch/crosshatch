@@ -7,13 +7,12 @@
     "watch": "tsc -b -w",
     "dev": "turbo run //#watch //#test dev",
     "test": "vitest run",
-    "clean": "repo-util clean --ignore repos",
+    "clean": "./repos/konfik/clean.ts --ignore repos",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.8",
-    "@crosshatch/repo-util": "catalog:",
     "@effect/language-service": "catalog:",
     "@effect/platform-node": "catalog:",
     "@effect/vitest": "catalog:",

@@ -10,10 +10,10 @@ catalog:
   "@cloudflare/vite-plugin": ^1.32.2
   "@cloudflare/vitest-pool-workers": ^0.14.6
   "@cloudflare/workers-types": ^4.20260414.1
-  "@crosshatch/repo-util": ^0.2.1
   "@effect/ai-openai": 4.0.0-beta.48
   "@effect/atom-react": 4.0.0-beta.48
   "@effect/language-service": 0.85.1
+  "@effect/openapi-generator": 4.0.0-beta.48
   "@effect/platform-browser": 4.0.0-beta.48
   "@effect/platform-node": 4.0.0-beta.48
   "@effect/sql-d1": 4.0.0-beta.48
