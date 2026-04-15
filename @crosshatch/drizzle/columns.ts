@@ -48,8 +48,11 @@ type Superset<U extends { _tag: string }> = {
 export const columnsFactory = <Common extends Record<string, AnyPgColumnBuilder>>(common: Common) => ({
   taggedUnion:
     <A extends { readonly _tag: string }>() =>
-    <C extends ColumnsConfig<Superset<A>, Extract<keyof Common, string> | "_tag">>(
-      tagEnum: PgEnum<Array.NonEmptyArray<A["_tag"]>>,
+    <
+      E extends Array.NonEmptyArray<A["_tag"]>,
+      C extends ColumnsConfig<Superset<A>, Extract<keyof Common, string> | "_tag">,
+    >(
+      tagEnum: PgEnum<E>,
       columns: C,
     ) => ({
       _tag: tagEnum("_tag").notNull(),
