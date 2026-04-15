@@ -253,6 +253,12 @@ overrides:
   '@types/react-dom': ^19.2.3
   react-dom: ^19.2.4
   react: ^19.2.4
+  zod: 3.25.76
+
+patchedDependencies:
+  drizzle-orm@1.0.0-beta.21:
+    hash: beee2318933b89b5ffb80cd6ddac5e460e5bb6b2eaa9efbb8be216547fc3ed63
+    path: patches/drizzle-orm@1.0.0-beta.21.patch
 
 importers:
 
@@ -332,7 +338,7 @@ importers:
         version: 1.0.0-beta.21
       drizzle-orm:
         specifier: 'catalog:'
-        version: 1.0.0-beta.21(@cloudflare/workers-types@4.20260414.1)(@effect/sql-pg@4.0.0-beta.48(effect@4.0.0-beta.48))(@electric-sql/pglite@0.3.15)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(mssql@11.0.1(@azure/core-client@1.10.1))(pg@8.20.0)(zod@3.25.76)
+        version: 1.0.0-beta.21(patch_hash=beee2318933b89b5ffb80cd6ddac5e460e5bb6b2eaa9efbb8be216547fc3ed63)(@cloudflare/workers-types@4.20260414.1)(@effect/sql-pg@4.0.0-beta.48(effect@4.0.0-beta.48))(@electric-sql/pglite@0.3.15)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(mssql@11.0.1(@azure/core-client@1.10.1))(pg@8.20.0)(zod@3.25.76)
       effect:
         specifier: 'catalog:'
         version: 4.0.0-beta.48
@@ -672,7 +678,7 @@ importers:
         version: 1.0.0-beta.21
       drizzle-orm:
         specifier: 'catalog:'
-        version: 1.0.0-beta.21(@cloudflare/workers-types@4.20260414.1)(@effect/sql-pg@4.0.0-beta.48(effect@4.0.0-beta.48))(@electric-sql/pglite@0.3.15)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(mssql@11.0.1(@azure/core-client@1.10.1))(pg@8.20.0)(zod@3.25.76)
+        version: 1.0.0-beta.21(patch_hash=beee2318933b89b5ffb80cd6ddac5e460e5bb6b2eaa9efbb8be216547fc3ed63)(@cloudflare/workers-types@4.20260414.1)(@effect/sql-pg@4.0.0-beta.48(effect@4.0.0-beta.48))(@electric-sql/pglite@0.3.15)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(mssql@11.0.1(@azure/core-client@1.10.1))(pg@8.20.0)(zod@3.25.76)
       effect:
         specifier: 'catalog:'
         version: 4.0.0-beta.48
@@ -729,7 +735,7 @@ importers:
         version: link:../../../crosshatch
       drizzle-orm:
         specifier: 'catalog:'
-        version: 1.0.0-beta.21(@cloudflare/workers-types@4.20260414.1)(@effect/sql-pg@4.0.0-beta.48(effect@4.0.0-beta.48))(@electric-sql/pglite@0.3.15)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(mssql@11.0.1(@azure/core-client@1.10.1))(pg@8.20.0)(zod@3.25.76)
+        version: 1.0.0-beta.21(patch_hash=beee2318933b89b5ffb80cd6ddac5e460e5bb6b2eaa9efbb8be216547fc3ed63)(@cloudflare/workers-types@4.20260414.1)(@effect/sql-pg@4.0.0-beta.48(effect@4.0.0-beta.48))(@electric-sql/pglite@0.3.15)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(mssql@11.0.1(@azure/core-client@1.10.1))(pg@8.20.0)(zod@3.25.76)
       effect:
         specifier: 'catalog:'
         version: 4.0.0-beta.48
@@ -3692,7 +3698,7 @@ packages:
     resolution: {integrity: sha512-Ofer5QUnuUdTFsBRwARMoWKOH1ND5ehwYhJ3OJ/BQO+StkwQjHw0XyVh4vDttzHB7QOFhPHa/o413PJ82gU/Tg==}
     peerDependencies:
       typescript: '>=5.0.4'
-      zod: ^3.22.0 || ^4.0.0
+      zod: 3.25.76
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -4349,7 +4355,7 @@ packages:
       sqlite3: '>=5'
       typebox: '>=1.0.0'
       valibot: '>=1.0.0-beta.7'
-      zod: ^3.25.0 || ^4.0.0
+      zod: 3.25.76
     peerDependenciesMeta:
       '@aws-sdk/client-rds-data':
         optional: true
@@ -10574,7 +10580,7 @@ snapshots:
       get-tsconfig: 4.13.6
       jiti: 2.6.1
 
-  drizzle-orm@1.0.0-beta.21(@cloudflare/workers-types@4.20260414.1)(@effect/sql-pg@4.0.0-beta.48(effect@4.0.0-beta.48))(@electric-sql/pglite@0.3.15)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(mssql@11.0.1(@azure/core-client@1.10.1))(pg@8.20.0)(zod@3.25.76):
+  drizzle-orm@1.0.0-beta.21(patch_hash=beee2318933b89b5ffb80cd6ddac5e460e5bb6b2eaa9efbb8be216547fc3ed63)(@cloudflare/workers-types@4.20260414.1)(@effect/sql-pg@4.0.0-beta.48(effect@4.0.0-beta.48))(@electric-sql/pglite@0.3.15)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(mssql@11.0.1(@azure/core-client@1.10.1))(pg@8.20.0)(zod@3.25.76):
     dependencies:
       '@types/mssql': 9.1.9(@azure/core-client@1.10.1)
       mssql: 11.0.1(@azure/core-client@1.10.1)
