@@ -20,7 +20,7 @@ export const deriveCommon = (mnemonic: Redacted.Redacted<string>): Array<typeof 
   return [
     {
       address,
-      chainId: "8453",
+      chainId: 8453,
       namespace: "eip155",
     },
   ]

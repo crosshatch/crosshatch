@@ -17,7 +17,7 @@ export const nonNullable = <A, E, R>(effect: Effect.Effect<A, E, R>) => Effect.f
 
 export const nullable = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
   Effect.catchTags(effect, {
-    NoSuchElementException: () => Effect.succeed(undefined),
+    NoSuchElementError: () => Effect.succeed(undefined),
   })
 
 export const nullableError =

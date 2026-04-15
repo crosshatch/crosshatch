@@ -8,7 +8,7 @@ import { Scheme } from "./Scheme.ts"
 export const Requirements = S.Struct({
   amount: S.String,
   asset: S.String,
-  extra: UnknownRecord,
+  extra: UnknownRecord.pipe(S.optional),
   maxTimeoutSeconds: S.Number,
   network: Network,
   payTo: Address,

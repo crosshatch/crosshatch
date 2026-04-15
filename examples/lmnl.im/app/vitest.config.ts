@@ -1,5 +1,4 @@
 import Path from "node:path"
-
 import tsconfigPaths from "vite-tsconfig-paths"
 import { defaultExclude, type ViteUserConfig } from "vitest/config"
 
