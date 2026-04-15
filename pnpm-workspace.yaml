@@ -92,6 +92,7 @@ catalog:
   shiki: ^3.22.0
   sonner: ^2.0.7
   streamdown: ^2.1.0
+  swagger2openapi: ^7.0.8
   tailwind-merge: ^3.4.0
   tailwindcss: ^4.1.18
   ts-patch: ^3.3.0
@@ -106,6 +107,7 @@ catalog:
   vitest: 4.0.18
   vocs: ^1.4.1
   wrangler: 4.82.2
+  yaml: ^2.8.3
 
 overrides:
   "@effect/sql-pg": 4.0.0-beta.48
