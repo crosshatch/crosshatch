@@ -1,7 +1,7 @@
-import { withLogging } from "@crosshatch/util/LoggerLive"
+import { annotateLogsLayer } from "@crosshatch/util/annotateLogsLayer"
 import { OpenAiClient, OpenAiEmbeddingModel } from "@effect/ai-openai"
 import { HttpClient } from "crosshatch/X402"
-import { Effect, Layer, Redacted, Config } from "effect"
+import { Effect, Layer, Redacted, Config, References } from "effect"
 import { Atom } from "effect/unstable/reactivity"
 
 import { Drizzle, PgliteClient } from "./Drizzle"
@@ -28,9 +28,8 @@ export const runtime = Layer.mergeAll(
       ),
   ),
   Layer.provideMerge(HttpClient),
-  Effect.succeed,
-  Effect.annotateLogs("context", "lmnl.im"),
-  Layer.unwrap,
-  withLogging,
+  Layer.tapError(Effect.logError),
+  annotateLogsLayer({ context: "lmnl.im" }),
+  Layer.provideMerge(Layer.succeed(References.MinimumLogLevel, "All")),
   Atom.runtime,
 )
