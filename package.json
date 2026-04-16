@@ -5,9 +5,9 @@
     "prepare": "ts-patch install -s",
     "build": "tsc -b",
     "watch": "tsc -b -w",
+    "clean": "node ./repos/konfik/main.ts clean --ignore '**/repos'",
     "dev": "turbo run //#watch //#test dev",
     "test": "vitest run",
-    "clean": "./repos/konfik/clean.ts --ignore repos",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check"
   },
@@ -23,6 +23,7 @@
     "@vitest/coverage-v8": "catalog:",
     "@vitest/expect": "catalog:",
     "@vitest/web-worker": "catalog:",
+    "effect": "catalog:",
     "fake-indexeddb": "catalog:",
     "happy-dom": "catalog:",
     "oxlint": "catalog:",
