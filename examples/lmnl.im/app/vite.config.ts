@@ -4,7 +4,6 @@ import { tanstackRouter } from "@tanstack/router-plugin/vite"
 import react from "@vitejs/plugin-react"
 import { fileURLToPath, URL } from "node:url"
 import { defineConfig } from "vite"
-import tsconfigPaths from "vite-tsconfig-paths"
 
 import migrations from "./plugin.ts"
 
@@ -31,17 +30,11 @@ export default defineConfig({
       routesDirectory: "routes",
       target: "react",
     }),
-    tsconfigPaths({
-      projects: ["tsconfig.json"],
-    }),
-    react({
-      babel: {
-        plugins: ["babel-plugin-react-compiler"],
-      },
-    }),
+    react(),
     tailwind(),
   ],
   resolve: {
+    tsconfigPaths: true,
     alias: {
       "@/migrations": "virtual:chat-migrations",
       "@": fileURLToPath(new URL(".", import.meta.url)),

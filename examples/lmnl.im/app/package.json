@@ -43,7 +43,6 @@
     "react-dom": "catalog:",
     "streamdown": "catalog:",
     "vite": "catalog:",
-    "vite-tsconfig-paths": "catalog:",
     "vitest": "catalog:"
   }
 }

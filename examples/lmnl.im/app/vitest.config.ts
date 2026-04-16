@@ -1,14 +1,9 @@
 import Path from "node:path"
-import tsconfigPaths from "vite-tsconfig-paths"
 import { defaultExclude, type ViteUserConfig } from "vitest/config"
 
 export default {
   esbuild: { target: "es2020" },
-  plugins: [
-    tsconfigPaths({
-      projects: ["./tsconfig.json"],
-    }),
-  ],
+  resolve: { tsconfigPaths: true },
   test: {
     environment: "happy-dom",
     exclude: defaultExclude,

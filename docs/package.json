@@ -9,18 +9,15 @@
     "preview": "vocs preview"
   },
   "dependencies": {
-    "react": "catalog:",
-    "react-dom": "catalog:",
-    "react-medium-image-zoom": "^5.4.1",
-    "vocs": "catalog:"
-  },
-  "devDependencies": {
     "@types/react": "catalog:",
     "crosshatch": "workspace:*",
     "effect": "catalog:",
-    "rehype": "^13.0.2",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "react-medium-image-zoom": "catalog:",
+    "rehype": "catalog:",
     "rehype-mermaid": "latest",
     "typescript": "catalog:",
-    "unified": "^11.0.5"
+    "vocs": "catalog:"
   }
 }
