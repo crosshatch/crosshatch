@@ -25,19 +25,24 @@ export const dev = <TSchema extends Record<string, unknown>, TRelationConfigs ex
     yield* Console.log("[migrator] db ready")
     yield* sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`
     const _ = yield* make({ relations, schema })
+    const context = yield* Effect.context()
+    const runPromise = Effect.runPromiseWith(context)
     const pushStart = Date.now()
     yield* Console.log("[migrator] pushSchema start")
     const pushResult = yield* Effect.tryPromise(() =>
       pushSchema(schema, {
         execute: (query: SQLWrapper | string) => {
           const queryStart = Date.now()
-          return _.execute(query).pipe(
-            Effect.tap(() => Console.log(`[migrator] query ok (${Date.now() - queryStart}ms): ${String(query)}`)),
-            Effect.tapError((error) =>
-              Console.error(`[migrator] query error (${Date.now() - queryStart}ms): ${String(query)}`, error),
-            ),
-            Effect.map((rows) => ({ rows })),
-            Effect.runPromise,
+          return runPromise(
+            _.execute(query)
+              .asEffect()
+              .pipe(
+                Effect.tap(() => Console.log(`[migrator] query ok (${Date.now() - queryStart}ms): ${String(query)}`)),
+                Effect.tapError((error) =>
+                  Console.error(`[migrator] query error (${Date.now() - queryStart}ms): ${String(query)}`, error),
+                ),
+                Effect.map((rows) => ({ rows })),
+              ),
           )
         },
       } as never),
