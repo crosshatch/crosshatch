@@ -1,4 +1,4 @@
-import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "effect/unstable/httpapi"
+import type { HttpApi, HttpApiEndpoint, HttpApiGroup } from "effect/unstable/httpapi"
 
 type GroupsOf<Api extends HttpApi.Any> = Api extends HttpApi.HttpApi<any, infer Groups> ? Groups : never
 
