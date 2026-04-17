@@ -16,7 +16,7 @@
 #     runs-on: ubuntu-latest
 #     environment: lmnl.im
 #     steps:
-#       - uses: actions/checkout@v4
+#       - uses: actions/checkout@v6
 #       - uses: ./repos/konfik/.github/actions/configure_environment
 #       - run: pnpm build
 #       - run: DEV=false pnpm build

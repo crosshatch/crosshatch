@@ -5,9 +5,9 @@ import { Payload } from "../X402/Payload.ts"
 import { Required } from "../X402/Required.ts"
 
 export const Propose = Method.define({
-  payload: {
+  payload: S.Struct({
     required: Required,
-  },
+  }),
   success: S.Struct({
     payload: Payload,
   }),
