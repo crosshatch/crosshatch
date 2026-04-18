@@ -5,7 +5,7 @@
     "prepare": "ts-patch install -s",
     "build": "tsc -b",
     "watch": "tsc -b -w",
-    "clean": "node ./repos/konfik/main.ts clean --ignore '**/repos'",
+    "clean": "node ./konfik/main.ts clean --ignore '**/repos'",
     "dev": "turbo run //#watch //#test dev",
     "test": "vitest run",
     "fmt": "oxfmt",

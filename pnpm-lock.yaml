@@ -264,13 +264,13 @@ overrides:
 patchedDependencies:
   drizzle-orm@1.0.0-beta.21:
     hash: 4d9b0045ba24198afa5e40a31883bae450cf94b2feb9cb89f269a4837a052e0a
-    path: repos/konfik/patches/drizzle-orm@1.0.0-beta.21.patch
+    path: konfik/patches/drizzle-orm@1.0.0-beta.21.patch
   miniflare@4.20260415.0:
     hash: 75e8c6e108a9a82fb6848f99ed3b62427c996631a855cfd9697edf16d2447c6b
-    path: repos/konfik/patches/miniflare@4.20260415.0.patch
+    path: konfik/patches/miniflare@4.20260415.0.patch
   vocs@1.4.1:
     hash: 9d5f90effe2c11945d1c58d556442ae982714328ef92da34fbcf9c3584c56ece
-    path: repos/konfik/patches/vocs@1.4.1.patch
+    path: konfik/patches/vocs@1.4.1.patch
 
 importers:
 

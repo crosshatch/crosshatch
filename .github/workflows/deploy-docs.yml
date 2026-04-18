@@ -23,7 +23,7 @@
 #        github.event.pull_request.author_association != 'NONE')
 #     steps:
 #       - uses: actions/checkout@v6
-#       - uses: ./repos/konfik/.github/actions/configure_environment
+#       - uses: ./konfik/.github/actions/configure_environment
 #       - run: pnpm build
 #       - run: pnpm build
 #         working-directory: docs
