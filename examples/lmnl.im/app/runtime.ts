@@ -1,7 +1,7 @@
-import { annotateLogsLayer } from "@crosshatch/util/annotateLogsLayer"
+import { boundLayer } from "@crosshatch/util/boundLayer"
 import { OpenAiClient, OpenAiEmbeddingModel } from "@effect/ai-openai"
 import { HttpClient } from "crosshatch/X402"
-import { Effect, Layer, Redacted, Config, References } from "effect"
+import { Effect, Layer, Redacted, Config } from "effect"
 import { Atom } from "effect/unstable/reactivity"
 
 import { Drizzle, PgliteClient } from "./Drizzle"
@@ -15,21 +15,17 @@ export const runtime = Layer.mergeAll(
       .pipe(Config.withDefault(true))
       .asEffect()
       .pipe(
-        Effect.map((dev) => `https://lmnl.im${dev ? ".localhost" : ""}`),
-        Effect.map((lmnlimUrl) =>
+        Effect.map((dev) =>
           Layer.mergeAll(
             OpenAiClient.layer({
               apiKey: Redacted.make(""),
-              apiUrl: `${lmnlimUrl}/openai`,
-            }),
+              apiUrl: `https://lmnl.im${dev ? ".localhost" : ""}/openai`,
+            }).pipe(Layer.provideMerge(HttpClient)),
           ),
         ),
         Layer.unwrap,
       ),
   ),
-  Layer.provideMerge(HttpClient),
-  Layer.tapError(Effect.logError),
-  annotateLogsLayer({ context: "lmnl.im" }),
-  Layer.provideMerge(Layer.succeed(References.MinimumLogLevel, "All")),
+  boundLayer("lmnl.im"),
   Atom.runtime,
 )
