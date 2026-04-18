@@ -30,20 +30,18 @@ export const openSessionWidgetAtom = atomRuntime.fn<void>()(
     const isCrosshatch = yield* CrosshatchEnv.isCrosshatch(origin)
     const state = yield* get.result(stateAtom)
     const common = { referrer: location.href }
-    const stream = Match.value(state).pipe(
-      Match.tagsExhaustive({
-        Challenged: ({ challengeId }) =>
-          isCrosshatch
-            ? IdWidget.stream(common)
-            : LinkWidget.stream({
-                amount: 10,
-                challengeId,
-                window: "Week",
-                ...common,
-              }),
-        Linked: () => EventsWidget.stream(common),
-      }),
-    )
+    const stream = Match.valueTags(state, {
+      Challenged: ({ challengeId }) =>
+        isCrosshatch
+          ? IdWidget.stream(common)
+          : LinkWidget.stream({
+              amount: 10,
+              challengeId,
+              window: "Week",
+              ...common,
+            }),
+      Linked: () => EventsWidget.stream(common),
+    })
     yield* stream.pipe(Stream.takeUntil(S.is(Finished)), Stream.runDrain)
   }),
 )

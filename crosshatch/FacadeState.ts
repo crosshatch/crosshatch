@@ -1,4 +1,4 @@
-import { Option, Match, Effect, Data, Stream, flow } from "effect"
+import { Option, Match, Effect, Data, Stream } from "effect"
 import { Accumulator } from "liminal"
 
 import { FacadeClient } from "./FacadeClient.ts"
@@ -28,7 +28,7 @@ const Linked = arm("Linked", () => () => Effect.succeed({ _tag: "Linked" }))
 
 export const layer = FacadeState.layer({
   source: FacadeClient.events,
-  reduce: flow(Match.value, Match.tagsExhaustive({ Challenged, Linked })),
+  reduce: Match.valueTags({ Challenged, Linked }),
   initial: (item) =>
     Effect.succeed(item._tag === "Challenged" || item._tag === "Linked" ? Option.some(item) : Option.none()),
 })
