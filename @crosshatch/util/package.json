@@ -25,6 +25,7 @@
     "@effect/atom-react": "catalog:",
     "@effect/platform-browser": "catalog:",
     "date-fns": "catalog:",
-    "effect": "catalog:"
+    "effect": "catalog:",
+    "liminal": "workspace:*"
   }
 }

@@ -156,6 +156,9 @@ catalogs:
     dedent:
       specifier: ^1.7.1
       version: 1.7.2
+    dprint:
+      specifier: ^0.52.0
+      version: 0.52.0
     drizzle-kit:
       specifier: 1.0.0-beta.21
       version: 1.0.0-beta.21
@@ -516,6 +519,9 @@ importers:
       effect:
         specifier: 'catalog:'
         version: 4.0.0-beta.50
+      liminal:
+        specifier: workspace:*
+        version: link:../../liminal/liminal
 
   '@crosshatch/widget':
     dependencies:
@@ -693,6 +699,9 @@ importers:
       effect:
         specifier: 'catalog:'
         version: 4.0.0-beta.50
+      liminal:
+        specifier: workspace:*
+        version: link:../../../liminal/liminal
       lmnl-im-api:
         specifier: workspace:*
         version: link:../api
@@ -868,6 +877,30 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 4.1.4(@types/node@25.6.0)(@vitest/coverage-v8@4.1.4)(happy-dom@20.9.0)(vite@8.0.8(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3))
+
+  liminal/konfik:
+    devDependencies:
+      '@effect/language-service':
+        specifier: 'catalog:'
+        version: 0.85.1
+      '@effect/platform-node':
+        specifier: 'catalog:'
+        version: 4.0.0-beta.50(effect@4.0.0-beta.50)(ioredis@5.10.1)
+      '@types/node':
+        specifier: 'catalog:'
+        version: 25.6.0
+      dprint:
+        specifier: 'catalog:'
+        version: 0.52.0
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.60.0
+      ts-patch:
+        specifier: 'catalog:'
+        version: 3.3.0
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.2
 
   liminal/liminal:
     dependencies:
@@ -1248,6 +1281,68 @@ packages:
 
   '@date-fns/tz@1.4.1':
     resolution: {integrity: sha512-P5LUNhtbj6YfI3iJjw5EL9eUAG6OitD0W3fWQcpQjDRc/QIsL0tRNuO1PcDvPccWL1fSTXXdE1ds+l95DV/OFA==}
+
+  '@dprint/darwin-arm64@0.52.0':
+    resolution: {integrity: sha512-HHpmHCeFw1V9qUU0pJrz7LihrMgQJ5DOejfI3GRCJOd2ue3Api3/ZrzNSIqUbnx/j0RT5c7zxZR5aTE0RHwRFQ==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@dprint/darwin-x64@0.52.0':
+    resolution: {integrity: sha512-ZuoYH/hyzFhwwFUmykkm1QvLk9u7zxpKL6M8r1fY+lINucujIoGZxW1PjRbbIXaST6nDLbQB21P7LyNncAByOg==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@dprint/linux-arm64-glibc@0.52.0':
+    resolution: {integrity: sha512-waghQcB32CLMuCxnVRQktc7U1S2qsL4spUmvCMyu4ufhZqXf4rQn07L1NcSmQOap40q9Db8ZBmLHfHm1Kab6uA==}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+
+  '@dprint/linux-arm64-musl@0.52.0':
+    resolution: {integrity: sha512-8ml2DmF8i7eEou1G5nqgMMhRir89Fsd9cMLZRPZN/FSw6Nc3vAhk2MqZIrYk2DGfoWts7jis6XvEu3/TwMP8fw==}
+    cpu: [arm64]
+    os: [linux]
+    libc: [musl]
+
+  '@dprint/linux-loong64-glibc@0.52.0':
+    resolution: {integrity: sha512-tKj7Bwtcf/zNa1onoshYfQ8CaYz0N6BRYKsovop1H1d2dsRBYAKkR/FvTaPRJp1+Sx7Lc0RjRllFezkhLMRxPw==}
+    cpu: [loong64]
+    os: [linux]
+    libc: [glibc]
+
+  '@dprint/linux-loong64-musl@0.52.0':
+    resolution: {integrity: sha512-8X+ICN/Pc4B+Zog2UXNDJph5uKLf0VVUItYEQbdbwqsWGzPa27Kqri5ainlFzaDs5TFkJHQKQlphg+TLyxBQ7A==}
+    cpu: [loong64]
+    os: [linux]
+    libc: [musl]
+
+  '@dprint/linux-riscv64-glibc@0.52.0':
+    resolution: {integrity: sha512-uQb2VqSnznfZHhrAKLxpjXMc7/c3AYepllVUhcGCdrTVp1fb7inHEilT2wSXUjOipBbfPG33cZWRzAgc5/Effg==}
+    cpu: [riscv64]
+    os: [linux]
+    libc: [glibc]
+
+  '@dprint/linux-x64-glibc@0.52.0':
+    resolution: {integrity: sha512-Yh3fZYUcHmII+swTUh0qgf0lEPrz4+7v3tq+vqXR8/xa3Sx8QH5MQJsJDw8Ll1mmKX5HrkBNxA5rC1lIDuFn9g==}
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
+
+  '@dprint/linux-x64-musl@0.52.0':
+    resolution: {integrity: sha512-zdcgL6+PRjyZ4HVll9DuIn2ZnnxKuU0cwXtpfUZNdy+xRh1+OedUY5aZQRDN4163vkLxV9znXQT/TS0+giph1g==}
+    cpu: [x64]
+    os: [linux]
+    libc: [musl]
+
+  '@dprint/win32-arm64@0.52.0':
+    resolution: {integrity: sha512-rQGhSbl2pcnU4Tl3xXJSPRi1smfIIf7XhVwzNOG7vcSExfcK8yYrrCS3z4VImYKqhI1kvv6gSfnIligtoyaX/g==}
+    cpu: [arm64]
+    os: [win32]
+
+  '@dprint/win32-x64@0.52.0':
+    resolution: {integrity: sha512-Bi4kW6z9eVtRdNSztSvjjYET4SQzX/OYqsexVyppxv24m5RNOG1h+c9F5MFJpYy9LqQBAKHOQfkzQwPrdgNOXQ==}
+    cpu: [x64]
+    os: [win32]
 
   '@drizzle-team/brocli@0.11.0':
     resolution: {integrity: sha512-hD3pekGiPg0WPCCGAZmusBBJsDqGUR66Y452YgQsZOnkdQ7ViEPKuyP4huUGEZQefp8g34RRodXYmJ2TbCH+tg==}
@@ -4671,6 +4766,10 @@ packages:
   dompurify@3.4.0:
     resolution: {integrity: sha512-nolgK9JcaUXMSmW+j1yaSvaEaoXYHwWyGJlkoCTghc97KgGDDSnpoU/PlEnw63Ah+TGKFOyY+X5LnxaWbCSfXg==}
 
+  dprint@0.52.0:
+    resolution: {integrity: sha512-qXf3B6/G4E6SJKngfo7a0z1ja21o/JJ55cF8xyhyIqvJGrpJ96vhXLr37RrbWBWIj8eV+hquBkCAV6jCwenQYA==}
+    hasBin: true
+
   drizzle-kit@1.0.0-beta.21:
     resolution: {integrity: sha512-qG1vkkXPhz9GJ6RZhM/DvzL5jeDNYn35cyGeFA0+8iZQ6GTP4FhbOltNDHh/8XNmcI89b40lXJuH1PdxaA7zdQ==}
     hasBin: true
@@ -7927,6 +8026,39 @@ snapshots:
 
   '@date-fns/tz@1.4.1': {}
 
+  '@dprint/darwin-arm64@0.52.0':
+    optional: true
+
+  '@dprint/darwin-x64@0.52.0':
+    optional: true
+
+  '@dprint/linux-arm64-glibc@0.52.0':
+    optional: true
+
+  '@dprint/linux-arm64-musl@0.52.0':
+    optional: true
+
+  '@dprint/linux-loong64-glibc@0.52.0':
+    optional: true
+
+  '@dprint/linux-loong64-musl@0.52.0':
+    optional: true
+
+  '@dprint/linux-riscv64-glibc@0.52.0':
+    optional: true
+
+  '@dprint/linux-x64-glibc@0.52.0':
+    optional: true
+
+  '@dprint/linux-x64-musl@0.52.0':
+    optional: true
+
+  '@dprint/win32-arm64@0.52.0':
+    optional: true
+
+  '@dprint/win32-x64@0.52.0':
+    optional: true
+
   '@drizzle-team/brocli@0.11.0': {}
 
   '@effect/ai-openai@4.0.0-beta.50(effect@4.0.0-beta.50)':
@@ -10996,6 +11128,20 @@ snapshots:
   dompurify@3.4.0:
     optionalDependencies:
       '@types/trusted-types': 2.0.7
+
+  dprint@0.52.0:
+    optionalDependencies:
+      '@dprint/darwin-arm64': 0.52.0
+      '@dprint/darwin-x64': 0.52.0
+      '@dprint/linux-arm64-glibc': 0.52.0
+      '@dprint/linux-arm64-musl': 0.52.0
+      '@dprint/linux-loong64-glibc': 0.52.0
+      '@dprint/linux-loong64-musl': 0.52.0
+      '@dprint/linux-riscv64-glibc': 0.52.0
+      '@dprint/linux-x64-glibc': 0.52.0
+      '@dprint/linux-x64-musl': 0.52.0
+      '@dprint/win32-arm64': 0.52.0
+      '@dprint/win32-x64': 0.52.0
 
   drizzle-kit@1.0.0-beta.21:
     dependencies:

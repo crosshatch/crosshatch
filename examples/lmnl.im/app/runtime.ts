@@ -1,8 +1,8 @@
-import { boundLayer } from "@crosshatch/util/boundLayer"
 import { OpenAiClient, OpenAiEmbeddingModel } from "@effect/ai-openai"
 import { HttpClient } from "crosshatch/X402"
 import { Effect, Layer, Redacted, Config } from "effect"
 import { Atom } from "effect/unstable/reactivity"
+import { boundLayer } from "liminal/_util/boundLayer"
 
 import { Drizzle, PgliteClient } from "./Drizzle"
 

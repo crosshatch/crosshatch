@@ -36,6 +36,7 @@
     "drizzle-kit": "catalog:",
     "drizzle-orm": "catalog:",
     "effect": "catalog:",
+    "liminal": "workspace:*",
     "lmnl-im-api": "workspace:*",
     "lucide-react": "catalog:",
     "next-themes": "catalog:",

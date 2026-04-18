@@ -13,6 +13,7 @@
     { "path": "../../../@crosshatch/react" },
     { "path": "../../../@crosshatch/ui" },
     { "path": "../../../@crosshatch/util" },
-    { "path": "../../../crosshatch" }
+    { "path": "../../../crosshatch" },
+    { "path": "../../../liminal/liminal" }
   ]
 }
