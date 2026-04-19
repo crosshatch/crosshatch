@@ -23,7 +23,9 @@ jobs:
        github.event.pull_request.author_association != 'NONE')
     steps:
       - uses: actions/checkout@v6
-      - run: "git -c url.https://github.com/.insteadOf=git@github.com: submodule update --init --depth 1 konfik liminal"
+      - run: |
+          git -c url.https://github.com/.insteadOf=git@github.com: submodule update --init --depth 1 konfik liminal
+          git -c url.https://github.com/.insteadOf=git@github.com: -C liminal submodule update --init --depth 1 konfik
       - uses: ./konfik/.github/actions/configure_environment
         with:
           playwright: true
