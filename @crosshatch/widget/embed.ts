@@ -4,14 +4,6 @@ import { Cause, Effect, Queue, Schema as S, Stream } from "effect"
 import type { WidgetConfig } from "./self.ts"
 
 const DEFAULT_SANDBOX = "allow-scripts allow-same-origin allow-popups allow-forms"
-const DEFAULT_ALLOW = [
-  "payment",
-  "clipboard-write",
-  "accelerometer",
-  "gyroscope",
-  "publickey-credentials-create *",
-  "publickey-credentials-get *",
-].join("; ")
 let currentZ = 100
 const cssText = Object.entries({
   position: "fixed",
@@ -22,7 +14,6 @@ const cssText = Object.entries({
   width: "100vw",
   height: "100vh",
   background: "transparent",
-  referrerPolicy: "no-referrer",
 })
   .map(([k, v]) => `${k}: ${v};`)
   .join(" ")
@@ -53,9 +44,18 @@ export const embed = <A, I>({
           document.body.removeChild(iframe)
         }),
       )
+      const { origin } = new URL(src)
+      const allow = [
+        "payment",
+        "clipboard-write",
+        "accelerometer",
+        "gyroscope",
+        `publickey-credentials-create ${origin}`,
+        `publickey-credentials-get ${origin}`,
+      ].join("; ")
       Object.assign(iframe, {
         sandbox: DEFAULT_SANDBOX,
-        allow: DEFAULT_ALLOW,
+        allow,
         src: src,
         referrerPolicy: "no-referrer",
         ...(className ? { className } : {}),

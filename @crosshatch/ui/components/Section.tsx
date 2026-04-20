@@ -5,5 +5,5 @@ export const Section = ({ className, ...rest }: React.ComponentProps<"div">) => 
 )
 
 export const SectionInner = ({ className, ...rest }: React.ComponentProps<"div">) => (
-  <div className={cn("relative mx-auto flex w-full max-w-5xl flex-col", className)} {...rest} />
+  <div className={cn("relative mx-auto flex w-full max-w-5xl flex-col h-full", className)} {...rest} />
 )
