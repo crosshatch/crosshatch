@@ -28,3 +28,24 @@
 [submodule "konfik"]
 	path = konfik
 	url = git@github.com:crosshatch/konfik.git
+[submodule "repos/accounts"]
+	path = repos/accounts
+	url = git@github.com:tempoxyz/accounts.git
+[submodule "repos/viem"]
+	path = repos/viem
+	url = git@github.com:wevm/viem.git
+[submodule "repos/abitype"]
+	path = repos/abitype
+	url = git@github.com:wevm/abitype.git
+[submodule "repos/mppx"]
+	path = repos/mppx
+	url = git@github.com:wevm/mppx.git
+[submodule "repos/workerd"]
+	path = repos/workerd
+	url = git@github.com:cloudflare/workerd.git
+[submodule "repos/capnweb"]
+	path = repos/capnweb
+	url = git@github.com:cloudflare/capnweb.git
+[submodule "repos/partykit"]
+	path = repos/partykit
+	url = git@github.com:cloudflare/partykit.git
