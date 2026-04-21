@@ -49,3 +49,6 @@
 [submodule "repos/partykit"]
 	path = repos/partykit
 	url = git@github.com:cloudflare/partykit.git
+[submodule "repos/ox"]
+	path = repos/ox
+	url = git@github.com:wevm/ox.git
