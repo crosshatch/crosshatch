@@ -52,3 +52,6 @@
 [submodule "repos/ox"]
 	path = repos/ox
 	url = git@github.com:wevm/ox.git
+[submodule "repos/CAIPs"]
+	path = repos/CAIPs
+	url = git@github.com:ChainAgnostic/CAIPs.git
