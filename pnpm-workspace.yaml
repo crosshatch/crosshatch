@@ -5,6 +5,7 @@ packages:
   - examples/*
   - examples/*/*
   - liminal/*
+  - liminal/examples/*
   - liminal/examples/*/*
 
 catalog:
