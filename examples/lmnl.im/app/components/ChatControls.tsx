@@ -6,7 +6,7 @@ import { Textarea } from "@crosshatch/ui/components/Textarea"
 import { e0, nonNullable } from "@crosshatch/util/unwrapping"
 import { OpenAiLanguageModel } from "@effect/ai-openai"
 import { useAtom, useAtomSet, useAtomValue } from "@effect/atom-react"
-import { isLinkedAtom, openSessionWidgetAtom } from "crosshatch"
+import { isLinkedAtom, openAtom } from "crosshatch"
 import { eq } from "drizzle-orm"
 import { Cause, Effect, Fiber } from "effect"
 import { AiError, EmbeddingModel, LanguageModel, Prompt } from "effect/unstable/ai"
@@ -77,7 +77,7 @@ const sendMessageAtom = runtime.fn<string | undefined>()(
     function* (chatId, get) {
       const isLinked = yield* get.result(isLinkedAtom)
       if (!isLinked) {
-        yield* get.setResult(openSessionWidgetAtom, void 0)
+        yield* get.setResult(openAtom, void 0)
       }
       let { text } = get(chatAtom(chatId))
       const items = yield* get.result(chatItemsAtom(chatId))

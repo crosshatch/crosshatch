@@ -4,7 +4,6 @@
     { "path": "./@crosshatch/ui" },
     { "path": "./@crosshatch/util" },
     { "path": "./@crosshatch/drizzle" },
-    { "path": "./@crosshatch/react" },
     { "path": "./@crosshatch/widget" },
     { "path": "./crosshatch" },
     { "path": "./docs" },

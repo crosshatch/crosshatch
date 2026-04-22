@@ -1,4 +1,4 @@
-import { LinkChallengeId } from "./LinkChallenge.ts"
+import { LinkChallengeId } from "../LinkChallenge.ts"
 
 export const Challenged = {
   challengeId: LinkChallengeId,

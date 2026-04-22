@@ -3,18 +3,16 @@ import { Layer, ManagedRuntime } from "effect"
 import { Client } from "liminal"
 import { boundLayer } from "liminal/_util/boundLayer"
 
-import * as CrosshatchEnv from "./CrosshatchEnv.ts"
-import { FacadeClient } from "./FacadeClient.ts"
-import * as Accumulator from "./FacadeState.ts"
-import * as FacadeWorker from "./FacadeWorker.ts"
+import * as Facade from "./Facade/Facade.ts"
+import { InternalEnv } from "./InternalEnv.ts"
 
-const CommonLive = Accumulator.layer.pipe(
+const CommonLive = Facade.FacadeState.layer.pipe(
   Layer.provideMerge(
     Client.layerWorker({
-      client: FacadeClient,
-    }).pipe(Layer.provide(FacadeWorker.layer)),
+      client: Facade.FacadeClient,
+    }).pipe(Layer.provide(Facade.FacadeWorker.layer)),
   ),
-  Layer.provideMerge(CrosshatchEnv.layer),
+  Layer.provideMerge(InternalEnv.layer),
   boundLayer("crosshatch"),
 )
 

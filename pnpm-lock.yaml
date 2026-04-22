@@ -364,27 +364,6 @@ importers:
         specifier: 'catalog:'
         version: 4.0.0-beta.50
 
-  '@crosshatch/react':
-    dependencies:
-      '@crosshatch/ui':
-        specifier: workspace:*
-        version: link:../ui
-      '@crosshatch/util':
-        specifier: workspace:*
-        version: link:../util
-      '@effect/atom-react':
-        specifier: 'catalog:'
-        version: 4.0.0-beta.50(effect@4.0.0-beta.50)(react@19.2.5)(scheduler@0.27.0)
-      crosshatch:
-        specifier: workspace:*
-        version: link:../../crosshatch
-      effect:
-        specifier: 'catalog:'
-        version: 4.0.0-beta.50
-      react:
-        specifier: ^19.2.4
-        version: 19.2.5
-
   '@crosshatch/ui':
     dependencies:
       '@crosshatch/util':
@@ -630,9 +609,6 @@ importers:
       '@crosshatch/drizzle':
         specifier: workspace:*
         version: link:../../../@crosshatch/drizzle
-      '@crosshatch/react':
-        specifier: workspace:*
-        version: link:../../../@crosshatch/react
       '@crosshatch/ui':
         specifier: workspace:*
         version: link:../../../@crosshatch/ui

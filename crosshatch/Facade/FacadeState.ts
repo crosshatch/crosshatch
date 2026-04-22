@@ -1,17 +1,18 @@
 import { Option, Match, Effect, Data, Stream } from "effect"
 import { Accumulator } from "liminal"
 
+import { LinkChallengeId } from "../LinkChallenge.ts"
 import { FacadeClient } from "./FacadeClient.ts"
-import { LinkChallengeId } from "./LinkChallenge.ts"
 
-type State = Data.TaggedEnum<{
-  Challenged: {
-    challengeId: typeof LinkChallengeId.Type
-  }
-  Linked: {}
-}>
-
-export class FacadeState extends Accumulator.Service<FacadeState, State>()("crosshatch/Accumulator") {}
+export class FacadeState extends Accumulator.Service<
+  FacadeState,
+  Data.TaggedEnum<{
+    Challenged: {
+      challengeId: typeof LinkChallengeId.Type
+    }
+    Linked: {}
+  }>
+>()("crosshatch/Accumulator") {}
 
 type Item = Stream.Success<typeof FacadeClient.events>
 

@@ -2,13 +2,12 @@ import { Finished } from "@crosshatch/widget/self"
 import { Effect, Stream, Match, Schema as S, Cause } from "effect"
 import { Atom } from "effect/unstable/reactivity"
 
-import * as CrosshatchEnv from "./CrosshatchEnv.ts"
-import { FacadeClient } from "./FacadeClient.ts"
-import { FacadeState } from "./FacadeState.ts"
+import * as Facade from "./Facade/Facade.ts"
+import { InternalEnv } from "./InternalEnv.ts"
 import { atomRuntime } from "./runtime.ts"
 import { EventsWidget, IdWidget, LinkWidget } from "./widgets.ts"
 
-export const stateAtom = atomRuntime.atom(FacadeState.stream)
+export const stateAtom = atomRuntime.atom(Facade.FacadeState.FacadeState.stream)
 
 export const isLinkedAtom = stateAtom.pipe(Atom.mapResult((v) => v._tag === "Linked"))
 
@@ -21,18 +20,17 @@ export const challengedAtom = atomRuntime.atom((ctx) =>
   ),
 )
 
-export const rescindAtom = atomRuntime.fn(FacadeClient.f("Rescind"))
+export const rescindAtom = atomRuntime.fn(Facade.FacadeClient.f("Rescind"))
 
-export const proposeAtom = atomRuntime.fn(FacadeClient.f("Propose"))
+export const proposeAtom = atomRuntime.fn(Facade.FacadeClient.f("Propose"))
 
-export const openSessionWidgetAtom = atomRuntime.fn<void>()(
+export const openAtom = atomRuntime.fn<void>()(
   Effect.fnUntraced(function* (_, get) {
-    const isCrosshatch = yield* CrosshatchEnv.isCrosshatch(origin)
     const state = yield* get.result(stateAtom)
     const common = { referrer: location.href }
     const stream = Match.valueTags(state, {
       Challenged: ({ challengeId }) =>
-        isCrosshatch
+        InternalEnv.isCrosshatch(origin)
           ? IdWidget.stream(common)
           : LinkWidget.stream({
               amount: 10,

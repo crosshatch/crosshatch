@@ -16,10 +16,12 @@ const ApiLive = Layer.mergeAll(
   HttpRouter.add("*", "/*", Assets.forward),
 )
 
-export default ApiLive.pipe(
-  Layer.provide(HttpServer.layerServices),
-  HttpRouter.toHttpEffect,
-  Effect.flatMap((v) => v),
-  Effect.catchCause(() => Effect.succeed(HttpServerResponse.empty({ status: 500 }))),
-  Worker.make(Layer.empty),
-)
+export default Worker.make({
+  handler: ApiLive.pipe(
+    Layer.provide(HttpServer.layerServices),
+    HttpRouter.toHttpEffect,
+    Effect.flatMap((v) => v),
+    Effect.catchCause(() => Effect.succeed(HttpServerResponse.empty({ status: 500 }))),
+  ),
+  prelude: Layer.empty,
+})

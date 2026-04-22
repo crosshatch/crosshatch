@@ -2,7 +2,7 @@
   "name": "crosshatch",
   "version": "0.1.0-beta.1",
   "private": true,
-  "description": "A non-custodial embedded stablecoin wallet that intercepts and pays x402s.",
+  "description": "",
   "homepage": "https://crosshatch.dev",
   "bugs": {
     "url": "https://github.com/crosshatch/crosshatch/issues"
@@ -28,6 +28,10 @@
     "./X402": {
       "types": "./X402/index.ts",
       "default": "./dist/X402/index.js"
+    },
+    "./http": {
+      "types": "./http/index.ts",
+      "default": "./dist/http/index.js"
     }
   },
   "peerDependencies": {

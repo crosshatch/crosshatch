@@ -2,7 +2,7 @@ import { Button } from "@crosshatch/ui/components/Button"
 import { Sidebar, SidebarInset, SidebarProvider, useSidebar } from "@crosshatch/ui/components/Sidebar"
 import { useAtomSet } from "@effect/atom-react"
 import { createRootRoute, Outlet } from "@tanstack/react-router"
-import { openSessionWidgetAtom } from "crosshatch"
+import { openAtom } from "crosshatch"
 import { PanelLeftIcon, WalletMinimal } from "lucide-react"
 import { ThemeProvider } from "next-themes"
 
@@ -40,7 +40,7 @@ function RouteComponent() {
 
 const Header = () => {
   const { toggleSidebar } = useSidebar()
-  const sessionButtonOnClick = useAtomSet(openSessionWidgetAtom)
+  const sessionButtonOnClick = useAtomSet(openAtom)
   return (
     <header className="sticky top-0 right-0 left-0 z-1 flex items-center justify-between border-b bg-secondary/75 p-2 py-2 backdrop-blur-sm">
       <Button

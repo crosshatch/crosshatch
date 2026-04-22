@@ -2,9 +2,8 @@ import type { ClientError, UnresolvedError } from "liminal"
 
 import { Schedule, Effect, Encoding, flow, Schema as S, Cause } from "effect"
 
-import { CrosshatchEnv } from "../CrosshatchEnv.ts"
-import { FacadeClient } from "../FacadeClient.ts"
-import { AllowanceDenial, DeclinedDecision } from "../methods/Propose.ts"
+import * as Facade from "../Facade/Facade.ts"
+import { InternalEnv } from "../InternalEnv.ts"
 import { managedRuntime } from "../runtime.ts"
 import {
   EscalationWidget,
@@ -13,12 +12,12 @@ import {
   ThawAppWidget,
   RaiseAllowanceWidget,
 } from "../widgets.ts"
-import { Payload } from "./Payload.ts"
-import { Required } from "./Required.ts"
-import { Version } from "./Version.ts"
+import { Payload } from "../X402/Payload.ts"
+import { Required } from "../X402/Required.ts"
+import { Version } from "../X402/Version.ts"
 
 export class CrosshatchFetchError extends S.TaggedErrorClass<CrosshatchFetchError>()("CrosshatchFetchError", {
-  decision: DeclinedDecision,
+  decision: Facade.DeclinedDecision,
 }) {}
 
 export const makeFetch =
@@ -41,9 +40,9 @@ export const makeFetch =
           )
       const make: Effect.Effect<
         { readonly payload: typeof Payload.Type },
-        S.SchemaError | Cause.NoSuchElementError | ClientError | UnresolvedError | AllowanceDenial,
-        FacadeClient | CrosshatchEnv
-      > = FacadeClient.f("Propose")({ required }).pipe(
+        S.SchemaError | Cause.NoSuchElementError | ClientError | UnresolvedError | Facade.AllowanceDenial,
+        Facade.FacadeClient | InternalEnv
+      > = Facade.FacadeClient.f("Propose")({ required }).pipe(
         (x) =>
           Effect.catchTags(x, {
             AppFrozen: ThawAppWidget.runDrain,

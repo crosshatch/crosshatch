@@ -2,18 +2,13 @@ import * as Host from "@crosshatch/widget/Host"
 import { BrowserWorker, BrowserStream } from "@effect/platform-browser"
 import { Effect, Fiber, Layer, Stream, Schema as S } from "effect"
 
-import * as CrosshatchEnv from "./CrosshatchEnv.ts"
-import { FacadeIntroduction, RequestFacadeIntroduction } from "./facade_handshake.ts"
+import { InternalEnv } from "../InternalEnv.ts"
+import { FacadeIntroduction, RequestFacadeIntroduction } from "./handshake.ts"
 
 export const layer = Effect.gen(function* () {
   yield* Host.hostListener.pipe(Effect.forkScoped)
   const fiber = yield* BrowserStream.fromEventListenerWindow("message").pipe(
-    Stream.takeUntilEffect(
-      Effect.fnUntraced(function* ({ data, origin }) {
-        const isCrosshatch = yield* CrosshatchEnv.isCrosshatch(origin)
-        return isCrosshatch && S.is(RequestFacadeIntroduction)(data)
-      }),
-    ),
+    Stream.takeUntil(({ data, origin }) => InternalEnv.isCrosshatch(origin) && S.is(RequestFacadeIntroduction)(data)),
     Stream.runDrain,
     Effect.forkScoped,
   )
@@ -22,7 +17,7 @@ export const layer = Effect.gen(function* () {
     id: "crosshatch-enclave",
     height: 1,
     sandbox: "allow-scripts allow-same-origin",
-    src: yield* CrosshatchEnv.href("enclave"),
+    src: yield* InternalEnv.href("enclave"),
     width: 1,
   })
   Object.assign(iframe.style, { cssText })

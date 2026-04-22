@@ -12,7 +12,6 @@
   "dependencies": {
     "@cloudflare/vite-plugin": "catalog:",
     "@crosshatch/drizzle": "workspace:*",
-    "@crosshatch/react": "workspace:*",
     "@crosshatch/ui": "workspace:*",
     "@crosshatch/util": "workspace:*",
     "@effect/ai-openai": "catalog:",

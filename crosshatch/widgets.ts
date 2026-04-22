@@ -1,18 +1,12 @@
-import { access } from "@crosshatch/util/unwrapping"
 import { embed } from "@crosshatch/widget/embed"
 import { Finished } from "@crosshatch/widget/self"
 import { Effect, flow, Schema as S, Stream } from "effect"
 import { UrlParams } from "effect/unstable/http"
 
-import * as CrosshatchEnv from "./CrosshatchEnv.ts"
+import { Allowance } from "./Allowance.ts"
+import * as Facade from "./Facade/Facade.ts"
+import { InternalEnv } from "./InternalEnv.ts"
 import { LinkChallengeId } from "./LinkChallenge.ts"
-import {
-  AccountFrozen,
-  AppFrozen,
-  Escalation,
-  InsufficientAllowanceRemaining,
-  InsufficientFunds,
-} from "./methods/Propose.ts"
 
 const widget = <A, I extends UrlParams.Input, A2 = never, I2 = never>({
   pathname,
@@ -23,25 +17,19 @@ const widget = <A, I extends UrlParams.Input, A2 = never, I2 = never>({
   readonly payload: S.Codec<A, I>
   readonly item?: S.Codec<A2, I2> | undefined
 }) => {
-  // TODO: refactor
   const stream = flow(
     S.encodeEffect(payload),
     Effect.flatMap(
       Effect.fn(function* (v) {
-        return yield* UrlParams.makeUrl(
-          yield* CrosshatchEnv.href(pathname),
-          UrlParams.fromInput(v),
-          undefined,
-        ).asEffect()
+        const base = yield* InternalEnv.href(pathname)
+        const { href: src } = yield* UrlParams.makeUrl(base, UrlParams.fromInput(v), undefined)
+        return embed({
+          item: S.Union([item, Finished]),
+          src,
+          className: "crosshatch-widget",
+        })
       }),
     ),
-    access("href"),
-    Effect.map((src) => ({
-      item: S.Union([item, Finished]),
-      src,
-      className: "crosshatch-widget",
-    })),
-    Effect.map(embed),
     Stream.unwrap,
   )
   return {
@@ -60,12 +48,6 @@ export const EventsWidget = widget({
   payload: Common,
 })
 
-export const AllowanceWindow = S.Literals(["Day", "Week", "Month", "Year", "Ever"])
-export const Allowance = S.Struct({
-  amount: S.Number,
-  window: AllowanceWindow,
-})
-
 export const LinkWidget = widget({
   pathname: "link",
   payload: S.Struct({
@@ -77,27 +59,27 @@ export const LinkWidget = widget({
 
 export const EscalationWidget = widget({
   pathname: "escalation",
-  payload: Escalation,
+  payload: Facade.Escalation,
 })
 
 export const ThawAccountWidget = widget({
   pathname: "thaw-account",
-  payload: AccountFrozen,
+  payload: Facade.AccountFrozen,
 })
 
 export const ThawAppWidget = widget({
   pathname: "thaw-app",
-  payload: AppFrozen,
+  payload: Facade.AppFrozen,
 })
 
 export const RaiseAllowanceWidget = widget({
   pathname: "raise-allowance",
-  payload: InsufficientAllowanceRemaining,
+  payload: Facade.InsufficientAllowanceRemaining,
 })
 
 export const OnrampExplainerWidget = widget({
-  pathname: "onramp-explainer",
-  payload: InsufficientFunds,
+  pathname: "onramp",
+  payload: Facade.InsufficientFunds,
 })
 
 export const IdWidget = widget({

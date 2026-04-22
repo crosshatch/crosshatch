@@ -1,5 +1,5 @@
 import { OpenAiClient, OpenAiEmbeddingModel } from "@effect/ai-openai"
-import { HttpClient } from "crosshatch/X402"
+import { HttpClient } from "crosshatch/http"
 import { Effect, Layer, Redacted, Config } from "effect"
 import { Atom } from "effect/unstable/reactivity"
 import { boundLayer } from "liminal/_util/boundLayer"
