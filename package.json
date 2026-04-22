@@ -6,6 +6,7 @@
     "build": "tsc -b",
     "watch": "tsc -b -w",
     "clean": "node ./konfik/main.ts clean --ignore '**/repos'",
+    "sync-repos": "node ./konfik/main.ts sync-repos",
     "dev": "turbo run //#watch //#test dev",
     "test": "vitest run",
     "fmt": "oxfmt",
