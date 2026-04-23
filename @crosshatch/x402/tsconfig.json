@@ -1,0 +1,10 @@
+{
+  "extends": "../../konfik/tsconfig.base",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "dist"
+  },
+  "include": ["."],
+  "exclude": ["dist"],
+  "references": [{ "path": "../caip" }, { "path": "../util" }]
+}

@@ -2,7 +2,9 @@
   "extends": "../../../konfik/tsconfig.base",
   "include": ["."],
   "references": [
+    { "path": "../../../@crosshatch/caip" },
     { "path": "../../../@crosshatch/util" },
+    { "path": "../../../@crosshatch/x402" },
     { "path": "../../../crosshatch" },
     { "path": "../../../liminal/liminal" },
     { "path": "../../../liminal/liminal-cloudflare" }

@@ -9,6 +9,10 @@ git clone --recurse-submodules=konfik git@github.com:crosshatch/crosshatch.git
 cd crosshatch
 git submodule update --init liminal
 git -C liminal submodule update --init konfik
+
+pn i
+pn build
+pn test
 ```
 
 Please read the [contributing guide](https://github.com/crosshatch/konfik/blob/main/CONTRIBUTING.md).

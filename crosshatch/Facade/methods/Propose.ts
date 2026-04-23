@@ -1,15 +1,13 @@
+import { Payload, Required } from "@crosshatch/x402"
 import { Schema as S } from "effect"
 import { Method } from "liminal"
 
-import { Payload } from "../../X402/Payload.ts"
-import { Required } from "../../X402/Required.ts"
-
 export const Propose = Method.make({
   payload: S.Struct({
-    required: Required,
+    required: Required.Required,
   }),
   success: S.Struct({
-    payload: Payload,
+    payload: Payload.Payload,
   }),
   failure: S.suspend(() => DeclinedDecision),
 })

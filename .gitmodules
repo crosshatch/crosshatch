@@ -55,3 +55,6 @@
 [submodule "repos/CAIPs"]
 	path = repos/CAIPs
 	url = git@github.com:ChainAgnostic/CAIPs.git
+[submodule "repos/namespaces"]
+	path = repos/namespaces
+	url = git@github.com:ChainAgnostic/namespaces.git

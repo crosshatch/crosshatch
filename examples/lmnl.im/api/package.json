@@ -6,7 +6,9 @@
   "dependencies": {
     "@cloudflare/vitest-pool-workers": "catalog:",
     "@cloudflare/workers-types": "catalog:",
+    "@crosshatch/caip": "workspace:*",
     "@crosshatch/util": "workspace:*",
+    "@crosshatch/x402": "workspace:*",
     "crosshatch": "workspace:*",
     "dedent": "catalog:",
     "effect": "catalog:",

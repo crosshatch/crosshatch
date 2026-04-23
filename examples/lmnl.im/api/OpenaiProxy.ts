@@ -1,4 +1,5 @@
-import { Requirements, Required, Address } from "crosshatch/X402"
+import { AccountAddress } from "@crosshatch/caip"
+import { Requirements, Required } from "@crosshatch/x402"
 import { Config, Effect, Encoding, flow, Option, Redacted, Schema as S, Stream } from "effect"
 import { Headers, HttpServerRequest, HttpServerResponse } from "effect/unstable/http"
 
@@ -17,7 +18,7 @@ export const OpenaiProxy = Effect.gen(function* () {
               amount: `${Math.floor(Math.random() * 100000)}`,
               recipient: yield* Config.string("PAY_TO_EVM")
                 .asEffect()
-                .pipe(Effect.flatMap(S.decodeUnknownEffect(Address.EvmAddress))),
+                .pipe(Effect.flatMap(S.decodeUnknownEffect(S.toType(AccountAddress)))),
             }),
           ],
           resource: {

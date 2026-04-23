@@ -1,20 +1,18 @@
 import type { ClientError, UnresolvedError } from "liminal"
 
+import { Payload, Required, Version } from "@crosshatch/x402"
 import { Schedule, Effect, Encoding, flow, Schema as S, Cause } from "effect"
 
-import * as Facade from "../Facade/Facade.ts"
-import { InternalEnv } from "../InternalEnv.ts"
-import { managedRuntime } from "../runtime.ts"
+import * as Facade from "./Facade/Facade.ts"
+import { InternalEnv } from "./InternalEnv.ts"
+import { managedRuntime } from "./runtime.ts"
 import {
   EscalationWidget,
   OnrampExplainerWidget,
   ThawAccountWidget,
   ThawAppWidget,
   RaiseAllowanceWidget,
-} from "../widgets.ts"
-import { Payload } from "../X402/Payload.ts"
-import { Required } from "../X402/Required.ts"
-import { Version } from "../X402/Version.ts"
+} from "./widgets.ts"
 
 export class CrosshatchFetchError extends S.TaggedErrorClass<CrosshatchFetchError>()("CrosshatchFetchError", {
   decision: Facade.DeclinedDecision,
@@ -33,13 +31,13 @@ export const makeFetch =
       const required = yield* header
         ? Encoding.decodeBase64String(header)
             .asEffect()
-            .pipe(Effect.flatMap(flow(JSON.parse, S.decodeUnknownEffect(Required))))
+            .pipe(Effect.flatMap(flow(JSON.parse, S.decodeUnknownEffect(Required.Required))))
         : Effect.tryPromise(() => response.json()).pipe(
-            Effect.flatMap(S.decodeUnknownEffect(Required)),
+            Effect.flatMap(S.decodeUnknownEffect(Required.Required)),
             Effect.filterOrFail(({ x402Version }) => x402Version === 1),
           )
       const make: Effect.Effect<
-        { readonly payload: typeof Payload.Type },
+        { readonly payload: typeof Payload.Payload.Type },
         S.SchemaError | Cause.NoSuchElementError | ClientError | UnresolvedError | Facade.AllowanceDenial,
         Facade.FacadeClient | InternalEnv
       > = Facade.FacadeClient.f("Propose")({ required }).pipe(
@@ -54,7 +52,7 @@ export const makeFetch =
         Effect.retry(Schedule.forever),
       )
       const { payload } = yield* make
-      const version = yield* S.decodeUnknownEffect(Version)(payload.x402Version)
+      const version = yield* S.decodeUnknownEffect(Version.Version)(payload.x402Version)
       const value = Encoding.encodeBase64(JSON.stringify(payload))
       switch (version) {
         case 1: {

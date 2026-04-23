@@ -21,6 +21,7 @@ export default Worker.make({
     Layer.provide(HttpServer.layerServices),
     HttpRouter.toHttpEffect,
     Effect.flatMap((v) => v),
+    Effect.provide(Assets.layer("ASSETS")),
     Effect.catchCause(() => Effect.succeed(HttpServerResponse.empty({ status: 500 }))),
   ),
   prelude: Layer.empty,

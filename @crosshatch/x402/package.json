@@ -1,8 +1,8 @@
 {
-  "name": "crosshatch",
+  "name": "@crosshatch/x402",
   "version": "0.1.0-beta.1",
   "private": true,
-  "description": "",
+  "description": "X402 utilities used by Crosshatch packages.",
   "homepage": "https://crosshatch.dev",
   "bugs": {
     "url": "https://github.com/crosshatch/crosshatch/issues"
@@ -11,7 +11,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/crosshatch/crosshatch.git",
-    "directory": "packages/crosshatch"
+    "directory": "@crosshatch/x402"
   },
   "type": "module",
   "sideEffects": false,
@@ -20,20 +20,14 @@
       "types": "./index.ts",
       "default": "./dist/index.js"
     },
-    "./*": {
-      "types": "./*.ts",
-      "default": "./dist/*.js"
-    },
-    "./package.json": "./package.json"
+    "./Facilitator": {
+      "types": "./Facilitator/Facilitator.ts.ts",
+      "default": "./dist/Facilitator/Facilitator.js"
+    }
   },
   "peerDependencies": {
     "@crosshatch/caip": "workspace:*",
     "@crosshatch/util": "workspace:*",
-    "@crosshatch/widget": "workspace:*",
-    "@crosshatch/x402": "workspace:*",
-    "@effect/platform-browser": "catalog:",
-    "effect": "catalog:",
-    "liminal": "workspace:*",
-    "ox": "catalog:"
+    "effect": "catalog:"
   }
 }

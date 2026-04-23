@@ -1,8 +1,7 @@
+import { ChainIdString, AccountAddress } from "@crosshatch/caip"
 import { UnknownRecord } from "@crosshatch/util/schema"
 import { Schema as S } from "effect"
 
-import { Address } from "./Address.ts"
-import { Network } from "./Network.ts"
 import { Scheme } from "./Scheme.ts"
 
 export const Requirements = S.Struct({
@@ -10,8 +9,8 @@ export const Requirements = S.Struct({
   asset: S.String,
   extra: UnknownRecord.pipe(S.optional),
   maxTimeoutSeconds: S.Number,
-  network: Network,
-  payTo: Address,
+  network: ChainIdString,
+  payTo: AccountAddress,
   scheme: Scheme,
 })
 
@@ -21,7 +20,7 @@ export const make = ({
   timeout,
   extra,
 }: {
-  recipient: typeof Address.Type
+  recipient: typeof AccountAddress.Type
   amount: string
   timeout?: number | undefined
   extra?: typeof UnknownRecord.Type
@@ -34,7 +33,7 @@ export const make = ({
     ...extra,
   },
   maxTimeoutSeconds: timeout ?? 60,
-  network: `eip155:8453`,
+  network: ChainIdString.make("eip155:8453"),
   payTo: recipient,
   scheme: "exact",
 })
