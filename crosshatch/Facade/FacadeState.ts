@@ -1,7 +1,7 @@
 import { Option, Match, Effect, Data, Stream } from "effect"
 import { Accumulator } from "liminal"
 
-import { LinkChallengeId } from "../LinkChallenge.ts"
+import { LinkChallengeId } from "../LinkChallengeId.ts"
 import { FacadeClient } from "./FacadeClient.ts"
 
 export class FacadeState extends Accumulator.Service<

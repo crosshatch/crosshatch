@@ -6,7 +6,7 @@ import { UrlParams } from "effect/unstable/http"
 import { Allowance } from "./Allowance.ts"
 import * as Facade from "./Facade/Facade.ts"
 import { InternalEnv } from "./InternalEnv.ts"
-import { LinkChallengeId } from "./LinkChallenge.ts"
+import { LinkChallengeId } from "./LinkChallengeId.ts"
 
 const widget = <A, I extends UrlParams.Input, A2 = never, I2 = never>({
   pathname,

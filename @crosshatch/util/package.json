@@ -1,7 +1,7 @@
 {
   "name": "@crosshatch/util",
   "version": "0.1.0-beta.1",
-  "private": true,
+  "private": false,
   "description": "Utilities shared between Crosshatch packages.",
   "homepage": "https://crosshatch.dev",
   "bugs": {
@@ -24,8 +24,6 @@
   "peerDependencies": {
     "@effect/atom-react": "catalog:",
     "@effect/platform-browser": "catalog:",
-    "date-fns": "catalog:",
-    "effect": "catalog:",
-    "liminal": "workspace:*"
+    "effect": "catalog:"
   }
 }

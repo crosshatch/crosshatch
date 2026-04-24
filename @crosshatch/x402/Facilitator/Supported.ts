@@ -1,4 +1,4 @@
-import { ChainId } from "@crosshatch/caip"
+import { ChainIdString } from "@crosshatch/caip"
 import { UnknownRecord } from "@crosshatch/util/schema"
 import { Schema as S } from "effect"
 import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
@@ -8,7 +8,7 @@ import { Version } from "../Version.ts"
 export const SupportedKind = S.Struct({
   x402Version: Version,
   scheme: S.String,
-  network: ChainId,
+  network: ChainIdString,
   extra: UnknownRecord.pipe(S.optional),
 })
 

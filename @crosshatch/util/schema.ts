@@ -1,8 +1,5 @@
 import { Schema as S, SchemaTransformation } from "effect"
 
-export const makeId = <B extends string>(identifier: B) =>
-  S.String.check(S.isUUID()).pipe(S.brand(identifier), S.annotate({ identifier }))
-
 export const UnknownRecord = S.Record(S.String, S.Unknown)
 
 export const ArrayBuffer_ = S.Uint8ArrayFromBase64.pipe(

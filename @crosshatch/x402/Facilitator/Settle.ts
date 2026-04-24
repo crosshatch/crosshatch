@@ -11,15 +11,20 @@ export const Settle = HttpApiEndpoint.post("settle", "/settle", {
     paymentPayload: Payload,
     paymentRequirements: Requirements,
   }),
-  success: S.Struct({
-    success: S.Boolean,
-    errorReason: S.String.pipe(S.optional),
-    errorMessage: S.String.pipe(S.optional),
-    payer: S.String.pipe(S.optional),
-    transaction: S.String,
-    network: ChainIdString,
-    extensions: UnknownRecord.pipe(S.optional),
-  }),
+  success: S.Union([
+    S.Struct({
+      success: S.tag(true),
+      payer: S.String.pipe(S.optional),
+      transaction: S.String,
+      network: ChainIdString,
+      extensions: UnknownRecord.pipe(S.optional),
+    }),
+    S.Struct({
+      success: S.tag(false),
+      errorReason: S.String.pipe(S.optional),
+      errorMessage: S.String.pipe(S.optional),
+    }),
+  ]),
 }).annotate(
   OpenApi.Description,
   `

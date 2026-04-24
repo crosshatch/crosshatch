@@ -12,7 +12,7 @@ export class InternalEnv extends Context.Service<
   }
 >()("InternalEnv", {
   make: Effect.gen(function* () {
-    const dev = yield* Config.boolean("__CROSSHATCH_DEV").pipe(Config.withDefault(true))
+    const dev = yield* Config.boolean("__CROSSHATCH_DEV").pipe(Config.withDefault(false))
     const domain = `${CROSSHATCH_DOMAIN}${dev ? ".localhost" : ""}`
     const url = `https://${domain}`
     return { dev, domain, url } as const

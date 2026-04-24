@@ -1,7 +1,7 @@
 {
   "name": "@crosshatch/x402",
   "version": "0.1.0-beta.1",
-  "private": true,
+  "private": false,
   "description": "X402 utilities used by Crosshatch packages.",
   "homepage": "https://crosshatch.dev",
   "bugs": {
@@ -21,7 +21,7 @@
       "default": "./dist/index.js"
     },
     "./Facilitator": {
-      "types": "./Facilitator/Facilitator.ts.ts",
+      "types": "./Facilitator/Facilitator.ts",
       "default": "./dist/Facilitator/Facilitator.js"
     }
   },

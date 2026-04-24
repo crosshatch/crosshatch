@@ -10,14 +10,18 @@ export const Verify = HttpApiEndpoint.post("verify", "/verify", {
     paymentPayload: Payload,
     paymentRequirements: Requirements,
   }),
-  // TODO: narrowing
-  success: S.Struct({
-    isValid: S.Boolean,
-    invalidReason: S.String.pipe(S.optional),
-    invalidMessage: S.String.pipe(S.optional),
-    payer: S.String.pipe(S.optional),
-    extensions: UnknownRecord.pipe(S.optional),
-  }),
+  success: S.Union([
+    S.Struct({
+      isValid: S.tag(true),
+      payer: S.String.pipe(S.optional),
+      extensions: UnknownRecord.pipe(S.optional),
+    }),
+    S.Struct({
+      isValid: S.tag(false),
+      invalidReason: S.String.pipe(S.optional),
+      invalidMessage: S.String.pipe(S.optional),
+    }),
+  ]),
 }).annotate(
   OpenApi.Description,
   `

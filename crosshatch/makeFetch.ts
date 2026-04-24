@@ -1,6 +1,6 @@
 import type { ClientError, UnresolvedError } from "liminal"
 
-import { Payload, Required, Version } from "@crosshatch/x402"
+import { Payload, Required } from "@crosshatch/x402"
 import { Schedule, Effect, Encoding, flow, Schema as S, Cause } from "effect"
 
 import * as Facade from "./Facade/Facade.ts"
@@ -31,9 +31,9 @@ export const makeFetch =
       const required = yield* header
         ? Encoding.decodeBase64String(header)
             .asEffect()
-            .pipe(Effect.flatMap(flow(JSON.parse, S.decodeUnknownEffect(Required.Required))))
+            .pipe(Effect.flatMap(flow(JSON.parse, S.decodeUnknownEffect(S.toType(Required.Required)))))
         : Effect.tryPromise(() => response.json()).pipe(
-            Effect.flatMap(S.decodeUnknownEffect(Required.Required)),
+            Effect.flatMap(S.decodeUnknownEffect(S.toType(Required.Required))),
             Effect.filterOrFail(({ x402Version }) => x402Version === 1),
           )
       const make: Effect.Effect<
@@ -52,9 +52,8 @@ export const makeFetch =
         Effect.retry(Schedule.forever),
       )
       const { payload } = yield* make
-      const version = yield* S.decodeUnknownEffect(Version.Version)(payload.x402Version)
       const value = Encoding.encodeBase64(JSON.stringify(payload))
-      switch (version) {
+      switch (payload.x402Version) {
         case 1: {
           headers.set("X-PAYMENT", value)
           break
