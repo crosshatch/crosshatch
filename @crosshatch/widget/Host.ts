@@ -11,8 +11,8 @@ export const HostIntroduction = S.TaggedStruct("HostIntroduction", {})
 
 export const hostListener = Effect.suspend(() =>
   BrowserStream.fromEventListenerWindow("message").pipe(
-    Stream.runForEach(
-      Effect.fnUntraced(function* ({ data, origin, source }) {
+    Stream.runForEach(({ data, origin, source }) =>
+      Effect.sync(() => {
         if (S.is(RequestHostIntroduction)(data)) {
           source?.postMessage(HostIntroduction.make({}), { targetOrigin: origin })
         }
