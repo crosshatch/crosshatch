@@ -2,17 +2,13 @@
   "include": [],
   "references": [
     { "path": "./@crosshatch/caip" },
-    { "path": "./@crosshatch/x402" },
+    { "path": "./@crosshatch/drizzle" },
     { "path": "./@crosshatch/ui" },
     { "path": "./@crosshatch/util" },
-    { "path": "./@crosshatch/drizzle" },
     { "path": "./@crosshatch/widget" },
+    { "path": "./@crosshatch/x402" },
     { "path": "./crosshatch" },
     { "path": "./docs" },
-    { "path": "./examples/lmnl.im/api" },
-    { "path": "./examples/lmnl.im/app" },
-    { "path": "./examples/lmnl.im/models" },
-    { "path": "./examples/lmnl.im/tables" },
     { "path": "./liminal" }
   ]
 }

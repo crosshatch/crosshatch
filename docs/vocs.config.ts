@@ -37,34 +37,6 @@ export default defineConfig({
         link: "/",
         text: "Quickstart",
       },
-      {
-        link: "/lifecycle",
-        text: "Lifecycle",
-      },
-      {
-        link: "/x402",
-        text: "X402 Primer",
-      },
-      {
-        link: "/allowances",
-        text: "Allowances",
-      },
-      {
-        link: "/purchases",
-        text: "Purchases",
-      },
-      {
-        link: "/facilitation",
-        text: "Facilitation",
-      },
-      {
-        link: "/merchants",
-        text: "Merchants",
-      },
-      {
-        link: "/example",
-        text: "Example",
-      },
     ],
   },
   socials: [

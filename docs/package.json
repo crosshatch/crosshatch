@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vocs dev --port 7776",
+    "dev": "portless docs.crosshatch.dev --app-port 7776 -- vocs dev",
     "build": "vocs build",
     "preview": "vocs preview"
   },

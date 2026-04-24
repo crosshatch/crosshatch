@@ -2,8 +2,6 @@ packages:
   - "@crosshatch/*"
   - crosshatch
   - docs
-  - examples/*
-  - examples/*/*
   - liminal/*
   - liminal/examples/*
   - liminal/examples/*/*
