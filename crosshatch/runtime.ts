@@ -1,7 +1,7 @@
 import { memoMap, runtime } from "@crosshatch/util/runtime"
 import { Layer, ManagedRuntime } from "effect"
-import { Client } from "liminal"
-import { boundLayer } from "liminal/_util/boundLayer"
+import { Client } from "liminal/actor"
+import { boundLayer } from "liminal/util/boundLayer"
 
 import * as Facade from "./Facade/Facade.ts"
 import { InternalEnv } from "./InternalEnv.ts"

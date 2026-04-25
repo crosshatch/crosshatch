@@ -1,5 +1,5 @@
 import { Option, Match, Effect, Data, Stream } from "effect"
-import { Accumulator } from "liminal"
+import * as Accumulator from "liminal/util/Accumulator"
 
 import { LinkChallengeId } from "../LinkChallengeId.ts"
 import { FacadeClient } from "./FacadeClient.ts"

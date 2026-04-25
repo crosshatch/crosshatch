@@ -1,5 +1,5 @@
 import { Schema as S } from "effect"
-import { Method } from "liminal"
+import { Method } from "liminal/actor"
 
 export const Rescind = Method.make({
   payload: S.Struct({}),
