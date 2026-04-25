@@ -14,10 +14,8 @@ export class InternalEnv extends Context.Service<
   make: Effect.gen(function* () {
     const dev =
       "env" in import.meta
-        ? !!(
-            (import.meta as never as { env: { VITE_PUBLIC_CROSSHATCH_DEV?: unknown } }).env
-              .VITE_PUBLIC_CROSSHATCH_DEV ?? false
-          )
+        ? // @ts-ignore
+          (import.meta.env.VITE_PUBLIC_CROSSHATCH_DEV ?? false)
         : yield* Config.boolean("CROSSHATCH_DEV").pipe(Config.withDefault(false))
     const domain = `${CROSSHATCH_DOMAIN}${dev ? ".localhost" : ""}`
     const url = `https://${domain}`
