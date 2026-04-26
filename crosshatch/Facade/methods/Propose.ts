@@ -1,6 +1,6 @@
 import { Payload, Required } from "@crosshatch/x402"
 import { Schema as S } from "effect"
-import { Method } from "liminal/actor"
+import { Method } from "liminal"
 
 export const Propose = Method.make({
   payload: S.Struct({

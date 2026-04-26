@@ -60,7 +60,7 @@ export const dev = <TSchema extends Record<string, unknown>, TRelationConfigs ex
     Effect.provide([
       DefaultServices,
       PgClient.layerConfig({
-        url: Config.redacted("DATABASE_URL"),
+        url: Config.redacted("CHX_DATABASE_URL"),
       }),
       NodeServices.layer,
     ]),

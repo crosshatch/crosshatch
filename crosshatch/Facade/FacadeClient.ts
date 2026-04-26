@@ -1,4 +1,4 @@
-import { Client } from "liminal/actor"
+import { Client } from "liminal"
 
 import * as events from "./events.ts"
 import { Propose } from "./methods/Propose.ts"

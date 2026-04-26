@@ -1,4 +1,4 @@
-import type { ClientError, UnresolvedError } from "liminal/actor"
+import type { ClientError, UnresolvedError } from "liminal"
 
 import { Payload, Required } from "@crosshatch/x402"
 import { Schedule, Effect, Encoding, flow, Schema as S, Cause } from "effect"
