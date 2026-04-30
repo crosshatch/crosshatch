@@ -32,4 +32,5 @@ export const layer = FacadeState.layer({
   reduce: Match.valueTags({ Challenged, Linked }),
   initial: (item) =>
     Effect.succeed(item._tag === "Challenged" || item._tag === "Linked" ? Option.some(item) : Option.none()),
+  onInitial: () => Effect.void,
 })
