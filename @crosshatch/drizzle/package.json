@@ -24,6 +24,7 @@
     "@effect/sql-pg": "catalog:",
     "drizzle-kit": "catalog:",
     "drizzle-orm": "catalog:",
-    "effect": "catalog:"
+    "effect": "catalog:",
+    "liminal-util": "workspace:*"
   }
 }
