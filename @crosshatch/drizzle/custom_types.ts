@@ -1,9 +1,9 @@
 import { customType } from "drizzle-orm/pg-core"
-import { identity, Schema as S } from "effect"
+import { Encoding, Schema as S } from "effect"
 
 export const bytea = customType<{
   data: Uint8Array
-  driverData: Uint8Array
+  driverData: string
 }>({
   dataType: () => "bytea",
   fromDriver: (v) => {
@@ -13,5 +13,5 @@ export const bytea = customType<{
     }
     return v
   },
-  toDriver: identity,
+  toDriver: (v) => `\\x${Encoding.encodeHex(v)}`,
 })

@@ -3,8 +3,8 @@ import { Queue, Effect, Schema as S, Stream } from "effect"
 import type { WidgetConfig } from "./self.ts"
 
 // TODO: revamp
-export const popup = <A, I>({ src, item = S.Never as never }: WidgetConfig<A, I>) =>
-  Stream.callback<A>(
+export const popup = <Item extends S.Codec<any, any>>({ src, item }: WidgetConfig<Item>) =>
+  Stream.callback<Item["Type"]>(
     Effect.fn(function* (queue) {
       const { origin: expectedOrigin } = new URL(src)
       const decodeOption = S.decodeUnknownOption(item)

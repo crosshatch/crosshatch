@@ -43,11 +43,11 @@ export const makeFetch =
       > = Facade.FacadeClient.f("Propose")({ required }).pipe(
         (x) =>
           Effect.catchTags(x, {
-            AppFrozen: ThawAppWidget.runDrain,
-            AccountFrozen: ThawAccountWidget.runDrain,
-            InsufficientFunds: OnrampExplainerWidget.runDrain,
-            Escalation: EscalationWidget.runDrain,
-            InsufficientAllowanceRemaining: RaiseAllowanceWidget.runDrain,
+            AppFrozen: ThawAppWidget.host,
+            AccountFrozen: ThawAccountWidget.host,
+            InsufficientFunds: OnrampExplainerWidget.host,
+            Escalation: EscalationWidget.host,
+            InsufficientAllowanceRemaining: RaiseAllowanceWidget.host,
           }).pipe(Effect.andThen(make), Effect.catchTag("UrlParamsError", Effect.die)),
         Effect.retry(Schedule.forever),
       )

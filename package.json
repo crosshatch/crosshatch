@@ -9,8 +9,8 @@
     "sync-repos": "node ./konfik/main.ts sync-repos",
     "dev": "turbo run //#watch //#test dev",
     "test": "vitest run",
-    "fmt": "oxfmt",
-    "fmt:check": "oxfmt --check"
+    "fmt": "oxfmt --config konfik/.oxfmtrc.jsonc",
+    "fmt:check": "oxfmt --check --config konfik/.oxfmtrc.jsonc"
   },
   "devDependencies": {
     "@changesets/cli": "catalog:",

@@ -1,9 +1,9 @@
-import { Finished } from "@crosshatch/widget/self"
-import { Effect, Stream, Match, Schema as S, Cause } from "effect"
+import { Effect, Match, Cause } from "effect"
 import { Atom } from "effect/unstable/reactivity"
 
 import * as Facade from "./Facade/Facade.ts"
 import { InternalEnv } from "./InternalEnv.ts"
+import { Micros } from "./Micros.ts"
 import { atomRuntime } from "./runtime.ts"
 import { EventsWidget, IdWidget, LinkWidget } from "./widgets.ts"
 
@@ -28,18 +28,19 @@ export const openAtom = atomRuntime.fn<void>()(
   Effect.fnUntraced(function* (_, get) {
     const state = yield* get.result(stateAtom)
     const common = { referrer: location.href }
-    const stream = Match.valueTags(state, {
+    yield* Match.valueTags(state, {
       Challenged: ({ challengeId }) =>
         InternalEnv.isCrosshatch(origin)
-          ? IdWidget.stream(common)
-          : LinkWidget.stream({
-              amount: 10,
+          ? IdWidget.host(common)
+          : LinkWidget.host({
               challengeId,
-              window: "Week",
+              allowance: {
+                amount: Micros.make(10_000_000n),
+                window: "Week",
+              },
               ...common,
             }),
-      Linked: () => EventsWidget.stream(common),
+      Linked: () => EventsWidget.host(common),
     })
-    yield* stream.pipe(Stream.takeUntil(S.is(Finished)), Stream.runDrain)
   }),
 )

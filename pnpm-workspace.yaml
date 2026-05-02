@@ -41,6 +41,7 @@ catalog:
   "@radix-ui/react-switch": 1.2.6
   "@radix-ui/react-tabs": ^1.1.13
   "@radix-ui/react-tooltip": ^1.2.8
+  "@standard-schema/spec": ^1.1.0
   "@streamdown/cjk": ^1.0.1
   "@streamdown/code": ^1.0.1
   "@streamdown/math": ^1.0.1
@@ -81,8 +82,8 @@ catalog:
   micro-key-producer: ^0.8.2
   next-themes: ^0.4.6
   ox: ^0.10.5
-  oxfmt: ^0.34.0
-  oxlint: ^1.60.0
+  oxfmt: ^0.47.0
+  oxlint: ^1.62.0
   pg: ^8.16.3
   playwright: ^1.59.1
   portless: ^0.9.5

@@ -18,14 +18,14 @@ const cssText = Object.entries({
   .map(([k, v]) => `${k}: ${v};`)
   .join(" ")
 
-export const embed = <A, I>({
+export const embed = <Item extends S.Codec<any, any>>({
   src,
-  item = S.Never as never,
+  item,
   className,
-}: WidgetConfig<A, I> & {
+}: WidgetConfig<Item> & {
   readonly className?: string | undefined
 }) =>
-  Stream.callback<A, Cause.NoSuchElementError>(
+  Stream.callback<Item["Type"], Cause.NoSuchElementError>(
     Effect.fn(function* (queue) {
       yield* BrowserStream.fromEventListenerWindow("message").pipe(
         Stream.runForEach(
