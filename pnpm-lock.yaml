@@ -165,6 +165,9 @@ catalogs:
     ox:
       specifier: ^0.10.5
       version: 0.10.6
+    oxfmt:
+      specifier: ^0.47.0
+      version: 0.47.0
     oxlint:
       specifier: ^1.62.0
       version: 1.62.0
@@ -241,9 +244,6 @@ patchedDependencies:
   drizzle-orm@1.0.0-beta.21:
     hash: 4d9b0045ba24198afa5e40a31883bae450cf94b2feb9cb89f269a4837a052e0a
     path: konfik/patches/drizzle-orm@1.0.0-beta.21.patch
-  effect@4.0.0-beta.57:
-    hash: 8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3
-    path: konfik/patches/effect@4.0.0-beta.57.patch
   miniflare@4.20260415.0:
     hash: 239c845a45ddc8a139a212672a91a0f0e7bdcc429e15b7cff9f929d1d1b300ad
     path: konfik/patches/miniflare@4.20260415.0.patch
@@ -263,10 +263,10 @@ importers:
         version: 0.85.1
       '@effect/platform-node':
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))(ioredis@5.10.1)
+        version: 4.0.0-beta.57(effect@4.0.0-beta.57)(ioredis@5.10.1)
       '@effect/vitest':
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))(vitest@4.1.4)
+        version: 4.0.0-beta.57(effect@4.0.0-beta.57)(vitest@4.1.4)
       '@types/node':
         specifier: 'catalog:'
         version: 25.6.0
@@ -290,7 +290,7 @@ importers:
         version: 4.1.4(vitest@4.1.4)
       effect:
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+        version: 4.0.0-beta.57
       fake-indexeddb:
         specifier: 'catalog:'
         version: 6.2.5
@@ -323,7 +323,7 @@ importers:
     dependencies:
       effect:
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+        version: 4.0.0-beta.57
 
   '@crosshatch/drizzle':
     dependencies:
@@ -332,16 +332,16 @@ importers:
         version: link:../util
       '@effect/sql-pg':
         specifier: 4.0.0-beta.57
-        version: 4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))
+        version: 4.0.0-beta.57(effect@4.0.0-beta.57)
       drizzle-kit:
         specifier: 'catalog:'
         version: 1.0.0-beta.21
       drizzle-orm:
         specifier: 'catalog:'
-        version: 1.0.0-beta.21(patch_hash=4d9b0045ba24198afa5e40a31883bae450cf94b2feb9cb89f269a4837a052e0a)(@cloudflare/workers-types@4.20260416.2)(@effect/sql-pg@4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)))(@electric-sql/pglite@0.3.16)(@types/mssql@9.1.11(@azure/core-client@1.10.1))(mssql@11.0.1(@azure/core-client@1.10.1))(pg@8.20.0)(zod@3.25.76)
+        version: 1.0.0-beta.21(patch_hash=4d9b0045ba24198afa5e40a31883bae450cf94b2feb9cb89f269a4837a052e0a)(@cloudflare/workers-types@4.20260416.2)(@effect/sql-pg@4.0.0-beta.57(effect@4.0.0-beta.57))(@electric-sql/pglite@0.3.16)(@types/mssql@9.1.11(@azure/core-client@1.10.1))(mssql@11.0.1(@azure/core-client@1.10.1))(pg@8.20.0)(zod@3.25.76)
       effect:
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+        version: 4.0.0-beta.57
       liminal-util:
         specifier: workspace:*
         version: link:../../liminal/liminal-util
@@ -353,10 +353,10 @@ importers:
         version: link:../util
       '@effect/atom-react':
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))(react@19.2.5)(scheduler@0.27.0)
+        version: 4.0.0-beta.57(effect@4.0.0-beta.57)(react@19.2.5)(scheduler@0.27.0)
       '@effect/platform-browser':
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))
+        version: 4.0.0-beta.57(effect@4.0.0-beta.57)
       '@radix-ui/react-accordion':
         specifier: 'catalog:'
         version: 1.2.12(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
@@ -431,7 +431,7 @@ importers:
         version: 1.1.1(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       effect:
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+        version: 4.0.0-beta.57
       lucide-react:
         specifier: 'catalog:'
         version: 0.575.0(react@19.2.5)
@@ -473,22 +473,22 @@ importers:
     dependencies:
       '@effect/atom-react':
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))(react@19.2.5)(scheduler@0.27.0)
+        version: 4.0.0-beta.57(effect@4.0.0-beta.57)(react@19.2.5)(scheduler@0.27.0)
       '@effect/platform-browser':
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))
+        version: 4.0.0-beta.57(effect@4.0.0-beta.57)
       effect:
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+        version: 4.0.0-beta.57
 
   '@crosshatch/widget':
     dependencies:
       '@effect/platform-browser':
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))
+        version: 4.0.0-beta.57(effect@4.0.0-beta.57)
       effect:
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+        version: 4.0.0-beta.57
 
   '@crosshatch/x402':
     dependencies:
@@ -500,7 +500,7 @@ importers:
         version: link:../util
       effect:
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+        version: 4.0.0-beta.57
 
   crosshatch:
     dependencies:
@@ -518,13 +518,13 @@ importers:
         version: link:../@crosshatch/x402
       '@effect/platform-browser':
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))
+        version: 4.0.0-beta.57(effect@4.0.0-beta.57)
       '@standard-schema/spec':
         specifier: 'catalog:'
         version: 1.1.0
       effect:
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+        version: 4.0.0-beta.57
       liminal:
         specifier: workspace:*
         version: link:../liminal/liminal
@@ -545,7 +545,7 @@ importers:
         version: link:../crosshatch
       effect:
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+        version: 4.0.0-beta.57
       react:
         specifier: ^19.2.4
         version: 19.2.5
@@ -575,7 +575,7 @@ importers:
         version: 19.2.14
       effect:
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+        version: 4.0.0-beta.57
       liminal:
         specifier: workspace:*
         version: link:../liminal
@@ -602,10 +602,10 @@ importers:
         version: 4.20260416.2
       '@effect/sql-d1':
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))
+        version: 4.0.0-beta.57(effect@4.0.0-beta.57)
       effect:
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+        version: 4.0.0-beta.57
       liminal-util:
         specifier: workspace:*
         version: link:../liminal-util
@@ -620,10 +620,10 @@ importers:
         version: 4.20260416.2
       '@effect/sql-d1':
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))
+        version: 4.0.0-beta.57(effect@4.0.0-beta.57)
       effect:
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+        version: 4.0.0-beta.57
       effect-workerd:
         specifier: workspace:*
         version: link:../../effect-workerd
@@ -650,10 +650,10 @@ importers:
         version: 4.20260416.2
       '@effect/sql-d1':
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))
+        version: 4.0.0-beta.57(effect@4.0.0-beta.57)
       effect:
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+        version: 4.0.0-beta.57
       effect-workerd:
         specifier: workspace:*
         version: link:../../../effect-workerd
@@ -677,10 +677,10 @@ importers:
         version: 1.32.3(vite@8.0.8(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3))(workerd@1.20260415.1)(wrangler@4.83.0(@cloudflare/workers-types@4.20260416.2))
       '@effect/atom-react':
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))(react@19.2.5)(scheduler@0.27.0)
+        version: 4.0.0-beta.57(effect@4.0.0-beta.57)(react@19.2.5)(scheduler@0.27.0)
       '@effect/platform-browser':
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))
+        version: 4.0.0-beta.57(effect@4.0.0-beta.57)
       '@liminal-examples/tictactoe':
         specifier: workspace:*
         version: link:../api
@@ -707,7 +707,7 @@ importers:
         version: 1.0.0
       effect:
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+        version: 4.0.0-beta.57
       liminal:
         specifier: workspace:*
         version: link:../../../liminal
@@ -731,7 +731,7 @@ importers:
         version: 0.85.1
       '@effect/platform-node':
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))(ioredis@5.10.1)
+        version: 4.0.0-beta.57(effect@4.0.0-beta.57)(ioredis@5.10.1)
       '@types/node':
         specifier: 'catalog:'
         version: 25.6.0
@@ -740,7 +740,10 @@ importers:
         version: 0.52.0
       effect:
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+        version: 4.0.0-beta.57
+      oxfmt:
+        specifier: 'catalog:'
+        version: 0.47.0
       oxlint:
         specifier: 'catalog:'
         version: 1.62.0
@@ -758,13 +761,13 @@ importers:
         version: 4.20260416.2
       '@effect/platform-browser':
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))
+        version: 4.0.0-beta.57(effect@4.0.0-beta.57)
       '@effect/sql-d1':
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))
+        version: 4.0.0-beta.57(effect@4.0.0-beta.57)
       effect:
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+        version: 4.0.0-beta.57
       effect-workerd:
         specifier: workspace:*
         version: link:../effect-workerd
@@ -776,19 +779,19 @@ importers:
     dependencies:
       effect:
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+        version: 4.0.0-beta.57
 
   liminal/scripts:
     dependencies:
       '@effect/openapi-generator':
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(@effect/platform-node@4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))(ioredis@5.10.1))(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))
+        version: 4.0.0-beta.57(@effect/platform-node@4.0.0-beta.57(effect@4.0.0-beta.57)(ioredis@5.10.1))(effect@4.0.0-beta.57)
       '@effect/platform-node':
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))(ioredis@5.10.1)
+        version: 4.0.0-beta.57(effect@4.0.0-beta.57)(ioredis@5.10.1)
       effect:
         specifier: 'catalog:'
-        version: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+        version: 4.0.0-beta.57
       yaml:
         specifier: 'catalog:'
         version: 2.8.3
@@ -2197,6 +2200,128 @@ packages:
 
   '@oxc-project/types@0.124.0':
     resolution: {integrity: sha512-VBFWMTBvHxS11Z5Lvlr3IWgrwhMTXV+Md+EQF0Xf60+wAdsGFTBx7X7K/hP4pi8N7dcm1RvcHwDxZ16Qx8keUg==}
+
+  '@oxfmt/binding-android-arm-eabi@0.47.0':
+    resolution: {integrity: sha512-KrMQRdMi/upr81qT4ijK6X6BNp6jqpMY7FwILQnwIy9QLc3qpnhUx5rsCLGzn4ewsCQ0CNAspN2ogmP1GXLyLw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm]
+    os: [android]
+
+  '@oxfmt/binding-android-arm64@0.47.0':
+    resolution: {integrity: sha512-r4ixS/PeUpAFKgrpDoZ5pSkthjZzVzKd95525Aazj+aOv9H4ulK5zYHGb7wFY5n5kZxHK8TbOJUZgoEb1ohddQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [android]
+
+  '@oxfmt/binding-darwin-arm64@0.47.0':
+    resolution: {integrity: sha512-CLWxiKpMl+195cm09CuaWEhJK0CirRkoMa07aR9+9AFPat2LfIKtwx1JqxZM0MTvcMe6+adlJNdVL6jdInvq3g==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@oxfmt/binding-darwin-x64@0.47.0':
+    resolution: {integrity: sha512-Xq5fjTYDC50faUeLSm0rZdBqoTgleXEdD7NpJdARtQIczkCJn3xNjMUSQQkUmh4CtxkKTNL68lytcOK3e/osgg==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [darwin]
+
+  '@oxfmt/binding-freebsd-x64@0.47.0':
+    resolution: {integrity: sha512-QOU9ZIJ52p5askcEC0QJvvr8trHAWoonul8bgISo6gYUL3s50zkqafBYcNAr9LJZQbsZtPfIWHk9+5+nUp1qJQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [freebsd]
+
+  '@oxfmt/binding-linux-arm-gnueabihf@0.47.0':
+    resolution: {integrity: sha512-oJxDM1aBhPvz9gmElBv8UpxyiqhwfjcbrSxT5F0xtuUzY6dQI27/AQPIt3eu3Z5Yvn0kQl5R7MA3Z+MbnRvCBw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm]
+    os: [linux]
+
+  '@oxfmt/binding-linux-arm-musleabihf@0.47.0':
+    resolution: {integrity: sha512-g8Lh50VS4ibGz2q6v7r9UZY4D0dM16SdrFYOMzhqIoCwGcai8VMIRUAcqn1/jlCsOOzUXJ741+kCeJt0cofakQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm]
+    os: [linux]
+
+  '@oxfmt/binding-linux-arm64-gnu@0.47.0':
+    resolution: {integrity: sha512-YrNT1vQ0asaXoRbrvYENPqmBfOQ9Xr8enPNOULeYfg44VjCcrUowFy5QZr+WawE0zyP8cH9e9Gxxg0fDEFzhcg==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxfmt/binding-linux-arm64-musl@0.47.0':
+    resolution: {integrity: sha512-IxtQC/sbBi4ubbY+MdwdanRWrG9InQJVZqyMsBa5IUaQcnSg86gQme574HxXMC1p4bo4YhV99zQ+wNnGCvEgzw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [linux]
+    libc: [musl]
+
+  '@oxfmt/binding-linux-ppc64-gnu@0.47.0':
+    resolution: {integrity: sha512-EWXEhOMbWO0q6eJSbu0QLkU8cKi0ljlYLngeDs2Ocu/pm1rrLwyQiYzlFbdnMRURI4w9ndr1sI9rSbhlJ5o23Q==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [ppc64]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxfmt/binding-linux-riscv64-gnu@0.47.0':
+    resolution: {integrity: sha512-tZrjS11TUiDuEpRaqdk8K9F9xETRyKXfuZKmdeW+Gj7coBnm7+8sBEfyt033EAFEQSlkniAXvBLh+Qja2ioGBQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [riscv64]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxfmt/binding-linux-riscv64-musl@0.47.0':
+    resolution: {integrity: sha512-KBFy+2CFKUCZzYwX2ZOPQKck1vjQbz+hextuc19G4r0WRJwadfAeuQMQRQvB+Ivc8brlbOVg7et8K7E467440g==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [riscv64]
+    os: [linux]
+    libc: [musl]
+
+  '@oxfmt/binding-linux-s390x-gnu@0.47.0':
+    resolution: {integrity: sha512-REUPFKVGSiK99B+9eaPhluEVglzaoj/SMykNC5SUiV2RSsBfV5lWN7Y0iCIc251Wz3GaeAGZsJ/zj3gjarxdFg==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [s390x]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxfmt/binding-linux-x64-gnu@0.47.0':
+    resolution: {integrity: sha512-KVftVSVEDeIfRW3TIeLe3aNI/iY4m1fu5mDwHcisKMZSCMKLkrhFsjowC7o9RoqNPxbbglm2+/6KAKBIts2t0Q==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxfmt/binding-linux-x64-musl@0.47.0':
+    resolution: {integrity: sha512-DTsmGEaA2860Aq5VUyDO8/MT9NFxwVL93RnRYmpMwK6DsSkThmvEpqoUDDljziEpAedMRG19SCogrNbINSbLUQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [linux]
+    libc: [musl]
+
+  '@oxfmt/binding-openharmony-arm64@0.47.0':
+    resolution: {integrity: sha512-8r5BDro7fLOBoq1JXHLVSs55OlrxQhEso4HVo0TcY7OXJUPYfjPoOaYL5us+yIwqyP9rQwN+rxuiNFSmaxSuOQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [openharmony]
+
+  '@oxfmt/binding-win32-arm64-msvc@0.47.0':
+    resolution: {integrity: sha512-qtz/gzm8IjSPUlseZ0ofW8zyHLoZsuP5HTfcGGkWkUblB89JT8GNYH3ICqjbDsqsGqXum0/ZndXTFplSdXFIcg==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [win32]
+
+  '@oxfmt/binding-win32-ia32-msvc@0.47.0':
+    resolution: {integrity: sha512-5vIcdcIDE7nCx+MXN6sm8kbC4zajDB31E86rez4i45iHNH/2NjdKlJ720xcHTr3eeiMcttCGPHPhE1TjtBDGZw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [ia32]
+    os: [win32]
+
+  '@oxfmt/binding-win32-x64-msvc@0.47.0':
+    resolution: {integrity: sha512-Sr59Y5ms54ONBjxFeWhVlGyQcHXxcl9DxC23f6yXlRkcos7LXBLoO+KDfxexjHIOZh7cWqrWduzvUjJ+pHp8cQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [win32]
 
   '@oxlint/binding-android-arm-eabi@1.62.0':
     resolution: {integrity: sha512-pKsthNECyvJh8lPTICz6VcwVy2jOqdhhsp1rlxCkhgZR47aKvXPmaRWQDv+zlXpRae4qm1MaaTnutkaOk5aofg==}
@@ -5894,6 +6019,11 @@ packages:
       typescript:
         optional: true
 
+  oxfmt@0.47.0:
+    resolution: {integrity: sha512-OFbkbzxKCpooQEnRmpTDnuwTX8KHXzZTQ4Df/hz85fpS67Pl+lxPEFvUtin56HIIS0B1k4X8oIzTXRZPufA2CA==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    hasBin: true
+
   oxlint@1.62.0:
     resolution: {integrity: sha512-1uFkg6HakjsGIpW9wNdeW4/2LOHW9MEkoWjZUTUfQtIHyLIZPYt00w3Sg+H3lH+206FgBPHBbW5dVE5l2ExECQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
@@ -6641,6 +6771,10 @@ packages:
   tinyglobby@0.2.16:
     resolution: {integrity: sha512-pn99VhoACYR8nFHhxqix+uvsbXineAasWm5ojXoN8xEwK5Kd3/TrhNn1wByuD52UxWRLy8pu+kRMniEi6Eq9Zg==}
     engines: {node: '>=12.0.0'}
+
+  tinypool@2.1.0:
+    resolution: {integrity: sha512-Pugqs6M0m7Lv1I7FtxN4aoyToKg1C4tu+/381vH35y8oENM/Ai7f7C4StcoK4/+BSw9ebcS8jRiVrORFKCALLw==}
+    engines: {node: ^20.0.0 || >=22.0.0}
 
   tinyrainbow@3.1.0:
     resolution: {integrity: sha512-Bf+ILmBgretUrdJxzXM0SgXLZ3XfiaUuOj/IKQHuTXip+05Xn+uyEYdVg0kYDipTBcLrCVyUzAPz7QmArb0mmw==}
@@ -7653,37 +7787,37 @@ snapshots:
 
   '@drizzle-team/brocli@0.11.0': {}
 
-  '@effect/atom-react@4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))(react@19.2.5)(scheduler@0.27.0)':
+  '@effect/atom-react@4.0.0-beta.57(effect@4.0.0-beta.57)(react@19.2.5)(scheduler@0.27.0)':
     dependencies:
-      effect: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+      effect: 4.0.0-beta.57
       react: 19.2.5
       scheduler: 0.27.0
 
   '@effect/language-service@0.85.1': {}
 
-  '@effect/openapi-generator@4.0.0-beta.57(@effect/platform-node@4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))(ioredis@5.10.1))(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))':
+  '@effect/openapi-generator@4.0.0-beta.57(@effect/platform-node@4.0.0-beta.57(effect@4.0.0-beta.57)(ioredis@5.10.1))(effect@4.0.0-beta.57)':
     dependencies:
-      '@effect/platform-node': 4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))(ioredis@5.10.1)
-      effect: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+      '@effect/platform-node': 4.0.0-beta.57(effect@4.0.0-beta.57)(ioredis@5.10.1)
+      effect: 4.0.0-beta.57
 
-  '@effect/platform-browser@4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))':
+  '@effect/platform-browser@4.0.0-beta.57(effect@4.0.0-beta.57)':
     dependencies:
-      effect: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+      effect: 4.0.0-beta.57
       multipasta: 0.2.7
 
-  '@effect/platform-node-shared@4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))':
+  '@effect/platform-node-shared@4.0.0-beta.57(effect@4.0.0-beta.57)':
     dependencies:
       '@types/ws': 8.18.1
-      effect: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+      effect: 4.0.0-beta.57
       ws: 8.20.0
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
 
-  '@effect/platform-node@4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))(ioredis@5.10.1)':
+  '@effect/platform-node@4.0.0-beta.57(effect@4.0.0-beta.57)(ioredis@5.10.1)':
     dependencies:
-      '@effect/platform-node-shared': 4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))
-      effect: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+      '@effect/platform-node-shared': 4.0.0-beta.57(effect@4.0.0-beta.57)
+      effect: 4.0.0-beta.57
       ioredis: 5.10.1
       mime: 4.1.0
       undici: 8.1.0
@@ -7691,14 +7825,14 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@effect/sql-d1@4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))':
+  '@effect/sql-d1@4.0.0-beta.57(effect@4.0.0-beta.57)':
     dependencies:
       '@cloudflare/workers-types': 4.20260416.2
-      effect: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+      effect: 4.0.0-beta.57
 
-  '@effect/sql-pg@4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))':
+  '@effect/sql-pg@4.0.0-beta.57(effect@4.0.0-beta.57)':
     dependencies:
-      effect: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+      effect: 4.0.0-beta.57
       pg: 8.20.0
       pg-connection-string: 2.12.0
       pg-cursor: 2.19.0(pg@8.20.0)
@@ -7707,9 +7841,9 @@ snapshots:
     transitivePeerDependencies:
       - pg-native
 
-  '@effect/vitest@4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))(vitest@4.1.4)':
+  '@effect/vitest@4.0.0-beta.57(effect@4.0.0-beta.57)(vitest@4.1.4)':
     dependencies:
-      effect: 4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)
+      effect: 4.0.0-beta.57
       vitest: 4.1.4(@types/node@25.6.0)(@vitest/coverage-v8@4.1.4)(happy-dom@20.9.0)(vite@8.0.8(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3))
 
   '@electric-sql/pglite@0.3.16':
@@ -8336,6 +8470,63 @@ snapshots:
       fastq: 1.20.1
 
   '@oxc-project/types@0.124.0': {}
+
+  '@oxfmt/binding-android-arm-eabi@0.47.0':
+    optional: true
+
+  '@oxfmt/binding-android-arm64@0.47.0':
+    optional: true
+
+  '@oxfmt/binding-darwin-arm64@0.47.0':
+    optional: true
+
+  '@oxfmt/binding-darwin-x64@0.47.0':
+    optional: true
+
+  '@oxfmt/binding-freebsd-x64@0.47.0':
+    optional: true
+
+  '@oxfmt/binding-linux-arm-gnueabihf@0.47.0':
+    optional: true
+
+  '@oxfmt/binding-linux-arm-musleabihf@0.47.0':
+    optional: true
+
+  '@oxfmt/binding-linux-arm64-gnu@0.47.0':
+    optional: true
+
+  '@oxfmt/binding-linux-arm64-musl@0.47.0':
+    optional: true
+
+  '@oxfmt/binding-linux-ppc64-gnu@0.47.0':
+    optional: true
+
+  '@oxfmt/binding-linux-riscv64-gnu@0.47.0':
+    optional: true
+
+  '@oxfmt/binding-linux-riscv64-musl@0.47.0':
+    optional: true
+
+  '@oxfmt/binding-linux-s390x-gnu@0.47.0':
+    optional: true
+
+  '@oxfmt/binding-linux-x64-gnu@0.47.0':
+    optional: true
+
+  '@oxfmt/binding-linux-x64-musl@0.47.0':
+    optional: true
+
+  '@oxfmt/binding-openharmony-arm64@0.47.0':
+    optional: true
+
+  '@oxfmt/binding-win32-arm64-msvc@0.47.0':
+    optional: true
+
+  '@oxfmt/binding-win32-ia32-msvc@0.47.0':
+    optional: true
+
+  '@oxfmt/binding-win32-x64-msvc@0.47.0':
+    optional: true
 
   '@oxlint/binding-android-arm-eabi@1.62.0':
     optional: true
@@ -10697,13 +10888,13 @@ snapshots:
       get-tsconfig: 4.14.0
       jiti: 2.6.1
 
-  drizzle-orm@1.0.0-beta.21(patch_hash=4d9b0045ba24198afa5e40a31883bae450cf94b2feb9cb89f269a4837a052e0a)(@cloudflare/workers-types@4.20260416.2)(@effect/sql-pg@4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3)))(@electric-sql/pglite@0.3.16)(@types/mssql@9.1.11(@azure/core-client@1.10.1))(mssql@11.0.1(@azure/core-client@1.10.1))(pg@8.20.0)(zod@3.25.76):
+  drizzle-orm@1.0.0-beta.21(patch_hash=4d9b0045ba24198afa5e40a31883bae450cf94b2feb9cb89f269a4837a052e0a)(@cloudflare/workers-types@4.20260416.2)(@effect/sql-pg@4.0.0-beta.57(effect@4.0.0-beta.57))(@electric-sql/pglite@0.3.16)(@types/mssql@9.1.11(@azure/core-client@1.10.1))(mssql@11.0.1(@azure/core-client@1.10.1))(pg@8.20.0)(zod@3.25.76):
     dependencies:
       '@types/mssql': 9.1.11(@azure/core-client@1.10.1)
       mssql: 11.0.1(@azure/core-client@1.10.1)
     optionalDependencies:
       '@cloudflare/workers-types': 4.20260416.2
-      '@effect/sql-pg': 4.0.0-beta.57(effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3))
+      '@effect/sql-pg': 4.0.0-beta.57(effect@4.0.0-beta.57)
       '@electric-sql/pglite': 0.3.16
       pg: 8.20.0
       zod: 3.25.76
@@ -10716,7 +10907,7 @@ snapshots:
 
   ee-first@1.1.1: {}
 
-  effect@4.0.0-beta.57(patch_hash=8fa4a402b4ddbc81ebced11c47df8934fee87a4e268fd5aa30bf3faffccb54c3):
+  effect@4.0.0-beta.57:
     dependencies:
       '@standard-schema/spec': 1.1.0
       fast-check: 4.6.0
@@ -12340,6 +12531,30 @@ snapshots:
     transitivePeerDependencies:
       - zod
 
+  oxfmt@0.47.0:
+    dependencies:
+      tinypool: 2.1.0
+    optionalDependencies:
+      '@oxfmt/binding-android-arm-eabi': 0.47.0
+      '@oxfmt/binding-android-arm64': 0.47.0
+      '@oxfmt/binding-darwin-arm64': 0.47.0
+      '@oxfmt/binding-darwin-x64': 0.47.0
+      '@oxfmt/binding-freebsd-x64': 0.47.0
+      '@oxfmt/binding-linux-arm-gnueabihf': 0.47.0
+      '@oxfmt/binding-linux-arm-musleabihf': 0.47.0
+      '@oxfmt/binding-linux-arm64-gnu': 0.47.0
+      '@oxfmt/binding-linux-arm64-musl': 0.47.0
+      '@oxfmt/binding-linux-ppc64-gnu': 0.47.0
+      '@oxfmt/binding-linux-riscv64-gnu': 0.47.0
+      '@oxfmt/binding-linux-riscv64-musl': 0.47.0
+      '@oxfmt/binding-linux-s390x-gnu': 0.47.0
+      '@oxfmt/binding-linux-x64-gnu': 0.47.0
+      '@oxfmt/binding-linux-x64-musl': 0.47.0
+      '@oxfmt/binding-openharmony-arm64': 0.47.0
+      '@oxfmt/binding-win32-arm64-msvc': 0.47.0
+      '@oxfmt/binding-win32-ia32-msvc': 0.47.0
+      '@oxfmt/binding-win32-x64-msvc': 0.47.0
+
   oxlint@1.62.0:
     optionalDependencies:
       '@oxlint/binding-android-arm-eabi': 1.62.0
@@ -13283,6 +13498,8 @@ snapshots:
     dependencies:
       fdir: 6.5.0(picomatch@4.0.4)
       picomatch: 4.0.4
+
+  tinypool@2.1.0: {}
 
   tinyrainbow@3.1.0: {}
 

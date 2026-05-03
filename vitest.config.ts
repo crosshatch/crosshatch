@@ -1,9 +1,8 @@
-import { mergeConfig, type ViteUserConfig } from "vitest/config"
+import { defineConfig } from "vitest/config"
 
-import config from "./vitest.ts"
-
-export default mergeConfig(config, {
+export default defineConfig({
   test: {
-    projects: ["crosshatch", "@crosshatch/*", "examples/*"],
+    passWithNoTests: true,
+    projects: ["./@crosshatch/*/vitest.config.ts", "./crosshatch/vitest.config.ts", "./liminal/*/vitest.config.ts"],
   },
-} satisfies ViteUserConfig)
+})

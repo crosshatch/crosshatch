@@ -16,11 +16,20 @@
   "type": "module",
   "sideEffects": true,
   "exports": {
-    "./*": {
-      "types": "./*.ts",
-      "import": "./dist/*.js"
-    },
+    "./CrosshatchLogo": "./CrosshatchLogo.tsx",
+    "./components/*": "./components/*.tsx",
+    "./hooks/*": "./hooks/*.ts",
+    "./*": "./*.ts",
     "./styles": "./styles.css"
+  },
+  "publishConfig": {
+    "exports": {
+      "./CrosshatchLogo": "./dist/CrosshatchLogo.js",
+      "./components/*": "./dist/components/*.js",
+      "./hooks/*": "./dist/hooks/*.js",
+      "./*": "./dist/*.js",
+      "./styles": "./styles.css"
+    }
   },
   "peerDependencies": {
     "@crosshatch/util": "workspace:*",

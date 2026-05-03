@@ -16,10 +16,7 @@
   "type": "module",
   "sideEffects": false,
   "exports": {
-    ".": {
-      "types": "./index.ts",
-      "default": "./dist/index.js"
-    }
+    ".": "./index.ts"
   },
   "peerDependencies": {
     "effect": "catalog:"

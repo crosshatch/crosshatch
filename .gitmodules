@@ -58,3 +58,6 @@
 [submodule "repos/namespaces"]
 	path = repos/namespaces
 	url = git@github.com:ChainAgnostic/namespaces.git
+[submodule "repos/vitest"]
+	path = repos/vitest
+	url = git@github.com:vitest-dev/vitest.git

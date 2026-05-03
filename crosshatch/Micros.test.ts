@@ -35,6 +35,7 @@ describe(import.meta.url, () => {
       network: ChainIdString.make("eip155:1"),
       asset: AccountAddress.make("0xabc"),
       decimals: 6,
+      rpcs: [],
     }
     assert.strictEqual(fromX402("1000000", asset), Micros.make(1_000_000n))
     assert.strictEqual(fromX402("1", asset), Micros.make(1n))

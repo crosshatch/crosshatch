@@ -1,5 +1,4 @@
 import type { ChainIdString, AccountAddress } from "@crosshatch/caip"
-
 import { Schema as S, Effect, BigDecimal, Option, Data } from "effect"
 
 const MICROS_PER_USD = 1_000_000n
@@ -9,6 +8,7 @@ export interface SupportedAsset {
   readonly network: typeof ChainIdString.Type
   readonly asset: typeof AccountAddress.Type
   readonly decimals: number
+  readonly rpcs: ReadonlyArray<string>
 }
 
 export const Micros = S.BigInt.check(S.isGreaterThanOrEqualToBigInt(0n)).pipe(S.brand("Micros"))

@@ -5,6 +5,6 @@
     "outDir": "dist"
   },
   "include": ["."],
-  "exclude": ["dist"],
+  "exclude": ["dist", "vitest.config.ts"],
   "references": [{ "path": "../util" }]
 }

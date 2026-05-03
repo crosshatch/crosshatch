@@ -16,10 +16,7 @@
   "type": "module",
   "sideEffects": false,
   "exports": {
-    "./*": {
-      "types": "./*.ts",
-      "default": "./dist/*.js"
-    }
+    "./*": "./*.ts"
   },
   "peerDependencies": {
     "@effect/atom-react": "catalog:",

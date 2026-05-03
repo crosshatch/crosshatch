@@ -16,14 +16,8 @@
   "type": "module",
   "sideEffects": false,
   "exports": {
-    ".": {
-      "types": "./index.ts",
-      "default": "./dist/index.js"
-    },
-    "./Facilitator": {
-      "types": "./Facilitator/Facilitator.ts",
-      "default": "./dist/Facilitator/Facilitator.js"
-    }
+    ".": "./index.ts",
+    "./Facilitator": "./Facilitator/Facilitator.ts"
   },
   "peerDependencies": {
     "@crosshatch/caip": "workspace:*",
