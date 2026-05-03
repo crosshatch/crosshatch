@@ -20,6 +20,12 @@ export const format = (amount: typeof Micros.Type): string => {
   return `${dollars}.${micros.toString().padStart(6, "0").replace(/0+$/, "")}`
 }
 
+export const display = (amount: typeof Micros.Type): string => {
+  const dollars = amount / MICROS_PER_USD
+  const micros = amount % MICROS_PER_USD
+  return `$${dollars}.${(micros / 100n).toString().padStart(4, "0")}`
+}
+
 const ceilDiv = (numerator: bigint, denominator: bigint) =>
   numerator === 0n ? 0n : (numerator - 1n) / denominator + 1n
 

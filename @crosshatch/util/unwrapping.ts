@@ -49,3 +49,5 @@ export const validateTag =
         () => new Cause.NoSuchElementError(),
       ),
     )
+
+export const unsafeNonEmptyValue = <A>(value: Array<A>): Array.NonEmptyArray<A> => value as never
