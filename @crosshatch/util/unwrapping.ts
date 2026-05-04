@@ -50,4 +50,5 @@ export const validateTag =
       ),
     )
 
+// TODO: figure out another approach
 export const unsafeNonEmptyValue = <A>(value: Array<A>): Array.NonEmptyArray<A> => value as never
