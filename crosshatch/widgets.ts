@@ -40,7 +40,8 @@ const widget = <Payload extends S.Codec<any, any>, Item extends S.Codec<any, any
       }),
     ),
     Stream.unwrap,
-    Stream.takeUntil(S.is(Finished)),
+    Stream.filter(S.is(Finished)),
+    Stream.take(1),
     Stream.runDrain,
   )
   return {
