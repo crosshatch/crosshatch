@@ -8,7 +8,6 @@ export interface SupportedAsset {
   readonly network: typeof ChainIdString.Type
   readonly asset: typeof AccountAddress.Type
   readonly decimals: number
-  readonly rpcs: ReadonlyArray<string>
 }
 
 export const Micros = S.BigInt.check(S.isGreaterThanOrEqualToBigInt(0n)).pipe(S.brand("Micros"))

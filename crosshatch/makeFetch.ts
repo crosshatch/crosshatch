@@ -11,7 +11,7 @@ import {
 } from "./widgets.ts"
 
 export class CrosshatchFetchError extends S.TaggedErrorClass<CrosshatchFetchError>()("CrosshatchFetchError", {
-  decision: Facade.DeclinedDecision,
+  decision: Facade.DeclinedError,
 }) {}
 
 export const makeFetch =
@@ -34,11 +34,11 @@ export const makeFetch =
           )
       const make = Facade.FacadeClient.f("Propose")({ required }).pipe(
         Effect.catchTags({
-          AppFrozen: ThawAppWidget.host,
-          AccountFrozen: ThawAccountWidget.host,
-          InsufficientFunds: OnrampExplainerWidget.host,
-          Escalation: EscalationWidget.host,
-          InsufficientAllowanceRemaining: RaiseAllowanceWidget.host,
+          AppFrozenError: ThawAppWidget.host,
+          AccountFrozenError: ThawAccountWidget.host,
+          InsufficientFundsError: OnrampExplainerWidget.host,
+          EscalationError: EscalationWidget.host,
+          InsufficientAllowanceRemainingError: RaiseAllowanceWidget.host,
         }),
       )
       const result = yield* make

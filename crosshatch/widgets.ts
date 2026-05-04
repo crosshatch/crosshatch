@@ -76,31 +76,31 @@ export const LinkWidget = widget({
 
 export const EscalationWidget = widget({
   pathname: "escalation",
-  payload: Facade.Escalation,
+  payload: Facade.EscalationError,
   item: S.Never,
 })
 
 export const ThawAccountWidget = widget({
   pathname: "thaw-account",
-  payload: Facade.AccountFrozen,
+  payload: Facade.AccountFrozenError,
   item: S.Never,
 })
 
 export const ThawAppWidget = widget({
   pathname: "thaw-app",
-  payload: Facade.AppFrozen,
+  payload: Facade.AppFrozenError,
   item: S.Never,
 })
 
 export const RaiseAllowanceWidget = widget({
   pathname: "raise-allowance",
-  payload: Facade.InsufficientAllowanceRemaining,
+  payload: Facade.InsufficientAllowanceRemainingError,
   item: S.Never,
 })
 
 export const OnrampExplainerWidget = widget({
   pathname: "onramp",
-  payload: Facade.InsufficientFunds,
+  payload: Facade.InsufficientFundsError,
   item: S.Never,
 })
 

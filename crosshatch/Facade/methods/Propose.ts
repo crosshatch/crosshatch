@@ -9,29 +9,38 @@ export const Propose = Method.make({
   success: S.Struct({
     payload: Payload.Payload,
   }),
-  failure: S.suspend(() => DeclinedDecision),
+  failure: S.suspend(() => DeclinedError),
 })
 
-export class AllowanceDenial extends S.TaggedErrorClass<AllowanceDenial>()("AllowanceDenial", {}) {}
-
-export class InsufficientFunds extends S.TaggedErrorClass<InsufficientFunds>()("InsufficientFunds", {}) {}
-
-export class InsufficientAllowanceRemaining extends S.TaggedErrorClass<InsufficientAllowanceRemaining>()(
-  "InsufficientAllowanceRemaining",
+export class AssetNotSupportedError extends S.TaggedErrorClass<AssetNotSupportedError>()(
+  "AssetNotSupportedError",
   {},
 ) {}
 
-export class AccountFrozen extends S.TaggedErrorClass<AccountFrozen>()("AccountFrozen", {}) {}
+export class AllowanceDenialError extends S.TaggedErrorClass<AllowanceDenialError>()("AllowanceDenialError", {}) {}
 
-export class AppFrozen extends S.TaggedErrorClass<AppFrozen>()("AppFrozen", {}) {}
+export class InsufficientFundsError extends S.TaggedErrorClass<InsufficientFundsError>()(
+  "InsufficientFundsError",
+  {},
+) {}
 
-export class Escalation extends S.TaggedErrorClass<Escalation>()("Escalation", {}) {}
+export class InsufficientAllowanceRemainingError extends S.TaggedErrorClass<InsufficientAllowanceRemainingError>()(
+  "InsufficientAllowanceRemainingError",
+  {},
+) {}
 
-export const DeclinedDecision = S.Union([
-  AllowanceDenial,
-  InsufficientFunds,
-  InsufficientAllowanceRemaining,
-  AccountFrozen,
-  AppFrozen,
-  Escalation,
+export class AccountFrozenError extends S.TaggedErrorClass<AccountFrozenError>()("AccountFrozenError", {}) {}
+
+export class AppFrozenError extends S.TaggedErrorClass<AppFrozenError>()("AppFrozenError", {}) {}
+
+export class EscalationError extends S.TaggedErrorClass<EscalationError>()("EscalationError", {}) {}
+
+export const DeclinedError = S.Union([
+  AssetNotSupportedError,
+  AllowanceDenialError,
+  InsufficientFundsError,
+  InsufficientAllowanceRemainingError,
+  AccountFrozenError,
+  AppFrozenError,
+  EscalationError,
 ])
