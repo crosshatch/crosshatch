@@ -27,6 +27,7 @@
     "effect": "catalog:",
     "fake-indexeddb": "catalog:",
     "happy-dom": "catalog:",
+    "oxfmt": "catalog:",
     "oxlint": "catalog:",
     "playwright": "catalog:",
     "ts-patch": "catalog:",
