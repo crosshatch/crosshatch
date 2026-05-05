@@ -2,8 +2,6 @@
   "include": [],
   "references": [
     { "path": "./@crosshatch/caip" },
-    { "path": "./@crosshatch/drizzle" },
-    { "path": "./@crosshatch/ui" },
     { "path": "./@crosshatch/widget" },
     { "path": "./@crosshatch/x402" },
     { "path": "./crosshatch" },
