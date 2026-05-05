@@ -1,4 +1,4 @@
-import type { PgEnum, PgArrayDimension, PgColumnBuilderBrand, AnyPgColumnBuilder } from "drizzle-orm/pg-core"
+import type { PgEnum, PgArrayDimension, AnyPgColumnBuilder } from "drizzle-orm/pg-core"
 
 import { Types, Array } from "effect"
 
@@ -20,16 +20,20 @@ type UnwrapArray<T, Depth extends PgArrayDimension = 0> = Depth extends 5
     ? UnwrapArray<U, Increment<Depth>>
     : { base: T; depth: Depth }
 
+type ColumnConfig<A> =
+  | (AnyPgColumnBuilder & { readonly _: { data: NonNullable<A> } | { $type: NonNullable<A> } })
+  | (UnwrapArray<NonNullable<A>> extends infer R extends {
+      base: unknown
+      depth: PgArrayDimension
+    }
+      ? AnyPgColumnBuilder & {
+          readonly _: ({ data: R["base"] } | { $type: R["base"] }) &
+            (R["depth"] extends 0 ? {} : { dimensions: R["depth"] })
+        }
+      : never)
+
 export type ColumnsConfig<A, E> = {
-  [K in Exclude<keyof A, E>]: UnwrapArray<NonNullable<A[K]>> extends infer R extends {
-    base: unknown
-    depth: PgArrayDimension
-  }
-    ? AnyPgColumnBuilder & {
-        readonly [PgColumnBuilderBrand]: ({ data: R["base"] } | { $type: R["base"] }) &
-          (R["depth"] extends 0 ? {} : { dimensions: R["depth"] })
-      }
-    : never
+  [K in Exclude<keyof A, E>]: ColumnConfig<A[K]>
 }
 
 type SupersetKey<U extends { _tag: string }> = Exclude<

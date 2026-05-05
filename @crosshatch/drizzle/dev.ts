@@ -113,7 +113,7 @@ export const dev = <TSchema extends Record<string, unknown>, TRelationConfigs ex
         yield* Console.log(`[migrator] constraints ${label}: ${JSON.stringify(rows)}`)
       })
       yield* constraintSnapshot("before pushSchema")
-      const _ = yield* make({ relations, schema })
+      const _ = yield* make({ relations })
       const context = yield* Effect.context()
       const runPromise = Effect.runPromiseWith(context)
       const pushStart = Date.now()
