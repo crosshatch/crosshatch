@@ -1,10 +1,7 @@
-import type { ClientError, UnresolvedError } from "liminal"
-
-import { Payload, Required } from "@crosshatch/x402"
-import { Schedule, Effect, Encoding, flow, Schema as S, Cause } from "effect"
+import { Required } from "@crosshatch/x402"
+import { Effect, Encoding, flow, Schema as S } from "effect"
 
 import * as Facade from "./Facade/Facade.ts"
-import { InternalEnv } from "./InternalEnv.ts"
 import { managedRuntime } from "./runtime.ts"
 import {
   EscalationWidget,
@@ -15,7 +12,7 @@ import {
 } from "./widgets.ts"
 
 export class CrosshatchFetchError extends S.TaggedErrorClass<CrosshatchFetchError>()("CrosshatchFetchError", {
-  decision: Facade.DeclinedDecision,
+  decision: Facade.DeclinedError,
 }) {}
 
 export const makeFetch =
@@ -36,22 +33,20 @@ export const makeFetch =
             Effect.flatMap(S.decodeUnknownEffect(S.toType(Required.Required))),
             Effect.filterOrFail(({ x402Version }) => x402Version === 1),
           )
-      const make: Effect.Effect<
-        { readonly payload: typeof Payload.Payload.Type },
-        S.SchemaError | Cause.NoSuchElementError | ClientError | UnresolvedError | Facade.AllowanceDenial,
-        Facade.FacadeClient | InternalEnv
-      > = Facade.FacadeClient.f("Propose")({ required }).pipe(
-        (x) =>
-          Effect.catchTags(x, {
-            AppFrozen: ThawAppWidget.host,
-            AccountFrozen: ThawAccountWidget.host,
-            InsufficientFunds: OnrampExplainerWidget.host,
-            Escalation: EscalationWidget.host,
-            InsufficientAllowanceRemaining: RaiseAllowanceWidget.host,
-          }).pipe(Effect.andThen(make), Effect.catchTag("UrlParamsError", Effect.die)),
-        Effect.retry(Schedule.forever),
+      const make = Facade.FacadeClient.f("Propose")({ required }).pipe(
+        Effect.catchTags({
+          AppFrozenError: ThawAppWidget.host,
+          AccountFrozenError: ThawAccountWidget.host,
+          InsufficientFundsError: OnrampExplainerWidget.host,
+          EscalationError: EscalationWidget.host,
+          InsufficientAllowanceRemainingError: RaiseAllowanceWidget.host,
+        }),
       )
-      const { payload } = yield* make
+      const result = yield* make
+      if (!result) {
+        return yield* Effect.die("TODO retry")
+      }
+      const { payload } = result
       const value = Encoding.encodeBase64(JSON.stringify(payload))
       switch (payload.x402Version) {
         case 1: {
@@ -64,9 +59,5 @@ export const makeFetch =
         }
       }
       return yield* Effect.tryPromise(() => fetch(input, { ...init, headers }))
-    }).pipe((x) =>
-      managedRuntime.runPromise(x, {
-        signal: init?.signal ?? undefined,
-      }),
-    )
+    }).pipe((x) => managedRuntime.runPromise(x, { signal: init?.signal ?? undefined }))
   }

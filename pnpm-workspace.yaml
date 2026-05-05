@@ -71,8 +71,8 @@ catalog:
   date-fns: ^4.1.0
   dedent: ^1.7.1
   dprint: ^0.52.0
-  drizzle-kit: 1.0.0-beta.21
-  drizzle-orm: 1.0.0-beta.21
+  drizzle-kit: 1.0.0-rc.1
+  drizzle-orm: 1.0.0-rc.1
   effect: 4.0.0-beta.57
   fake-indexeddb: ^6.2.5
   happy-dom: ^20.9.0
@@ -122,6 +122,5 @@ overrides:
   zod: 3.25.76
 
 patchedDependencies:
-  drizzle-orm@1.0.0-beta.21: konfik/patches/drizzle-orm@1.0.0-beta.21.patch
   miniflare@4.20260415.0: konfik/patches/miniflare@4.20260415.0.patch
   vocs@1.4.1: konfik/patches/vocs@1.4.1.patch

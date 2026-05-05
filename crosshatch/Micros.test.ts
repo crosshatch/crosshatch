@@ -2,7 +2,7 @@ import { AccountAddress, ChainIdString } from "@crosshatch/caip"
 import { assert, describe, it } from "@effect/vitest"
 import { Effect } from "effect"
 
-import { parseInput, Micros, format, fromX402 } from "./Micros.ts"
+import { parseInput, Micros, format, display, fromX402 } from "./Micros.ts"
 
 describe(import.meta.url, () => {
   it.effect(
@@ -28,6 +28,13 @@ describe(import.meta.url, () => {
     assert.strictEqual(format(Micros.make(10_000_000n)), "10")
     assert.strictEqual(format(Micros.make(1_500_000n)), "1.5")
     assert.strictEqual(format(Micros.make(1n)), "0.000001")
+  })
+
+  it("displays micros as fixed dollar amounts", () => {
+    assert.strictEqual(display(Micros.make(20_000_000n)), "$20.0000")
+    assert.strictEqual(display(Micros.make(1_500_000n)), "$1.5000")
+    assert.strictEqual(display(Micros.make(1n)), "$0.0000")
+    assert.strictEqual(display(Micros.make(1_234_567n)), "$1.2345")
   })
 
   it("converts x402 base units using ceiling micros", () => {

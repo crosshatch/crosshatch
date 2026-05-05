@@ -1,5 +1,5 @@
-import { memoMap, runtime } from "@crosshatch/util/runtime"
 import { Layer, ManagedRuntime } from "effect"
+import { Atom } from "effect/unstable/reactivity"
 import { Client } from "liminal"
 import { boundLayer } from "liminal-util/boundLayer"
 
@@ -16,5 +16,6 @@ const CommonLive = Facade.FacadeState.layer.pipe(
   boundLayer("crosshatch"),
 )
 
-export const atomRuntime = runtime(CommonLive)
+export const memoMap = Layer.makeMemoMapUnsafe()
+export const atomRuntime = Atom.context({ memoMap })(CommonLive)
 export const managedRuntime = ManagedRuntime.make(CommonLive, { memoMap })

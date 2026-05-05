@@ -1,4 +1,3 @@
-import { UnknownRecord } from "@crosshatch/util/schema"
 import { Schema as S } from "effect"
 
 import { Requirements } from "./Requirements.ts"
@@ -41,7 +40,7 @@ export const PaymentPayload = S.Union([Erc3009Payload, Permit2Payload, SolanaPay
 
 export const Payload = S.Struct({
   accepted: Requirements,
-  extensions: UnknownRecord.pipe(S.optional),
+  extensions: S.Record(S.String, S.Unknown).pipe(S.optional),
   payload: PaymentPayload,
   resource: ResourceInfo.pipe(S.optional),
   x402Version: Version,

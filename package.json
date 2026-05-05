@@ -8,9 +8,7 @@
     "clean": "node ./konfik/main.ts clean --ignore '**/repos'",
     "sync-repos": "node ./konfik/main.ts sync-repos",
     "dev": "turbo run //#watch //#test dev",
-    "test": "vitest run",
-    "fmt": "oxfmt --config konfik/.oxfmtrc.jsonc",
-    "fmt:check": "oxfmt --check --config konfik/.oxfmtrc.jsonc"
+    "test": "vitest run"
   },
   "devDependencies": {
     "@changesets/cli": "catalog:",
@@ -27,6 +25,7 @@
     "effect": "catalog:",
     "fake-indexeddb": "catalog:",
     "happy-dom": "catalog:",
+    "oxfmt": "catalog:",
     "oxlint": "catalog:",
     "playwright": "catalog:",
     "ts-patch": "catalog:",

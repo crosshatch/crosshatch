@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "@crosshatch/caip": "workspace:*",
-    "@crosshatch/util": "workspace:*",
     "@crosshatch/widget": "workspace:*",
     "@crosshatch/x402": "workspace:*",
     "@effect/platform-browser": "catalog:",
