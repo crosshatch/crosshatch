@@ -192,6 +192,9 @@ importers:
       happy-dom:
         specifier: 'catalog:'
         version: 20.9.0
+      oxfmt:
+        specifier: 'catalog:'
+        version: 0.47.0
       oxlint:
         specifier: 'catalog:'
         version: 1.62.0
