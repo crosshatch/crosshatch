@@ -20,7 +20,6 @@
     "./*": "./*.ts"
   },
   "peerDependencies": {
-    "@crosshatch/util": "workspace:*",
     "@effect/sql-pg": "catalog:",
     "drizzle-kit": "catalog:",
     "drizzle-orm": "catalog:",

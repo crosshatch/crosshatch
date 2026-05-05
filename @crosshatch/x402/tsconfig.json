@@ -6,5 +6,5 @@
   },
   "include": ["."],
   "exclude": ["dist", "vitest.config.ts"],
-  "references": [{ "path": "../caip" }, { "path": "../util" }]
+  "references": [{ "path": "../caip" }]
 }

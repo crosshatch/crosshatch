@@ -9,7 +9,6 @@
   "references": [
     { "path": "../@crosshatch/caip" },
     { "path": "../@crosshatch/x402" },
-    { "path": "../@crosshatch/util" },
     { "path": "../@crosshatch/widget" },
     { "path": "../liminal/liminal" },
     { "path": "../liminal/liminal-util" }

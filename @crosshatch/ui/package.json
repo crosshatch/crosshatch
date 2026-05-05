@@ -32,7 +32,6 @@
     }
   },
   "peerDependencies": {
-    "@crosshatch/util": "workspace:*",
     "@effect/atom-react": "catalog:",
     "@effect/platform-browser": "catalog:",
     "@radix-ui/react-accordion": "catalog:",

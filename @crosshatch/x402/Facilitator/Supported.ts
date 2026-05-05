@@ -1,5 +1,4 @@
 import { ChainIdString } from "@crosshatch/caip"
-import { UnknownRecord } from "@crosshatch/util/schema"
 import { Schema as S } from "effect"
 import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 
@@ -9,7 +8,7 @@ export const SupportedKind = S.Struct({
   x402Version: Version,
   scheme: S.String,
   network: ChainIdString,
-  extra: UnknownRecord.pipe(S.optional),
+  extra: S.Record(S.String, S.Unknown).pipe(S.optional),
 })
 
 export const Supported = HttpApiEndpoint.get("supported", "/supported", {

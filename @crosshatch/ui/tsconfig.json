@@ -6,6 +6,5 @@
     "paths": { "@/*": ["./*"] }
   },
   "include": ["."],
-  "exclude": ["dist"],
-  "references": [{ "path": "../util" }]
+  "exclude": ["dist"]
 }

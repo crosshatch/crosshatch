@@ -1,10 +1,13 @@
-import { memoMap, runtime } from "@crosshatch/util/runtime"
 import { Layer, ManagedRuntime } from "effect"
 import { Client } from "liminal"
 import { boundLayer } from "liminal-util/boundLayer"
-
+import { Atom } from "effect/unstable/reactivity"
 import * as Facade from "./Facade/Facade.ts"
 import { InternalEnv } from "./InternalEnv.ts"
+
+export const memoMap = Layer.makeMemoMapUnsafe()
+
+export const runtime = Atom.context({ memoMap })
 
 const CommonLive = Facade.FacadeState.layer.pipe(
   Layer.provideMerge(

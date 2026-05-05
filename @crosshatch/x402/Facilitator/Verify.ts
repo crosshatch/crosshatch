@@ -1,4 +1,3 @@
-import { UnknownRecord } from "@crosshatch/util/schema"
 import { Schema as S } from "effect"
 import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 
@@ -14,7 +13,7 @@ export const Verify = HttpApiEndpoint.post("verify", "/verify", {
     S.Struct({
       isValid: S.tag(true),
       payer: S.String.pipe(S.optional),
-      extensions: UnknownRecord.pipe(S.optional),
+      extensions: S.Record(S.String, S.Unknown).pipe(S.optional),
     }),
     S.Struct({
       isValid: S.tag(false),
