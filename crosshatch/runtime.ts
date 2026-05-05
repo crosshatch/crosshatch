@@ -1,7 +1,8 @@
 import { Layer, ManagedRuntime } from "effect"
+import { Atom } from "effect/unstable/reactivity"
 import { Client } from "liminal"
 import { boundLayer } from "liminal-util/boundLayer"
-import { Atom } from "effect/unstable/reactivity"
+
 import * as Facade from "./Facade/Facade.ts"
 import { InternalEnv } from "./InternalEnv.ts"
 
