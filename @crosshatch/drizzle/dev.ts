@@ -1,8 +1,7 @@
-import type { AnyRelations, SQLWrapper } from "drizzle-orm"
-
 import { NodeServices } from "@effect/platform-node"
 import { PgClient } from "@effect/sql-pg"
 import { pushSchema } from "drizzle-kit/api-postgres"
+import type { AnyRelations, SQLWrapper } from "drizzle-orm"
 import { DefaultServices, make } from "drizzle-orm/effect-postgres"
 import { Console, Effect, Schedule } from "effect"
 import { SqlClient } from "effect/unstable/sql"
@@ -56,7 +55,7 @@ const summarizeQuery = (query: SQLWrapper | string) => {
 
 const makePgConfig = (value: string | undefined) => {
   if (value === undefined || value.length === 0) {
-    throw new Error("[migrator] CHX_DATABASE_URL is missing")
+    throw new Error("[migrator] db url is missing")
   }
   const url = new URL(value)
   if (url.password.length > 0) {
@@ -73,22 +72,23 @@ const makePgConfig = (value: string | undefined) => {
 export const dev = <TSchema extends Record<string, unknown>, TRelationConfigs extends AnyRelations>({
   relations,
   schema,
+  databaseUrl,
 }: {
   schema: TSchema
   relations: TRelationConfigs
+  databaseUrl: string
 }) => {
-  const databaseUrl = process.env.CHX_DATABASE_URL
   console.log("[migrator] bootstrap")
-  console.log(`[migrator] CHX_DATABASE_URL ${JSON.stringify(summarizeDatabaseUrl(databaseUrl))}`)
+  console.log(`[migrator] db url ${JSON.stringify(summarizeDatabaseUrl(databaseUrl))}`)
   console.log(`[migrator] schema exports (${Object.keys(schema).length}): ${Object.keys(schema).join(", ")}`)
   return Effect.runPromise(
     Effect.gen(function* () {
       const sql = yield* SqlClient.SqlClient
       yield* Console.log("[migrator] start")
-      yield* Console.log(`[migrator] CHX_DATABASE_URL ${JSON.stringify(summarizeDatabaseUrl(databaseUrl))}`)
+      yield* Console.log(`[migrator] db url: ${JSON.stringify(summarizeDatabaseUrl(databaseUrl))}`)
       yield* Console.log(`[migrator] schema exports (${Object.keys(schema).length}): ${Object.keys(schema).join(", ")}`)
       if (databaseUrl === undefined || databaseUrl.length === 0) {
-        return yield* Effect.die(new Error("[migrator] CHX_DATABASE_URL is missing"))
+        return yield* Effect.die(new Error("[migrator] db url is missing"))
       }
       yield* Console.log("[migrator] wait for db")
       yield* sql`select 1`.pipe(
@@ -161,7 +161,7 @@ export const dev = <TSchema extends Record<string, unknown>, TRelationConfigs ex
       yield* Console.log("[migrator] done")
     }).pipe(
       Effect.tapCause(logCause),
-      Effect.provide([DefaultServices, PgClient.layer(makePgConfig(process.env.CHX_DATABASE_URL)), NodeServices.layer]),
+      Effect.provide([DefaultServices, PgClient.layer(makePgConfig(databaseUrl)), NodeServices.layer]),
     ),
   )
 }
