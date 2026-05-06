@@ -1,16 +1,4 @@
-import { Payload, Required } from "@crosshatch/x402"
 import { Schema as S } from "effect"
-import { Method } from "liminal"
-
-export const Propose = Method.make({
-  payload: S.Struct({
-    required: Required.Required,
-  }),
-  success: S.Struct({
-    payload: Payload.Payload,
-  }),
-  failure: S.suspend(() => DeclinedError),
-})
 
 export class AssetNotSupportedError extends S.TaggedErrorClass<AssetNotSupportedError>()(
   "AssetNotSupportedError",
