@@ -33,7 +33,7 @@ export const makeFetch =
             Effect.flatMap(S.decodeUnknownEffect(S.toType(Required.Required))),
             Effect.filterOrFail(({ x402Version }) => x402Version === 1),
           )
-      const make = Facade.FacadeClient.f("Propose")({ required }).pipe(
+      const make = Facade.FacadeClient.fn("Propose")({ required }).pipe(
         Effect.catchTags({
           AppFrozenError: ThawAppWidget.host,
           AccountFrozenError: ThawAccountWidget.host,

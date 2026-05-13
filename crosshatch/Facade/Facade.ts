@@ -1,6 +1,6 @@
-export * as FacadeState from "./FacadeState.ts"
 export * as FacadeWorker from "./FacadeWorker.ts"
+export * as reducers from "./reducers.ts"
 export * from "./FacadeClient.ts"
+export * from "./errors.ts"
 export * from "./handshake.ts"
 export * from "./methods.ts"
-export * from "./errors.ts"
