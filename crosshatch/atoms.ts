@@ -1,12 +1,18 @@
 import { Effect, Match, Cause } from "effect"
 import { Atom } from "effect/unstable/reactivity"
+import * as Spanner from "liminal-util/Spanner"
 import * as Facade from "./Facade/Facade.ts"
 import { InternalEnv } from "./InternalEnv.ts"
 import { Micros } from "./Micros.ts"
 import { atomRuntime } from "./runtime.ts"
 import { EventsWidget, IdWidget, LinkWidget } from "./widgets.ts"
 
-export const stateAtom = atomRuntime.atom(Facade.FacadeClient.state).pipe(Atom.mapResult(({ status }) => status))
+const span = Spanner.make(import.meta.url)
+
+export const stateAtom = atomRuntime.atom(Facade.FacadeClient.state).pipe(
+  Atom.keepAlive,
+  Atom.mapResult(({ status }) => status),
+)
 
 export const isLinkedAtom = stateAtom.pipe(Atom.mapResult((v) => v._tag === "Linked"))
 
@@ -27,9 +33,10 @@ export const openAtom = atomRuntime.fn<void>()(
   Effect.fnUntraced(function* (_, get) {
     const state = yield* get.result(stateAtom)
     const common = { referrer: location.href }
+    const internal = InternalEnv.isCrosshatch(origin)
     yield* Match.valueTags(state, {
       Challenged: ({ challengeId }) =>
-        InternalEnv.isCrosshatch(origin)
+        internal
           ? IdWidget.host(common)
           : LinkWidget.host({
               challengeId,
@@ -40,6 +47,13 @@ export const openAtom = atomRuntime.fn<void>()(
               ...common,
             }),
       Linked: () => EventsWidget.host(common),
-    })
+    }).pipe(
+      span("open", {
+        attributes: {
+          state: state._tag,
+          internal,
+        },
+      }),
+    )
   }),
 )
