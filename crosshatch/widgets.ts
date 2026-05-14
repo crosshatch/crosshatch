@@ -46,7 +46,7 @@ const widget = <Payload extends S.Codec<any, any>, Item extends S.Codec<any, any
     Stream.filter(S.is(Finished)),
     Stream.take(1),
     Stream.runDrain,
-    span("widget.host", { attributes: { pathname } }),
+    span("stream-host", { attributes: { pathname } }),
   )
   return {
     standard,
