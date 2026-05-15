@@ -1,12 +1,32 @@
 import { Client } from "liminal"
-import * as events from "./events.ts"
-import * as methods from "./methods.ts"
 import { Schema as S } from "effect"
 import { LinkChallengeId } from "../LinkChallengeId.ts"
+import { Payload, Required } from "@crosshatch/x402"
+import { DeclinedError } from "./errors.ts"
 
 export class FacadeClient extends Client.Service<FacadeClient>()("crosshatch/FacadeClient", {
-  events,
-  methods,
+  events: {
+    Challenged: {
+      challengeId: LinkChallengeId,
+    },
+    Linked: {},
+  },
+  methods: {
+    Rescind: {
+      payload: S.Void,
+      success: S.Void,
+      failure: S.Never,
+    },
+    Propose: {
+      payload: S.Struct({
+        required: Required.Required,
+      }),
+      success: S.Struct({
+        payload: Payload.Payload,
+      }),
+      failure: DeclinedError,
+    },
+  },
   state: {
     status: S.TaggedUnion({
       Challenged: {
