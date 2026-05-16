@@ -237,9 +237,6 @@ importers:
       '@crosshatch/caip':
         specifier: workspace:*
         version: link:../caip
-      '@standard-schema/spec':
-        specifier: 'catalog:'
-        version: 1.1.0
       effect:
         specifier: 'catalog:'
         version: 4.0.0-beta.57

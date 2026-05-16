@@ -1,6 +1,6 @@
 import { embed } from "@crosshatch/widget/embed"
 import { Finished } from "@crosshatch/widget/self"
-import { Cause, Effect, flow, Schema as S, SchemaGetter, Stream } from "effect"
+import { Cause, Effect, pipe, Schema as S, SchemaGetter, Stream } from "effect"
 import { UrlParams } from "effect/unstable/http"
 import * as Spanner from "liminal-util/Spanner"
 import type { StandardSchemaV1 } from "@standard-schema/spec"
@@ -38,25 +38,27 @@ const widget = <Payload extends S.Codec<any, any>, Item extends S.Codec<any, any
       }),
     ),
   )
-  const host = flow(
-    S.encodeEffect(Payload),
-    Effect.flatMap(
-      Effect.fn(function* (x) {
-        const base = yield* InternalEnv.href(pathname)
-        const { href: src } = yield* UrlParams.makeUrl(base, UrlParams.make([["x", x]]), undefined)
-        return embed({
-          item: S.Union([item, Finished]),
-          src,
-          className: "crosshatch-widget",
-        })
-      }),
-    ),
-    Stream.unwrap,
-    Stream.filter(S.is(Finished)),
-    Stream.take(1),
-    Stream.runDrain,
-    span("stream-host", { attributes: { pathname } }),
-  )
+  const host = (payload: Payload["Type"]) =>
+    pipe(
+      payload,
+      S.encodeEffect(Payload),
+      Effect.flatMap(
+        Effect.fn(function* (x) {
+          const base = yield* InternalEnv.href(pathname)
+          const { href: src } = yield* UrlParams.makeUrl(base, UrlParams.make([["x", x]]), undefined)
+          return embed({
+            item: S.Union([item, Finished]),
+            src,
+            className: "crosshatch-widget",
+          })
+        }),
+      ),
+      Stream.unwrap,
+      Stream.filter(S.is(Finished)),
+      Stream.take(1),
+      Stream.runDrain,
+      span("stream-host", { attributes: { pathname } }),
+    )
   return { Payload, standard, host }
 }
 
