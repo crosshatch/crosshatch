@@ -11,7 +11,7 @@ export class FacadeClient extends Client.Service<FacadeClient>()("crosshatch/Fac
     },
     Linked: {},
   },
-  methods: {
+  external: {
     Rescind: {
       payload: S.Void,
       success: S.Void,
