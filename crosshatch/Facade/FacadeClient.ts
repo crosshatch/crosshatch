@@ -1,7 +1,8 @@
-import { Client } from "liminal"
-import { Schema as S } from "effect"
-import { LinkChallengeId } from "../LinkChallengeId.ts"
 import { Payload, Required } from "@crosshatch/x402"
+import { Schema as S } from "effect"
+import { Client } from "liminal"
+
+import { LinkChallengeId } from "../LinkChallengeId.ts"
 import { DeclinedError } from "./errors.ts"
 
 export class FacadeClient extends Client.Service<FacadeClient>()("crosshatch/FacadeClient", {

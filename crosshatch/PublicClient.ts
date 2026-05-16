@@ -1,7 +1,7 @@
-import { HttpApiClient } from "effect/unstable/httpapi"
 import { Context, Layer, Effect } from "effect"
-import { InternalEnv } from "./InternalEnv.ts"
+import { HttpApiClient } from "effect/unstable/httpapi"
 
+import { InternalEnv } from "./InternalEnv.ts"
 import { Public } from "./Public.ts"
 
 export class PublicClient extends Context.Service<PublicClient>()("crosshatch/PublicClient", {
