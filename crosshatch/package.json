@@ -20,7 +20,7 @@
     "./*": "./*.ts",
     "./package.json": "./package.json"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@crosshatch/caip": "workspace:*",
     "@crosshatch/widget": "workspace:*",
     "@crosshatch/x402": "workspace:*",
@@ -28,7 +28,6 @@
     "@standard-schema/spec": "catalog:",
     "effect": "catalog:",
     "liminal": "workspace:*",
-    "liminal-util": "workspace:*",
-    "ox": "catalog:"
+    "liminal-util": "workspace:*"
   }
 }
