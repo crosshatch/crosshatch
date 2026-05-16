@@ -4,7 +4,7 @@ import { Requirements } from "./Requirements.ts"
 import { ResourceInfo } from "./ResourceInfo.ts"
 import { Version } from "./Version.ts"
 
-const Erc3009Payload = S.Struct({
+export const Erc3009Payload = S.Struct({
   signature: S.String,
   authorization: S.Struct({
     from: S.String,
@@ -16,7 +16,7 @@ const Erc3009Payload = S.Struct({
   }),
 })
 
-const Permit2Payload = S.Struct({
+export const Permit2Payload = S.Struct({
   signature: S.String,
   permit2Authorization: S.Struct({
     from: S.String,
@@ -32,7 +32,7 @@ const Permit2Payload = S.Struct({
   }),
 })
 
-const SolanaPayload = S.Struct({
+export const SolanaPayload = S.Struct({
   transaction: S.String,
 })
 
