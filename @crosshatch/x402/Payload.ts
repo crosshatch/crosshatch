@@ -20,7 +20,10 @@ export const Permit2Payload = S.Struct({
   signature: S.String,
   permit2Authorization: S.Struct({
     from: S.String,
-    permitted: S.Struct({ token: S.String, amount: S.String }),
+    permitted: S.Struct({
+      token: S.String,
+      amount: S.String,
+    }),
     spender: S.String,
     nonce: S.String,
     deadline: S.String,
