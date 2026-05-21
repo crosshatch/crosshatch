@@ -20,6 +20,13 @@
     "./*": "./*.ts",
     "./package.json": "./package.json"
   },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.js",
+      "./*": "./dist/*.js",
+      "./package.json": "./package.json"
+    }
+  },
   "peerDependencies": {
     "@crosshatch/caip": "workspace:*",
     "@crosshatch/widget": "workspace:*",

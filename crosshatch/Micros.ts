@@ -1,4 +1,4 @@
-import type { ChainIdString, AccountAddress } from "@crosshatch/caip"
+import { AccountAddress, ChainIdString } from "@crosshatch/caip"
 import { Schema as S, Effect, BigDecimal, Option, Data } from "effect"
 
 const MICROS_PER_USD = 1_000_000n
@@ -9,6 +9,17 @@ export interface SupportedAsset {
   readonly asset: typeof AccountAddress.Type
   readonly decimals: number
 }
+
+export const BASE_USDC: SupportedAsset = {
+  network: ChainIdString.make("eip155:8453"),
+  asset: AccountAddress.make("0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"),
+  decimals: 6,
+}
+
+export const SUPPORTED: ReadonlyArray<SupportedAsset> = [BASE_USDC]
+
+export const findSupported = (network: typeof ChainIdString.Type, asset: string) =>
+  SUPPORTED.find((supported) => supported.network === network && supported.asset.toLowerCase() === asset.toLowerCase())
 
 export const Micros = S.BigInt.check(S.isGreaterThanOrEqualToBigInt(0n)).pipe(S.brand("Micros"))
 
@@ -33,6 +44,9 @@ const integerDecimalToBigInt = (decimal: BigDecimal.BigDecimal) =>
 
 export const fromX402 = (amount: string, asset: SupportedAsset): typeof Micros.Type =>
   Micros.make(ceilDiv(BigInt(amount) * MICROS_PER_USD, 10n ** BigInt(asset.decimals)))
+
+export const toX402 = (amount: typeof Micros.Type, asset: SupportedAsset): string =>
+  ceilDiv(amount * 10n ** BigInt(asset.decimals), MICROS_PER_USD).toString()
 
 export class MicrosInvalidError extends Data.TaggedError("MicrosInvalidError")<{ input: string }> {}
 

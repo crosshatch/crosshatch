@@ -3,6 +3,7 @@ import { Schema as S } from "effect"
 import { Client } from "liminal"
 
 import { LinkChallengeId } from "../LinkChallengeId.ts"
+import { PaymentMetadata } from "../PaymentMetadata.ts"
 import { DeclinedError } from "./errors.ts"
 
 export class FacadeClient extends Client.Service<FacadeClient>()("crosshatch/FacadeClient", {
@@ -21,6 +22,7 @@ export class FacadeClient extends Client.Service<FacadeClient>()("crosshatch/Fac
     Propose: {
       payload: S.Struct({
         required: Required.Required,
+        metadata: PaymentMetadata.pipe(S.optional),
       }),
       success: S.Struct({
         payload: Payload.Payload,

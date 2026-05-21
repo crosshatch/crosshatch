@@ -2,7 +2,7 @@ import { AccountAddress, ChainIdString } from "@crosshatch/caip"
 import { assert, describe, it } from "@effect/vitest"
 import { Effect } from "effect"
 
-import { parseInput, Micros, format, display, fromX402 } from "./Micros.ts"
+import { parseInput, Micros, format, display, fromX402, toX402 } from "./Micros.ts"
 
 describe(import.meta.url, () => {
   it.effect(
@@ -46,5 +46,22 @@ describe(import.meta.url, () => {
     }
     assert.strictEqual(fromX402("1000000", asset), Micros.make(1_000_000n))
     assert.strictEqual(fromX402("1", asset), Micros.make(1n))
+  })
+
+  it("converts micros to x402 base units using ceiling units", () => {
+    const usdc = {
+      network: ChainIdString.make("eip155:1"),
+      asset: AccountAddress.make("0xabc"),
+      decimals: 6,
+      rpcs: [],
+    }
+    const wholeDollars = {
+      ...usdc,
+      decimals: 0,
+    }
+
+    assert.strictEqual(toX402(Micros.make(1_000_000n), usdc), "1000000")
+    assert.strictEqual(toX402(Micros.make(1000n), usdc), "1000")
+    assert.strictEqual(toX402(Micros.make(1n), wholeDollars), "1")
   })
 })
