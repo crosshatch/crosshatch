@@ -1,6 +1,4 @@
-import { Context, Schema as S } from "effect"
-
-export const PaymentContextPart = S.TaggedUnion({})
+import { Schema as S, Context } from "effect"
 
 export const PaymentMetadata = S.Struct({
   title: S.String,
@@ -12,11 +10,7 @@ export const PaymentContext = S.Struct({
   metadata: PaymentMetadata.pipe(S.optional),
 })
 
-// TODO: somehow separate from front-end concerns?
 export class CurrentPaymentContext extends Context.Service<
   CurrentPaymentContext,
-  {
-    readonly id: string
-    readonly metadata: typeof PaymentMetadata.Type
-  }
+  typeof PaymentContext.Type | undefined
 >()("crosshatch/CurrentPaymentContext") {}
