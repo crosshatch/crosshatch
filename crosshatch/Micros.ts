@@ -45,6 +45,10 @@ const integerDecimalToBigInt = (decimal: BigDecimal.BigDecimal) =>
 export const fromX402 = (amount: string, asset: SupportedAsset): typeof Micros.Type =>
   Micros.make(ceilDiv(BigInt(amount) * MICROS_PER_USD, 10n ** BigInt(asset.decimals)))
 
+export const fromInt = (n: number) => Micros.make(BigInt(n * 1000))
+
+export const fromString = (n: string) => fromInt(parseInt(n))
+
 export const toX402 = (amount: typeof Micros.Type, asset: SupportedAsset): string =>
   ceilDiv(amount * 10n ** BigInt(asset.decimals), MICROS_PER_USD).toString()
 

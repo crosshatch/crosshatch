@@ -1,6 +1,6 @@
 import type { AccountAddress } from "@crosshatch/caip"
 import { Required, Requirements } from "@crosshatch/x402"
-import { Micros, PaymentContextId, CurrentPaymentMetadata, PaymentMetadata } from "crosshatch"
+import { Micros, CurrentPaymentContext, PaymentContext } from "crosshatch"
 import { Context, Effect, String } from "effect"
 
 import { BASE_USDC } from "./Micros.ts"
@@ -10,11 +10,11 @@ export class PaymentBridge extends Context.Service<
   {
     readonly recipient: typeof AccountAddress.Type
     readonly take: ({
+      context,
       required,
-      metadata,
     }: {
+      readonly context: typeof PaymentContext.Type
       readonly required: typeof Required.Required.Type
-      readonly metadata: typeof PaymentMetadata.Type
     }) => Effect.Effect<void>
   }
 >()("crosshatch/Bridge") {}
@@ -24,8 +24,9 @@ export const charge =
   (template: TemplateStringsArray, ...substitutions: ReadonlyArray<unknown>) =>
     Effect.gen(function* () {
       const { take, recipient } = yield* PaymentBridge
-      const metadata = yield* CurrentPaymentMetadata
+      const context = yield* CurrentPaymentContext
       yield* take({
+        context,
         required: Required.Required.make({
           x402Version: 2,
           accepts: [
@@ -47,18 +48,21 @@ export const charge =
             description: String.stripMargin(globalThis.String.raw(template, ...substitutions)),
           },
         }),
-        metadata,
       })
     })
 
 export const grouped =
+  (title: string) =>
   (template: TemplateStringsArray, ...substitutions: ReadonlyArray<unknown>) =>
   <A, E, R>(effect: Effect.Effect<A, E, R>) =>
     Effect.provideServiceEffect(
       effect,
-      CurrentPaymentMetadata,
+      CurrentPaymentContext,
       Effect.sync(() => ({
-        paymentContextId: PaymentContextId.make(crypto.randomUUID()),
-        description: String.stripMargin(globalThis.String.raw(template, ...substitutions)).trim(),
+        id: crypto.randomUUID(),
+        metadata: {
+          title,
+          description: String.stripMargin(globalThis.String.raw(template, ...substitutions)).trim(),
+        },
       })),
     )
