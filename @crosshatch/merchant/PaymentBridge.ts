@@ -1,8 +1,7 @@
 import { AccountAddress } from "@crosshatch/caip"
 import { Payload, Required } from "@crosshatch/x402"
+import { TraceConfig } from "crosshatch"
 import { Context, Effect, Data } from "effect"
-
-import { TraceConfig } from "../TraceConfig.ts"
 
 export class CreateRunError extends Data.TaggedError("CreateRunError")<{
   readonly cause: unknown

@@ -18,6 +18,11 @@
   "exports": {
     "./*": "./*.ts"
   },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.js"
+    }
+  },
   "peerDependencies": {
     "@effect/platform-browser": "catalog:",
     "effect": "catalog:"

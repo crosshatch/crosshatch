@@ -1,8 +1,8 @@
 {
-  "name": "@crosshatch/caip",
+  "name": "@crosshatch/merchant",
   "version": "0.1.0-beta.1",
   "private": false,
-  "description": "CAIP utilities used by Crosshatch packages.",
+  "description": "Crosshatch x402 backend integrations.",
   "homepage": "https://crosshatch.dev",
   "bugs": {
     "url": "https://github.com/crosshatch/crosshatch/issues"
@@ -11,7 +11,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/crosshatch/crosshatch.git",
-    "directory": "@crosshatch/caip"
+    "directory": "@crosshatch/merchant"
   },
   "type": "module",
   "sideEffects": false,
@@ -24,6 +24,10 @@
     }
   },
   "peerDependencies": {
-    "effect": "catalog:"
+    "@crosshatch/caip": "workspace:*",
+    "@crosshatch/x402": "workspace:*",
+    "crosshatch": "workspace:*",
+    "effect": "catalog:",
+    "viem": "catalog:"
   }
 }

@@ -19,6 +19,12 @@
     ".": "./index.ts",
     "./Facilitator": "./Facilitator/Facilitator.ts"
   },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.js",
+      "./Facilitator": "./dist/Facilitator/Facilitator.js"
+    }
+  },
   "peerDependencies": {
     "@crosshatch/caip": "workspace:*",
     "effect": "catalog:",

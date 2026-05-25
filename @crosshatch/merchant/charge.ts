@@ -1,10 +1,9 @@
+import { makeRequired, Micros } from "crosshatch"
 import { Context, Effect, Option, String } from "effect"
 
-import { makeRequired } from "../makeRequired.ts"
-import { BASE_USDC, type Micros } from "../Micros.ts"
-import { Treasury } from "../Treasury.ts"
 import { MerchantMetadata } from "./MerchantMetadata.ts"
 import { PaymentBridge } from "./PaymentBridge.ts"
+import { Treasury } from "./Treasury.ts"
 
 export class TraceId extends Context.Service<TraceId, string>()("crosshatch/TraceId") {}
 
@@ -27,7 +26,7 @@ export const provideChargeGroup =
       return yield* Effect.provideService(effect, TraceId, traceId)
     })
 
-export const charge = (amount: typeof Micros.Type) =>
+export const charge = (amount: typeof Micros.Micros.Type) =>
   Effect.fnUntraced(function* (template: TemplateStringsArray, ...substitutions: ReadonlyArray<unknown>) {
     const treasury = yield* Treasury
     const { createPayload } = yield* PaymentBridge
@@ -41,7 +40,7 @@ export const charge = (amount: typeof Micros.Type) =>
         description: String.stripMargin(globalThis.String.raw(template, ...substitutions)),
         amount,
         recipient: treasury,
-        asset: BASE_USDC,
+        asset: Micros.BASE_USDC,
       }),
     })
     // yield* settle(payload)
