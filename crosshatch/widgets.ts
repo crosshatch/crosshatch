@@ -66,8 +66,8 @@ const Common = S.Struct({
   referrer: S.String.pipe(S.optional),
 })
 
-export const EventsWidget = widget({
-  pathname: "events",
+export const ActivityWidget = widget({
+  pathname: "activity",
   payload: Common,
   item: S.Never,
 })

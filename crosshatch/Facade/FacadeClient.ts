@@ -1,9 +1,9 @@
-import { Payload } from "@crosshatch/x402"
+import { Payload, Required } from "@crosshatch/x402"
 import { Schema as S } from "effect"
 import { Client } from "liminal"
 
 import { LinkChallengeId } from "../LinkChallengeId.ts"
-import { RequiredEnvelope } from "../merchant/merchant.ts"
+import { TraceConfig } from "../TraceConfig.ts"
 import { DeclinedError } from "./errors.ts"
 
 export class FacadeClient extends Client.Service<FacadeClient>()("crosshatch/FacadeClient", {
@@ -19,8 +19,16 @@ export class FacadeClient extends Client.Service<FacadeClient>()("crosshatch/Fac
       success: S.Void,
       failure: S.Never,
     },
+    CreateTrace: {
+      payload: TraceConfig,
+      success: S.Void,
+      failure: S.Never,
+    },
     Propose: {
-      payload: RequiredEnvelope,
+      payload: S.Struct({
+        traceId: S.String.pipe(S.optional),
+        required: Required.Required,
+      }),
       success: S.Struct({ payload: Payload.Payload }),
       failure: DeclinedError,
     },

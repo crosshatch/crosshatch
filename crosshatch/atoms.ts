@@ -6,7 +6,7 @@ import * as Facade from "./Facade/Facade.ts"
 import { InternalEnv } from "./InternalEnv.ts"
 import { Micros } from "./Micros.ts"
 import { atomRuntime } from "./runtime.ts"
-import { EventsWidget, IdWidget, LinkWidget } from "./widgets.ts"
+import { ActivityWidget, IdWidget, LinkWidget } from "./widgets.ts"
 
 const span = Spanner.make(import.meta.url)
 
@@ -47,7 +47,7 @@ export const openAtom = atomRuntime.fn<void>()(
               },
               ...common,
             }),
-      Linked: () => EventsWidget.host(common),
+      Linked: () => ActivityWidget.host(common),
     }).pipe(
       span("open", {
         attributes: {
