@@ -5,6 +5,7 @@ export class AssetNotSupportedError extends S.TaggedErrorClass<AssetNotSupported
   {},
 ) {}
 
+// TODO: rename? This error is used when no matching asset / usable allowance (not a matter of general denial)
 export class AllowanceDenialError extends S.TaggedErrorClass<AllowanceDenialError>()("AllowanceDenialError", {}) {}
 
 export class InsufficientFundsError extends S.TaggedErrorClass<InsufficientFundsError>()(

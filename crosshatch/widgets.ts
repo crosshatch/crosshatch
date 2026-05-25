@@ -106,7 +106,7 @@ export const RaiseAllowanceWidget = widget({
   item: S.Never,
 })
 
-export const OnrampExplainerWidget = widget({
+export const OnrampWidget = widget({
   pathname: "onramp",
   payload: Facade.InsufficientFundsError,
   item: S.Never,

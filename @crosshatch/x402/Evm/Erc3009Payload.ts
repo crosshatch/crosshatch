@@ -1,7 +1,9 @@
-import { Data, Effect, Schema as S } from "effect"
-import type { EvmSigner } from "./EvmSigner.ts"
-import type { Requirements } from "../Requirements.ts"
+import { Effect, Schema as S } from "effect"
 import { getAddress, toHex } from "viem"
+
+import { PayloadMakeError } from "../errors.ts"
+import type { Requirements } from "../Requirements.ts"
+import type { EvmSigner } from "./EvmSigner.ts"
 
 const Erc3009Authorization = S.Struct({
   from: S.String,
@@ -28,11 +30,9 @@ const authorizationTypes = {
   ],
 } as const
 
-export class MakeErc3009PayloadError extends Data.TaggedError("MakeErc3009PayloadError")<{}> {}
-
 export const make = Effect.fn(function* (signer: EvmSigner["Service"], requirement: typeof Requirements.Type) {
   if (!requirement.extra?.name || !requirement.extra?.version) {
-    return yield* new MakeErc3009PayloadError()
+    return yield* new PayloadMakeError()
   }
   const now = Math.floor(Date.now() / 1000)
   const chainId = parseInt(requirement.network.split(":")[1]!)

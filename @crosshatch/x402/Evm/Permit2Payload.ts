@@ -1,6 +1,7 @@
-import { Data, Effect, Schema as S } from "effect"
-import type { Requirements } from "../Requirements.ts"
+import { Effect, Schema as S } from "effect"
 import { getAddress, toHex } from "viem"
+
+import type { Requirements } from "../Requirements.ts"
 import type { EvmSigner } from "./EvmSigner.ts"
 
 const Permit2Authorization = S.Struct({
@@ -45,8 +46,6 @@ const permit2WitnessTypes = {
     { name: "extra", type: "bytes" },
   ],
 } as const
-
-export class Permit2PayloadMakeError extends Data.TaggedError("Permit2PayloadMakeError")<{}> {}
 
 export const make = Effect.fn(function* (signer: EvmSigner["Service"], requirement: typeof Requirements.Type) {
   const now = Math.floor(Date.now() / 1000)
