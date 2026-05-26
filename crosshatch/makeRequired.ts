@@ -23,7 +23,7 @@ export const makeRequired = ({
         amount: toX402(amount, asset),
         asset: asset.asset,
         extra: {
-          name: "USDC",
+          name: "USD Coin",
           version: "2",
         },
         maxTimeoutSeconds: 60,

@@ -9,7 +9,7 @@ export class Trace extends Context.Service<
     readonly name: string
     readonly description: string
   }
->()("crosshatch/Trace") {}
+>()("@crosshatch/merchant/Trace") {}
 
 export const traced =
   (name: string) =>

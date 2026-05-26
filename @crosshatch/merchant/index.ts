@@ -1,5 +1,5 @@
-export * as MerchantMetadata from "./MerchantMetadata.ts"
-export * as PaymentBridge from "./PaymentBridge.ts"
-export * as Treasury from "./Treasury.ts"
+export * as Merchant from "./Merchant.ts"
+export * from "./PaymentBridge.ts"
 export * from "./charge.ts"
 export * from "./Trace.ts"
+export * from "./PaymentsPending.ts"

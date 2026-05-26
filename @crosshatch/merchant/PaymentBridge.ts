@@ -1,30 +1,20 @@
-import { AccountAddress } from "@crosshatch/caip"
 import { Payload, Required } from "@crosshatch/x402"
 import { TraceConfig } from "crosshatch"
 import { Context, Effect, Data } from "effect"
 
-export class CreateRunError extends Data.TaggedError("CreateRunError")<{
-  readonly cause: unknown
-}> {}
+export class CreateRunError extends Data.TaggedError("CreateRunError")<{ readonly cause: unknown }> {}
 
-export class CreateTraceError extends Data.TaggedError("CreateTraceError")<{
-  readonly cause: unknown
-}> {}
+export class CreateTraceError extends Data.TaggedError("CreateTraceError")<{ readonly cause: unknown }> {}
 
 export class PaymentBridge extends Context.Service<
   PaymentBridge,
   {
     readonly createTrace: (config: typeof TraceConfig.Type) => Effect.Effect<void, CreateTraceError>
 
+    // TODO: include `from` / info about payer?
     readonly createPayload: (config: {
       readonly traceId?: string | undefined
       readonly required: typeof Required.Required.Type
-    }) => Effect.Effect<
-      {
-        readonly from: typeof AccountAddress.Type
-        readonly payload: typeof Payload.Payload.Type
-      },
-      CreateTraceError
-    >
+    }) => Effect.Effect<{ readonly payload: typeof Payload.Payload.Type }, CreateTraceError>
   }
->()("crosshatch/PaymentBridge") {}
+>()("@crosshatch/merchant/PaymentBridge") {}
