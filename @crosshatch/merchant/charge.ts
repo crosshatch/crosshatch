@@ -27,5 +27,5 @@ export const charge = (amount: typeof Micros.Micros.Type) =>
         asset: Micros.BASE_USDC,
       }),
     })
-    return yield* settle({ payload })
+    yield* settle({ payload })
   })
