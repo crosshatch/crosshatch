@@ -226,6 +226,24 @@ importers:
         specifier: 'catalog:'
         version: 4.0.0-beta.57
 
+  '@crosshatch/merchant':
+    dependencies:
+      '@crosshatch/caip':
+        specifier: workspace:*
+        version: link:../caip
+      '@crosshatch/x402':
+        specifier: workspace:*
+        version: link:../x402
+      crosshatch:
+        specifier: workspace:*
+        version: link:../../crosshatch
+      effect:
+        specifier: 'catalog:'
+        version: 4.0.0-beta.57
+      viem:
+        specifier: 'catalog:'
+        version: 2.51.0(typescript@6.0.2)(zod@3.25.76)
+
   '@crosshatch/widget':
     dependencies:
       '@effect/platform-browser':
@@ -5121,7 +5139,7 @@ packages:
     resolution: {integrity: sha512-/jHxFIzoMXdqPzTaCpFzAAWhpkSjZPF4Vsn6jAfNpmbH/ymsmd7Qc6VE9BGn0L6YMj6uwpQLxCECpus4ukKS9Q==}
 
   ox@https://pkg.pr.new/ox@386a3439fe1ce76d237930f8c6e6bb493746069a:
-    resolution: {integrity: sha512-OHHm9re1yVjiMN66GZ2JSGuqmvJPrk40zh3PIS/3I6prZLbt6U/zKlgW18eIIkO0Y/ZyySKr6D/4mUXjBmky1g==, tarball: https://pkg.pr.new/ox@386a3439fe1ce76d237930f8c6e6bb493746069a}
+    resolution: {tarball: https://pkg.pr.new/ox@386a3439fe1ce76d237930f8c6e6bb493746069a}
     version: 0.14.26-386a343.0
     peerDependencies:
       typescript: '>=5.4.0'
