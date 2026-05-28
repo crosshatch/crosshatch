@@ -11,7 +11,6 @@ export class Bridge extends Context.Service<
   {
     readonly createTrace: (config: typeof TraceConfig.Type) => Effect.Effect<void, CreateTraceError>
 
-    // TODO: include `from` / info about payer
     readonly createPayload: (config: {
       readonly traceId?: string | undefined
       readonly required: typeof Required.Required.Type
