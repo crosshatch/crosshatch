@@ -6,7 +6,6 @@ export class Merchant extends Context.Service<
   {
     readonly url: string
     readonly treasury: typeof AccountAddress.Type
-    readonly facilitator?: string | undefined
   }
 >()("@crosshatch/merchant/Merchant") {
   static readonly layer = Layer.succeed(this)
