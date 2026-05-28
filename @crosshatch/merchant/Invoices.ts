@@ -2,7 +2,7 @@ import { Payload } from "@crosshatch/x402"
 import { InvoiceId } from "crosshatch"
 import { Context, Deferred, Effect, Layer, Schema as S } from "effect"
 
-export class Invoices extends Context.Service<Invoices>()("@crosshatch/merchant/PaymentsPending", {
+export class Invoices extends Context.Service<Invoices>()("@crosshatch/merchant/Invoices", {
   make: Effect.sync<Record<typeof InvoiceId.Type, Deferred.Deferred<typeof Payload.Payload.Type>>>(() => ({})),
 }) {
   static readonly layer = Layer.succeed(this, {})

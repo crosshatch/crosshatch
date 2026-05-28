@@ -1,6 +1,6 @@
 import { Context, Effect, String } from "effect"
 
-import { PaymentBridge } from "./PaymentBridge.ts"
+import { Bridge } from "./Bridge.ts"
 
 export class Trace extends Context.Service<
   Trace,
@@ -15,10 +15,12 @@ export const traced =
   (name: string) =>
   (template: TemplateStringsArray, ...substitutions: ReadonlyArray<unknown>) =>
     Effect.fnUntraced(function* <A, E, R>(effect: Effect.Effect<A, E, R>) {
-      const { createTrace } = yield* PaymentBridge
+      const { createTrace } = yield* Bridge
       const traceId = yield* Effect.currentSpan.pipe(
         Effect.map(({ traceId }) => traceId),
-        Effect.catchTag("NoSuchElementError", Effect.die),
+        Effect.catchTags({
+          NoSuchElementError: Effect.die,
+        }),
       )
       const trace = {
         traceId,

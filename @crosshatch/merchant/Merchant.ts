@@ -8,6 +8,6 @@ export class Merchant extends Context.Service<
     readonly treasury: typeof AccountAddress.Type
     readonly facilitator?: string | undefined
   }
->()("@crosshatch/merchant/Merchant") {}
-
-export const layer = (metadata: Merchant["Service"]) => Layer.succeed(Merchant, metadata)
+>()("@crosshatch/merchant/Merchant") {
+  static readonly layer = Layer.succeed(this)
+}

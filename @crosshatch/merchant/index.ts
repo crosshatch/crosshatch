@@ -1,5 +1,5 @@
-export * as Merchant from "./Merchant.ts"
-export * from "./PaymentBridge.ts"
+export * from "./Merchant.ts"
+export * from "./Bridge.ts"
 export * from "./charge.ts"
 export * from "./Trace.ts"
-export * from "./PaymentsPending.ts"
+export * from "./Invoices.ts"

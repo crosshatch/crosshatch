@@ -6,15 +6,15 @@ export class CreateRunError extends Data.TaggedError("CreateRunError")<{ readonl
 
 export class CreateTraceError extends Data.TaggedError("CreateTraceError")<{ readonly cause: unknown }> {}
 
-export class PaymentBridge extends Context.Service<
-  PaymentBridge,
+export class Bridge extends Context.Service<
+  Bridge,
   {
     readonly createTrace: (config: typeof TraceConfig.Type) => Effect.Effect<void, CreateTraceError>
 
-    // TODO: include `from` / info about payer?
+    // TODO: include `from` / info about payer
     readonly createPayload: (config: {
       readonly traceId?: string | undefined
       readonly required: typeof Required.Required.Type
     }) => Effect.Effect<{ readonly payload: typeof Payload.Payload.Type }, CreateTraceError>
   }
->()("@crosshatch/merchant/PaymentBridge") {}
+>()("@crosshatch/merchant/Bridge") {}

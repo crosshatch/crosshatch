@@ -23,7 +23,7 @@ export const makeFetch =
         ? Encoding.decodeBase64String(header)
             .asEffect()
             .pipe(Effect.flatMap(flow(JSON.parse, S.decodeUnknownEffect(S.toType(Required.Required)))))
-        : Effect.tryPromise(() => response.json()).pipe(
+        : Effect.promise(() => response.json()).pipe(
             Effect.flatMap(S.decodeUnknownEffect(S.toType(Required.Required))),
             Effect.filterOrFail(({ x402Version }) => x402Version === 1),
           )
@@ -52,6 +52,6 @@ export const makeFetch =
           break
         }
       }
-      return yield* Effect.tryPromise(() => fetch(input, { ...init, headers }))
+      return yield* Effect.promise(() => fetch(input, { ...init, headers }))
     }).pipe((x) => managedRuntime.runPromise(x, { signal: init?.signal ?? undefined }))
   }
