@@ -9,6 +9,9 @@
     "preview": "vocs preview"
   },
   "dependencies": {
+    "@crosshatch/caip": "workspace:*",
+    "@crosshatch/merchant": "workspace:*",
+    "@crosshatch/x402": "workspace:*",
     "@types/react": "catalog:",
     "alchemy": "catalog:",
     "crosshatch": "workspace:*",
@@ -21,10 +24,6 @@
     "rehype": "catalog:",
     "rehype-mermaid": "latest",
     "typescript": "catalog:",
-    "vocs": "catalog:",
-    "@crosshatch/caip": "workspace:*",
-    "@crosshatch/x402": "workspace:*",
-    "@crosshatch/merchant": "workspace:*",
-    "crosshatch": "workspace:*"
+    "vocs": "catalog:"
   }
 }
