@@ -1,9 +1,10 @@
 import type { AccountAddress } from "@crosshatch/caip"
 import { Required, Requirements } from "@crosshatch/x402"
 
-import { toX402, type Micros, type SupportedAsset } from "./Micros.ts"
+import type { Asset } from "./Asset.ts"
+import { toX402, type Micros } from "./Micros.ts"
 
-export const makeRequired = ({
+export const required = ({
   url,
   amount,
   asset,
@@ -12,7 +13,7 @@ export const makeRequired = ({
 }: {
   readonly url: string
   readonly amount: typeof Micros.Type
-  readonly asset: SupportedAsset
+  readonly asset: Asset
   readonly description: string
   readonly recipient: typeof AccountAddress.Type
 }) =>
@@ -22,10 +23,7 @@ export const makeRequired = ({
       Requirements.Requirements.make({
         amount: toX402(amount, asset),
         asset: asset.asset,
-        extra: {
-          name: "USD Coin",
-          version: "2",
-        },
+        extra: asset.extra,
         maxTimeoutSeconds: 60,
         network: asset.network,
         payTo: recipient,

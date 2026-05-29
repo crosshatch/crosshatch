@@ -1,27 +1,15 @@
-import { AccountAddress, ChainIdString } from "@crosshatch/caip"
+import { ChainIdString } from "@crosshatch/caip"
 import { Schema as S, Effect, BigDecimal, Option, Data } from "effect"
+
+import { type Asset, SUPPORTED } from "./Asset.ts"
+
+export const Micros = S.BigInt.check(S.isGreaterThanOrEqualToBigInt(0n)).pipe(S.brand("Micros"))
 
 const MICROS_PER_USD = 1_000_000n
 const MICROS_PER_USD_DECIMAL = BigDecimal.make(MICROS_PER_USD, 0)
 
-export interface SupportedAsset {
-  readonly network: typeof ChainIdString.Type
-  readonly asset: typeof AccountAddress.Type
-  readonly decimals: number
-}
-
-export const BASE_USDC: SupportedAsset = {
-  network: ChainIdString.make("eip155:8453"),
-  asset: AccountAddress.make("0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"),
-  decimals: 6,
-}
-
-export const SUPPORTED: ReadonlyArray<SupportedAsset> = [BASE_USDC]
-
 export const findSupported = (network: typeof ChainIdString.Type, asset: string) =>
   SUPPORTED.find((supported) => supported.network === network && supported.asset.toLowerCase() === asset.toLowerCase())
-
-export const Micros = S.BigInt.check(S.isGreaterThanOrEqualToBigInt(0n)).pipe(S.brand("Micros"))
 
 export const format = (amount: typeof Micros.Type): string => {
   const dollars = amount / MICROS_PER_USD
@@ -42,28 +30,28 @@ const ceilDiv = (numerator: bigint, denominator: bigint) =>
 const integerDecimalToBigInt = (decimal: BigDecimal.BigDecimal) =>
   decimal.scale < 0 ? decimal.value * 10n ** BigInt(-decimal.scale) : decimal.value
 
-export const fromX402 = (amount: string, asset: SupportedAsset): typeof Micros.Type =>
+export const fromX402 = (amount: string, asset: Asset): typeof Micros.Type =>
   Micros.make(ceilDiv(BigInt(amount) * MICROS_PER_USD, 10n ** BigInt(asset.decimals)))
 
 export const fromInt = (n: number) => Micros.make(BigInt(n * 1000))
 
 export const fromString = (n: string) => fromInt(parseInt(n))
 
-export const toX402 = (amount: typeof Micros.Type, asset: SupportedAsset): string =>
+export const toX402 = (amount: typeof Micros.Type, asset: Asset): string =>
   ceilDiv(amount * 10n ** BigInt(asset.decimals), MICROS_PER_USD).toString()
 
 export class MicrosInvalidError extends Data.TaggedError("MicrosInvalidError")<{ input: string }> {}
 
 export const parseInput = (input: string) =>
   input.trim() === ""
-    ? new MicrosInvalidError({ input }).asEffect()
+    ? new MicrosInvalidError({ input })
     : BigDecimal.fromString(input).pipe(
         Option.match({
-          onNone: () => new MicrosInvalidError({ input }).asEffect(),
+          onNone: () => new MicrosInvalidError({ input }),
           onSome: (decimal) => {
-            if (BigDecimal.isNegative(decimal)) return new MicrosInvalidError({ input }).asEffect()
+            if (BigDecimal.isNegative(decimal)) return new MicrosInvalidError({ input })
             const micros = BigDecimal.multiply(decimal, MICROS_PER_USD_DECIMAL)
-            if (!BigDecimal.isInteger(micros)) return new MicrosInvalidError({ input }).asEffect()
+            if (!BigDecimal.isInteger(micros)) return new MicrosInvalidError({ input })
             return Effect.succeed(Micros.make(integerDecimalToBigInt(BigDecimal.normalize(micros))))
           },
         }),

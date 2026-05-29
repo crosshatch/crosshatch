@@ -20,9 +20,10 @@ export const makeFetch =
     return Effect.gen(function* () {
       const header = response.headers.get("PAYMENT-REQUIRED")
       const required = yield* header
-        ? Encoding.decodeBase64String(header)
-            .asEffect()
-            .pipe(Effect.flatMap(flow(JSON.parse, S.decodeUnknownEffect(S.toType(Required.Required)))))
+        ? Encoding.decodeBase64String(header).pipe(
+            Effect.fromResult,
+            Effect.flatMap(flow(JSON.parse, S.decodeUnknownEffect(S.toType(Required.Required)))),
+          )
         : Effect.promise(() => response.json()).pipe(
             Effect.flatMap(S.decodeUnknownEffect(S.toType(Required.Required))),
             Effect.filterOrFail(({ x402Version }) => x402Version === 1),

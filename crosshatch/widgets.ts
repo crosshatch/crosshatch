@@ -45,7 +45,9 @@ const widget = <Payload extends S.Codec<any, any>, Item extends S.Codec<any, any
       Effect.flatMap(
         Effect.fn(function* (x) {
           const base = yield* InternalEnv.href(pathname)
-          const { href: src } = yield* UrlParams.makeUrl(base, UrlParams.make([["x", x]]), undefined)
+          const { href: src } = yield* UrlParams.makeUrl(base, UrlParams.make([["x", x]]), undefined).pipe(
+            Effect.fromResult,
+          )
           return embed({
             item: S.Union([item, Finished]),
             src,

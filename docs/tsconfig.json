@@ -16,5 +16,12 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["."]
+  "include": ["."],
+  "references": [
+    { "path": "../@crosshatch/caip" },
+    { "path": "../@crosshatch/merchant" },
+    { "path": "../@crosshatch/x402" },
+    { "path": "../crosshatch" },
+    { "path": "../liminal/effect-workerd" }
+  ]
 }

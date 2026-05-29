@@ -24,7 +24,7 @@ export const settle = Effect.fnUntraced(function* ({ payload }: { readonly paylo
         paymentRequirements,
       },
     })
-    .pipe(Effect.catch(() => new SettlementError().asEffect()))
+    .pipe(Effect.catch(() => new SettlementError()))
   if (!response.success) {
     const { errorReason: reason, errorMessage: message } = response
     yield* Effect.logError({ reason, message })

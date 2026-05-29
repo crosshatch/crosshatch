@@ -1,4 +1,4 @@
-import { makeRequired, Micros, settle } from "crosshatch"
+import { Asset, required, Micros, settle } from "crosshatch"
 import { Effect, flow, Option, String } from "effect"
 
 import { Bridge } from "./Bridge.ts"
@@ -19,12 +19,12 @@ export const charge = (amount: typeof Micros.Micros.Type) =>
     const { url, treasury } = yield* Merchant
     const { payload } = yield* createPayload({
       traceId,
-      required: makeRequired({
+      required: required({
         url,
         description: String.stripMargin(globalThis.String.raw(template, ...substitutions)),
         amount,
         recipient: treasury,
-        asset: Micros.BASE_USDC,
+        asset: Asset.BASE_USDC,
       }),
     })
     return yield* settle({ payload })

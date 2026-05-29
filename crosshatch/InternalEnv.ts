@@ -24,7 +24,7 @@ export class InternalEnv extends Context.Service<
 }) {
   static readonly layer = Layer.effect(this, this.make)
 
-  static readonly href = (subpath: string) => this.asEffect().pipe(Effect.map(({ url }) => `${url}/${subpath}`))
+  static readonly href = (subpath: string) => this.pipe(Effect.map(({ url }) => `${url}/${subpath}`))
 
   static readonly isCrosshatch = (origin: string) =>
     origin === CROSSHATCH_URL || origin === `${CROSSHATCH_URL}.localhost`

@@ -4,11 +4,12 @@ import { Atom } from "effect/unstable/reactivity"
 import { Client } from "liminal"
 import { boundLayer } from "liminal-util/boundLayer"
 
+import { CrosshatchClient } from "./CrosshatchClient.ts"
 import * as Facade from "./Facade/Facade.ts"
 import { CrosshatchHttpClient } from "./http.ts"
 import { InternalEnv } from "./InternalEnv.ts"
 
-const OtlpLive = InternalEnv.asEffect().pipe(
+const OtlpLive = InternalEnv.pipe(
   Effect.map(({ dev }) =>
     dev
       ? Layer.mergeAll(
@@ -26,12 +27,13 @@ const OtlpLive = InternalEnv.asEffect().pipe(
   Layer.unwrap,
 )
 
+// TODO: clean this up
 const CommonLive = Client.layerWorker({
   client: Facade.FacadeClient,
   reducers: Facade.reducers,
 }).pipe(
   Layer.provide(Facade.FacadeWorker.layer),
-  Layer.provideMerge(InternalEnv.layer),
+  Layer.provideMerge(Layer.mergeAll(CrosshatchClient.layer, InternalEnv.layer)),
   Layer.provideMerge(OtlpLive.pipe(Layer.provide(InternalEnv.layer), Layer.provideMerge(CrosshatchHttpClient))),
   boundLayer("crosshatch"),
 )
