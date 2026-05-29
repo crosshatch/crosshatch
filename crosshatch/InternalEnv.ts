@@ -16,7 +16,7 @@ export class InternalEnv extends Context.Service<
       "env" in import.meta
         ? // @ts-ignore
           (import.meta.env.VITE_PUBLIC_CROSSHATCH_DEV ?? false)
-        : yield* Config.boolean("CROSSHATCH_DEV").pipe(Config.withDefault(false))
+        : yield* Config.withDefault(Config.boolean("CROSSHATCH_DEV"), false)
     const domain = `${CROSSHATCH_DOMAIN}${dev ? ".localhost" : ""}`
     const url = `https://${domain}`
     return { dev, domain, url } as const
@@ -24,7 +24,7 @@ export class InternalEnv extends Context.Service<
 }) {
   static readonly layer = Layer.effect(this, this.make)
 
-  static readonly href = (subpath: string) => this.pipe(Effect.map(({ url }) => `${url}/${subpath}`))
+  static readonly href = (subpath: string) => Effect.map(this, ({ url }) => `${url}/${subpath}`)
 
   static readonly isCrosshatch = (origin: string) =>
     origin === CROSSHATCH_URL || origin === `${CROSSHATCH_URL}.localhost`
