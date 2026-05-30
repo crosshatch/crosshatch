@@ -25,6 +25,7 @@ export default Alchemy.Stack(
             "Secrets Store Write",
             "Workers KV Storage Write",
             "Workers R2 Storage Write",
+            "Workers Scripts Read",
             "Workers Scripts Write",
             "Workers Tail Read",
           ],
