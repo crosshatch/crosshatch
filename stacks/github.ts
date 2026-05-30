@@ -1,7 +1,7 @@
 import * as Alchemy from "alchemy"
 import * as Cloudflare from "alchemy/Cloudflare"
 import * as GitHub from "alchemy/GitHub"
-import { Config, Effect, Layer, Redacted } from "effect"
+import { Config, Effect, Layer } from "effect"
 
 export default Alchemy.Stack(
   "crosshatch-github",
@@ -50,7 +50,7 @@ export default Alchemy.Stack(
       environment: "deploy",
       secrets: {
         CLOUDFLARE_API_TOKEN: apiToken,
-        CLOUDFLARE_ACCOUNT_ID: Redacted.make(accountId),
+        CLOUDFLARE_ACCOUNT_ID: accountId,
       },
     })
   }).pipe(Effect.orDie),
