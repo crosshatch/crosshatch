@@ -1,12 +1,10 @@
 import * as Host from "@crosshatch/widget/Host"
 import { BrowserWorker, BrowserStream } from "@effect/platform-browser"
 import { Effect, Fiber, Layer, Stream, Schema as S, Schedule } from "effect"
-import * as Spanner from "liminal-util/Spanner"
+import * as Boundary from "liminal-util/Boundary"
 
 import { InternalEnv } from "../InternalEnv.ts"
 import { FacadeIntroduction, RequestFacadeIntroduction } from "./handshake.ts"
-
-const span = Spanner.make(import.meta.url)
 
 export const layer = Effect.gen(function* () {
   yield* Host.hostListener.pipe(Effect.forkScoped)
@@ -34,7 +32,7 @@ export const layer = Effect.gen(function* () {
   yield* Effect.addFinalizer(() => Effect.sync(() => iframe.remove()))
   return BrowserWorker.layer(() => port1)
 }).pipe(
-  span("make"),
+  Boundary.span("make", import.meta.url),
   Effect.retry(Schedule.exponential("100 millis", 2).pipe(Schedule.jittered, Schedule.take(6))),
   Layer.unwrap,
 )

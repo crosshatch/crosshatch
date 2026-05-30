@@ -1,14 +1,12 @@
 import { Effect, Match, Cause } from "effect"
 import { Atom } from "effect/unstable/reactivity"
-import * as Spanner from "liminal-util/Spanner"
+import * as Boundary from "liminal-util/Boundary"
 
 import * as Facade from "./Facade/Facade.ts"
 import { InternalEnv } from "./InternalEnv.ts"
 import { Micros } from "./Micros.ts"
 import { atomRuntime } from "./runtime.ts"
 import { ActivityWidget, IdWidget, LinkWidget } from "./widgets.ts"
-
-const span = Spanner.make(import.meta.url)
 
 export const stateAtom = atomRuntime.atom(Facade.FacadeClient.state).pipe(
   Atom.keepAlive,
@@ -49,11 +47,8 @@ export const openAtom = atomRuntime.fn<void>()(
             }),
       Linked: () => ActivityWidget.host(common),
     }).pipe(
-      span("open", {
-        attributes: {
-          state: state._tag,
-          internal,
-        },
+      Boundary.span("open", import.meta.url, {
+        attributes: { stateTag: state._tag, internal },
       }),
     )
   }),

@@ -1,5 +1,6 @@
 import { Required } from "@crosshatch/x402"
 import { Effect, Encoding, flow, Schema as S } from "effect"
+import * as Boundary from "liminal-util/Boundary"
 
 import * as Facade from "./Facade/Facade.ts"
 import { managedRuntime } from "./runtime.ts"
@@ -54,5 +55,7 @@ export const makeFetch =
         }
       }
       return yield* Effect.promise(() => fetch(input, { ...init, headers }))
-    }).pipe((x) => managedRuntime.runPromise(x, { signal: init?.signal ?? undefined }))
+    }).pipe(Effect.onError(Boundary.log), Boundary.span("crosshatch-fetch", import.meta.url), (effect) =>
+      managedRuntime.runPromise(effect, { signal: init?.signal ?? undefined }),
+    )
   }

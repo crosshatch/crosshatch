@@ -3,14 +3,12 @@ import { Finished } from "@crosshatch/widget/self"
 import type { StandardSchemaV1 } from "@standard-schema/spec"
 import { Cause, Effect, pipe, Schema as S, SchemaGetter, Stream } from "effect"
 import { UrlParams } from "effect/unstable/http"
-import * as Spanner from "liminal-util/Spanner"
+import * as Boundary from "liminal-util/Boundary"
 
 import { Allowance } from "./Allowance.ts"
 import * as Facade from "./Facade/Facade.ts"
 import { InternalEnv } from "./InternalEnv.ts"
 import { LinkChallengeId } from "./LinkChallengeId.ts"
-
-const span = Spanner.make(import.meta.url)
 
 export type Widget<Payload extends S.Codec<any, any>> = {
   Payload: Payload["Type"]
@@ -59,7 +57,9 @@ const widget = <Payload extends S.Codec<any, any>, Item extends S.Codec<any, any
       Stream.filter(S.is(Finished)),
       Stream.take(1),
       Stream.runDrain,
-      span("stream-host", { attributes: { pathname } }),
+      Boundary.span("stream-host", import.meta.url, {
+        attributes: { pathname },
+      }),
     )
   return { Payload, standard, host }
 }

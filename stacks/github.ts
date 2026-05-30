@@ -29,9 +29,7 @@ export default Alchemy.Stack(
             "Workers Scripts Write",
             "Workers Tail Read",
           ],
-          resources: {
-            [`com.cloudflare.api.account.${accountId}`]: "*",
-          },
+          resources: { [`com.cloudflare.api.account.${accountId}`]: "*" },
         },
         {
           effect: "allow",

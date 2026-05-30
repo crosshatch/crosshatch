@@ -9,5 +9,5 @@ export const CrosshatchDocs = Cloudflare.StaticSite("CrosshatchDocs", {
   compatibility: { date: "2026-04-08" },
   observability: { enabled: true },
   assetsConfig: { notFoundHandling: "single-page-application" },
-  domain: "docs.crosshatch.dev",
+  domain: ["docs.crosshatch.dev", "www.docs.crosshatch.dev"],
 })
