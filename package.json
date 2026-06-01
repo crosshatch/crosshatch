@@ -27,14 +27,14 @@
     "effect": "catalog:",
     "fake-indexeddb": "catalog:",
     "happy-dom": "catalog:",
+    "liminal-util": "workspace:*",
     "oxfmt": "catalog:",
     "oxlint": "catalog:",
     "playwright": "catalog:",
     "ts-patch": "catalog:",
     "turbo": "catalog:",
     "typescript": "catalog:",
-    "vitest": "catalog:",
-    "wrangler": "catalog:"
+    "vitest": "catalog:"
   },
   "packageManager": "pnpm@11.5.0"
 }
