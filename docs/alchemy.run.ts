@@ -2,13 +2,16 @@ import * as Alchemy from "alchemy"
 import * as Cloudflare from "alchemy/Cloudflare"
 import * as GitHub from "alchemy/GitHub"
 import { Effect, Layer } from "effect"
-import { github } from "liminal-util/alchemy/github"
+import { docs } from "liminal-util/alchemicals/docs"
+import { GithubEnv } from "liminal-util/alchemicals/GithubEnv"
 
 export default Alchemy.Stack(
-  "crosshatch-github",
+  "crosshatch-docs",
   {
+    state: Cloudflare.state(),
     providers: Layer.mergeAll(Cloudflare.providers(), GitHub.providers()),
-    state: Alchemy.localState(),
   },
-  github({ repository: "crosshatch" }).pipe(Effect.orDie),
+  docs({
+    domain: "docs.crosshatch.dev",
+  }).pipe(Effect.provide(GithubEnv.layer)),
 )

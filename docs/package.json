@@ -4,9 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "portless docs.crosshatch.dev --app-port 7776 -- vocs dev",
-    "build": "vocs build",
-    "preview": "vocs preview"
+    "dev": "portless docs.crosshatch.dev --app-port 7776 -- vocs dev"
   },
   "dependencies": {
     "@crosshatch/caip": "workspace:*",
