@@ -26,6 +26,8 @@ jobs:
           git -c url.https://github.com/.insteadOf=git@github.com: -C liminal submodule update --init --depth 1 konfik
       - uses: ./konfik/.github/actions/configure_environment
       - uses: ./liminal/konfik/.github/actions/alchemize
+        with:
+          working-directory: docs
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
