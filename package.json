@@ -5,9 +5,8 @@
     "prepare": "ts-patch install -s",
     "build": "tsc -b",
     "watch": "tsc -b -w",
-    "clean": "node ./konfik/main.ts clean --ignore '**/repos'",
-    "bootstrap": "alchemy deploy bootstrap.ts --stage prod --yes --profile crosshatch-env",
-    "sync-repos": "node ./konfik/main.ts sync-repos",
+    "konfik": "node ./konfik/main.ts",
+    "clean": "pnpm konfik clean --ignore '**/repos'",
     "dev": "turbo run //#watch dev",
     "test": "vitest run"
   },
@@ -36,5 +35,5 @@
     "typescript": "catalog:",
     "vitest": "catalog:"
   },
-  "packageManager": "pnpm@11.5.0"
+  "packageManager": "pnpm@11.5.2"
 }

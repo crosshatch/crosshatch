@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "portless docs.crosshatch.dev --app-port 7776 -- vocs dev"
+    "dev": "alchemy dev --env-file ../.env"
   },
   "dependencies": {
     "@crosshatch/caip": "workspace:*",
@@ -15,7 +15,6 @@
     "crosshatch": "workspace:*",
     "effect": "catalog:",
     "effect-workerd": "workspace:*",
-    "portless": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-medium-image-zoom": "catalog:",
