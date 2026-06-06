@@ -1,20 +1,32 @@
 name: Deploy
+
 on:
   workflow_dispatch:
   push:
     branches: [main]
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
 
 permissions:
   contents: read
+  issues: write
+  pull-requests: write
 
 concurrency:
-  group: ${{ github.workflow }}
+  group: deploy-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.number) || github.ref }}
 
 jobs:
   alchemize:
-    uses: crosshatch/konfik/.github/workflows/alchemize.yml@main
-    with:
-      cloudflare-account-id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-    secrets:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      github-token: ${{ secrets.GITHUB_TOKEN }}
+    runs-on: ubuntu-latest
+    environment: deploy
+    steps:
+      - uses: actions/checkout@v6
+      - run: |
+          git -c url.https://github.com/.insteadOf=git@github.com: submodule update --init --depth 1 konfik liminal
+          git -c url.https://github.com/.insteadOf=git@github.com: -C liminal submodule update --init --depth 1 konfik
+      - uses: ./konfik/.github/actions/configure_environment
+      - uses: ./liminal/konfik/.github/actions/alchemize
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
