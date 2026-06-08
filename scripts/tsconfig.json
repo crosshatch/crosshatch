@@ -1,5 +1,4 @@
 {
   "extends": "../konfik/tsconfig.base",
-  "include": ["."],
-  "references": [{ "path": "../util" }]
+  "include": ["."]
 }
