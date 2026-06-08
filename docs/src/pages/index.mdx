@@ -1,0 +1,66 @@
+---
+title: Crosshatch
+description: Embedded x402 payments for apps and agents.
+layout: minimal
+showAskAi: false
+showLogo: false
+---
+
+import { Card, HomePage } from "vocs"
+
+<HomePage.Root>
+  <HomePage.Logo />
+
+  <HomePage.Tagline>Embedded x402 payments for apps and agents.</HomePage.Tagline>
+
+  <HomePage.Description>
+    Add app-native payments that respond to 402s, sign payloads from the user's wallet, and
+    settle paid resources without rebuilding payment infrastructure.
+  </HomePage.Description>
+
+  <HomePage.Buttons>
+    <HomePage.Button href="/quickstart" variant="accent">
+      Get started
+    </HomePage.Button>
+    <HomePage.Button href="/merchants/effect-http">Merchant integrations</HomePage.Button>
+  </HomePage.Buttons>
+
+  <div className="vocs:grid vocs:w-full vocs:max-w-5xl vocs:grid-cols-1 vocs:gap-4 vocs:text-left vocs:md:grid-cols-2 vocs:lg:grid-cols-3">
+    <Card
+      title="Quickstart"
+      description="Install Crosshatch and make your first app-native paid request."
+      icon="rocket"
+      to="/quickstart"
+    />
+    <Card
+      title="Lifecycle"
+      description="Trace a payment from 402 response through proposal, signing, and settlement."
+      icon="route"
+      to="/lifecycle"
+    />
+    <Card
+      title="Allowances"
+      description="Bound repeated payments with user-approved app-scoped spending limits."
+      icon="code"
+      to="/allowances"
+    />
+    <Card
+      title="Merchants"
+      description="Pick settlement strategies and expose paid resources from your services."
+      icon="store"
+      to="/merchants/granular-settlement"
+    />
+    <Card
+      title="Integrations"
+      description="Return standards-compliant 402s from Effect HTTP, RPC, or custom stacks."
+      icon="plug"
+      to="/merchants/effect-http"
+    />
+    <Card
+      title="Facilitation"
+      description="Verify payment payloads and connect merchant requests to settlement infrastructure."
+      icon="badge-dollar-sign"
+      to="/facilitation"
+    />
+  </div>
+</HomePage.Root>

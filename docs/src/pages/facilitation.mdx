@@ -1,0 +1,51 @@
+---
+title: Facilitation Overview
+description: Understand how facilitators verify x402 payment payloads and connect merchant requests to settlement infrastructure.
+---
+
+# Facilitation Overview
+
+Facilitation is the infrastructure layer that helps merchants verify, settle, and account for x402 payments.
+
+## Why It Exists
+
+Merchants should be able to price resources without each one needing to own every network-specific settlement concern.
+A facilitator can provide common verification and settlement behavior behind the x402 boundary.
+
+## Responsibilities
+
+Facilitation may include:
+
+- Verifying payment payloads.
+- Submitting or coordinating settlement.
+- Supporting deposit and rebate flows.
+- Reporting payment state back to merchants.
+- Normalizing network-specific details behind a consistent interface.
+
+The current `@crosshatch/x402/Facilitator` API group exposes three endpoints:
+
+- `POST /verify`: validates a payment payload against payment requirements without broadcasting a transaction.
+- `POST /settle`: executes settlement and returns the transaction hash and CAIP-2 network on success.
+- `GET /supported`: returns supported x402 versions, schemes, networks, extensions, and signer metadata.
+
+## Relationship To Crosshatch
+
+Crosshatch creates payment payloads from user wallets. Facilitators help the receiving side determine whether those
+payloads are valid and how they should settle.
+
+## Verification
+
+Verification determines whether a payment payload satisfies the merchant's payment requirement. A verifier may check that
+the payload is well formed, signed correctly, intended for the right recipient, valid for the requested resource, and not
+already spent.
+
+Some merchants verify directly. Others delegate verification to a facilitator. In both cases, the merchant should serve the
+paid resource only after verification succeeds.
+
+## Settlement
+
+Settlement turns a valid payment payload into final accounting for the merchant. It can happen immediately for granular
+purchases or later for session-based flows such as deposit + rebate.
+
+Merchants should be able to observe whether a payment is pending, verified, settled, rejected, or requires follow-up. This
+state is useful for retries, reconciliation, and support.

@@ -64,3 +64,9 @@
 [submodule "repos/alchemy-effect"]
 	path = repos/alchemy-effect
 	url = git@github.com:alchemy-run/alchemy-effect.git
+[submodule "repos/vocs"]
+	path = repos/vocs
+	url = git@github.com:wevm/vocs.git
+[submodule "repos/tempo-docs"]
+	path = repos/tempo-docs
+	url = git@github.com:tempoxyz/docs.git

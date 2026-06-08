@@ -1,0 +1,117 @@
+---
+title: Quickstart
+description:
+  Install Crosshatch and make your first x402 payment flow with the embedded wallet client for JavaScript runtimes.
+---
+
+import { Card, Cards } from "vocs"
+
+# Quickstart
+
+## Overview
+
+Crosshatch is an embedded wallet that turns standard x402 payment requirements into signed payment payloads, thereby
+enabling seamless payment to x402 merchant.
+
+## Installation
+
+:::code-group
+
+```bash [npm]
+npm install crosshatch
+```
+
+```bash [pnpm]
+pnpm add crosshatch
+```
+
+```bash [bun]
+bun add crosshatch
+```
+
+:::
+
+## Core Functionality
+
+Whenever your app requires a payment payload, `propose` it:
+
+```ts
+import { Effect } from "effect"
+import { propose, CrosshatchRuntime, settle } from "crosshatch" // [!code focus]
+
+Effect.gen(function* () {
+  const { payload } = yield* propose({ required }) // [!code focus]
+  yield* settle({ payload })
+}).pipe(CrosshatchRuntime.runPromise)
+```
+
+A user's first proposal will open a secure dialog to create, link and/or fund a Crosshatch wallet. Thereafter, payloads
+can be created without additional prompts while the payment is within the app's allowance.
+
+## Settle Payment
+
+```ts
+import { Effect } from "effect"
+import { propose, CrosshatchRuntime, settle } from "crosshatch" // [!code focus]
+
+Effect.gen(function* () {
+  const { payload } = yield* propose({ required })
+  yield* settle({ payload }) // [!code focus]
+}).pipe(CrosshatchRuntime.runPromise)
+```
+
+## Settle Hundreds of Payments
+
+```ts
+import { Effect } from "effect"
+import { propose, CrosshatchRuntime, settle } from "crosshatch"
+
+Effect.gen(function* () {
+  // [!code focus:start]
+  for (let i = 0; i < 1000; i++) {
+    const { payload } = yield* propose({ required })
+    yield* settle({ payload })
+  }
+  // [!code focus:end]
+}).pipe(CrosshatchRuntime.runPromise)
+```
+
+## Fetch X402 Resources
+
+Crosshatch's `fetch` wraps `globalThis.fetch` so that 402s from any x402-compliant merchant are intercepted and retried
+automatically.
+
+```ts
+import { fetch } from "crosshatch"
+
+const response = await fetch("https://merchant.example/resource")
+```
+
+## Next Steps
+
+<Cards>
+  <Card
+    title="Lifecycle"
+    description="Follow a Crosshatch session from the initial 402 through payment signing and resource delivery."
+    icon="route"
+    to="/lifecycle"
+  />
+  <Card
+    title="Allowances"
+    description="Bound repeated payments with user-approved app-scoped spending limits."
+    icon="code"
+    to="/allowances"
+  />
+  <Card
+    title="Effect HTTP"
+    description="Protect HTTP routes with payment requirements, verification, and delivery."
+    icon="receipt"
+    to="/merchants/effect-http"
+  />
+  <Card
+    title="Merchant Strategies"
+    description="Choose between granular settlement and deposit + rebate flows."
+    icon="store"
+    to="/merchants/granular-settlement"
+  />
+</Cards>

@@ -1,67 +1,96 @@
 import PackageJson from "crosshatch/package.json" with { type: "json" }
-import rehypeMermaid from "rehype-mermaid"
-import { defineConfig } from "vocs"
+import { Changelog, defineConfig, McpSource } from "vocs/config"
 
 export default defineConfig({
-  vite: {
-    server: {
-      host: "127.0.0.1",
-      port: 7776,
-      strictPort: true,
-      allowedHosts: [".localhost"],
+  accentColor: "light-dark(#6D5BD0, #A99BFF)",
+  codeHighlight: {
+    themes: {
+      light: "nord",
+      dark: "tokyo-night",
     },
   },
-  markdown: {
-    rehypePlugins: [[rehypeMermaid, { strategy: "inline-svg" }]],
-  },
-  logoUrl: "https://crosshatch.dev/favicon.ico",
-  aiCta: false,
-  banner: {
-    backgroundColor: "#0E0D0F",
-    content: "Crosshatch is in preview; harry@crosshatch.dev for details.",
-    dismissable: false,
-    height: "28px",
-    textColor: "white",
-  },
-  blogDir: "./pages/articles",
-  baseUrl: "https://docs.crosshatch.dev",
-  description: PackageJson.description,
-  editLink: {
-    pattern: "https://github.com/crosshatch/crosshatch/edit/main/docs/pages/:path",
-    text: "Edit on GitHub",
-  },
-  rootDir: ".",
-  sidebar: {
-    "/": [
-      {
-        link: "/",
-        text: "Quickstart",
-      },
-    ],
-  },
-  socials: [
-    {
-      icon: "discord",
-      link: "https://discord.gg/CSXCRUKjh9",
-    },
-    {
-      icon: "github",
-      link: "https://github.com/crosshatch/crosshatch",
-    },
-    {
-      icon: "x",
-      link: "https://x.com/CrosshatchDev",
-    },
-  ],
   title: "Crosshatch",
+  titleTemplate: "%s ⋅ Crosshatch",
+  description: PackageJson.description,
+  // checkDeadlinks: true,
+  changelog: Changelog.github({
+    prereleases: true,
+    repo: "crosshatch/crosshatch",
+  }),
   topNav: [
     {
       link: "/",
-      text: "Guides",
+      text: "Documentation",
     },
     {
-      link: "/articles",
-      text: "Articles",
+      text: "Wallet",
+      link: "https://id.crosshatch.dev",
+      external: true,
     },
+  ],
+  iconUrl: "https://crosshatch.dev/favicon.ico",
+  banner: {
+    content: "Crosshatch is in preview. Join the discord for updates.",
+    dismissable: false,
+    href: "https://discord.gg/CSXCRUKjh9",
+    variant: "tip",
+  },
+  baseUrl: "https://crosshatch.dev",
+  editLink: {
+    link: (p) => `https://github.com/crosshatch/crosshatch/edit/main/docs/src/pages/${p}`,
+    text: "Edit on GitHub",
+  },
+  mcp: {
+    enabled: true,
+    sources: [McpSource.github({ repo: "crosshatch/crosshatch" })],
+  },
+  sidebar: {
+    "/": [
+      {
+        text: "Introduction",
+        items: [
+          { text: "Quickstart", link: "/quickstart" },
+          { text: "Examples" },
+          { text: "Lifecycle", link: "/lifecycle" },
+          { text: "Why Crosshatch?", link: "/why" },
+        ],
+      },
+      {
+        text: "Payment Flow",
+        items: [
+          { text: "Create Requirements" },
+          { text: "Propose" },
+          { text: "Settle Payloads" },
+          { text: "Settlement Strategy", link: "/merchants/granular-settlement" },
+          { text: "OpenTelemetry", link: "/merchants/opentelemetry" },
+          { text: "Errors" },
+        ],
+      },
+      {
+        text: "Integration Guides",
+        items: [
+          { text: "Effect HTTP", link: "/merchants/effect-http" },
+          { text: "Effect RPC", link: "/merchants/effect-rpc" },
+          { text: "Effect AI", link: "/merchants/effect-ai" },
+          { text: "Effect Sockets", link: "/merchants/socket" },
+        ],
+      },
+      {
+        text: "Facilitation",
+        items: [
+          { text: "Local Development", link: "/development" },
+          { text: "Custom Endpoint", link: "/facilitation" },
+        ],
+      },
+    ],
+    "/articles": [
+      { link: "/articles", text: "All Articles" },
+      { link: "/articles/hello_crosshatch", text: "Hello Crosshatch" },
+    ],
+  },
+  socials: [
+    { icon: "github", link: "https://github.com/crosshatch/crosshatch" },
+    { icon: "discord", link: "https://discord.gg/CSXCRUKjh9" },
+    { icon: "x", link: "https://x.com/CrosshatchDev" },
   ],
 })

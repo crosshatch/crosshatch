@@ -1,0 +1,33 @@
+---
+title: Deposit + Rebate
+description: Use deposit and rebate flows when a merchant knows final usage after a session completes.
+---
+
+# Deposit + Rebate
+
+Deposit + rebate supports flows where the final cost is not known upfront.
+
+## When To Use It
+
+Use this strategy for sessions, streams, searches, or jobs where usage accumulates over time and unused value should be
+returned.
+
+## Shape
+
+::::steps
+
+### Collect A Deposit
+
+The merchant requires an upfront payment large enough to cover expected usage.
+
+### Meter Usage
+
+The merchant tracks actual consumption during the session.
+
+### Rebate The Difference
+
+Any unused balance is returned according to the facilitator and settlement rules for the integration.
+
+::::
+
+This strategy trades a larger initial payment for fewer payment interruptions during long-running interactions.
