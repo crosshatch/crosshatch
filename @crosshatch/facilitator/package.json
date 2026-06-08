@@ -1,0 +1,34 @@
+{
+  "name": "@crosshatch/facilitator",
+  "version": "0.1.0-beta.1",
+  "private": false,
+  "description": "Crosshatch x402 facilitator implementation.",
+  "homepage": "https://crosshatch.dev",
+  "bugs": {
+    "url": "https://github.com/crosshatch/crosshatch/issues"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/crosshatch/crosshatch.git",
+    "directory": "@crosshatch/facilitator"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "scripts": {
+    "dev": "alchemy dev --env-file ../../.env"
+  },
+  "peerDependencies": {
+    "@coinbase/cdp-sdk": "catalog:",
+    "@crosshatch/caip": "workspace:*",
+    "@crosshatch/x402": "workspace:*",
+    "@effect/sql-pg": "catalog:",
+    "alchemy": "catalog:",
+    "crosshatch": "workspace:*",
+    "drizzle-orm": "catalog:",
+    "effect": "catalog:",
+    "effect-workerd": "workspace:*",
+    "liminal-util": "workspace:*",
+    "viem": "catalog:"
+  }
+}

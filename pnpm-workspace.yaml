@@ -5,6 +5,7 @@ packages:
   - liminal/*
   - liminal/examples/*
   - liminal/examples/*/*
+  - scripts
 
 catalog:
   "@changesets/cli": ^2.30.0
@@ -12,6 +13,7 @@ catalog:
   "@cloudflare/vitest-pool-workers": ^0.14.7
   "@cloudflare/worker-bundler": ^0.1.2
   "@cloudflare/workers-types": ^4.20260414.1
+  "@coinbase/cdp-sdk": ^1.44.0
   "@effect/ai-openai-compat": 4.0.0-beta.78
   "@effect/atom-react": 4.0.0-beta.78
   "@effect/language-service": 0.86.2

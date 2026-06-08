@@ -2,11 +2,13 @@
   "include": [],
   "references": [
     { "path": "./@crosshatch/caip" },
+    { "path": "./@crosshatch/facilitator" },
     { "path": "./@crosshatch/merchant" },
     { "path": "./@crosshatch/widget" },
     { "path": "./@crosshatch/x402" },
     { "path": "./crosshatch" },
     { "path": "./docs" },
-    { "path": "./liminal" }
+    { "path": "./liminal" },
+    { "path": "./scripts" }
   ]
 }
