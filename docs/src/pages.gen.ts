@@ -5,13 +5,11 @@ import type { PathsForPages } from 'waku/router'
 
 // prettier-ignore
 type Page =
-  | { path: '/_slots'; render: 'static' }
   | { path: '/allowances'; render: 'static' }
   | { path: '/articles/hello_crosshatch'; render: 'static' }
   | { path: '/articles'; render: 'static' }
   | { path: '/escalations'; render: 'static' }
   | { path: '/facilitation'; render: 'static' }
-  | { path: '/guide-template'; render: 'static' }
   | { path: '/'; render: 'static' }
   | { path: '/lifecycle'; render: 'static' }
   | { path: '/merchants/deposit-rebate'; render: 'static' }

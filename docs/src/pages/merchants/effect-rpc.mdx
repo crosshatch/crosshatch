@@ -5,39 +5,4 @@ description: Add x402 payment requirements and verification to paid Effect RPC m
 
 # Effect RPC
 
-Effect RPC integrations place payment requirements around service methods instead of raw HTTP routes.
-
-## Method Boundary
-
-Price the RPC method invocation, return a payment requirement when payment is missing, and verify the signed payload before
-executing the paid operation.
-
-## Why RPC
-
-RPC is useful when the paid surface is already modeled as typed service calls. The x402 requirement becomes part of the
-protocol-level contract for paid methods.
-
-## Effect Shape
-
-The current `@crosshatch/merchant` helper surface is Effect-native. A paid method can use `charge` once the method has
-decided what the requested resource costs:
-
-```ts
-import { charge } from "@crosshatch/merchant"
-import { Micros } from "crosshatch"
-import { Effect } from "effect"
-import * as Boundary from "liminal-util/Boundary"
-
-const renderClip = (prompt: string) =>
-  Effect.gen(function* () {
-    yield* charge(Micros.fromInt(1))`Render clip for ${prompt}`
-    return yield* generateClip(prompt)
-  }).pipe(Boundary.span("merchant.rpc.render-clip", import.meta.url))
-```
-
-Provide `Merchant.layer`, a concrete `Bridge`, and any trace/invoice services required by the integration at the service
-boundary.
-
-## Next Step
-
-Use this page for typed examples that show how requirements and payloads flow through Effect RPC clients and servers.
+TODO
