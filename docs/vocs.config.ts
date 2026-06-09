@@ -1,22 +1,12 @@
 import PackageJson from "crosshatch/package.json" with { type: "json" }
-import { Changelog, defineConfig, McpSource } from "vocs/config"
+import { VocsConfig } from "liminal-util/vocs"
+import { defineConfig } from "vocs/config"
 
 export default defineConfig({
-  accentColor: "light-dark(#6D5BD0, #A99BFF)",
-  codeHighlight: {
-    themes: {
-      light: "nord",
-      dark: "tokyo-night",
-    },
-  },
-  title: "Crosshatch",
-  titleTemplate: "%s ⋅ Crosshatch",
-  description: PackageJson.description,
-  // checkDeadlinks: true,
-  changelog: Changelog.github({
-    prereleases: true,
-    repo: "crosshatch/crosshatch",
+  ...VocsConfig({
+    title: "Crosshatch",
   }),
+  description: PackageJson.description,
   topNav: [
     {
       link: "/",
@@ -36,14 +26,6 @@ export default defineConfig({
     variant: "tip",
   },
   baseUrl: "https://crosshatch.dev",
-  editLink: {
-    link: (p) => `https://github.com/crosshatch/crosshatch/edit/main/docs/src/pages/${p}`,
-    text: "Edit on GitHub",
-  },
-  mcp: {
-    enabled: true,
-    sources: [McpSource.github({ repo: "crosshatch/crosshatch" })],
-  },
   sidebar: {
     "/": [
       {
@@ -63,7 +45,7 @@ export default defineConfig({
           { text: "Settle Payloads" },
           { text: "Settlement Strategy", link: "/merchants/granular-settlement" },
           { text: "OpenTelemetry", link: "/merchants/opentelemetry" },
-          { text: "Errors" },
+          { text: "Error Recovery" },
         ],
       },
       {
