@@ -2,7 +2,7 @@ import { generateJwt } from "@coinbase/cdp-sdk/auth"
 import { Redacted, Effect, flow, Config } from "effect"
 import { HttpClient, HttpClientRequest } from "effect/unstable/http"
 
-import * as Cdp from "./Cdp.ts"
+import { make as make_ } from "./CdpClient.gen.ts"
 
 export const make = Effect.fn(function* ({ host, path }: { readonly host: string; readonly path: string }) {
   const apiKeyId = yield* Config.string("CDP_API_KEY_ID")
@@ -17,7 +17,7 @@ export const make = Effect.fn(function* ({ host, path }: { readonly host: string
       requestPath: path,
     }),
   )
-  return Cdp.make(yield* HttpClient.HttpClient, {
+  return make_(yield* HttpClient.HttpClient, {
     transformClient: (client) =>
       Effect.succeed(
         client.pipe(

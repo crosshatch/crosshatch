@@ -7,7 +7,6 @@
     { "path": "./@crosshatch/widget" },
     { "path": "./@crosshatch/x402" },
     { "path": "./crosshatch" },
-    { "path": "./docs" },
-    { "path": "./liminal" }
+    { "path": "./docs" }
   ]
 }

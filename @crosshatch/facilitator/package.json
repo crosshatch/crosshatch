@@ -15,8 +15,22 @@
   },
   "type": "module",
   "sideEffects": false,
+  "exports": {
+    "./*": "./*.ts"
+  },
+  "publishConfig": {
+    "exports": {
+      "./*": "./dist/*.js"
+    }
+  },
   "scripts": {
     "dev": "alchemy dev --env-file ../../.env"
+  },
+  "devDependencies": {
+    "@effect/openapi-generator": "catalog:",
+    "@effect/platform-node": "catalog:",
+    "swagger2openapi": "catalog:",
+    "yaml": "catalog:"
   },
   "peerDependencies": {
     "@coinbase/cdp-sdk": "catalog:",
