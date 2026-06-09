@@ -1,12 +1,12 @@
 import { ChainIdString } from "@crosshatch/caip"
+import { handler } from "@crosshatch/util/httpapi"
+import { FacilitatorApi } from "@crosshatch/x402"
 import { Effect, Schema as S } from "effect"
 
-import { handler } from "../_httpapi_util.ts"
-import { Api } from "../Api.ts"
 import { make } from "../CdpClient.ts"
 
 export const handleSettle = handler(
-  Api,
+  FacilitatorApi,
   "facilitator",
   "settle",
   Effect.fn(function* ({ payload: { paymentPayload, paymentRequirements } }) {

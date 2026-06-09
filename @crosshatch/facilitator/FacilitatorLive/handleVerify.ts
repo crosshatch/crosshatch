@@ -1,11 +1,11 @@
+import { handler } from "@crosshatch/util/httpapi"
+import { FacilitatorApi } from "@crosshatch/x402"
 import { Effect } from "effect"
 
-import { handler } from "../_httpapi_util.ts"
-import { Api } from "../Api.ts"
 import { make } from "../CdpClient.ts"
 
 export const handleVerify = handler(
-  Api,
+  FacilitatorApi,
   "facilitator",
   "verify",
   Effect.fn(function* ({ payload: { paymentPayload, paymentRequirements } }) {

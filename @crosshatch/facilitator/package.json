@@ -21,6 +21,7 @@
   "peerDependencies": {
     "@coinbase/cdp-sdk": "catalog:",
     "@crosshatch/caip": "workspace:*",
+    "@crosshatch/util": "workspace:*",
     "@crosshatch/x402": "workspace:*",
     "@effect/sql-pg": "catalog:",
     "alchemy": "catalog:",

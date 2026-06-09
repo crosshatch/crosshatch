@@ -1,3 +1,4 @@
+import { CrosshatchEnv } from "@crosshatch/util/CrosshatchEnv"
 import { embed } from "@crosshatch/widget/embed"
 import { Finished } from "@crosshatch/widget/self"
 import type { StandardSchemaV1 } from "@standard-schema/spec"
@@ -7,7 +8,6 @@ import * as Boundary from "liminal-util/Boundary"
 
 import { Allowance } from "./Allowance.ts"
 import * as Facade from "./Facade/Facade.ts"
-import { InternalEnv } from "./InternalEnv.ts"
 import { LinkChallengeId } from "./LinkChallengeId.ts"
 
 export type Widget<Payload extends S.Codec<any, any>> = {
@@ -15,7 +15,7 @@ export type Widget<Payload extends S.Codec<any, any>> = {
   standard: StandardSchemaV1<{ readonly x: string }, Payload["Type"]>
   host: (
     input: Payload["Type"],
-  ) => Effect.Effect<void, Cause.NoSuchElementError | S.SchemaError | UrlParams.UrlParamsError, InternalEnv>
+  ) => Effect.Effect<void, Cause.NoSuchElementError | S.SchemaError | UrlParams.UrlParamsError, CrosshatchEnv>
 }
 
 const widget = <Payload extends S.Codec<any, any>, Item extends S.Codec<any, any>>({
@@ -42,10 +42,12 @@ const widget = <Payload extends S.Codec<any, any>, Item extends S.Codec<any, any
       S.encodeEffect(Payload),
       Effect.flatMap(
         Effect.fn(function* (x) {
-          const base = yield* InternalEnv.href(pathname)
-          const { href: src } = yield* UrlParams.makeUrl(base, UrlParams.make([["x", x]]), undefined).pipe(
-            Effect.fromResult,
-          )
+          const { url } = yield* CrosshatchEnv
+          const { href: src } = yield* UrlParams.makeUrl(
+            url("id", pathname),
+            UrlParams.make([["x", x]]),
+            undefined,
+          ).pipe(Effect.fromResult)
           return embed({
             item: S.Union([item, Finished]),
             src,

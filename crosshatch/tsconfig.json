@@ -8,6 +8,7 @@
   "exclude": ["dist", "vitest.config.ts"],
   "references": [
     { "path": "../@crosshatch/caip" },
+    { "path": "../@crosshatch/util" },
     { "path": "../@crosshatch/x402" },
     { "path": "../@crosshatch/widget" },
     { "path": "../liminal/liminal" },

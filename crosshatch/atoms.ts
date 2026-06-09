@@ -1,9 +1,9 @@
+import { CROSSHATCH_ID_URL } from "@crosshatch/util/CrosshatchEnv"
 import { Effect, Match, Cause } from "effect"
 import { Atom } from "effect/unstable/reactivity"
 import * as Boundary from "liminal-util/Boundary"
 
 import * as Facade from "./Facade/Facade.ts"
-import { InternalEnv } from "./InternalEnv.ts"
 import { Micros } from "./Micros.ts"
 import { atomRuntime } from "./runtime.ts"
 import { ActivityWidget, IdWidget, LinkWidget } from "./widgets.ts"
@@ -32,7 +32,7 @@ export const openAtom = atomRuntime.fn<void>()(
   Effect.fnUntraced(function* (_, get) {
     const state = yield* get.result(stateAtom)
     const common = { referrer: location.href }
-    const internal = InternalEnv.isCrosshatch(origin)
+    const internal = origin.startsWith(CROSSHATCH_ID_URL)
     yield* Match.valueTags(state, {
       Challenged: ({ challengeId }) =>
         internal

@@ -1,9 +1,7 @@
 import { ChainIdString } from "@crosshatch/caip"
-import type { Payload } from "@crosshatch/x402"
+import { type Payload, FacilitatorClient } from "@crosshatch/x402"
 import { Effect, Schema as S } from "effect"
 import * as Boundary from "liminal-util/Boundary"
-
-import { CrosshatchClient } from "./CrosshatchClient.ts"
 
 export class SettlementError extends S.TaggedErrorClass<SettlementError>()("SettlementError", {}) {}
 
@@ -14,9 +12,9 @@ export interface Settlement {
 
 export const settle = Effect.fnUntraced(
   function* ({ payload }: { readonly payload: typeof Payload.Payload.Type }) {
-    const chx = yield* CrosshatchClient
+    const { facilitator } = yield* FacilitatorClient
     const { accepted: paymentRequirements } = payload
-    const response = yield* chx.facilitator
+    const response = yield* facilitator
       .settle({
         payload: {
           paymentPayload: payload,

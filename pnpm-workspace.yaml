@@ -5,7 +5,6 @@ packages:
   - liminal/*
   - liminal/examples/*
   - liminal/examples/*/*
-  - scripts
 
 catalog:
   "@changesets/cli": ^2.30.0
