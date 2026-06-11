@@ -18,8 +18,8 @@ export default Alchemy.Stack(
       ...base,
       main: "main.ts",
       env: {
-        CDP_API_KEY_ID: yield* Config.string("CDP_API_KEY_ID"),
-        CDP_API_KEY_SECRET: yield* Config.redacted("CDP_API_KEY_SECRET"),
+        CDP_API_KEY_ID: Config.string("CDP_API_KEY_ID"),
+        CDP_API_KEY_SECRET: Config.redacted("CDP_API_KEY_SECRET"),
       },
     })
   }).pipe(Effect.provide(AlchemicalEnv.layer)),
