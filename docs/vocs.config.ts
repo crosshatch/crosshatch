@@ -5,6 +5,7 @@ import { defineConfig } from "vocs/config"
 export default defineConfig({
   ...VocsConfig({
     title: "Crosshatch",
+    repo: "crosshatch",
   }),
   description: PackageJson.description,
   topNav: [

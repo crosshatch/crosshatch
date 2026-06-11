@@ -1,4 +1,4 @@
-@import "liminal-util/root.css";
+@import "liminal-util/vocs.css";
 
 [data-v-logo-text]::before {
   content: "";
