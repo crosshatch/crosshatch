@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy Facilitator
 
 on:
   workflow_dispatch:
@@ -25,12 +25,13 @@ jobs:
           git -c url.https://github.com/.insteadOf=git@github.com: submodule update --init --depth 1 konfik liminal
           git -c url.https://github.com/.insteadOf=git@github.com: -C liminal submodule update --init --depth 1 konfik
       - uses: crosshatch/konfik/.github/actions/configure_environment@main
-      - run: pnpm exec vocs build
-        working-directory: docs
+      - run: pnpm build
       - uses: crosshatch/konfik/.github/actions/alchemize@main
         with:
-          working-directory: docs
+          working-directory: "@crosshatch/facilitator"
         env:
+          CDP_API_KEY_ID: ${{ vars.CDP_API_KEY_ID }}
+          CDP_API_KEY_SECRET: ${{ secrets.CDP_API_KEY_SECRET }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
