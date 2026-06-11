@@ -27,7 +27,7 @@ jobs:
       - uses: ./konfik/.github/actions/configure_environment
       - run: pnpm exec vocs build
         working-directory: docs
-      - uses: crosshatch/konfik/.github/workflows/alchemize.yml@main
+      - uses: crosshatch/konfik/.github/actions/alchemize@main
         with:
           working-directory: docs
         env:
