@@ -27,5 +27,6 @@ export default Alchemy.Stack(
       },
     })
     yield* PrPreviewComment({ name: "Facilitator", url })
+    return { url }
   }).pipe(Effect.provide(AlchemicalEnv.layer)),
 )
