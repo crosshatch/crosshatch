@@ -19,6 +19,7 @@ export default Alchemy.Stack(
       owner,
       repository,
       variables: {
+        CDP_API_KEY_ID: Config.string("CDP_API_KEY_ID"),
         PAY_TO_EVM: Config.string("PAY_TO_EVM"),
         OTEL_EXPORTER_OTLP_ENDPOINT: "https://ingest.us2.signoz.cloud",
       },
@@ -27,7 +28,6 @@ export default Alchemy.Stack(
       owner,
       repository,
       secrets: {
-        CDP_API_KEY_ID: Config.redacted("CDP_API_KEY_ID"),
         CDP_API_KEY_SECRET: Config.redacted("CDP_API_KEY_SECRET"),
         OTEL_EXPORTER_OTLP_HEADERS: Config.redacted("OTEL_EXPORTER_OTLP_HEADERS"),
         EVM_PROXY_URL: Config.redacted("EVM_PROXY_URL"),
