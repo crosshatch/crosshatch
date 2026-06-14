@@ -7,7 +7,8 @@
     "watch": "tsc -b -w",
     "konfik": "node ./konfik/main.ts",
     "clean": "pnpm konfik clean --ignore '**/repos'",
-    "dev": "turbo run //#watch dev",
+    "dev": "turbo run //#watch //#aliases dev",
+    "aliases": "caddy run --config ./Caddyfile",
     "test": "vitest run"
   },
   "devDependencies": {
