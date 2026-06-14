@@ -13,5 +13,6 @@ export default Alchemy.Stack(
   },
   docs({
     domain: "docs.crosshatch.dev",
+    devPort: 4382,
   }).pipe(Effect.provide(AlchemicalEnv.layer)),
 )
