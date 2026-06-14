@@ -1,7 +1,7 @@
 import { CrosshatchEnv } from "@crosshatch/util/CrosshatchEnv"
 import { Effect, Layer, ManagedRuntime } from "effect"
 import { FetchHttpClient } from "effect/unstable/http"
-import { OtlpSerialization, Otlp } from "effect/unstable/observability"
+import { OtlpSerialization, OtlpLogger, OtlpTracer } from "effect/unstable/observability"
 import { Atom } from "effect/unstable/reactivity"
 import { Client } from "liminal"
 import * as Boundary from "liminal-util/Boundary"
@@ -9,12 +9,18 @@ import * as Boundary from "liminal-util/Boundary"
 import * as Facade from "./Facade/Facade.ts"
 
 const OtlpLive = CrosshatchEnv.pipe(
-  Effect.map(({ dev, domain }) =>
+  Effect.map(({ dev, url }) =>
     dev
-      ? Otlp.layer({
-          baseUrl: domain,
-          resource: { serviceName: "crosshatch-lib" },
-        }).pipe(Layer.provide(OtlpSerialization.layerJson))
+      ? Layer.mergeAll(
+          OtlpLogger.layer({
+            url: url("id", "otel/v1/logs"),
+            resource: { serviceName: "crosshatch-lib" },
+          }),
+          OtlpTracer.layer({
+            url: url("id", "otel/v1/traces"),
+            resource: { serviceName: "crosshatch-lib" },
+          }),
+        ).pipe(Layer.provide(OtlpSerialization.layerJson))
       : Layer.empty,
   ),
   Layer.unwrap,
