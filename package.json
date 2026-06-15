@@ -6,6 +6,7 @@
     "build": "tsc -b",
     "watch": "tsc -b -w",
     "konfik": "node ./konfik/main.ts",
+    "sync-repos": "pnpm konfik sync-repos",
     "clean": "pnpm konfik clean --ignore '**/repos'",
     "dev": "turbo run //#watch //#aliases dev",
     "aliases": "caddy run --config ./Caddyfile",
