@@ -2,7 +2,6 @@ import * as Alchemy from "alchemy"
 import * as Cloudflare from "alchemy/Cloudflare"
 import * as Github from "alchemy/GitHub"
 import { Effect, Config, Layer } from "effect"
-import * as AlchemicalEnv from "liminal-util/alchemicals/AlchemicalEnv"
 import { PrPreviewComment } from "liminal-util/alchemicals/PrComment"
 import { WorkerConfig } from "liminal-util/alchemicals/WorkerConfig"
 
@@ -27,7 +26,11 @@ export default Alchemy.Stack(
         CDP_API_KEY_SECRET: Config.redacted("CDP_API_KEY_SECRET"),
       },
     })
-    yield* PrPreviewComment({ name: "Facilitator", url })
+    yield* PrPreviewComment({ name: "Facilitator", url }).pipe(
+      Effect.catchTags({
+        NotInPrError: Effect.die,
+      }),
+    )
     return { url }
-  }).pipe(Effect.provide(AlchemicalEnv.layer)),
+  }),
 )
