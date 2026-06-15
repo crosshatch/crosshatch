@@ -1,11 +1,11 @@
-docs.crosshatch.dev.localhost {
+import ./liminal/Caddyfile
+
+docs.crosshatch.dev.local {
 	tls internal
 	reverse_proxy 127.0.0.1:4382
 }
 
-facilitator.crosshatch.dev.localhost {
+facilitator.crosshatch.dev.local {
 	tls internal
 	reverse_proxy 127.0.0.1:1337
 }
-
-import ./liminal/Caddyfile

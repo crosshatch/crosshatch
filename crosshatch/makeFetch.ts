@@ -55,7 +55,7 @@ export const makeFetch =
         }
       }
       return yield* Effect.promise(() => fetch(input, { ...init, headers }))
-    }).pipe(Effect.onError(Boundary.log), Boundary.span("crosshatch-fetch", import.meta.url), (effect) =>
+    }).pipe(Effect.onError(Effect.logError), Boundary.span("crosshatch-fetch", import.meta.url), (effect) =>
       managedRuntime.runPromise(effect, { signal: init?.signal ?? undefined }),
     )
   }
