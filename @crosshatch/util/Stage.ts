@@ -15,13 +15,12 @@ export class Stage extends Context.Service<
 >()("@crosshatch/util/Stage") {}
 
 export const layerConfig = Effect.gen(function* () {
-  const decode = S.decodeUnknownEffect(
+  const raw =
+    (import.meta as { readonly env?: undefined | { VITE_PUBLIC_STAGE?: string | undefined } }).env?.VITE_PUBLIC_STAGE ??
+    (yield* Config.string("STAGE"))
+  const stage = yield* S.decodeUnknownEffect(
     S.Union([S.TemplateLiteral(["dev_", S.String]), S.TemplateLiteral(["staging-", S.Number]), S.Literal("prod")]),
-  )
-  const meta = import.meta as ImportMeta & { readonly env?: { readonly VITE_PUBLIC_STAGE?: string | undefined } }
-  const publicStage = meta.env?.VITE_PUBLIC_STAGE
-  const stage = publicStage === undefined ? yield* Config.string("STAGE").pipe(Effect.flatMap(decode)) : yield* decode(publicStage)
-
+  )(raw)
   const domain = ({ sub, pathname }: PathConfig = {}) =>
     `${stage.startsWith("staging-") ? `${stage}.` : ""}${sub ? `${sub}.` : ""}crosshatch.dev${stage.startsWith("dev_") ? ".localhost" : ""}${pathname ? `/${pathname}` : ""}`
 
