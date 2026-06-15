@@ -102,6 +102,9 @@ overrides:
   react-dom: ^19.2.4
   zod: 3.25.76
 
+patchedDependencies:
+  alchemy@2.0.0-beta.55: konfik/patches/alchemy@2.0.0-beta.55.patch
+
 minimumReleaseAgeExclude:
   - "@aws-sdk/*"
   - "@distilled.cloud/*"

@@ -22,7 +22,7 @@ export const layerConfig = Effect.gen(function* () {
     S.Union([S.TemplateLiteral(["dev_", S.String]), S.TemplateLiteral(["staging-", S.Number]), S.Literal("prod")]),
   )(raw)
   const domain = ({ sub, pathname }: PathConfig = {}) =>
-    `${stage.startsWith("staging-") ? `${stage}.` : ""}${sub ? `${sub}.` : ""}crosshatch.dev${stage.startsWith("dev_") ? ".local" : ""}${pathname ? `/${pathname}` : ""}`
+    `${stage.startsWith("staging-") ? `${stage}.` : ""}${sub ? `${sub}.` : ""}crosshatch.dev${stage.startsWith("dev_") ? ".localhost" : ""}${pathname ? `/${pathname}` : ""}`
 
   const url = (config?: PathConfig | undefined) => `https://${domain(config)}`
 
