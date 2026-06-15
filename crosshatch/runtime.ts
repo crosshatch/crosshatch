@@ -10,7 +10,7 @@ import * as Facade from "./Facade/Facade.ts"
 
 const OtlpLive = Stage.Stage.pipe(
   Effect.map(({ stage, url }) =>
-    stage !== "main"
+    stage !== "prod"
       ? Layer.mergeAll(
           OtlpLogger.layer({
             url: url({ pathname: "otel/v1/logs" }),

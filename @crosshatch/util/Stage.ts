@@ -8,7 +8,7 @@ export interface PathConfig {
 export class Stage extends Context.Service<
   Stage,
   {
-    readonly stage: `dev_${string}` | `staging_${number}` | "main"
+    readonly stage: `dev_${string}` | `staging-${number}` | "prod"
     readonly domain: (config?: PathConfig | undefined) => string
     readonly url: (config?: PathConfig | undefined) => string
   }
@@ -16,16 +16,14 @@ export class Stage extends Context.Service<
 
 export const layerConfig = Effect.gen(function* () {
   const decode = S.decodeUnknownEffect(
-    S.Union([S.TemplateLiteral(["dev_", S.String]), S.TemplateLiteral(["staging_", S.Number]), S.Literal("main")]),
+    S.Union([S.TemplateLiteral(["dev_", S.String]), S.TemplateLiteral(["staging-", S.Number]), S.Literal("prod")]),
   )
-  const stage =
-    "env" in import.meta
-      ? // @ts-ignore
-        yield* decode(import.meta.env.VITE_PUBLIC_STAGE)
-      : yield* Config.string("STAGE").pipe(Effect.flatMap(decode))
+  const meta = import.meta as ImportMeta & { readonly env?: { readonly VITE_PUBLIC_STAGE?: string | undefined } }
+  const publicStage = meta.env?.VITE_PUBLIC_STAGE
+  const stage = publicStage === undefined ? yield* Config.string("STAGE").pipe(Effect.flatMap(decode)) : yield* decode(publicStage)
 
   const domain = ({ sub, pathname }: PathConfig = {}) =>
-    `${stage.startsWith("staging_") ? `${stage}.` : ""}${sub ? `${sub}.` : ""}crosshatch.dev${stage.startsWith("dev_") ? ".localhost" : undefined}${pathname ? `/${pathname}` : ""}`
+    `${stage.startsWith("staging-") ? `${stage}.` : ""}${sub ? `${sub}.` : ""}crosshatch.dev${stage.startsWith("dev_") ? ".localhost" : ""}${pathname ? `/${pathname}` : ""}`
 
   const url = (config?: PathConfig | undefined) => `https://${domain(config)}`
 
