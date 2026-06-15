@@ -1,4 +1,4 @@
-import { CrosshatchEnv } from "@crosshatch/util/CrosshatchEnv"
+import { Stage } from "@crosshatch/util/Stage"
 import { embed } from "@crosshatch/widget/embed"
 import { Finished } from "@crosshatch/widget/self"
 import type { StandardSchemaV1 } from "@standard-schema/spec"
@@ -15,7 +15,7 @@ export type Widget<Payload extends S.Codec<any, any>> = {
   standard: StandardSchemaV1<{ readonly x: string }, Payload["Type"]>
   host: (
     input: Payload["Type"],
-  ) => Effect.Effect<void, Cause.NoSuchElementError | S.SchemaError | UrlParams.UrlParamsError, CrosshatchEnv>
+  ) => Effect.Effect<void, Cause.NoSuchElementError | S.SchemaError | UrlParams.UrlParamsError, Stage>
 }
 
 const widget = <Payload extends S.Codec<any, any>, Item extends S.Codec<any, any>>({
@@ -42,12 +42,10 @@ const widget = <Payload extends S.Codec<any, any>, Item extends S.Codec<any, any
       S.encodeEffect(Payload),
       Effect.flatMap(
         Effect.fn(function* (x) {
-          const { url } = yield* CrosshatchEnv
-          const { href: src } = yield* UrlParams.makeUrl(
-            url("id", pathname),
-            UrlParams.make([["x", x]]),
-            undefined,
-          ).pipe(Effect.fromResult)
+          const { url } = yield* Stage
+          const { href: src } = yield* UrlParams.makeUrl(url({ pathname }), UrlParams.make([["x", x]]), undefined).pipe(
+            Effect.fromResult,
+          )
           return embed({
             item: S.Union([item, Finished]),
             src,

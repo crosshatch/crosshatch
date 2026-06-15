@@ -15,7 +15,7 @@ export default defineConfig({
     },
     {
       text: "Wallet",
-      link: "https://id.crosshatch.dev",
+      link: "https://crosshatch.dev",
       external: true,
     },
   ],

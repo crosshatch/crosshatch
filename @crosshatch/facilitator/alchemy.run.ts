@@ -16,12 +16,13 @@ export default Alchemy.Stack(
     const base = yield* WorkerConfig({
       domain: "facilitator.crosshatch.dev",
     })
-    const { dev: DEV } = yield* Alchemy.AlchemyContext
+    const STAGE = yield* Alchemy.Stage
     const { url } = yield* Cloudflare.Worker("Entry", {
       ...base,
       main: "main.ts",
       env: {
-        DEV,
+        STAGE,
+        VITE_PUBLIC_STAGE: STAGE,
         CDP_API_KEY_ID: Config.string("CDP_API_KEY_ID"),
         CDP_API_KEY_SECRET: Config.redacted("CDP_API_KEY_SECRET"),
       },

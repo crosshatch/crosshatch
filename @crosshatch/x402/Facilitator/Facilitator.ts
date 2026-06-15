@@ -1,4 +1,4 @@
-import { CrosshatchEnv } from "@crosshatch/util/CrosshatchEnv"
+import * as Stage from "@crosshatch/util/Stage"
 import { Context, Layer, Effect } from "effect"
 import { HttpApiClient, HttpApiGroup } from "effect/unstable/httpapi"
 import { HttpApi } from "effect/unstable/httpapi"
@@ -15,9 +15,12 @@ export class FacilitatorClient extends Context.Service<FacilitatorClient, HttpAp
   "@crosshatch/x402/FacilitatorClient",
 ) {
   static readonly layer = (config?: undefined | { readonly url?: string | undefined }) =>
-    (config?.url ? Effect.succeed(config.url) : CrosshatchEnv.pipe(Effect.map(({ url }) => url("facilitator")))).pipe(
+    (config?.url
+      ? Effect.succeed(config.url)
+      : Stage.Stage.pipe(Effect.map(({ url }) => url({ sub: "facilitator" })))
+    ).pipe(
       Effect.flatMap((baseUrl) => HttpApiClient.make(FacilitatorApi, { baseUrl })),
       Layer.effect(FacilitatorClient),
-      Layer.provide(CrosshatchEnv.layer),
+      Layer.provide(Stage.layerConfig),
     )
 }

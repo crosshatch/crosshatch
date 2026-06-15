@@ -1,4 +1,4 @@
-import { CROSSHATCH_ID_URL } from "@crosshatch/util/CrosshatchEnv"
+import { Stage } from "@crosshatch/util/Stage"
 import { Effect, Match, Cause } from "effect"
 import { Atom } from "effect/unstable/reactivity"
 import * as Boundary from "liminal-util/Boundary"
@@ -32,7 +32,8 @@ export const openAtom = atomRuntime.fn<void>()(
   Effect.fnUntraced(function* (_, get) {
     const state = yield* get.result(stateAtom)
     const common = { referrer: location.href }
-    const internal = origin.startsWith(CROSSHATCH_ID_URL)
+    const { url } = yield* Stage
+    const internal = origin.startsWith(url())
     yield* Match.valueTags(state, {
       Challenged: ({ challengeId }) =>
         internal
