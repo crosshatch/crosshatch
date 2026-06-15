@@ -26,11 +26,7 @@ export default Alchemy.Stack(
         CDP_API_KEY_SECRET: Config.redacted("CDP_API_KEY_SECRET"),
       },
     })
-    yield* PrPreviewComment({ name: "Facilitator", url }).pipe(
-      Effect.catchTags({
-        NotInPrError: Effect.die,
-      }),
-    )
+    yield* PrPreviewComment({ name: "Facilitator", url })
     return { url }
   }),
 )
