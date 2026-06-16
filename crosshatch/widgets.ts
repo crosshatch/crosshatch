@@ -2,7 +2,7 @@ import { Stage } from "@crosshatch/util/Stage"
 import { embed } from "@crosshatch/widget/embed"
 import { Finished } from "@crosshatch/widget/self"
 import type { StandardSchemaV1 } from "@standard-schema/spec"
-import { Cause, Effect, pipe, Schema as S, SchemaGetter, Stream } from "effect"
+import { Data, Effect, pipe, Schema as S, SchemaGetter, Stream } from "effect"
 import { UrlParams } from "effect/unstable/http"
 import * as Boundary from "liminal-util/Boundary"
 
@@ -13,10 +13,12 @@ import { LinkChallengeId } from "./LinkChallengeId.ts"
 export type Widget<Payload extends S.Codec<any, any>> = {
   Payload: Payload["Type"]
   standard: StandardSchemaV1<{ readonly x: string }, Payload["Type"]>
-  host: (
-    input: Payload["Type"],
-  ) => Effect.Effect<void, Cause.NoSuchElementError | S.SchemaError | UrlParams.UrlParamsError, Stage>
+  host: (input: Payload["Type"]) => Effect.Effect<void, WidgetError, any>
 }
+
+export class WidgetError extends Data.TaggedError("WidgetError")<{
+  readonly cause: unknown
+}> {}
 
 const widget = <Payload extends S.Codec<any, any>, Item extends S.Codec<any, any>>({
   pathname,
@@ -57,6 +59,7 @@ const widget = <Payload extends S.Codec<any, any>, Item extends S.Codec<any, any
       Stream.filter(S.is(Finished)),
       Stream.take(1),
       Stream.runDrain,
+      Effect.mapError((cause) => new WidgetError({ cause })),
       Boundary.span("stream-host", import.meta.url, {
         attributes: { pathname },
       }),

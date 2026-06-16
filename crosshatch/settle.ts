@@ -12,7 +12,7 @@ export interface Settlement {
 
 export const settle = Effect.fnUntraced(
   function* ({ payload }: { readonly payload: typeof Payload.Payload.Type }) {
-    const { facilitator } = yield* FacilitatorClient
+    const facilitator = yield* FacilitatorClient.getOrDefault
     const { accepted: paymentRequirements } = payload
     const response = yield* facilitator
       .settle({

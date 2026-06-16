@@ -1,10 +1,10 @@
+import { Amount } from "@crosshatch/assets"
 import { Stage } from "@crosshatch/util/Stage"
 import { Effect, Match, Cause } from "effect"
 import { Atom } from "effect/unstable/reactivity"
 import * as Boundary from "liminal-util/Boundary"
 
 import * as Facade from "./Facade/Facade.ts"
-import { Micros } from "./Micros.ts"
 import { atomRuntime } from "./runtime.ts"
 import { ActivityWidget, IdWidget, LinkWidget } from "./widgets.ts"
 
@@ -41,7 +41,7 @@ export const openAtom = atomRuntime.fn<void>()(
           : LinkWidget.host({
               challengeId,
               allowance: {
-                amount: Micros.make(10_000_000n),
+                amount: Amount.Usd.make(10_000_000n),
                 window: "Week",
               },
               ...common,

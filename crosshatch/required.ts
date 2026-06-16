@@ -1,8 +1,6 @@
+import { Amount, Asset } from "@crosshatch/assets"
 import type { AccountAddress } from "@crosshatch/caip"
 import { Required, Requirements } from "@crosshatch/x402"
-
-import type { Asset } from "./Asset.ts"
-import { toX402, type Micros } from "./Micros.ts"
 
 export const required = ({
   url,
@@ -12,8 +10,8 @@ export const required = ({
   recipient,
 }: {
   readonly url: string
-  readonly amount: typeof Micros.Type
-  readonly asset: Asset
+  readonly amount: typeof Amount.Usd.Type
+  readonly asset: Asset.Asset
   readonly description: string
   readonly recipient: typeof AccountAddress.Type
 }) =>
@@ -21,11 +19,11 @@ export const required = ({
     x402Version: 2,
     accepts: [
       Requirements.Requirements.make({
-        amount: toX402(amount, asset),
-        asset: asset.asset,
-        extra: asset.extra,
+        amount: Amount.usdToAtomic(amount, asset),
+        asset: asset.address,
+        extra: Asset.toX402Extra(asset),
         maxTimeoutSeconds: 60,
-        network: asset.network,
+        network: asset.chainId as never,
         payTo: recipient,
         scheme: "exact",
       }),

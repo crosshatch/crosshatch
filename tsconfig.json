@@ -3,10 +3,12 @@
   "references": [
     { "path": "./@crosshatch/caip" },
     { "path": "./@crosshatch/facilitator" },
+    { "path": "./@crosshatch/assets" },
     { "path": "./@crosshatch/merchant" },
     { "path": "./@crosshatch/widget" },
     { "path": "./@crosshatch/x402" },
     { "path": "./crosshatch" },
-    { "path": "./docs" }
+    { "path": "./docs" },
+    { "path": "./examples" }
   ]
 }

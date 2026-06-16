@@ -5,7 +5,7 @@ export class Merchant extends Context.Service<
   Merchant,
   {
     readonly url: string
-    readonly treasury: typeof AccountAddress.Type
+    readonly pot: typeof AccountAddress.Type
   }
 >()("@crosshatch/merchant/Merchant") {
   static readonly layer = Layer.succeed(this)

@@ -1,0 +1,19 @@
+{
+  "name": "@crosshatch-examples/effect-http",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "alchemy dev"
+  },
+  "dependencies": {
+    "@cloudflare/workers-types": "catalog:",
+    "@crosshatch/caip": "workspace:*",
+    "@crosshatch/merchant": "workspace:*",
+    "alchemy": "catalog:",
+    "crosshatch": "workspace:*",
+    "effect": "catalog:",
+    "effect-workerd": "workspace:*",
+    "vitest": "catalog:"
+  }
+}

@@ -1,8 +1,8 @@
 {
-  "name": "@crosshatch/merchant",
+  "name": "@crosshatch/assets",
   "version": "0.1.0-beta.1",
   "private": false,
-  "description": "Crosshatch x402 backend integrations.",
+  "description": "Known assets and amount utilities used by Crosshatch packages.",
   "homepage": "https://crosshatch.dev",
   "bugs": {
     "url": "https://github.com/crosshatch/crosshatch/issues"
@@ -11,7 +11,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/crosshatch/crosshatch.git",
-    "directory": "@crosshatch/merchant"
+    "directory": "@crosshatch/assets"
   },
   "type": "module",
   "sideEffects": false,
@@ -24,11 +24,6 @@
     }
   },
   "peerDependencies": {
-    "@crosshatch/assets": "workspace:*",
-    "@crosshatch/caip": "workspace:*",
-    "@crosshatch/x402": "workspace:*",
-    "crosshatch": "workspace:*",
-    "effect": "catalog:",
-    "viem": "catalog:"
+    "effect": "catalog:"
   }
 }

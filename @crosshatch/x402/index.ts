@@ -1,4 +1,5 @@
 export * from "./Facilitator/Facilitator.ts"
+export * as FacilitatorClient from "./Facilitator/FacilitatorClient.ts"
 export * as Payload from "./Payload.ts"
 export * as Required from "./Required.ts"
 export * as Requirements from "./Requirements.ts"
