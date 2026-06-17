@@ -27,6 +27,5 @@ export default Alchemy.Stack(
       },
     })
     yield* PrPreviewComment({ name: "Facilitator", url })
-    return { url }
   }),
 )

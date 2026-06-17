@@ -14,7 +14,7 @@ export default Alchemy.Stack(
       domain: "example-effect-http.crosshatch.dev",
     })
     const CROSSHATCH_STAGE = yield* Alchemy.Stage
-    const { url } = yield* Cloudflare.Vite("Entry", {
+    yield* Cloudflare.Vite("Entry", {
       ...base,
       dev: {
         host: "127.0.0.1",
@@ -26,6 +26,5 @@ export default Alchemy.Stack(
         VITE_PUBLIC_CROSSHATCH_STAGE: CROSSHATCH_STAGE,
       },
     })
-    return { url }
   }),
 )
