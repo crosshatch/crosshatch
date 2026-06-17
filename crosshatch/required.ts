@@ -1,32 +1,17 @@
-import { Amount, Asset } from "@crosshatch/assets"
-import type { AccountAddress } from "@crosshatch/caip"
 import { Required, Requirements } from "@crosshatch/x402"
+import { Array } from "effect"
 
 export const required = ({
   url,
-  amount,
-  asset,
   description,
-  recipient,
+  accepts,
 }: {
   readonly url: string
-  readonly amount: typeof Amount.Usd.Type
-  readonly asset: Asset.Asset
   readonly description: string
-  readonly recipient: typeof AccountAddress.Type
+  readonly accepts: Array.NonEmptyReadonlyArray<typeof Requirements.Requirements.Type>
 }) =>
   Required.Required.make({
     x402Version: 2,
-    accepts: [
-      Requirements.Requirements.make({
-        amount: Amount.usdToAtomic(amount, asset),
-        asset: asset.address,
-        extra: Asset.toX402Extra(asset),
-        maxTimeoutSeconds: 60,
-        network: asset.chainId as never,
-        payTo: recipient,
-        scheme: "exact",
-      }),
-    ],
+    accepts,
     resource: { url, description },
   })

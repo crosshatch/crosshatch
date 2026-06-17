@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@cloudflare/workers-types": "catalog:",
+    "@crosshatch/assets": "workspace:*",
     "@crosshatch/caip": "workspace:*",
     "@crosshatch/merchant": "workspace:*",
     "alchemy": "catalog:",

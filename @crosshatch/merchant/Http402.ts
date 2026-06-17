@@ -1,4 +1,5 @@
-import { PaymentSpec, Amount } from "@crosshatch/assets"
+import { Amount } from "@crosshatch/assets"
+import { Asset } from "@crosshatch/assets"
 import { Payload as X402Payload, Required } from "@crosshatch/x402"
 import { required } from "crosshatch"
 import { Context, Schema as S, Effect, flow, Option, String } from "effect"
@@ -11,16 +12,11 @@ export class Payload extends Context.Service<Payload, typeof X402Payload.Payload
   "@crosshatch/merchant/Http402/Payload",
 ) {}
 
-export const require = (paymentSpec: PaymentSpec.PaymentSpec) =>
+export const require = ({ amount, asset }: { readonly amount: bigint; readonly asset: Asset.Asset }) =>
   Effect.fnUntraced(function* (
     template: TemplateStringsArray,
     ...substitutions: ReadonlyArray<unknown>
-  ): Effect.fn.Return<
-    HttpServerResponse.HttpServerResponse,
-    Amount.InvalidUsdError | PaymentSpec.InvalidPaymentSpecError | S.SchemaError,
-    Merchant
-  > {
-    const { amount, asset } = yield* PaymentSpec.unwrap(paymentSpec)
+  ): Effect.fn.Return<HttpServerResponse.HttpServerResponse, Amount.InvalidUsdError | S.SchemaError, Merchant> {
     const traceId = yield* Effect.serviceOption(Trace).pipe(
       Effect.map(
         flow(
@@ -29,16 +25,20 @@ export const require = (paymentSpec: PaymentSpec.PaymentSpec) =>
         ),
       ),
     )
-    const { url, pot } = yield* Merchant
+    const { url, pot: recipient } = yield* Merchant
     const paymentRequired = yield* S.encodeEffect(
       S.StringFromBase64.pipe(S.decodeTo(S.fromJsonString(S.toCodecJson(Required.Required)))),
     )(
       required({
         url,
         description: String.stripMargin(globalThis.String.raw(template, ...substitutions)),
-        amount,
-        recipient: pot,
-        asset,
+        accepts: [
+          Asset.requirements({
+            asset,
+            amount: Amount.Usd.make(amount),
+            recipient,
+          }),
+        ],
       }),
     )
     return HttpServerResponse.empty({

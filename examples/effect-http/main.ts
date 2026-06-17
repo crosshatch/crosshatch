@@ -1,3 +1,4 @@
+import { ASSETS } from "@crosshatch/assets"
 import { AccountAddress } from "@crosshatch/caip"
 import { Http402, Merchant } from "@crosshatch/merchant"
 import { settle } from "crosshatch"
@@ -14,7 +15,10 @@ export default Worker.make({
       Effect.gen(function* () {
         const payload = yield* Http402.Payload
         if (!payload) {
-          return yield* Http402.require("0.01 eip155:8453 USDC")`
+          return yield* Http402.require({
+            amount: 1_000n,
+            asset: ASSETS.BASE_USDC,
+          })`
           | Description of the charge here.
           `
         }

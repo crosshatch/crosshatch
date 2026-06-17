@@ -3,6 +3,7 @@
   "include": ["."],
   "references": [
     { "path": "../../crosshatch" },
+    { "path": "../../@crosshatch/assets" },
     { "path": "../../@crosshatch/caip" },
     { "path": "../../@crosshatch/merchant" },
     { "path": "../../liminal/effect-workerd" }
