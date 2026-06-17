@@ -33,6 +33,7 @@
     "yaml": "catalog:"
   },
   "peerDependencies": {
+    "@crosshatch/assets": "workspace:*",
     "@crosshatch/caip": "workspace:*",
     "@crosshatch/merchant": "workspace:*",
     "@crosshatch/util": "workspace:*",

@@ -1,7 +1,12 @@
+import { AccountAddress, ChainIdString } from "@crosshatch/caip"
+import { Requirements } from "@crosshatch/x402"
+
+import * as Amount from "./Amount.ts"
+
 export interface Asset {
-  readonly address: string
+  readonly address: typeof AccountAddress.Encoded
   readonly assetTransferMethod?: "permit2" | undefined
-  readonly chainId: string
+  readonly chainId: typeof ChainIdString.Encoded
   readonly decimals: number
   readonly name: string
   readonly namespace: "erc20"
@@ -24,3 +29,24 @@ export const findByX402 = (chainId: string, x402Asset: string, assets: Record<st
 
 export const findByChain = (chainId: string, assets: Record<string, Asset>): ReadonlyArray<Asset> =>
   Object.values(assets).filter((asset) => asset.chainId === chainId)
+
+export const requirements = ({
+  asset,
+  recipient,
+  amount,
+}: {
+  readonly asset: Asset
+  readonly recipient: string
+  readonly amount: typeof Amount.Usd.Type
+}) => {
+  const { address, name, version, chainId } = asset
+  return Requirements.Requirements.make({
+    amount: Amount.usdToAtomic(amount, asset),
+    asset: address,
+    extra: { name, version },
+    maxTimeoutSeconds: 300,
+    network: ChainIdString.make(chainId),
+    payTo: AccountAddress.make(recipient),
+    scheme: "exact",
+  })
+}

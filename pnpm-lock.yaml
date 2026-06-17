@@ -142,6 +142,7 @@ overrides:
   zod: 3.25.76
 
 patchedDependencies:
+  '@distilled.cloud/coinbase@0.25.2': ab040815e3050a289c241580dc8e55967038d29ab29b61e8da79af3d3919454e
   alchemy@2.0.0-beta.56: 47f8ffb499431b625b45f08dc9ce5129876dabc48f5c1043132364bdd85175ef
 
 importers:
@@ -220,6 +221,12 @@ importers:
 
   '@crosshatch/assets':
     dependencies:
+      '@crosshatch/caip':
+        specifier: workspace:*
+        version: link:../caip
+      '@crosshatch/x402':
+        specifier: workspace:*
+        version: link:../x402
       effect:
         specifier: 'catalog:'
         version: 4.0.0-beta.83
@@ -232,6 +239,9 @@ importers:
 
   '@crosshatch/facilitator':
     dependencies:
+      '@crosshatch/assets':
+        specifier: workspace:*
+        version: link:../assets
       '@crosshatch/caip':
         specifier: workspace:*
         version: link:../caip
@@ -246,7 +256,7 @@ importers:
         version: link:../x402
       '@distilled.cloud/coinbase':
         specifier: 'catalog:'
-        version: 0.25.2(effect@4.0.0-beta.83)
+        version: 0.25.2(patch_hash=ab040815e3050a289c241580dc8e55967038d29ab29b61e8da79af3d3919454e)(effect@4.0.0-beta.83)
       alchemy:
         specifier: 'catalog:'
         version: 2.0.0-beta.56(patch_hash=47f8ffb499431b625b45f08dc9ce5129876dabc48f5c1043132364bdd85175ef)(@effect/platform-node@4.0.0-beta.83(effect@4.0.0-beta.83)(ioredis@5.10.1))(@types/node@25.6.0)(@types/react@19.2.14)(drizzle-orm@1.0.0-rc.3(@cloudflare/workers-types@4.20260531.1)(@libsql/client@0.17.3)(effect@4.0.0-beta.83)(mysql2@3.22.4(@types/node@25.6.0))(pg@8.21.0)(zod@3.25.76))(effect@4.0.0-beta.83)(vite@8.0.8(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(terser@5.48.0)(tsx@4.21.0)(yaml@2.8.3))(vitest@4.1.4)(workerd@1.20260526.1)(ws@8.20.1)
@@ -7849,7 +7859,7 @@ snapshots:
       '@distilled.cloud/core': 0.25.2(effect@4.0.0-beta.83)
       effect: 4.0.0-beta.83
 
-  '@distilled.cloud/coinbase@0.25.2(effect@4.0.0-beta.83)':
+  '@distilled.cloud/coinbase@0.25.2(patch_hash=ab040815e3050a289c241580dc8e55967038d29ab29b61e8da79af3d3919454e)(effect@4.0.0-beta.83)':
     dependencies:
       '@distilled.cloud/core': 0.25.2(effect@4.0.0-beta.83)
       effect: 4.0.0-beta.83

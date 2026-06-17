@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from "node:fs"
+
 import { mergeConfig, type ViteUserConfig } from "vitest/config"
 
 import config from "../../konfik/vitest.ts"

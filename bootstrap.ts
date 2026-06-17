@@ -30,6 +30,7 @@ export default Alchemy.Stack(
       secrets: {
         CDP_API_KEY_SECRET: Config.redacted("CDP_API_KEY_SECRET"),
         OTEL_EXPORTER_OTLP_HEADERS: Config.redacted("OTEL_EXPORTER_OTLP_HEADERS"),
+        EVM_SEED_PHRASE: Config.redacted("EVM_SEED_PHRASE"),
         EVM_PROXY_URL: Config.redacted("EVM_PROXY_URL"),
       },
     })
