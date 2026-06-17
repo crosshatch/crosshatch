@@ -1,4 +1,3 @@
-import { Stage } from "@crosshatch/util/Stage"
 import { Effect, Context, Layer } from "effect"
 import { HttpApiClient } from "effect/unstable/httpapi"
 
@@ -16,9 +15,8 @@ export const getOrDefault = Effect.gen(function* () {
     return facilitator
   }
   if (!default_) {
-    const { url } = yield* Stage
     default_ = yield* HttpApiClient.make(FacilitatorApi, {
-      baseUrl: url({ sub: "facilitator" }),
+      baseUrl: "https://facilitator.crosshatch.dev",
     })
   }
   return default_.facilitator

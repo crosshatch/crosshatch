@@ -33,10 +33,11 @@
     "yaml": "catalog:"
   },
   "peerDependencies": {
-    "@coinbase/cdp-sdk": "catalog:",
     "@crosshatch/caip": "workspace:*",
+    "@crosshatch/merchant": "workspace:*",
     "@crosshatch/util": "workspace:*",
     "@crosshatch/x402": "workspace:*",
+    "@distilled.cloud/coinbase": "catalog:",
     "alchemy": "catalog:",
     "crosshatch": "workspace:*",
     "effect": "catalog:",

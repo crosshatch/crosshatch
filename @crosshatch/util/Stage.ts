@@ -6,22 +6,17 @@ export const StageName = S.Union([
   S.Literal("prod"),
 ])
 
-export interface PathConfig {
-  readonly sub?: string | undefined
-  readonly pathname?: string | undefined
-}
-
 export interface Stage {
   readonly name: typeof StageName.Type
-  readonly domain: (config?: PathConfig) => string
-  readonly url: (config?: PathConfig) => string
+  readonly domain: (pathname?: string) => string
+  readonly url: (pathname?: string) => string
 }
 
 const make = (name: typeof StageName.Type) => {
-  const domain = ({ sub, pathname }: PathConfig = {}) =>
-    `${name.startsWith("staging-") ? `${name}.` : ""}${sub ? `${sub}.` : ""}crosshatch.dev${name.startsWith("dev_") ? ".localhost" : ""}${pathname ? `/${pathname}` : ""}`
+  const domain = (pathname?: string) =>
+    `${name.startsWith("staging-") ? `${name}.` : ""}crosshatch.dev${name.startsWith("dev_") ? ".localhost" : ""}${pathname ? `/${pathname}` : ""}`
 
-  const url = (config?: PathConfig | undefined) => `https://${domain(config)}`
+  const url = (pathname?: string) => `https://${domain(pathname)}`
 
   return { name, domain, url }
 }

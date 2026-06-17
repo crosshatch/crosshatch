@@ -13,7 +13,7 @@ catalog:
   "@cloudflare/vitest-pool-workers": ^0.14.7
   "@cloudflare/worker-bundler": ^0.1.2
   "@cloudflare/workers-types": ^4.20260414.1
-  "@coinbase/cdp-sdk": ^1.44.0
+  "@distilled.cloud/coinbase": ^0.25.2
   "@effect/ai-openai-compat": 4.0.0-beta.83
   "@effect/atom-react": 4.0.0-beta.83
   "@effect/language-service": 0.86.2

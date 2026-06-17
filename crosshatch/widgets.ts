@@ -45,7 +45,7 @@ const widget = <Payload extends S.Codec<any, any>, Item extends S.Codec<any, any
       Effect.flatMap(
         Effect.fn(function* (x) {
           const { url } = yield* Stage
-          const { href: src } = yield* UrlParams.makeUrl(url({ pathname }), UrlParams.make([["x", x]]), undefined).pipe(
+          const { href: src } = yield* UrlParams.makeUrl(url(pathname), UrlParams.make([["x", x]]), undefined).pipe(
             Effect.fromResult,
           )
           return embed({

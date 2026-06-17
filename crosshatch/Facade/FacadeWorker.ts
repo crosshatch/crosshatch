@@ -20,7 +20,7 @@ export const layer = Effect.gen(function* () {
     id: "crosshatch-enclave",
     height: 1,
     sandbox: "allow-scripts allow-same-origin",
-    src: url({ pathname: "enclave" }),
+    src: url("enclave"),
     width: 1,
   })
   Object.assign(iframe.style, { cssText })
