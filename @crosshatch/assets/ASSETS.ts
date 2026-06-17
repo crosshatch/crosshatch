@@ -57,7 +57,6 @@ export const ASSETS = {
     symbol: "USDT0",
     version: "1",
   },
-
   POLYGON_USDC: {
     address: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
     chainId: "eip155:137",
@@ -76,7 +75,6 @@ export const ASSETS = {
     symbol: "USDC",
     version: "2",
   },
-
   ARBITRUM_SEPOLIA_USDC: {
     address: "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d",
     chainId: "eip155:421614",
@@ -86,7 +84,6 @@ export const ASSETS = {
     symbol: "USDC",
     version: "2",
   },
-
   MEZO_MUSD: {
     address: "0xdD468A1DDc392dcdbEf6db6e34E89AA338F9F186",
     assetTransferMethod: "permit2",
@@ -132,7 +129,6 @@ export const ASSETS = {
     symbol: "SBC",
     version: "1",
   },
-
   ADI_USDCE: {
     address: "0x9cb8142aEBBcdc60AF7c97Af897A67A8f3CA71C2",
     chainId: "eip155:36900",
@@ -142,7 +138,6 @@ export const ASSETS = {
     symbol: "USDC.e",
     version: "2",
   },
-
   HPP_USDCE: {
     address: "0x401eCb1D350407f13ba348573E5630B83638E30D",
     chainId: "eip155:190415",
