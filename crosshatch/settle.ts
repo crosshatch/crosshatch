@@ -16,8 +16,6 @@ export const settle = Effect.fnUntraced(
   function* ({ payload }: { readonly payload: typeof Payload.Payload.Type }) {
     const facilitator = yield* FacilitatorClient.getOrDefault
     const { accepted: paymentRequirements } = payload
-    const text = yield* Effect.promise(() => fetch("https://facilitator.crosshatch.dev/health").then((v) => v.text()))
-    console.log("THE TEXT HERE:", text)
     const response = yield* facilitator
       .settle({
         payload: {

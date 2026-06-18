@@ -1,31 +1,37 @@
-import { ASSETS } from "@crosshatch/assets"
-import { AccountAddress } from "@crosshatch/caip"
-import { Http402, Merchant } from "@crosshatch/merchant"
-import { settle } from "crosshatch"
+import { USDC } from "@crosshatch/assets"
+import { CaipConfig } from "@crosshatch/caip"
+import { Http402 } from "@crosshatch/merchant"
+import { Required } from "@crosshatch/x402"
+import { Asset, settle } from "crosshatch"
 import { Layer, Effect } from "effect"
 import { Worker } from "effect-workerd"
 import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
 
 export default Worker.make({
-  handler: Layer.mergeAll(
-    HttpRouter.add("GET", "/health", Effect.succeed(HttpServerResponse.text("ok"))),
-    HttpRouter.add(
-      "GET",
-      "/paid",
-      Effect.gen(function* () {
-        const payload = yield* Http402.Payload
-        if (!payload) {
-          return yield* Http402.require({
-            amount: 1_000n,
-            asset: ASSETS.BASE_USDC,
-          })`
-          | Description of the charge here.
-          `
-        }
-        yield* settle({ payload })
-        return HttpServerResponse.text("The paid resource.")
-      }),
-    ),
+  handler: HttpRouter.add(
+    "GET",
+    "/paid",
+    Effect.gen(function* () {
+      const payload = yield* Http402.Payload
+      if (!payload) {
+        const required = Required.builder({
+          url: "https://example-merchant.com",
+        }).pipe(
+          Required.accepts(
+            Asset.requirements(0.01, USDC, {
+              "eip155:8453": yield* CaipConfig.accountAddress("PAY_TO_EVM"),
+            }),
+          ),
+        )`
+        | Description of the charge here.
+        | What is this charge for?
+        | How does it fit into the current flow?
+        `
+        return yield* Http402.require(required)
+      }
+      yield* settle({ payload })
+      return HttpServerResponse.text("The paid resource.")
+    }),
   ).pipe(
     Layer.provide([
       HttpRouter.cors({
@@ -39,10 +45,5 @@ export default Worker.make({
     HttpRouter.toHttpEffect,
     Effect.flatten,
   ),
-  prelude: Layer.mergeAll(
-    Merchant.layer({
-      pot: AccountAddress.make("..."),
-      url: "https://example-x402-endpoint.com",
-    }),
-  ),
+  prelude: Layer.empty,
 })

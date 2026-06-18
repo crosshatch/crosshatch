@@ -11,6 +11,7 @@
     "@crosshatch/assets": "workspace:*",
     "@crosshatch/caip": "workspace:*",
     "@crosshatch/merchant": "workspace:*",
+    "@crosshatch/x402": "workspace:*",
     "alchemy": "catalog:",
     "crosshatch": "workspace:*",
     "effect": "catalog:",

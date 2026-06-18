@@ -2,7 +2,17 @@ import { assert, describe, it } from "@effect/vitest"
 import { Effect } from "effect"
 
 import * as Amount from "./Amount.ts"
-import { ASSETS } from "./ASSETS.ts"
+import type { AssetDeployment } from "./Asset.ts"
+
+const EXAMPLE = {
+  decimals: 6,
+  address: null!,
+  chainId: null!,
+  name: null!,
+  namespace: null!,
+  symbol: null!,
+  version: null!,
+} as const satisfies typeof AssetDeployment.Type
 
 describe(import.meta.url, () => {
   it.effect(
@@ -38,18 +48,14 @@ describe(import.meta.url, () => {
   })
 
   it("converts atomic units using ceiling micros", () => {
-    assert.strictEqual(Amount.atomicToUsd(Amount.Atomic.make("1000000"), ASSETS.BASE_USDC), Amount.Usd.make(1_000_000n))
-    assert.strictEqual(Amount.atomicToUsd(Amount.Atomic.make("1"), ASSETS.BASE_USDC), Amount.Usd.make(1n))
+    assert.strictEqual(Amount.atomicToUsd(Amount.Atomic.make("1000000"), EXAMPLE), Amount.Usd.make(1_000_000n))
+    assert.strictEqual(Amount.atomicToUsd(Amount.Atomic.make("1"), EXAMPLE), Amount.Usd.make(1n))
   })
 
   it("converts micros to atomic units using ceiling units", () => {
-    const wholeDollars = {
-      ...ASSETS.BASE_USDC,
-      decimals: 0,
-    }
-
-    assert.strictEqual(Amount.usdToAtomic(Amount.Usd.make(1_000_000n), ASSETS.BASE_USDC), Amount.Atomic.make("1000000"))
-    assert.strictEqual(Amount.usdToAtomic(Amount.Usd.make(1000n), ASSETS.BASE_USDC), Amount.Atomic.make("1000"))
+    const wholeDollars = { ...EXAMPLE, decimals: 0 }
+    assert.strictEqual(Amount.usdToAtomic(Amount.Usd.make(1_000_000n), EXAMPLE), Amount.Atomic.make("1000000"))
+    assert.strictEqual(Amount.usdToAtomic(Amount.Usd.make(1000n), EXAMPLE), Amount.Atomic.make("1000"))
     assert.strictEqual(Amount.usdToAtomic(Amount.Usd.make(1n), wholeDollars), Amount.Atomic.make("1"))
   })
 })

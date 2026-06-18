@@ -218,6 +218,9 @@ importers:
       '@crosshatch/x402':
         specifier: workspace:*
         version: link:../x402
+      crosshatch:
+        specifier: workspace:*
+        version: link:../../crosshatch
       effect:
         specifier: 'catalog:'
         version: 4.0.0-beta.83
@@ -320,9 +323,6 @@ importers:
 
   crosshatch:
     dependencies:
-      '@crosshatch/assets':
-        specifier: workspace:*
-        version: link:../@crosshatch/assets
       '@crosshatch/caip':
         specifier: workspace:*
         version: link:../@crosshatch/caip
@@ -416,6 +416,9 @@ importers:
       '@crosshatch/merchant':
         specifier: workspace:*
         version: link:../../@crosshatch/merchant
+      '@crosshatch/x402':
+        specifier: workspace:*
+        version: link:../../@crosshatch/x402
       alchemy:
         specifier: 'catalog:'
         version: 2.0.0-beta.56(patch_hash=47f8ffb499431b625b45f08dc9ce5129876dabc48f5c1043132364bdd85175ef)(@effect/platform-node@4.0.0-beta.83(effect@4.0.0-beta.83)(ioredis@5.10.1))(@types/node@25.6.0)(@types/react@19.2.14)(drizzle-orm@1.0.0-rc.3(@cloudflare/workers-types@4.20260416.2)(@libsql/client@0.17.3)(effect@4.0.0-beta.83)(mysql2@3.22.4(@types/node@25.6.0))(pg@8.21.0)(zod@3.25.76))(effect@4.0.0-beta.83)(vite@8.0.8(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0))(vitest@4.1.4)(workerd@1.20260526.1)(ws@8.20.1)

@@ -1,6 +1,5 @@
-import { Context, Effect, String } from "effect"
-
-import { Bridge } from "./Bridge.ts"
+import { Bridge } from "crosshatch"
+import { Context, Option, Effect, flow, String } from "effect"
 
 export class Trace extends Context.Service<
   Trace,
@@ -30,3 +29,12 @@ export const traced =
       yield* createTrace(trace)
       return yield* Effect.provideService(effect, Trace, trace)
     }, Effect.withSpan(name))
+
+export const CurrentTraceId = Effect.serviceOption(Trace).pipe(
+  Effect.map(
+    flow(
+      Option.map(({ traceId }) => traceId),
+      Option.getOrUndefined,
+    ),
+  ),
+)

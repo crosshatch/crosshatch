@@ -1,5 +1,5 @@
-import { Amount } from "@crosshatch/assets"
 import { Stage } from "@crosshatch/util/Stage"
+import { Amount } from "crosshatch"
 import { Effect, Match, Cause } from "effect"
 import { Atom } from "effect/unstable/reactivity"
 import * as Boundary from "liminal-util/Boundary"
