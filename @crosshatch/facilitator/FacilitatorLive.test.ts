@@ -22,22 +22,7 @@ describe(import.meta.url, () => {
     "verifies and settles a freshly signed EVM x402 payment",
     Effect.fn(function* () {
       const seed = yield* Config.redacted("EVM_SEED_PHRASE")
-      const mnemonic = Redacted.value(seed)
-      const trimmedMnemonic = mnemonic.trim()
-      const words = trimmedMnemonic.split(/\s+/).filter(Boolean)
-
-      console.info("EVM_SEED_PHRASE diagnostics", {
-        length: mnemonic.length,
-        trimmedLength: trimmedMnemonic.length,
-        wordCount: words.length,
-        wordLengths: words.map((word) => word.length),
-        hasOuterWhitespace: mnemonic !== trimmedMnemonic,
-        hasDoubleQuote: mnemonic.includes('"'),
-        hasSingleQuote: mnemonic.includes("'"),
-        hasNewline: /\r|\n/.test(mnemonic),
-      })
-
-      const account = mnemonicToAccount(mnemonic)
+      const account = mnemonicToAccount(Redacted.value(seed))
       const paymentRequirements = Asset.requirements(USDC, {
         amount: 0.01,
         recipients: {
