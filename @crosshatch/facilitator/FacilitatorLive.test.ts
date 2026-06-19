@@ -22,9 +22,14 @@ describe(import.meta.url, () => {
     "verifies and settles a freshly signed EVM x402 payment",
     Effect.fn(function* () {
       const account = mnemonicToAccount(yield* Config.string("EVM_SEED_PHRASE"))
-      const [paymentRequirements] = Asset.requirements(0.01, USDC, {
-        "eip155:8453": yield* CaipConfig.accountAddress("PAY_TO_EVM"),
-      })
+      const paymentRequirements = Asset.requirements(USDC, {
+        amount: 0.01,
+        recipients: {
+          eip155: {
+            8453: yield* CaipConfig.accountAddress("PAY_TO_EVM"),
+          },
+        },
+      })[0]!
       const paymentPayload = yield* Payload.make(account, paymentRequirements)
       const client = yield* HttpApiClient.make(FacilitatorApi)
       const verified = yield* client.facilitator.verify({

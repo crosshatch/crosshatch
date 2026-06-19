@@ -58,3 +58,15 @@ export const atomicToUsd = (
   amount: typeof Atomic.Type,
   assetDeployment: typeof AssetDeployment.Type,
 ): typeof Usd.Type => Usd.make(ceilDiv(BigInt(amount) * MICROS_PER_USD, atomicScale(assetDeployment)))
+
+export const usdFromNumber = (amount: number): typeof Usd.Type => {
+  if (!Number.isFinite(amount) || amount < 0) {
+    throw new InvalidUsdError({ input: String(amount) })
+  }
+
+  const micros = amount * Number(MICROS_PER_USD)
+  if (!Number.isSafeInteger(micros)) {
+    throw new InvalidUsdError({ input: String(amount) })
+  }
+  return Usd.make(BigInt(micros))
+}

@@ -18,8 +18,13 @@ export default Worker.make({
           url: "https://example-merchant.com",
         }).pipe(
           Required.accepts(
-            Asset.requirements(0.01, USDC, {
-              "eip155:8453": yield* CaipConfig.accountAddress("PAY_TO_EVM"),
+            Asset.requirements(USDC, {
+              amount: 0.01,
+              recipients: {
+                eip155: {
+                  8453: yield* CaipConfig.accountAddress("PAY_TO_EVM"),
+                },
+              },
             }),
           ),
         )`

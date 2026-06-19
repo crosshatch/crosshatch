@@ -1,32 +1,56 @@
 import { AccountAddress, ChainIdString } from "@crosshatch/caip"
 import { Requirements } from "@crosshatch/x402"
-import { Schema as S, Array, Effect, Brand } from "effect"
+import { Record, Schema as S, Effect, Duration } from "effect"
+
+import { usdToAtomic, usdFromNumber } from "./Amount.ts"
+
+export type Asset = Record<string, Record<string, typeof AssetDeployment.Type>>
 
 export const AssetDeployment = S.Struct({
   address: AccountAddress,
-  chainId: ChainIdString,
+  assetNamespace: S.Literal("erc20"),
   decimals: S.Number,
   name: S.String,
-  namespace: S.Literal("erc20"),
   symbol: S.String,
   version: S.String,
 })
 
-export const Asset = S.NonEmptyArray(AssetDeployment)
-
-export const decodeSync = S.decodeSync(Asset)
-
-export declare const requirements: <
-  const A extends typeof Asset.Type,
-  // TODO
-  N extends Exclude<A[number]["chainId"], Brand.Brand<string>>,
->(
-  amount: number,
+export const requirements = <A extends Asset>(
   asset: A,
-  recipients: {
-    readonly [K in N]+?: typeof AccountAddress.Type | undefined
+  {
+    amount,
+    recipients,
+    ttl,
+  }: {
+    amount: number
+    recipients: {
+      [K in keyof A]: {
+        [K2 in keyof A[K]]+?: typeof AccountAddress.Type | undefined
+      }
+    }
+    ttl?: Duration.Input | undefined
   },
-) => Array.NonEmptyReadonlyArray<typeof Requirements.Requirements.Type>
+): ReadonlyArray<typeof Requirements.Requirements.Type> =>
+  Record.toEntries(recipients).flatMap(([namespace, references]) =>
+    Record.toEntries(references).reduce(
+      (acc, [reference, payTo]) => [
+        ...acc,
+        ...(payTo
+          ? [
+              {
+                amount: usdToAtomic(usdFromNumber(amount), asset[namespace]![reference]!),
+                asset: AccountAddress.make(asset[namespace]![reference]!.address),
+                maxTimeoutSeconds: ttl ? Duration.fromInputUnsafe(ttl).pipe(Duration.toMillis) : 10,
+                network: ChainIdString.make(`${namespace}:${reference}`),
+                payTo,
+                scheme: "exact",
+              } satisfies typeof Requirements.Requirements.Type,
+            ]
+          : []),
+      ],
+      [] as ReadonlyArray<typeof Requirements.Requirements.Type>,
+    ),
+  )
 
 export class NoSuchSupportedAssetError extends S.TaggedErrorClass<NoSuchSupportedAssetError>()(
   "NoSuchSupportedAssetError",
@@ -34,14 +58,18 @@ export class NoSuchSupportedAssetError extends S.TaggedErrorClass<NoSuchSupporte
 ) {}
 
 export const getFirstSupported = Effect.fnUntraced(function* (
-  supported: Record<string, typeof Asset.Type>,
+  supported: Record<string, Asset>,
   accepts: ReadonlyArray<typeof Requirements.Requirements.Type>,
 ) {
-  const deployments = Object.values(supported).flat(1)
-  for (const deployment of deployments) {
-    for (const accepted of accepts) {
-      if (deployment.chainId === accepted.network && deployment.address === accepted.asset) {
-        return { deployment, accepted }
+  for (const asset of Object.values(supported)) {
+    for (const [namespace, references] of Object.entries(asset)) {
+      for (const [reference, deployment] of Object.entries(references)) {
+        const network = ChainIdString.make(`${namespace}:${reference}`)
+        for (const accepted of accepts) {
+          if (network === accepted.network && deployment.address === accepted.asset) {
+            return { accepted, deployment, network }
+          }
+        }
       }
     }
   }

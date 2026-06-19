@@ -7,9 +7,8 @@ import type { AssetDeployment } from "./Asset.ts"
 const EXAMPLE = {
   decimals: 6,
   address: null!,
-  chainId: null!,
+  assetNamespace: null!,
   name: null!,
-  namespace: null!,
   symbol: null!,
   version: null!,
 } as const satisfies typeof AssetDeployment.Type

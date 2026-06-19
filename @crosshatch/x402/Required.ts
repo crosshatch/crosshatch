@@ -1,4 +1,4 @@
-import { Pipeable, Schema as S } from "effect"
+import { Pipeable, Schema as S, Array } from "effect"
 
 import { Requirements } from "./Requirements.ts"
 import { ResourceInfo } from "./ResourceInfo.ts"
@@ -18,14 +18,45 @@ export const RequiredFromBase64JsonString = S.StringFromBase64.pipe(
   S.decodeTo(S.fromJsonString(S.toCodecJson(Required))),
 )
 
-export interface BuilderEmpty extends Pipeable.Pipeable {}
+export interface BuilderEmpty extends Pipeable.Pipeable {
+  readonly url: string
+  readonly accepts?: never
+}
 
-export interface Builder extends Pipeable.Pipeable {
+interface Builder_ extends Pipeable.Pipeable {
+  readonly url: string
+  readonly accepts: ReadonlyArray<typeof Requirements.Type>
+}
+
+export interface Builder extends Builder_ {
   (template: TemplateStringsArray, ...substitutions: ReadonlyArray<unknown>): typeof Required.Type
 }
 
-export declare const builder: ({ url }: { readonly url: string }) => BuilderEmpty
+export const builder = ({ url }: { readonly url: string }): BuilderEmpty => ({
+  url,
+  pipe() {
+    return Pipeable.pipeArguments(this, arguments)
+  },
+})
 
-export declare const accepts: (
-  ...requirements: ReadonlyArray<typeof Requirements.Type | ReadonlyArray<typeof Requirements.Type>>
-) => (builder: BuilderEmpty | Builder) => Builder
+export const accepts =
+  (...accepts: ReadonlyArray<typeof Requirements.Type | ReadonlyArray<typeof Requirements.Type>>) =>
+  (builder: BuilderEmpty | Builder): Builder =>
+    Object.assign(
+      (template: TemplateStringsArray, ...substitutions: ReadonlyArray<unknown>) =>
+        ({
+          x402Version: 2,
+          accepts: [...(builder.accepts ?? []), ...accepts.flat(1)] as Array.NonEmptyArray<typeof Requirements.Type>,
+          resource: {
+            url: builder.url,
+            description: String.raw(template, ...substitutions),
+          },
+        }) satisfies typeof Required.Type,
+      {
+        url: builder.url,
+        accepts: [...(builder.accepts ?? []), ...accepts.flat(1)],
+        pipe() {
+          return Pipeable.pipeArguments(this, arguments)
+        },
+      } satisfies Builder_,
+    )
