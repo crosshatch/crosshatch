@@ -142,6 +142,9 @@ importers:
       '@changesets/cli':
         specifier: 'catalog:'
         version: 2.30.0(@types/node@25.6.0)
+      '@crosshatch/caip':
+        specifier: workspace:*
+        version: link:@crosshatch/caip
       '@effect/language-service':
         specifier: 'catalog:'
         version: 0.86.2

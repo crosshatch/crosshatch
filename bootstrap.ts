@@ -1,3 +1,4 @@
+import { CaipConfig } from "@crosshatch/caip"
 import * as Alchemy from "alchemy"
 import * as Cloudflare from "alchemy/Cloudflare"
 import * as Github from "alchemy/GitHub"
@@ -20,7 +21,7 @@ export default Alchemy.Stack(
       repository,
       variables: {
         CDP_API_KEY_ID: Config.string("CDP_API_KEY_ID"),
-        PAY_TO_EVM: Config.string("PAY_TO_EVM"),
+        PAY_TO_EVM: CaipConfig.accountAddress("PAY_TO_EVM"),
         OTEL_EXPORTER_OTLP_ENDPOINT: "https://ingest.us2.signoz.cloud",
       },
     })

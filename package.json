@@ -14,6 +14,7 @@
   },
   "devDependencies": {
     "@changesets/cli": "catalog:",
+    "@crosshatch/caip": "workspace:*",
     "@effect/language-service": "catalog:",
     "@effect/platform-node": "catalog:",
     "@effect/vitest": "catalog:",
