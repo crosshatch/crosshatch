@@ -5,7 +5,7 @@ import { CredentialsFromEnv } from "@distilled.cloud/coinbase"
 import { NodeHttpClient, NodeHttpServer } from "@effect/platform-node"
 import { describe, it, assert } from "@effect/vitest"
 import { Asset } from "crosshatch"
-import { Config, Effect, Layer } from "effect"
+import { Config, Effect, Layer, Redacted } from "effect"
 import { HttpRouter } from "effect/unstable/http"
 import { HttpApiBuilder, HttpApiClient } from "effect/unstable/httpapi"
 import { mnemonicToAccount } from "viem/accounts"
@@ -21,7 +21,8 @@ describe(import.meta.url, () => {
   it.effect(
     "verifies and settles a freshly signed EVM x402 payment",
     Effect.fn(function* () {
-      const account = mnemonicToAccount(yield* Config.string("EVM_SEED_PHRASE"))
+      const seed = yield* Config.redacted("EVM_SEED_PHRASE")
+      const account = mnemonicToAccount(Redacted.value(seed))
       const paymentRequirements = Asset.requirements(USDC, {
         amount: 0.01,
         recipients: {
