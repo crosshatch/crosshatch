@@ -3,6 +3,10 @@ import { Trace } from "crosshatch"
 import { Context, Schema as S, Effect, flow, Option } from "effect"
 import { HttpRouter, HttpServerRequest, HttpServerResponse } from "effect/unstable/http"
 
+export const PAYMENT_REQUIRED = "payment-required"
+export const CROSSHATCH_TRACE_ID = "x-crosshatch-trace-id"
+export const EXPOSED_HEADERS = [PAYMENT_REQUIRED, CROSSHATCH_TRACE_ID]
+
 export class Payload extends Context.Service<Payload, typeof X402Payload.Payload.Type | undefined>()(
   "@crosshatch/merchant/Http402/Payload",
 ) {}
@@ -19,8 +23,8 @@ export const require = Effect.fnUntraced(function* (required: typeof Required.Re
   const paymentRequired = yield* S.encodeEffect(Required.RequiredFromBase64JsonString)(required)
   return HttpServerResponse.empty({
     headers: {
-      "payment-required": paymentRequired,
-      "x-crosshatch-trace-id": traceId,
+      [PAYMENT_REQUIRED]: paymentRequired,
+      [CROSSHATCH_TRACE_ID]: traceId,
     },
   })
 })
@@ -46,5 +50,3 @@ export const layer = HttpRouter.middleware<{ readonly provides: Payload }>()(
     }),
   { global: true },
 )
-
-export const EXPOSED_HEADERS = ["payment-required", "x-crosshatch-trace-id"]

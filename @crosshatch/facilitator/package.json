@@ -26,6 +26,9 @@
   "scripts": {
     "dev": "alchemy dev --env-file ../../.env"
   },
+  "devDependencies": {
+    "vite": "catalog:"
+  },
   "peerDependencies": {
     "@crosshatch/assets": "workspace:*",
     "@crosshatch/caip": "workspace:*",

@@ -271,6 +271,10 @@ importers:
       viem:
         specifier: 'catalog:'
         version: 2.51.3(typescript@6.0.2)(zod@3.25.76)
+    devDependencies:
+      vite:
+        specifier: 'catalog:'
+        version: 8.0.8(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0)
 
   '@crosshatch/merchant':
     dependencies:

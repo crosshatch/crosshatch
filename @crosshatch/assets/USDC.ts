@@ -68,4 +68,4 @@ export const USDC = {
       version: "2",
     },
   },
-} satisfies Asset.Asset
+} as const satisfies Asset.Asset

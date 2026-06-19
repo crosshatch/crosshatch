@@ -12,4 +12,4 @@ export const MEGAUSDC = {
       version: "1",
     },
   },
-} satisfies Asset.Asset
+} as const satisfies Asset.Asset

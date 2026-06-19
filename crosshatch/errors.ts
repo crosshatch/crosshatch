@@ -2,8 +2,8 @@ import { Schema as S } from "effect"
 
 import { Prerequisites } from "./Prerequisite.ts"
 
-export class AssetNotSupportedError extends S.TaggedErrorClass<AssetNotSupportedError>()(
-  "AssetNotSupportedError",
+export class NoSuchSupportedAssetError extends S.TaggedErrorClass<NoSuchSupportedAssetError>()(
+  "NoSuchSupportedAssetError",
   {},
 ) {}
 
@@ -11,4 +11,4 @@ export class PrerequisitesUnmetError extends S.TaggedErrorClass<PrerequisitesUnm
   prerequisites: Prerequisites,
 }) {}
 
-export const ProposeError = S.Union([AssetNotSupportedError, PrerequisitesUnmetError])
+export const ProposeError = S.Union([NoSuchSupportedAssetError, PrerequisitesUnmetError])

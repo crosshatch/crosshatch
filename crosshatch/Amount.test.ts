@@ -4,14 +4,7 @@ import { Effect } from "effect"
 import * as Amount from "./Amount.ts"
 import type { AssetDeployment } from "./Asset.ts"
 
-const EXAMPLE = {
-  decimals: 6,
-  address: null!,
-  assetNamespace: null!,
-  name: null!,
-  symbol: null!,
-  version: null!,
-} as const satisfies typeof AssetDeployment.Type
+const EXAMPLE = { decimals: 6 } as never as typeof AssetDeployment.Type
 
 describe(import.meta.url, () => {
   it.effect(

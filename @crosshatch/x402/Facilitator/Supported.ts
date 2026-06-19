@@ -4,6 +4,7 @@ import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 
 import { Version } from "../Version.ts"
 
+// TODO: drop v1 support?
 const LegacyNetwork = S.Literals(["base-sepolia", "base", "solana-devnet", "solana"])
 
 export const SupportedKind = S.Struct({

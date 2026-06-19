@@ -40,13 +40,17 @@ export const builder = ({ url }: { readonly url: string }): BuilderEmpty => ({
 })
 
 export const accepts =
-  (...accepts: ReadonlyArray<typeof Requirements.Type | ReadonlyArray<typeof Requirements.Type>>) =>
-  (builder: BuilderEmpty | Builder): Builder =>
-    Object.assign(
+  (...accepts_: ReadonlyArray<typeof Requirements.Type | ReadonlyArray<typeof Requirements.Type>>) =>
+  (builder: BuilderEmpty | Builder): Builder => {
+    // TODO: are we okay lying about non-empty with lack of assertion just to keep it sync?
+    const accepts = [...(builder.accepts ?? []), ...Array.flatMap(accepts_, Array.ensure)] as Array.NonEmptyArray<
+      typeof Requirements.Type
+    >
+    return Object.assign(
       (template: TemplateStringsArray, ...substitutions: ReadonlyArray<unknown>) =>
         ({
           x402Version: 2,
-          accepts: [...(builder.accepts ?? []), ...accepts.flat(1)] as Array.NonEmptyArray<typeof Requirements.Type>,
+          accepts,
           resource: {
             url: builder.url,
             description: String.raw(template, ...substitutions),
@@ -54,9 +58,10 @@ export const accepts =
         }) satisfies typeof Required.Type,
       {
         url: builder.url,
-        accepts: [...(builder.accepts ?? []), ...accepts.flat(1)],
+        accepts,
         pipe() {
           return Pipeable.pipeArguments(this, arguments)
         },
       } satisfies Builder_,
     )
+  }

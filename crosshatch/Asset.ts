@@ -3,6 +3,7 @@ import { Requirements } from "@crosshatch/x402"
 import { Record, Schema as S, Effect, Duration } from "effect"
 
 import { usdToAtomic, usdFromNumber } from "./Amount.ts"
+import { NoSuchSupportedAssetError } from "./errors.ts"
 
 export type Asset = Record<string, Record<string, typeof AssetDeployment.Type>>
 
@@ -58,11 +59,6 @@ export const requirements = <A extends Asset>(
     ),
   )
 }
-
-export class NoSuchSupportedAssetError extends S.TaggedErrorClass<NoSuchSupportedAssetError>()(
-  "NoSuchSupportedAssetError",
-  {},
-) {}
 
 export const getFirstSupported = Effect.fnUntraced(function* (
   supported: Record<string, Asset>,
