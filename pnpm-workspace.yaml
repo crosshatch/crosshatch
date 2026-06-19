@@ -105,7 +105,7 @@ overrides:
 
 patchedDependencies:
   "@distilled.cloud/coinbase@0.25.2": konfik/patches/@distilled.cloud__coinbase@0.25.2.patch
-  alchemy@2.0.0-beta.56: konfik/patches/alchemy@2.0.0-beta.56.patch
+  alchemy@2.0.0-beta.57: konfik/patches/alchemy@2.0.0-beta.57.patch
 
 minimumReleaseAgeExclude:
   - "@aws-sdk/*"
