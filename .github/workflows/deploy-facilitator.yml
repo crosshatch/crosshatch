@@ -41,3 +41,4 @@ jobs:
           OTEL_LOGS_EXPORTER: ${{ env.OTEL_LOGS_EXPORTER }}
           OTEL_METRICS_EXPORTER: ${{ env.OTEL_METRICS_EXPORTER }}
           OTEL_TRACES_EXPORTER: ${{ env.OTEL_TRACES_EXPORTER }}
+          PAY_TO_EVM: ${{ env.PAY_TO_EVM }}
