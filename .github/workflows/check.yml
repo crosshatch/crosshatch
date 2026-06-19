@@ -24,3 +24,5 @@ jobs:
       - run: pnpm oxfmt --check
       - run: pnpm build
       - run: pnpm test
+        env:
+          EVM_SEED_PHRASE: ${{ secrets.EVM_SEED_PHRASE }}
