@@ -30,27 +30,34 @@ export const requirements = <A extends Asset>(
     }
     ttl?: Duration.Input | undefined
   },
-): ReadonlyArray<typeof Requirements.Requirements.Type> =>
-  Record.toEntries(recipients).flatMap(([namespace, references]) =>
+): ReadonlyArray<typeof Requirements.Requirements.Type> => {
+  const maxTimeoutSeconds = ttl ? Math.ceil(Duration.fromInputUnsafe(ttl).pipe(Duration.toSeconds)) : 300
+  return Record.toEntries(recipients).flatMap(([namespace, references]) =>
     Record.toEntries(references).reduce(
-      (acc, [reference, payTo]) => [
-        ...acc,
-        ...(payTo
-          ? [
-              {
-                amount: usdToAtomic(usdFromNumber(amount), asset[namespace]![reference]!),
-                asset: AccountAddress.make(asset[namespace]![reference]!.address),
-                maxTimeoutSeconds: ttl ? Duration.fromInputUnsafe(ttl).pipe(Duration.toMillis) : 10,
-                network: ChainIdString.make(`${namespace}:${reference}`),
-                payTo,
-                scheme: "exact",
-              } satisfies typeof Requirements.Requirements.Type,
-            ]
-          : []),
-      ],
+      (acc, [reference, payTo]) => {
+        const deployment = asset[namespace]![reference]!
+        const { name, version } = deployment
+        return [
+          ...acc,
+          ...(payTo
+            ? [
+                {
+                  amount: usdToAtomic(usdFromNumber(amount), deployment),
+                  asset: AccountAddress.make(deployment.address),
+                  maxTimeoutSeconds,
+                  network: ChainIdString.make(`${namespace}:${reference}`),
+                  payTo,
+                  scheme: "exact",
+                  extra: { name, version },
+                } satisfies typeof Requirements.Requirements.Type,
+              ]
+            : []),
+        ]
+      },
       [] as ReadonlyArray<typeof Requirements.Requirements.Type>,
     ),
   )
+}
 
 export class NoSuchSupportedAssetError extends S.TaggedErrorClass<NoSuchSupportedAssetError>()(
   "NoSuchSupportedAssetError",

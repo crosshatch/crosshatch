@@ -7,8 +7,8 @@ import { UrlParams } from "effect/unstable/http"
 import * as Boundary from "liminal-util/Boundary"
 
 import { Allowance } from "./Allowance.ts"
-import * as Facade from "./Facade/Facade.ts"
 import { LinkChallengeId } from "./LinkChallengeId.ts"
+import { Prerequisites } from "./Prerequisite.ts"
 
 export type Widget<Payload extends S.Codec<any, any>> = {
   Payload: Payload["Type"]
@@ -87,33 +87,9 @@ export const LinkWidget = widget({
   item: S.Never,
 })
 
-export const EscalationWidget = widget({
-  pathname: "escalation",
-  payload: Facade.EscalationError,
-  item: S.Never,
-})
-
-export const ThawAccountWidget = widget({
-  pathname: "thaw-account",
-  payload: Facade.AccountFrozenError,
-  item: S.Never,
-})
-
-export const ThawAppWidget = widget({
-  pathname: "thaw-app",
-  payload: Facade.AppFrozenError,
-  item: S.Never,
-})
-
-export const RaiseAllowanceWidget = widget({
-  pathname: "raise-allowance",
-  payload: Facade.InsufficientAllowanceRemainingError,
-  item: S.Never,
-})
-
-export const OnrampWidget = widget({
-  pathname: "onramp",
-  payload: Facade.InsufficientFundsError,
+export const PrerequisitesWidget = widget({
+  pathname: "prerequisites",
+  payload: Prerequisites,
   item: S.Never,
 })
 

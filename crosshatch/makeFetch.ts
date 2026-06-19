@@ -1,14 +1,15 @@
 import { Required } from "@crosshatch/x402"
-import { Effect, Encoding, flow, Schema as S } from "effect"
+import { Effect, Encoding, flow, Schema as S, Data } from "effect"
 import * as Boundary from "liminal-util/Boundary"
 
+import type { ProposeError } from "./errors.ts"
 import * as Facade from "./Facade/Facade.ts"
 import { managedRuntime } from "./runtime.ts"
-import { EscalationWidget, OnrampWidget, ThawAccountWidget, ThawAppWidget, RaiseAllowanceWidget } from "./widgets.ts"
+import { PrerequisitesWidget } from "./widgets.ts"
 
-export class CrosshatchFetchError extends S.TaggedErrorClass<CrosshatchFetchError>()("CrosshatchFetchError", {
-  decision: Facade.DeclinedError,
-}) {}
+export class CrosshatchFetchError extends Data.TaggedError("CrosshatchFetchError")<{
+  readonly prerequisites: typeof ProposeError.Type
+}> {}
 
 export const makeFetch =
   (fetch: typeof globalThis.fetch): typeof globalThis.fetch =>
@@ -31,18 +32,18 @@ export const makeFetch =
           )
       const make = Facade.FacadeClient.fn("Propose")({ required }).pipe(
         Effect.catchTags({
-          AppFrozenError: ThawAppWidget.host,
-          AccountFrozenError: ThawAccountWidget.host,
-          InsufficientFundsError: OnrampWidget.host,
-          EscalationError: EscalationWidget.host,
-          InsufficientAllowanceRemainingError: RaiseAllowanceWidget.host,
+          AuditionError: Effect.die,
+          ConnectionError: Effect.die,
+          SchemaError: Effect.die,
+          UnresolvedError: Effect.die,
         }),
       )
-      const result = yield* make
-      if (!result) {
-        return yield* Effect.die("TODO retry")
-      }
-      const { payload } = result
+      const { payload } = yield* make.pipe(
+        Effect.catchTags({
+          PrerequisitesUnmetError: ({ prerequisites }) =>
+            PrerequisitesWidget.host(prerequisites).pipe(Effect.andThen(make)),
+        }),
+      )
       const value = Encoding.encodeBase64(JSON.stringify(payload))
       switch (payload.x402Version) {
         case 1: {
