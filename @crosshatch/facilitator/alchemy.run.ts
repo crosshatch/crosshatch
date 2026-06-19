@@ -23,6 +23,7 @@ export default Alchemy.Stack(
         CROSSHATCH_STAGE,
         CDP_API_KEY_ID: Config.string("CDP_API_KEY_ID"),
         CDP_API_KEY_SECRET: Config.redacted("CDP_API_KEY_SECRET"),
+        EVM_SEED_PHRASE: Config.redacted("EVM_SEED_PHRASE"),
         OTEL_EXPORTER_OTLP_ENDPOINT: Config.string("OTEL_EXPORTER_OTLP_ENDPOINT"),
         OTEL_EXPORTER_OTLP_HEADERS: Config.redacted("OTEL_EXPORTER_OTLP_HEADERS"),
         OTEL_LOGS_EXPORTER: "otlp",
