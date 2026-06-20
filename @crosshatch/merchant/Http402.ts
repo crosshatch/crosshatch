@@ -1,6 +1,6 @@
 import { Payload as X402Payload, Required } from "@crosshatch/x402"
 import { Trace } from "crosshatch"
-import { Context, Schema as S, Effect, flow, Option } from "effect"
+import { Context, Schema as S, Effect } from "effect"
 import { HttpRouter, HttpServerRequest, HttpServerResponse } from "effect/unstable/http"
 
 export const PAYMENT_REQUIRED = "payment-required"
@@ -12,19 +12,12 @@ export class Payload extends Context.Service<Payload, typeof X402Payload.Payload
 ) {}
 
 export const require = Effect.fnUntraced(function* (required: typeof Required.Required.Type) {
-  const traceId = yield* Effect.serviceOption(Trace).pipe(
-    Effect.map(
-      flow(
-        Option.map(({ traceId }) => traceId),
-        Option.getOrUndefined,
-      ),
-    ),
-  )
+  const traceId = yield* Trace.TraceId
   const paymentRequired = yield* S.encodeEffect(Required.RequiredFromBase64JsonString)(required)
   return HttpServerResponse.empty({
     headers: {
       [PAYMENT_REQUIRED]: paymentRequired,
-      [CROSSHATCH_TRACE_ID]: traceId,
+      ...(traceId && { [CROSSHATCH_TRACE_ID]: traceId }),
     },
   })
 })

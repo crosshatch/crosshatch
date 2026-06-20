@@ -5,7 +5,7 @@ import { Client } from "liminal"
 import { ProposeError } from "../errors.ts"
 import { InvoiceId } from "../Invoice.ts"
 import { LinkChallengeId } from "../LinkChallengeId.ts"
-import { TraceConfig } from "../TraceConfig.ts"
+import { TraceConfig } from "../Trace.ts"
 
 export class FacadeClient extends Client.Service<FacadeClient>()("crosshatch/FacadeClient", {
   events: {
