@@ -10,7 +10,6 @@
     { "path": "../../crosshatch" },
     { "path": "../assets" },
     { "path": "../caip" },
-    { "path": "../merchant" },
     { "path": "../util" },
     { "path": "../x402" }
   ]

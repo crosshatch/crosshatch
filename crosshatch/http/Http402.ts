@@ -8,7 +8,7 @@ export const CROSSHATCH_TRACE_ID = "x-crosshatch-trace-id"
 export const EXPOSED_HEADERS = [PAYMENT_REQUIRED, CROSSHATCH_TRACE_ID]
 
 export class Payload extends Context.Service<Payload, typeof X402Payload.Payload.Type | undefined>()(
-  "@crosshatch/merchant/Http402/Payload",
+  "crosshatch/http/Http402/Payload",
 ) {}
 
 export const require = Effect.fnUntraced(function* (required: typeof Required.Required.Type) {

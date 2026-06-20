@@ -17,7 +17,7 @@
   "sideEffects": false,
   "exports": {
     ".": "./index.ts",
-    "./*": "./*.ts",
+    "./http": "./http/index.ts",
     "./package.json": "./package.json"
   },
   "publishConfig": {

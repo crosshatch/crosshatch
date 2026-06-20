@@ -8,7 +8,6 @@
   },
   "dependencies": {
     "@crosshatch/caip": "workspace:*",
-    "@crosshatch/merchant": "workspace:*",
     "@crosshatch/x402": "workspace:*",
     "@effect/atom-react": "catalog:",
     "@types/react": "catalog:",

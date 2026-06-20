@@ -1,17 +1,16 @@
 {
   "extends": "../../konfik/tsconfig.base",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "dist"
+  },
   "include": ["."],
+  "exclude": ["dist"],
   "references": [
     { "path": "../../crosshatch" },
     { "path": "../../@crosshatch/assets" },
     { "path": "../../@crosshatch/caip" },
-    { "path": "../../@crosshatch/merchant" },
     { "path": "../../@crosshatch/x402" },
     { "path": "../../liminal/effect-workerd" }
-  ],
-  "exclude": ["dist"],
-  "compilerOptions": {
-    "noEmit": false,
-    "outDir": "dist"
-  }
+  ]
 }
