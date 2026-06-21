@@ -96,9 +96,7 @@ export default defineConfig({
       },
       {
         text: "Development",
-        items: [
-          { text: "Local Development", link: "/development" },
-        ],
+        items: [{ text: "Local Development", link: "/development" }],
       },
     ],
     "/articles": [
