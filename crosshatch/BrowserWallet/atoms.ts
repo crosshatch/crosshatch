@@ -4,7 +4,7 @@ import { Atom } from "effect/unstable/reactivity"
 import * as Boundary from "liminal-util/Boundary"
 
 import { Stage } from "../Stage.ts"
-import { FacadeClient } from "./Facade/Facade"
+import { FacadeClient } from "./Facade/Facade.ts"
 import { atomRuntime } from "./runtime.ts"
 import { ActivityWidget, IdWidget, LinkWidget } from "./Widgets.ts"
 

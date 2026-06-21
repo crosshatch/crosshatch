@@ -142,9 +142,6 @@ importers:
       '@changesets/cli':
         specifier: 'catalog:'
         version: 2.30.0(@types/node@25.6.0)
-      '@crosshatch/caip':
-        specifier: workspace:*
-        version: link:@crosshatch/caip
       '@effect/language-service':
         specifier: 'catalog:'
         version: 0.86.2
@@ -178,6 +175,9 @@ importers:
       alchemy:
         specifier: 'catalog:'
         version: 2.0.0-beta.57(patch_hash=02b05e5b60191f6fc5787e154b0acd23fa1250d0d92a635437e0f91746bb7e78)(@effect/platform-node@4.0.0-beta.83(effect@4.0.0-beta.83)(ioredis@5.10.1))(@types/node@25.6.0)(@types/react@19.2.14)(drizzle-orm@1.0.0-rc.3(@cloudflare/workers-types@4.20260531.1)(@libsql/client@0.17.3)(effect@4.0.0-beta.83)(mysql2@3.22.4(@types/node@25.6.0))(pg@8.21.0)(zod@3.25.76))(effect@4.0.0-beta.83)(vite@8.0.8(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0))(vitest@4.1.4)(workerd@1.20260526.1)(ws@8.20.1)
+      crosshatch:
+        specifier: workspace:*
+        version: link:crosshatch
       effect:
         specifier: 'catalog:'
         version: 4.0.0-beta.83
@@ -214,21 +214,9 @@ importers:
 
   '@crosshatch/assets':
     dependencies:
-      '@crosshatch/caip':
-        specifier: workspace:*
-        version: link:../caip
-      '@crosshatch/x402':
-        specifier: workspace:*
-        version: link:../x402
       crosshatch:
         specifier: workspace:*
         version: link:../../crosshatch
-      effect:
-        specifier: 'catalog:'
-        version: 4.0.0-beta.83
-
-  '@crosshatch/caip':
-    dependencies:
       effect:
         specifier: 'catalog:'
         version: 4.0.0-beta.83
@@ -238,15 +226,9 @@ importers:
       '@crosshatch/assets':
         specifier: workspace:*
         version: link:../assets
-      '@crosshatch/caip':
-        specifier: workspace:*
-        version: link:../caip
       '@crosshatch/util':
         specifier: workspace:*
         version: link:../util
-      '@crosshatch/x402':
-        specifier: workspace:*
-        version: link:../x402
       '@distilled.cloud/coinbase':
         specifier: 'catalog:'
         version: 0.26.1(effect@4.0.0-beta.83)
@@ -288,35 +270,14 @@ importers:
         specifier: 'catalog:'
         version: 4.0.0-beta.83
 
-  '@crosshatch/x402':
-    dependencies:
-      '@crosshatch/caip':
-        specifier: workspace:*
-        version: link:../caip
-      '@crosshatch/util':
-        specifier: workspace:*
-        version: link:../util
-      effect:
-        specifier: 'catalog:'
-        version: 4.0.0-beta.83
-      viem:
-        specifier: 'catalog:'
-        version: 2.51.3(typescript@6.0.2)(zod@3.25.76)
-
   crosshatch:
     dependencies:
-      '@crosshatch/caip':
-        specifier: workspace:*
-        version: link:../@crosshatch/caip
       '@crosshatch/util':
         specifier: workspace:*
         version: link:../@crosshatch/util
       '@crosshatch/widget':
         specifier: workspace:*
         version: link:../@crosshatch/widget
-      '@crosshatch/x402':
-        specifier: workspace:*
-        version: link:../@crosshatch/x402
       '@effect/platform-browser':
         specifier: 'catalog:'
         version: 4.0.0-beta.83(effect@4.0.0-beta.83)
@@ -332,15 +293,12 @@ importers:
       liminal-util:
         specifier: workspace:*
         version: link:../liminal/liminal-util
+      viem:
+        specifier: 'catalog:'
+        version: 2.51.3(typescript@6.0.2)(zod@3.25.76)
 
   docs:
     dependencies:
-      '@crosshatch/caip':
-        specifier: workspace:*
-        version: link:../@crosshatch/caip
-      '@crosshatch/x402':
-        specifier: workspace:*
-        version: link:../@crosshatch/x402
       '@effect/atom-react':
         specifier: 'catalog:'
         version: 4.0.0-beta.83(effect@4.0.0-beta.83)(react@19.2.5)(scheduler@0.27.0)
@@ -389,12 +347,6 @@ importers:
       '@crosshatch/assets':
         specifier: workspace:*
         version: link:../../@crosshatch/assets
-      '@crosshatch/caip':
-        specifier: workspace:*
-        version: link:../../@crosshatch/caip
-      '@crosshatch/x402':
-        specifier: workspace:*
-        version: link:../../@crosshatch/x402
       alchemy:
         specifier: 'catalog:'
         version: 2.0.0-beta.57(patch_hash=02b05e5b60191f6fc5787e154b0acd23fa1250d0d92a635437e0f91746bb7e78)(@effect/platform-node@4.0.0-beta.83(effect@4.0.0-beta.83)(ioredis@5.10.1))(@types/node@25.6.0)(@types/react@19.2.14)(drizzle-orm@1.0.0-rc.3(@cloudflare/workers-types@4.20260416.2)(@libsql/client@0.17.3)(effect@4.0.0-beta.83)(mysql2@3.22.4(@types/node@25.6.0))(pg@8.21.0)(zod@3.25.76))(effect@4.0.0-beta.83)(vite@8.0.8(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0))(vitest@4.1.4)(workerd@1.20260526.1)(ws@8.20.1)
