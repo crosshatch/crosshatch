@@ -12,6 +12,7 @@ export const PaymentPayload = S.Union([
   SvmPayload.SvmPayload,
 ])
 
+// TODO: use `CaSigner`
 export const make = Effect.fnUntraced(
   function* (signer: EvmSigner.EvmSigner["Service"], requirements: typeof Requirements.Requirements.Type) {
     const method = requirements.extra?.assetTransferMethod ?? "eip3009"
