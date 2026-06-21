@@ -27,4 +27,4 @@ jobs:
         env:
           CDP_API_KEY_ID: ${{ vars.CDP_API_KEY_ID }}
           CDP_API_KEY_SECRET: ${{ secrets.CDP_API_KEY_SECRET }}
-          EVM_SEED_PHRASE: ${{ secrets.EVM_SEED_PHRASE }}
+          PAY_TO_EVM: ${{ vars.PAY_TO_EVM }}
