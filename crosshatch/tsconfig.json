@@ -7,7 +7,6 @@
   "include": ["."],
   "exclude": ["dist", "vitest.config.ts"],
   "references": [
-    { "path": "../@crosshatch/util" },
     { "path": "../@crosshatch/widget" },
     { "path": "../liminal/liminal" },
     { "path": "../liminal/liminal-util" }

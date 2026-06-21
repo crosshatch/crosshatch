@@ -42,7 +42,6 @@
     }
   },
   "peerDependencies": {
-    "@crosshatch/util": "workspace:*",
     "@crosshatch/widget": "workspace:*",
     "@effect/platform-browser": "catalog:",
     "@standard-schema/spec": "catalog:",

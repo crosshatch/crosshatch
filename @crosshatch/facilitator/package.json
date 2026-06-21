@@ -31,7 +31,6 @@
   },
   "peerDependencies": {
     "@crosshatch/assets": "workspace:*",
-    "@crosshatch/util": "workspace:*",
     "@distilled.cloud/coinbase": "catalog:",
     "alchemy": "catalog:",
     "crosshatch": "workspace:*",
