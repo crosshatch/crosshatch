@@ -6,11 +6,5 @@
   },
   "include": ["."],
   "exclude": ["dist", "vitest.config.ts"],
-  "references": [
-    { "path": "../../crosshatch" },
-    { "path": "../assets" },
-    { "path": "../caip" },
-    { "path": "../util" },
-    { "path": "../x402" }
-  ]
+  "references": [{ "path": "../../crosshatch" }, { "path": "../assets" }, { "path": "../util" }]
 }

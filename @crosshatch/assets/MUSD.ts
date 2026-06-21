@@ -1,5 +1,5 @@
-import { AccountAddress } from "@crosshatch/caip"
 import { Asset } from "crosshatch"
+import { AccountAddress } from "crosshatch/Ca"
 
 export const MUSD = {
   eip155: {

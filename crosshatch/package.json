@@ -17,25 +17,38 @@
   "sideEffects": false,
   "exports": {
     ".": "./index.ts",
-    "./http": "./http/index.ts",
+    "./*": "./*.ts",
+    "./X402": "./X402/X402.ts",
+    "./Evm": "./Evm/Evm.ts",
+    "./Svm": "./Svm/Svm.ts",
+    "./BrowserWallet": "./BrowserWallet/BrowserWallet.ts",
+    "./Facade": "./Facade/Facade.ts",
+    "./Ca": "./Ca/Ca.ts",
+    "./Http402": "./Http402/Http402.ts",
     "./package.json": "./package.json"
   },
   "publishConfig": {
     "exports": {
       ".": "./dist/index.js",
-      "./*": "./dist/*.js",
+      "./*": "./dist/*/index.js",
+      "./X402": "./dist/X402/X402.js",
+      "./Svm": "./dist/Svm/Svm.js",
+      "./Evm": "./dist/Evm/Evm.js",
+      "./BrowserWallet": "./dist/BrowserWallet/BrowserWallet.js",
+      "./Facade": "./dist/Facade/Facade.js",
+      "./Ca": "./dist/Ca/Ca.js",
+      "./Http402": "./dist/Http402/Http402.js",
       "./package.json": "./package.json"
     }
   },
   "peerDependencies": {
-    "@crosshatch/caip": "workspace:*",
     "@crosshatch/util": "workspace:*",
     "@crosshatch/widget": "workspace:*",
-    "@crosshatch/x402": "workspace:*",
     "@effect/platform-browser": "catalog:",
     "@standard-schema/spec": "catalog:",
     "effect": "catalog:",
     "liminal": "workspace:*",
-    "liminal-util": "workspace:*"
+    "liminal-util": "workspace:*",
+    "viem": "catalog:"
   }
 }

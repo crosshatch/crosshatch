@@ -1,7 +1,7 @@
-import { Payload, Required } from "@crosshatch/x402"
 import { Context, Data, Effect } from "effect"
 
 import type { TraceConfig } from "./Trace.ts"
+import type { Payload, Required } from "./X402/X402.ts"
 
 export class CreateTraceError extends Data.TaggedError("CreateTraceError")<{ readonly cause: unknown }> {}
 

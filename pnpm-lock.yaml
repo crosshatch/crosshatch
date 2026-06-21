@@ -241,9 +241,6 @@ importers:
       '@crosshatch/caip':
         specifier: workspace:*
         version: link:../caip
-      '@crosshatch/merchant':
-        specifier: workspace:*
-        version: link:../merchant
       '@crosshatch/util':
         specifier: workspace:*
         version: link:../util
@@ -275,27 +272,6 @@ importers:
       vite:
         specifier: 'catalog:'
         version: 8.0.8(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0)
-
-  '@crosshatch/merchant':
-    dependencies:
-      '@crosshatch/assets':
-        specifier: workspace:*
-        version: link:../assets
-      '@crosshatch/caip':
-        specifier: workspace:*
-        version: link:../caip
-      '@crosshatch/x402':
-        specifier: workspace:*
-        version: link:../x402
-      crosshatch:
-        specifier: workspace:*
-        version: link:../../crosshatch
-      effect:
-        specifier: 'catalog:'
-        version: 4.0.0-beta.83
-      viem:
-        specifier: 'catalog:'
-        version: 2.51.3(typescript@6.0.2)(zod@3.25.76)
 
   '@crosshatch/util':
     dependencies:
@@ -362,9 +338,6 @@ importers:
       '@crosshatch/caip':
         specifier: workspace:*
         version: link:../@crosshatch/caip
-      '@crosshatch/merchant':
-        specifier: workspace:*
-        version: link:../@crosshatch/merchant
       '@crosshatch/x402':
         specifier: workspace:*
         version: link:../@crosshatch/x402
@@ -419,9 +392,6 @@ importers:
       '@crosshatch/caip':
         specifier: workspace:*
         version: link:../../@crosshatch/caip
-      '@crosshatch/merchant':
-        specifier: workspace:*
-        version: link:../../@crosshatch/merchant
       '@crosshatch/x402':
         specifier: workspace:*
         version: link:../../@crosshatch/x402

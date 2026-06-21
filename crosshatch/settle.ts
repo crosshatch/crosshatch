@@ -1,7 +1,8 @@
-import { ChainIdString } from "@crosshatch/caip"
-import { type Payload, FacilitatorClient } from "@crosshatch/x402"
+import { ChainIdString } from "crosshatch/Ca"
 import { Effect, Data } from "effect"
 import * as Boundary from "liminal-util/Boundary"
+
+import { type Payload, FacilitatorClient } from "./X402/X402.ts"
 
 export class SettlementError extends Data.TaggedError("SettlementError")<{
   readonly cause: unknown

@@ -24,8 +24,6 @@
     }
   },
   "peerDependencies": {
-    "@crosshatch/caip": "workspace:*",
-    "@crosshatch/x402": "workspace:*",
     "crosshatch": "workspace:*",
     "effect": "catalog:"
   }

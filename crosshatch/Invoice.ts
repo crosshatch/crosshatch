@@ -1,5 +1,6 @@
-import { Payload } from "@crosshatch/x402"
 import { Context, Deferred, Effect, Layer, Schema as S } from "effect"
+
+import { Payload } from "./X402/X402.ts"
 
 export const InvoiceId = S.PropertyKey.pipe(S.brand("Invoice"))
 

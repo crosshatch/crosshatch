@@ -14,7 +14,6 @@
   },
   "devDependencies": {
     "@changesets/cli": "catalog:",
-    "@crosshatch/caip": "workspace:*",
     "@effect/language-service": "catalog:",
     "@effect/platform-node": "catalog:",
     "@effect/vitest": "catalog:",
@@ -26,6 +25,7 @@
     "@vitest/expect": "catalog:",
     "@vitest/web-worker": "catalog:",
     "alchemy": "catalog:",
+    "crosshatch": "workspace:*",
     "effect": "catalog:",
     "fake-indexeddb": "catalog:",
     "happy-dom": "catalog:",

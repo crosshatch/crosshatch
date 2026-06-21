@@ -1,6 +1,6 @@
-import { FacilitatorApi } from "@crosshatch/x402"
 import { CredentialsFromEnv } from "@distilled.cloud/coinbase"
-import { Http402 } from "crosshatch/http"
+import { EXPOSED_HEADERS } from "crosshatch/Http402"
+import { FacilitatorApi } from "crosshatch/X402"
 import { Layer, Effect } from "effect"
 import { Worker } from "effect-workerd"
 import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
@@ -22,7 +22,7 @@ export default Worker.make({
             allowedHeaders: ["*"],
             allowedMethods: ["*"],
             allowedOrigins: ["*"],
-            exposedHeaders: Http402.EXPOSED_HEADERS,
+            exposedHeaders: EXPOSED_HEADERS,
           }),
         ),
       ),

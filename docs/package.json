@@ -7,8 +7,6 @@
     "dev": "alchemy dev --env-file ../../.env"
   },
   "dependencies": {
-    "@crosshatch/caip": "workspace:*",
-    "@crosshatch/x402": "workspace:*",
     "@effect/atom-react": "catalog:",
     "@types/react": "catalog:",
     "alchemy": "catalog:",

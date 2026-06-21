@@ -1,7 +1,7 @@
-import { ChainIdString } from "@crosshatch/caip"
 import { handler } from "@crosshatch/util/httpapi"
-import { FacilitatorApi } from "@crosshatch/x402"
 import { settleX402Payment } from "@distilled.cloud/coinbase"
+import { ChainIdString } from "crosshatch/Ca"
+import { FacilitatorApi } from "crosshatch/X402"
 import { Effect, Schema as S } from "effect"
 
 export const handleSettle = handler(

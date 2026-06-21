@@ -18,8 +18,6 @@
   },
   "include": ["."],
   "references": [
-    { "path": "../@crosshatch/caip" },
-    { "path": "../@crosshatch/x402" },
     { "path": "../crosshatch" },
     { "path": "../liminal/effect-workerd" },
     { "path": "../liminal/liminal-util" }

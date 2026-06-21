@@ -1,6 +1,6 @@
 import { handler } from "@crosshatch/util/httpapi"
-import { FacilitatorApi } from "@crosshatch/x402"
 import { verifyX402Payment } from "@distilled.cloud/coinbase"
+import { FacilitatorApi } from "crosshatch/X402"
 import { Effect } from "effect"
 
 export const handleVerify = handler(

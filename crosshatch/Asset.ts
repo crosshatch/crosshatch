@@ -1,5 +1,5 @@
-import { AccountAddress, ChainIdString } from "@crosshatch/caip"
-import { Requirements } from "@crosshatch/x402"
+import { AccountAddress, ChainIdString } from "crosshatch/Ca"
+import { Requirements } from "crosshatch/X402"
 import { Record, Schema as S, Effect, Duration } from "effect"
 
 import { usdToAtomic, usdFromNumber } from "./Amount.ts"

@@ -1,0 +1,29 @@
+import { ChainIdString } from "crosshatch/Ca"
+import { Schema as S } from "effect"
+import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
+
+import { Version } from "../Version.ts"
+
+// TODO: drop v1 support?
+const LegacyNetwork = S.Literals(["base-sepolia", "base", "solana-devnet", "solana"])
+
+export const SupportedKind = S.Struct({
+  x402Version: Version,
+  scheme: S.String,
+  network: S.Union([ChainIdString, LegacyNetwork]),
+  extra: S.Record(S.String, S.Unknown).pipe(S.optional),
+})
+
+export const Supported = HttpApiEndpoint.get("supported", "/supported", {
+  success: S.Struct({
+    kinds: S.Array(SupportedKind),
+    extensions: S.Array(S.String),
+    signers: S.Record(S.String, S.Array(S.String)),
+  }),
+}).annotate(
+  OpenApi.Description,
+  `
+    Returns the list of payment schemes, networks, and extensions supported by this facilitator,
+    along with signer addresses keyed by CAIP-2 network family patterns.
+  `,
+)

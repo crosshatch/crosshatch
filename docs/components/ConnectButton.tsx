@@ -1,7 +1,7 @@
 "use client"
 
 import { useAtomSet } from "@effect/atom-react"
-import { openAtom } from "crosshatch"
+import { openAtom } from "crosshatch/BrowserWallet"
 
 export const ConnectButton = () => {
   const open = useAtomSet(openAtom)
