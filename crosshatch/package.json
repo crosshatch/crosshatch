@@ -1,7 +1,7 @@
 {
   "name": "crosshatch",
   "version": "0.0.2",
-  "private": true,
+  "private": false,
   "description": "x402 x Effect",
   "homepage": "https://crosshatch.dev",
   "bugs": {
