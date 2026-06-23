@@ -9,7 +9,8 @@ packages:
   - liminal/examples/*/*
 
 catalog:
-  "@changesets/cli": ^2.30.0
+  "@changesets/changelog-github": ^0.7.0
+  "@changesets/cli": ^2.31.0
   "@cloudflare/vite-plugin": ^1.32.3
   "@cloudflare/vitest-pool-workers": ^0.14.7
   "@cloudflare/worker-bundler": ^0.1.2
@@ -105,6 +106,9 @@ overrides:
   zod: 3.25.76
 
 patchedDependencies:
+  "@changesets/apply-release-plan@7.1.1": konfik/patches/@changesets__apply-release-plan@7.1.1.patch
+  "@changesets/assemble-release-plan@6.0.10": konfik/patches/@changesets__assemble-release-plan@6.0.10.patch
+  "@changesets/get-github-info@0.8.0": konfik/patches/@changesets__get-github-info@0.8.0.patch
   alchemy@2.0.0-beta.57: konfik/patches/alchemy@2.0.0-beta.57.patch
 
 minimumReleaseAgeExclude:
