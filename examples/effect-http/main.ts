@@ -1,7 +1,7 @@
-import { USDC } from "@crosshatch/assets"
 import { Asset, settle } from "crosshatch"
 import { CaConfig } from "crosshatch/Ca"
 import { Http402Middleware, Http402Payload, EXPOSED_HEADERS } from "crosshatch/Http402"
+import { USDC } from "crosshatch/KnownAsset"
 import { Required } from "crosshatch/X402"
 import { Layer, Effect } from "effect"
 import { Worker } from "effect-workerd"

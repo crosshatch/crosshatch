@@ -1,11 +1,10 @@
 {
   "include": [],
   "references": [
-    { "path": "./@crosshatch/facilitator" },
-    { "path": "./@crosshatch/assets" },
     { "path": "./@crosshatch/widget" },
     { "path": "./crosshatch" },
     { "path": "./docs" },
-    { "path": "./examples" }
+    { "path": "./examples" },
+    { "path": "./facilitator" }
   ]
 }

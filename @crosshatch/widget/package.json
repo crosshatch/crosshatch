@@ -1,8 +1,8 @@
 {
   "name": "@crosshatch/widget",
-  "version": "0.1.0-beta.1",
+  "version": "0.0.1",
   "private": false,
-  "description": "Widgeting, fidgeting.",
+  "description": "Widgeting, fidgeting, gadgeting.",
   "homepage": "https://crosshatch.dev",
   "bugs": {
     "url": "https://github.com/crosshatch/crosshatch/issues"

@@ -6,5 +6,5 @@
   },
   "include": ["."],
   "exclude": ["dist", "vitest.config.ts"],
-  "references": [{ "path": "../../crosshatch" }, { "path": "../assets" }]
+  "references": [{ "path": "../crosshatch" }]
 }

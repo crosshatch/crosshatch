@@ -212,46 +212,6 @@ importers:
         specifier: 'catalog:'
         version: 4.1.4(@types/node@25.6.0)(@vitest/coverage-v8@4.1.4)(happy-dom@20.9.0)(vite@8.0.8(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0))
 
-  '@crosshatch/assets':
-    dependencies:
-      crosshatch:
-        specifier: workspace:*
-        version: link:../../crosshatch
-      effect:
-        specifier: 'catalog:'
-        version: 4.0.0-beta.83
-
-  '@crosshatch/facilitator':
-    dependencies:
-      '@crosshatch/assets':
-        specifier: workspace:*
-        version: link:../assets
-      '@distilled.cloud/coinbase':
-        specifier: 'catalog:'
-        version: 0.26.1(effect@4.0.0-beta.83)
-      alchemy:
-        specifier: 'catalog:'
-        version: 2.0.0-beta.57(patch_hash=6c62ad526405edf6211963c4c0ba1ae1491b4b19714bd7f88c3f6f0abc8175b2)(@effect/platform-node@4.0.0-beta.83(effect@4.0.0-beta.83)(ioredis@5.10.1))(@types/node@25.6.0)(@types/react@19.2.14)(drizzle-orm@1.0.0-rc.3(@cloudflare/workers-types@4.20260531.1)(@libsql/client@0.17.3)(effect@4.0.0-beta.83)(mysql2@3.22.4(@types/node@25.6.0))(pg@8.21.0)(zod@3.25.76))(effect@4.0.0-beta.83)(vite@8.0.8(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0))(vitest@4.1.4)(workerd@1.20260526.1)(ws@8.20.1)
-      crosshatch:
-        specifier: workspace:*
-        version: link:../../crosshatch
-      effect:
-        specifier: 'catalog:'
-        version: 4.0.0-beta.83
-      effect-workerd:
-        specifier: workspace:*
-        version: link:../../liminal/effect-workerd
-      liminal-util:
-        specifier: workspace:*
-        version: link:../../liminal/liminal-util
-      viem:
-        specifier: 'catalog:'
-        version: 2.51.3(typescript@6.0.2)(zod@3.25.76)
-    devDependencies:
-      vite:
-        specifier: 'catalog:'
-        version: 8.0.8(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0)
-
   '@crosshatch/widget':
     dependencies:
       '@effect/platform-browser':
@@ -332,9 +292,6 @@ importers:
       '@cloudflare/workers-types':
         specifier: 'catalog:'
         version: 4.20260416.2
-      '@crosshatch/assets':
-        specifier: workspace:*
-        version: link:../../@crosshatch/assets
       alchemy:
         specifier: 'catalog:'
         version: 2.0.0-beta.57(patch_hash=6c62ad526405edf6211963c4c0ba1ae1491b4b19714bd7f88c3f6f0abc8175b2)(@effect/platform-node@4.0.0-beta.83(effect@4.0.0-beta.83)(ioredis@5.10.1))(@types/node@25.6.0)(@types/react@19.2.14)(drizzle-orm@1.0.0-rc.3(@cloudflare/workers-types@4.20260416.2)(@libsql/client@0.17.3)(effect@4.0.0-beta.83)(mysql2@3.22.4(@types/node@25.6.0))(pg@8.21.0)(zod@3.25.76))(effect@4.0.0-beta.83)(vite@8.0.8(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0))(vitest@4.1.4)(workerd@1.20260526.1)(ws@8.20.1)
@@ -350,6 +307,33 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 4.1.4(@types/node@25.6.0)(@vitest/coverage-v8@4.1.4)(happy-dom@20.9.0)(vite@8.0.8(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0))
+
+  facilitator:
+    dependencies:
+      '@distilled.cloud/coinbase':
+        specifier: 'catalog:'
+        version: 0.26.1(effect@4.0.0-beta.83)
+      alchemy:
+        specifier: 'catalog:'
+        version: 2.0.0-beta.57(patch_hash=6c62ad526405edf6211963c4c0ba1ae1491b4b19714bd7f88c3f6f0abc8175b2)(@effect/platform-node@4.0.0-beta.83(effect@4.0.0-beta.83)(ioredis@5.10.1))(@types/node@25.6.0)(@types/react@19.2.14)(drizzle-orm@1.0.0-rc.3(@cloudflare/workers-types@4.20260531.1)(@libsql/client@0.17.3)(effect@4.0.0-beta.83)(mysql2@3.22.4(@types/node@25.6.0))(pg@8.21.0)(zod@3.25.76))(effect@4.0.0-beta.83)(vite@8.0.8(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0))(vitest@4.1.4)(workerd@1.20260526.1)(ws@8.20.1)
+      crosshatch:
+        specifier: workspace:*
+        version: link:../crosshatch
+      effect:
+        specifier: 'catalog:'
+        version: 4.0.0-beta.83
+      effect-workerd:
+        specifier: workspace:*
+        version: link:../liminal/effect-workerd
+      liminal-util:
+        specifier: workspace:*
+        version: link:../liminal/liminal-util
+      viem:
+        specifier: 'catalog:'
+        version: 2.51.3(typescript@6.0.2)(zod@3.25.76)
+      vite:
+        specifier: 'catalog:'
+        version: 8.0.8(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0)
 
   liminal/docs:
     dependencies:

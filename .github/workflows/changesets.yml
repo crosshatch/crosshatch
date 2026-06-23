@@ -1,0 +1,31 @@
+name: Changesets
+on:
+  push:
+    branches: [main]
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+jobs:
+  changesets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      id-token: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.MADHATCHER_PAT }}
+      - run: |
+          git config user.name "madhatcher"
+          git config user.email "<USER_ID>+madhatcher@users.noreply.github.com"
+      - run: "git -c url.https://github.com/.insteadOf=git@github.com: submodule update --init konfik"
+      - uses: crosshatch/konfik/.github/actions/configure_environment@main
+      - run: pnpm build
+      - uses: changesets/action@v1
+        with:
+          setupGitUser: false
+          publish: pnpm changeset publish
+          commit: version packages
+          title: version packages
+        env:
+          GITHUB_TOKEN: ${{ secrets.MADHATCHER_PAT }}

@@ -6,9 +6,5 @@
   },
   "include": ["."],
   "exclude": ["dist"],
-  "references": [
-    { "path": "../../crosshatch" },
-    { "path": "../../@crosshatch/assets" },
-    { "path": "../../liminal/effect-workerd" }
-  ]
+  "references": [{ "path": "../../crosshatch" }, { "path": "../../liminal/effect-workerd" }]
 }
