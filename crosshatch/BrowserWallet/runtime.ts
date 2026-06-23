@@ -6,6 +6,7 @@ import { Atom } from "effect/unstable/reactivity"
 import { Client } from "liminal"
 import * as Boundary from "liminal-util/Boundary"
 
+import * as BrowserWalletPayer from "./BrowserWalletPayer.ts"
 import { FacadeClient, reducers, FacadeWorker } from "./Facade/Facade.ts"
 
 const OtlpLive = Stage.pipe(
@@ -26,15 +27,17 @@ const OtlpLive = Stage.pipe(
   Layer.unwrap,
 )
 
-const FacadeLive = Client.layerWorker({
-  client: FacadeClient,
-  reducers,
-}).pipe(Layer.provide(FacadeWorker.layer))
-
-const Live = FacadeLive.pipe(
-  Layer.provideMerge(OtlpLive.pipe(Layer.provideMerge(FetchHttpClient.layer))),
-  Boundary.layer("crosshatch", import.meta.url),
-)
+const Live = Layer.mergeAll(
+  BrowserWalletPayer.layer.pipe(
+    Layer.provideMerge(
+      Client.layerWorker({
+        client: FacadeClient,
+        reducers,
+      }).pipe(Layer.provide(FacadeWorker.layer)),
+    ),
+  ),
+  OtlpLive.pipe(Layer.provideMerge(FetchHttpClient.layer)),
+).pipe(Boundary.layer("crosshatch", import.meta.url))
 
 export const memoMap = Layer.makeMemoMapUnsafe()
 export const atomRuntime = Atom.context({ memoMap })(Live)
