@@ -22,7 +22,6 @@
     "./Evm": "./Evm/Evm.ts",
     "./Svm": "./Svm/Svm.ts",
     "./BrowserWallet": "./BrowserWallet/BrowserWallet.ts",
-    "./KnownAsset": "./KnownAsset/KnownAsset.ts",
     "./Facade": "./Facade/Facade.ts",
     "./Ca": "./Ca/Ca.ts",
     "./Http402": "./Http402/Http402.ts",

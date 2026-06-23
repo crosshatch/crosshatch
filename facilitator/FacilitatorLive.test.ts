@@ -1,10 +1,9 @@
 import { CredentialsFromEnv } from "@distilled.cloud/coinbase"
 import { NodeHttpClient, NodeHttpServer } from "@effect/platform-node"
 import { describe, it, assert } from "@effect/vitest"
-import { Asset } from "crosshatch"
+import { Asset, KnownAsset } from "crosshatch"
 import { CaConfig } from "crosshatch/Ca"
 import { CaPaymentPayload } from "crosshatch/Ca"
-import { USDC } from "crosshatch/KnownAsset"
 import { FacilitatorApi } from "crosshatch/X402"
 import { Config, Effect, Layer, Redacted } from "effect"
 import { HttpRouter } from "effect/unstable/http"
@@ -24,7 +23,7 @@ describe(import.meta.url, () => {
     Effect.fn(function* () {
       const seed = yield* Config.redacted("EVM_SEED_PHRASE")
       const account = mnemonicToAccount(Redacted.value(seed))
-      const paymentRequirements = Asset.requirements(USDC, {
+      const paymentRequirements = Asset.requirements(KnownAsset.USDC, {
         amount: 0.01,
         recipients: {
           eip155: {

@@ -1,7 +1,6 @@
-import { Asset, settle } from "crosshatch"
+import { Asset, settle, KnownAsset } from "crosshatch"
 import { CaConfig } from "crosshatch/Ca"
 import { Http402Middleware, Http402Payload, EXPOSED_HEADERS } from "crosshatch/Http402"
-import { USDC } from "crosshatch/KnownAsset"
 import { Required } from "crosshatch/X402"
 import { Layer, Effect } from "effect"
 import { Worker } from "effect-workerd"
@@ -18,7 +17,7 @@ export default Worker.make({
           url: "https://example-merchant.com",
         }).pipe(
           Required.accepts(
-            Asset.requirements(USDC, {
+            Asset.requirements(KnownAsset.USDC, {
               amount: 0.01,
               recipients: {
                 eip155: {

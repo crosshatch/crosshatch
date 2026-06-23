@@ -1,5 +1,6 @@
-import { Asset } from "crosshatch"
 import { AccountAddress } from "crosshatch/Ca"
+
+import type { Asset } from "../Asset.ts"
 
 export const MEGAUSDC = {
   eip155: {
@@ -12,4 +13,4 @@ export const MEGAUSDC = {
       version: "1",
     },
   },
-} as const satisfies Asset.Asset
+} as const satisfies Asset
