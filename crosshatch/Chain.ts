@@ -1,9 +1,9 @@
 import { type Effect, Context } from "effect"
 
-import type { Payload, Requirements } from "../X402/X402.ts"
 import type { CreatePayloadError } from "./errors.ts"
+import type { Payload, Requirements } from "./X402/X402.ts"
 
-export interface CaChain {
+export interface Chain {
   readonly createPayload: ({
     requirements,
   }: {
@@ -19,4 +19,4 @@ export interface CaChain {
 export const Service =
   <Self>() =>
   <Id extends string>(id: Id) =>
-    Context.Service<Self, CaChain>()(id)
+    Context.Service<Self, Chain>()(id)

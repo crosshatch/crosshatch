@@ -1,4 +1,4 @@
-import { Address, ChainId, Asset } from "crosshatch/Ca"
+import { Address, ChainId, Asset } from "crosshatch"
 import { Requirements } from "crosshatch/X402"
 import { Record, Duration } from "effect"
 

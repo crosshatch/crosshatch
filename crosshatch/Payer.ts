@@ -1,10 +1,9 @@
-import { Context, Data, Effect, Layer } from "effect"
+import { Context, Effect, Layer } from "effect"
 
-import { CaChain, CreatePayloadError } from "./Ca/Ca.ts"
+import type { Chain } from "./Chain.ts"
+import { CreatePayloadError, CreateTraceError } from "./errors.ts"
 import type { TraceConfig } from "./Trace.ts"
 import type { Payload, Required } from "./X402/X402.ts"
-
-export class CreateTraceError extends Data.TaggedError("CreateTraceError")<{ readonly cause: unknown }> {}
 
 export class Payer extends Context.Service<
   Payer,
@@ -19,7 +18,7 @@ export class Payer extends Context.Service<
 >()("crosshatch/Payer") {}
 
 // TODO: configurable selection mechanism.
-export const layerChain = (chain: CaChain.CaChain) =>
+export const layerChain = (chain: Chain) =>
   Layer.succeed(Payer, {
     createPayload: ({ required }) =>
       chain.createPayload({

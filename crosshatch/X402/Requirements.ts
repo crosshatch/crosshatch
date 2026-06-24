@@ -1,4 +1,4 @@
-import { ChainId, Address, Asset } from "crosshatch/Ca"
+import { ChainId, Address, Asset } from "crosshatch"
 import { Schema as S } from "effect"
 
 import { Scheme } from "./Scheme.ts"

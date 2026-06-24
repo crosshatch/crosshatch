@@ -1,4 +1,4 @@
-import { ChainId } from "crosshatch/Ca"
+import { ChainId } from "crosshatch"
 import { Effect, Data } from "effect"
 import * as Boundary from "liminal-util/Boundary"
 

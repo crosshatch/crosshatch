@@ -1,14 +1,15 @@
-import { Schema as S } from "effect"
+import { Data, Schema as S } from "effect"
 
-import { Asset, ChainId } from "./Ca/Ca.ts"
+import { Asset } from "./Asset.ts"
+import { ChainId } from "./ChainId.ts"
 
 export class NoSuchSupportedAssetError extends S.TaggedErrorClass<NoSuchSupportedAssetError>()(
   "NoSuchSupportedAssetError",
   {
     notFound: S.Array(
       S.Struct({
-        chainId: ChainId.ChainId,
-        asset: Asset.Asset,
+        chainId: ChainId,
+        asset: Asset,
       }),
     ),
   },
@@ -18,3 +19,9 @@ export class NoSuchSupportedMethodError extends S.TaggedErrorClass<NoSuchSupport
   "NoSuchSupportedAssetError",
   { method: S.String },
 ) {}
+
+// TODO: schema-ify
+export class CreatePayloadError extends Data.TaggedError("CreatePayloadError")<{ readonly cause?: unknown }> {}
+
+// TODO: schema-ify
+export class CreateTraceError extends Data.TaggedError("CreateTraceError")<{ readonly cause: unknown }> {}

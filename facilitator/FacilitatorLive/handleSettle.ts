@@ -1,5 +1,5 @@
 import { settleX402Payment } from "@distilled.cloud/coinbase"
-import { ChainId } from "crosshatch/Ca"
+import { ChainId } from "crosshatch"
 import { FacilitatorApi } from "crosshatch/X402"
 import { Effect, Schema as S } from "effect"
 

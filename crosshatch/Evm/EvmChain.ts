@@ -3,16 +3,16 @@ import { Effect } from "effect"
 import { Mnemonic } from "ox"
 import { privateKeyToAccount } from "viem/accounts"
 
-import { CaChain } from "../Ca/Ca.ts"
+import * as Chain from "../Chain.ts"
 import { Requirements } from "../X402/X402.ts"
 import * as Erc3009Payload from "./Erc3009Payload.ts"
 import type { EvmSigner } from "./EvmSigner.ts"
 import * as Permit2Payload from "./Permit2Payload.ts"
 
-export class EvmChain extends CaChain.Service<EvmChain>()("crosshatch/Evm/EvmChain") {}
+export class EvmChain extends Chain.Service<EvmChain>()("crosshatch/Evm/EvmChain") {}
 
 // TODO: extensions + resource
-export const fromSigner = (signer: EvmSigner): CaChain.CaChain => ({
+export const fromSigner = (signer: EvmSigner): Chain.Chain => ({
   createPayload: Effect.fnUntraced(function* ({
     requirements,
   }: {

@@ -18,26 +18,26 @@
   "exports": {
     ".": "./index.ts",
     "./*": "./*.ts",
-    "./X402": "./X402/X402.ts",
-    "./Evm": "./Evm/Evm.ts",
-    "./Svm": "./Svm/Svm.ts",
     "./Browser": "./Browser/Browser.ts",
+    "./Evm": "./Evm/Evm.ts",
     "./Facade": "./Facade/Facade.ts",
-    "./Ca": "./Ca/Ca.ts",
     "./Http402": "./Http402/Http402.ts",
+    "./Svm": "./Svm/Svm.ts",
+    "./X402": "./X402/X402.ts",
+    "./internal": "./internal/internal.ts",
     "./package.json": "./package.json"
   },
   "publishConfig": {
     "exports": {
       ".": "./dist/index.js",
       "./*": "./dist/*/index.js",
-      "./X402": "./dist/X402/X402.js",
-      "./Svm": "./dist/Svm/Svm.js",
-      "./Evm": "./dist/Evm/Evm.js",
       "./Browser": "./dist/Browser/Browser.js",
+      "./Evm": "./dist/Evm/Evm.js",
       "./Facade": "./dist/Facade/Facade.js",
-      "./Ca": "./dist/Ca/Ca.js",
       "./Http402": "./dist/Http402/Http402.js",
+      "./Svm": "./dist/Svm/Svm.js",
+      "./X402": "./dist/X402/X402.js",
+      "./internal": "./dist/internal/internal.js",
       "./package.json": "./package.json"
     }
   },

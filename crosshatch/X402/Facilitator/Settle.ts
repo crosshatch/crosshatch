@@ -1,4 +1,4 @@
-import { ChainId } from "crosshatch/Ca"
+import { ChainId } from "crosshatch"
 import { Schema as S } from "effect"
 import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 

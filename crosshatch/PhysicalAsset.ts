@@ -1,4 +1,4 @@
-import { ChainId, CaChain, Asset } from "crosshatch/Ca"
+import { ChainId, Chain, Asset } from "crosshatch"
 import { Requirements } from "crosshatch/X402"
 import { Record, Effect, Context } from "effect"
 
@@ -13,7 +13,7 @@ export interface Deployment {
   readonly name: string
   readonly symbol: string
   readonly version: string
-  readonly service: Context.ServiceClass<any, any, CaChain.CaChain>
+  readonly service: Context.ServiceClass<any, any, Chain.Chain>
 }
 
 export const getFirstSupported = Effect.fnUntraced(function* (
