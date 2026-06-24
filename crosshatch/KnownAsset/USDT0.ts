@@ -1,12 +1,10 @@
-import { AccountAddress } from "crosshatch/Ca"
-
-import type { Asset } from "../Asset.ts"
-import { EvmChain } from "../Evm/Evm.ts"
+import { EvmChain, EvmAsset } from "../Evm/Evm.ts"
+import type { PhysicalAsset } from "../PhysicalAsset.ts"
 
 export const USDT0 = {
   eip155: {
     988: {
-      address: AccountAddress.make("0x779Ded0c9e1022225f8E0630b35a9b54bE713736"),
+      asset: EvmAsset.EvmAsset.make("0x779Ded0c9e1022225f8E0630b35a9b54bE713736"),
       assetNamespace: "erc20",
       decimals: 6,
       name: "USDT0",
@@ -15,7 +13,7 @@ export const USDT0 = {
       service: EvmChain.EvmChain,
     },
     2201: {
-      address: AccountAddress.make("0x78Cf24370174180738C5B8E352B6D14c83a6c9A9"),
+      asset: EvmAsset.EvmAsset.make("0x78Cf24370174180738C5B8E352B6D14c83a6c9A9"),
       assetNamespace: "erc20",
       decimals: 6,
       name: "USDT0",
@@ -24,4 +22,4 @@ export const USDT0 = {
       service: EvmChain.EvmChain,
     },
   },
-} as const satisfies Asset
+} as const satisfies PhysicalAsset

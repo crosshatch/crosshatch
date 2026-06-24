@@ -1,4 +1,4 @@
-import { Context, Redacted } from "effect"
+import { Redacted } from "effect"
 import { Effect } from "effect"
 import { Mnemonic } from "ox"
 import { privateKeyToAccount } from "viem/accounts"
@@ -9,7 +9,7 @@ import * as Erc3009Payload from "./Erc3009Payload.ts"
 import type { EvmSigner } from "./EvmSigner.ts"
 import * as Permit2Payload from "./Permit2Payload.ts"
 
-export class EvmChain extends Context.Service<EvmChain, CaChain.CaChain>()("crosshatch/Evm/EvmChain") {}
+export class EvmChain extends CaChain.Service<EvmChain>()("crosshatch/Evm/EvmChain") {}
 
 // TODO: extensions + resource
 export const fromSigner = (signer: EvmSigner): CaChain.CaChain => ({

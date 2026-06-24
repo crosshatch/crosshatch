@@ -1,5 +1,5 @@
 import { supportedX402PaymentKinds } from "@distilled.cloud/coinbase"
-import { ChainIdString } from "crosshatch/Ca"
+import { ChainId } from "crosshatch/Ca"
 import { FacilitatorApi } from "crosshatch/X402"
 import { Effect, Schema as S } from "effect"
 
@@ -11,7 +11,7 @@ export const handleSupported = handler(FacilitatorApi, "facilitator", "supported
       Effect.forEach(
         kinds,
         ({ network, ...rest }) =>
-          S.decodeUnknownEffect(ChainIdString)(network).pipe(Effect.map((network) => ({ network, ...rest }))),
+          S.decodeUnknownEffect(ChainId.ChainId)(network).pipe(Effect.map((network) => ({ network, ...rest }))),
         { concurrency: "unbounded" },
       ).pipe(Effect.map((kinds) => ({ kinds, ...rest }))),
     ),

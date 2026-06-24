@@ -1,4 +1,4 @@
-import { ChainIdString } from "crosshatch/Ca"
+import { ChainId } from "crosshatch/Ca"
 import { Schema as S } from "effect"
 import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 
@@ -15,7 +15,7 @@ export const Settle = HttpApiEndpoint.post("settle", "/settle", {
       success: S.tag(true),
       payer: S.String.pipe(S.optional),
       transaction: S.String,
-      network: ChainIdString,
+      network: ChainId.ChainId,
       extensions: S.Record(S.String, S.Unknown).pipe(S.optional),
     }),
     S.Struct({

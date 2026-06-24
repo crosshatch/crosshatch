@@ -1,9 +1,8 @@
 import { CredentialsFromEnv } from "@distilled.cloud/coinbase"
 import { NodeHttpClient, NodeHttpServer } from "@effect/platform-node"
 import { describe, it, assert } from "@effect/vitest"
-import { Asset, KnownAsset } from "crosshatch"
-import { CaConfig } from "crosshatch/Ca"
-import { EvmChain } from "crosshatch/Evm"
+import { KnownAsset, requirements } from "crosshatch"
+import { EvmChain, EvmAddress } from "crosshatch/Evm"
 import { FacilitatorApi } from "crosshatch/X402"
 import { Config, Effect, Layer } from "effect"
 import { HttpRouter } from "effect/unstable/http"
@@ -21,11 +20,11 @@ describe(import.meta.url, () => {
     "verifies and settles a freshly signed EVM x402 payment",
     Effect.fn(function* () {
       const seed = yield* Config.redacted("EVM_SEED_PHRASE")
-      const paymentRequirements = Asset.requirements(KnownAsset.USDC, {
+      const paymentRequirements = requirements(KnownAsset.USDC, {
         amount: 0.01,
         recipients: {
           eip155: {
-            8453: yield* CaConfig.accountAddress("PAY_TO_EVM"),
+            8453: yield* EvmAddress.config("PAY_TO_EVM"),
           },
         },
       })[0]!

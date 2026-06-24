@@ -1,6 +1,6 @@
 import { BigDecimal, Effect, Option, Schema as S, Data } from "effect"
 
-import type { AssetDeployment } from "./Asset.ts"
+import type { Deployment } from "./PhysicalAsset.ts"
 
 export const Atomic = S.String.check(S.isPattern(/^(0|[1-9]\d*)$/)).pipe(S.brand("Atomic"))
 
@@ -15,7 +15,7 @@ const ceilDiv = (numerator: bigint, denominator: bigint) =>
 const integerDecimalToBigInt = (decimal: BigDecimal.BigDecimal) =>
   decimal.scale < 0 ? decimal.value * 10n ** BigInt(-decimal.scale) : decimal.value
 
-const atomicScale = ({ decimals }: AssetDeployment) => 10n ** BigInt(decimals)
+const atomicScale = ({ decimals }: Deployment) => 10n ** BigInt(decimals)
 
 export class InvalidUsdError extends Data.TaggedError("InvalidUsdError")<{
   readonly input: string
@@ -49,10 +49,10 @@ export const displayUsd = (amount: typeof Usd.Type): string => {
   return `$${dollars}.${(micros / 100n).toString().padStart(4, "0")}`
 }
 
-export const usdToAtomic = (amount: typeof Usd.Type, assetDeployment: AssetDeployment): typeof Atomic.Type =>
+export const usdToAtomic = (amount: typeof Usd.Type, assetDeployment: Deployment): typeof Atomic.Type =>
   Atomic.make(ceilDiv(amount * atomicScale(assetDeployment), MICROS_PER_USD).toString())
 
-export const atomicToUsd = (amount: typeof Atomic.Type, assetDeployment: AssetDeployment): typeof Usd.Type =>
+export const atomicToUsd = (amount: typeof Atomic.Type, assetDeployment: Deployment): typeof Usd.Type =>
   Usd.make(ceilDiv(BigInt(amount) * MICROS_PER_USD, atomicScale(assetDeployment)))
 
 export const usdFromNumber = (amount: number): typeof Usd.Type => {

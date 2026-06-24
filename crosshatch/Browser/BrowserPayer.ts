@@ -1,7 +1,7 @@
 import { Effect, Layer, flow } from "effect"
 import { Client } from "liminal"
 
-import { CreatePayloadError } from "../Ca/errors.ts"
+import { CreatePayloadError } from "../Ca/Ca.ts"
 import { Payer, CreateTraceError } from "../Payer.ts"
 import { FacadeClient, reducers, FacadeWorker } from "./Facade/Facade.ts"
 

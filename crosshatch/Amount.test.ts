@@ -2,9 +2,9 @@ import { assert, describe, it } from "@effect/vitest"
 import { Effect } from "effect"
 
 import * as Amount from "./Amount.ts"
-import type { AssetDeployment } from "./Asset.ts"
+import type { Deployment } from "./PhysicalAsset.ts"
 
-const EXAMPLE = { decimals: 6 } as never as AssetDeployment
+const EXAMPLE = { decimals: 6 } as never as Deployment
 
 describe(import.meta.url, () => {
   it.effect(

@@ -1,4 +1,4 @@
-import { ChainIdString } from "crosshatch/Ca"
+import { ChainId } from "crosshatch/Ca"
 import { Effect, Data } from "effect"
 import * as Boundary from "liminal-util/Boundary"
 
@@ -9,7 +9,7 @@ export class SettlementError extends Data.TaggedError("SettlementError")<{
 }> {}
 
 export interface Settlement {
-  chainId: typeof ChainIdString.Type
+  chainId: typeof ChainId.ChainId.Type
   transaction: string
 }
 
