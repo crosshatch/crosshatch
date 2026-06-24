@@ -15,7 +15,7 @@ const ceilDiv = (numerator: bigint, denominator: bigint) =>
 const integerDecimalToBigInt = (decimal: BigDecimal.BigDecimal) =>
   decimal.scale < 0 ? decimal.value * 10n ** BigInt(-decimal.scale) : decimal.value
 
-const atomicScale = ({ decimals }: typeof AssetDeployment.Type) => 10n ** BigInt(decimals)
+const atomicScale = ({ decimals }: AssetDeployment) => 10n ** BigInt(decimals)
 
 export class InvalidUsdError extends Data.TaggedError("InvalidUsdError")<{
   readonly input: string
@@ -49,15 +49,11 @@ export const displayUsd = (amount: typeof Usd.Type): string => {
   return `$${dollars}.${(micros / 100n).toString().padStart(4, "0")}`
 }
 
-export const usdToAtomic = (
-  amount: typeof Usd.Type,
-  assetDeployment: typeof AssetDeployment.Type,
-): typeof Atomic.Type => Atomic.make(ceilDiv(amount * atomicScale(assetDeployment), MICROS_PER_USD).toString())
+export const usdToAtomic = (amount: typeof Usd.Type, assetDeployment: AssetDeployment): typeof Atomic.Type =>
+  Atomic.make(ceilDiv(amount * atomicScale(assetDeployment), MICROS_PER_USD).toString())
 
-export const atomicToUsd = (
-  amount: typeof Atomic.Type,
-  assetDeployment: typeof AssetDeployment.Type,
-): typeof Usd.Type => Usd.make(ceilDiv(BigInt(amount) * MICROS_PER_USD, atomicScale(assetDeployment)))
+export const atomicToUsd = (amount: typeof Atomic.Type, assetDeployment: AssetDeployment): typeof Usd.Type =>
+  Usd.make(ceilDiv(BigInt(amount) * MICROS_PER_USD, atomicScale(assetDeployment)))
 
 export const usdFromNumber = (amount: number): typeof Usd.Type => {
   if (!Number.isFinite(amount) || amount < 0) {

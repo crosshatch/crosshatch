@@ -1,14 +1,10 @@
-import { Context } from "effect"
+export interface EvmSigner {
+  readonly address: `0x${string}`
 
-export class EvmSigner extends Context.Service<
-  EvmSigner,
-  {
-    readonly address: `0x${string}`
-    signTypedData(message: {
-      domain: Record<string, unknown>
-      types: Record<string, unknown>
-      primaryType: string
-      message: Record<string, unknown>
-    }): Promise<`0x${string}`>
-  }
->()("crosshatch/X402/Signer/EvmSigner") {}
+  readonly signTypedData: (message: {
+    domain: Record<string, unknown>
+    types: Record<string, unknown>
+    primaryType: string
+    message: Record<string, unknown>
+  }) => Promise<`0x${string}`>
+}

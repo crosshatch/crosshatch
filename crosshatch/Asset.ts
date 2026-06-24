@@ -1,20 +1,21 @@
-import { AccountAddress, ChainIdString } from "crosshatch/Ca"
+import { AccountAddress, ChainIdString, CaChain } from "crosshatch/Ca"
 import { Requirements } from "crosshatch/X402"
-import { Record, Schema as S, Effect, Duration } from "effect"
+import { Record, Effect, Duration, Context } from "effect"
 
 import { usdToAtomic, usdFromNumber } from "./Amount.ts"
 import { NoSuchSupportedAssetError } from "./errors.ts"
 
-export type Asset = Record<string, Record<string, typeof AssetDeployment.Type>>
+export type Asset = Record<string, Record<string, AssetDeployment>>
 
-export const AssetDeployment = S.Struct({
-  address: AccountAddress,
-  assetNamespace: S.Literal("erc20"),
-  decimals: S.Number,
-  name: S.String,
-  symbol: S.String,
-  version: S.String,
-})
+export interface AssetDeployment {
+  readonly address: typeof AccountAddress.Type
+  readonly assetNamespace: "erc20"
+  readonly decimals: number
+  readonly name: string
+  readonly symbol: string
+  readonly version: string
+  readonly service: Context.ServiceClass<any, any, CaChain.CaChain>
+}
 
 export const requirements = <A extends Asset>(
   asset: A,

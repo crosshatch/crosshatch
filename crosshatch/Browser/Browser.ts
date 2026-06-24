@@ -1,4 +1,4 @@
-export * as BrowserWalletPayer from "./BrowserWalletPayer.ts"
+export * as BrowserPayer from "./BrowserPayer.ts"
 export * from "./ProposeError.ts"
 export * from "./atoms.ts"
 export * from "./LinkChallengeId.ts"

@@ -1,6 +1,7 @@
 import { Effect, Schema as S } from "effect"
 import { getAddress, toHex } from "viem"
 
+import { CreatePayloadError } from "../Ca/Ca.ts"
 import { Requirements } from "../X402/X402.ts"
 import type { EvmSigner } from "./EvmSigner.ts"
 
@@ -18,11 +19,6 @@ export const Erc3009Payload = S.Struct({
   authorization: Erc3009Authorization,
 })
 
-export class Erc3009PayloadMakeError extends S.TaggedErrorClass<Erc3009PayloadMakeError>()(
-  "Erc3009PayloadMakeError",
-  {},
-) {}
-
 const authorizationTypes = {
   TransferWithAuthorization: [
     { name: "from", type: "address" },
@@ -34,12 +30,13 @@ const authorizationTypes = {
   ],
 } as const
 
-export const make = Effect.fn(function* (
-  signer: EvmSigner["Service"],
+export const make = Effect.fnUntraced(function* (
+  signer: EvmSigner,
   requirement: typeof Requirements.Requirements.Type,
 ) {
   if (!requirement.extra?.name || !requirement.extra?.version) {
-    return yield* new Erc3009PayloadMakeError()
+    // TODO: inner schema error
+    return yield* new CreatePayloadError({})
   }
   const now = Math.floor(Date.now() / 1000)
   const chainId = parseInt(requirement.network.split(":")[1]!)

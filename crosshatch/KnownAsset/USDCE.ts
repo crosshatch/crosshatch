@@ -1,6 +1,7 @@
 import { AccountAddress } from "crosshatch/Ca"
 
 import type { Asset } from "../Asset.ts"
+import { EvmChain } from "../Evm/Evm.ts"
 
 export const USDCE = {
   eip155: {
@@ -11,6 +12,7 @@ export const USDCE = {
       name: "USDC.e",
       symbol: "USDC.e",
       version: "2",
+      service: EvmChain.EvmChain,
     },
     190415: {
       address: AccountAddress.make("0x401eCb1D350407f13ba348573E5630B83638E30D"),
@@ -19,6 +21,7 @@ export const USDCE = {
       name: "Bridged USDC",
       symbol: "USDC.e",
       version: "2",
+      service: EvmChain.EvmChain,
     },
     181228: {
       address: AccountAddress.make("0x401eCb1D350407f13ba348573E5630B83638E30D"),
@@ -27,6 +30,7 @@ export const USDCE = {
       name: "Bridged USDC",
       symbol: "USDC.e",
       version: "2",
+      service: EvmChain.EvmChain,
     },
   },
 } as const satisfies Asset

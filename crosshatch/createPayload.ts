@@ -6,7 +6,7 @@ import type { Required } from "./X402/X402.ts"
 
 export const createTrace = Effect.fnUntraced(function* (config: typeof TraceConfig.Type) {
   const { createTrace } = yield* Payer
-  return yield* createTrace(config)
+  return yield* createTrace?.(config) ?? Effect.void
 })
 
 export const createPayload = Effect.fnUntraced(function* ({

@@ -1,8 +1,9 @@
 import { Effect, Layer, flow } from "effect"
 import { Client } from "liminal"
 
-import { Payer, CreatePayloadError, CreateTraceError } from "../Payer.ts"
-import { FacadeClient } from "./Facade/Facade.ts"
+import { CreatePayloadError } from "../Ca/errors.ts"
+import { Payer, CreateTraceError } from "../Payer.ts"
+import { FacadeClient, reducers, FacadeWorker } from "./Facade/Facade.ts"
 
 export const layer = Layer.effect(
   Payer,
@@ -20,4 +21,11 @@ export const layer = Layer.effect(
       ),
     } satisfies Payer["Service"]
   }),
+).pipe(
+  Layer.provideMerge(
+    Client.layerWorker({
+      client: FacadeClient,
+      reducers,
+    }).pipe(Layer.provide(FacadeWorker.layer)),
+  ),
 )

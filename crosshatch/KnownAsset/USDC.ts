@@ -1,6 +1,7 @@
 import { AccountAddress } from "crosshatch/Ca"
 
 import type { Asset } from "../Asset.ts"
+import { EvmChain } from "../Evm/Evm.ts"
 
 export const USDC = {
   eip155: {
@@ -11,6 +12,7 @@ export const USDC = {
       name: "USDC",
       symbol: "USDC",
       version: "2",
+      service: EvmChain.EvmChain,
     },
     51: {
       address: AccountAddress.make("0xb5AB69F7bBada22B28e79C8FFAECe55eF1c771D4"),
@@ -19,6 +21,7 @@ export const USDC = {
       name: "USDC",
       symbol: "USDC",
       version: "2",
+      service: EvmChain.EvmChain,
     },
     137: {
       address: AccountAddress.make("0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"),
@@ -27,6 +30,7 @@ export const USDC = {
       name: "USD Coin",
       symbol: "USDC",
       version: "2",
+      service: EvmChain.EvmChain,
     },
     143: {
       address: AccountAddress.make("0x754704Bc059F8C67012fEd69BC8A327a5aafb603"),
@@ -35,6 +39,7 @@ export const USDC = {
       name: "USD Coin",
       symbol: "USDC",
       version: "2",
+      service: EvmChain.EvmChain,
     },
     8453: {
       address: AccountAddress.make("0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"),
@@ -43,6 +48,7 @@ export const USDC = {
       name: "USD Coin",
       symbol: "USDC",
       version: "2",
+      service: EvmChain.EvmChain,
     },
     42161: {
       address: AccountAddress.make("0xaf88d065e77c8cC2239327C5EDb3A432268e5831"),
@@ -51,6 +57,7 @@ export const USDC = {
       name: "USD Coin",
       symbol: "USDC",
       version: "2",
+      service: EvmChain.EvmChain,
     },
     421614: {
       address: AccountAddress.make("0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d"),
@@ -59,6 +66,7 @@ export const USDC = {
       name: "USD Coin",
       symbol: "USDC",
       version: "2",
+      service: EvmChain.EvmChain,
     },
     84532: {
       address: AccountAddress.make("0x036CbD53842c5426634e7929541eC2318f3dCF7e"),
@@ -67,6 +75,7 @@ export const USDC = {
       name: "USDC",
       symbol: "USDC",
       version: "2",
+      service: EvmChain.EvmChain,
     },
   },
 } as const satisfies Asset

@@ -21,7 +21,7 @@
     "./X402": "./X402/X402.ts",
     "./Evm": "./Evm/Evm.ts",
     "./Svm": "./Svm/Svm.ts",
-    "./BrowserWallet": "./BrowserWallet/BrowserWallet.ts",
+    "./Browser": "./Browser/Browser.ts",
     "./Facade": "./Facade/Facade.ts",
     "./Ca": "./Ca/Ca.ts",
     "./Http402": "./Http402/Http402.ts",
@@ -34,7 +34,7 @@
       "./X402": "./dist/X402/X402.js",
       "./Svm": "./dist/Svm/Svm.js",
       "./Evm": "./dist/Evm/Evm.js",
-      "./BrowserWallet": "./dist/BrowserWallet/BrowserWallet.js",
+      "./Browser": "./dist/Browser/Browser.js",
       "./Facade": "./dist/Facade/Facade.js",
       "./Ca": "./dist/Ca/Ca.js",
       "./Http402": "./dist/Http402/Http402.js",
@@ -48,6 +48,7 @@
     "effect": "catalog:",
     "liminal": "workspace:*",
     "liminal-util": "workspace:*",
+    "ox": "catalog:",
     "viem": "catalog:"
   }
 }

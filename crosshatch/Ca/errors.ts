@@ -1,6 +1,3 @@
-import { Schema as S } from "effect"
+import { Data } from "effect"
 
-export class CaPaymentPayloadMakeError extends S.TaggedErrorClass<CaPaymentPayloadMakeError>()(
-  "CaPaymentPayloadMakeError",
-  {},
-) {}
+export class CreatePayloadError extends Data.TaggedError("CreatePayloadError")<{ readonly cause?: unknown }> {}

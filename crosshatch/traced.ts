@@ -21,6 +21,6 @@ export const traced =
         name,
         description: String.stripMargin(globalThis.String.raw(template, ...substitutions)),
       }
-      yield* createTrace(trace)
+      yield* createTrace?.(trace) ?? Effect.void
       return yield* Effect.provideService(effect, Trace, trace)
     }, Effect.withSpan(name))

@@ -1,6 +1,7 @@
 import { AccountAddress } from "crosshatch/Ca"
 
 import type { Asset } from "../Asset.ts"
+import { EvmChain } from "../Evm/Evm.ts"
 
 export const MEGAUSDC = {
   eip155: {
@@ -11,6 +12,7 @@ export const MEGAUSDC = {
       name: "MegaUSD",
       symbol: "MegaUSD",
       version: "1",
+      service: EvmChain.EvmChain,
     },
   },
 } as const satisfies Asset
