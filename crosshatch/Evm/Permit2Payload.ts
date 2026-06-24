@@ -47,7 +47,10 @@ const permit2WitnessTypes = {
   ],
 } as const
 
-export const make = Effect.fn(function* (signer: EvmSigner, requirement: typeof Requirements.Requirements.Type) {
+export const make = Effect.fnUntraced(function* (
+  signer: EvmSigner,
+  requirement: typeof Requirements.Requirements.Type,
+) {
   const now = Math.floor(Date.now() / 1000)
   const chainId = parseInt(requirement.network.split(":")[1]!)
   const nonce = BigInt(toHex(crypto.getRandomValues(new Uint8Array(32)))).toString()

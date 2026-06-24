@@ -29,7 +29,6 @@ describe(import.meta.url, () => {
           },
         },
       })[0]!
-
       const chain = EvmChain.fromMnemonic(seed)
       const { payload: paymentPayload } = yield* chain.createPayload({
         requirements: paymentRequirements,
