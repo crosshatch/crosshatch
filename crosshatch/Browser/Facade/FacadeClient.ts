@@ -25,9 +25,9 @@ export class FacadeClient extends Client.Service<FacadeClient>()("crosshatch/Fac
     },
     Propose: {
       payload: S.Struct({
-        invoiceId: PaymentId.PaymentId.pipe(S.optional),
         traceId: S.String.pipe(S.optional),
         required: Required.Required,
+        paymentId: PaymentId.PaymentId.pipe(S.optional),
       }),
       success: S.Struct({
         payload: Payload.Payload,

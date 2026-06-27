@@ -6,12 +6,15 @@ import type { Deployment, PhysicalAssetLookup } from "./PhysicalAsset.ts"
 import type { Required } from "./Required.ts"
 import type { Requirements } from "./Requirements.ts"
 
-export class SelectRequirements extends Context.Service<
-  SelectRequirements,
+export class Treasurer extends Context.Service<
+  Treasurer,
   {
     readonly select: (required: typeof Required.Type) => Effect.Effect<
       {
-        readonly accepted: typeof Requirements.Type
+        readonly config: {
+          readonly accepted: typeof Requirements.Type
+          readonly extensions?: Record<string, unknown> | undefined
+        }
         readonly deployment: Deployment
       },
       RequirementSelectionError | NoSuchSupportedAssetError
@@ -19,6 +22,7 @@ export class SelectRequirements extends Context.Service<
   }
 >()("crosshatch/SelectRequirements") {}
 
+// TODO: extensions
 export const getFirstSupported = (supported: PhysicalAssetLookup) =>
   Effect.fnUntraced(function* (required: typeof Required.Type) {
     const { accepts } = required
@@ -28,7 +32,10 @@ export const getFirstSupported = (supported: PhysicalAssetLookup) =>
           const network = ChainId.make(`${namespace}:${reference}`)
           for (const accepted of accepts) {
             if (network === accepted.network && deployment.asset === accepted.asset) {
-              return { accepted, deployment }
+              return {
+                config: { accepted },
+                deployment,
+              }
             }
           }
         }
@@ -40,6 +47,6 @@ export const getFirstSupported = (supported: PhysicalAssetLookup) =>
   })
 
 export const layerFirstSupported = (supported: PhysicalAssetLookup) =>
-  Layer.succeed(SelectRequirements, {
+  Layer.succeed(Treasurer, {
     select: getFirstSupported(supported),
   })

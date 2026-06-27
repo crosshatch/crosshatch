@@ -4,8 +4,8 @@ import type { Chain } from "./Chain.ts"
 import { CreatePayloadError, CreateTraceError, NoSuchSupportedAssetError, RequirementSelectionError } from "./errors.ts"
 import type { Payload } from "./Payload.ts"
 import type { Required } from "./Required.ts"
-import { SelectRequirements } from "./SelectRequirements.ts"
 import type { TraceConfig } from "./traced.ts"
+import { Treasurer } from "./Treasurer.ts"
 
 export class Payer extends Context.Service<
   Payer,
@@ -26,11 +26,11 @@ export const layer = (chain: Chain) =>
   Layer.effect(
     Payer,
     Effect.gen(function* () {
-      const { select } = yield* SelectRequirements
+      const { select } = yield* Treasurer
       return {
         createPayload: Effect.fnUntraced(function* ({ required }) {
-          const { accepted } = yield* select(required)
-          return yield* chain.createPayload({ requirements: accepted })
+          const { config } = yield* select(required)
+          return yield* chain.createPayload(config)
         }),
       }
     }),
