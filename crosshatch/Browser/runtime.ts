@@ -1,10 +1,10 @@
-import { Stage } from "crosshatch"
 import { Effect, Layer, ManagedRuntime } from "effect"
 import { FetchHttpClient } from "effect/unstable/http"
 import { OtlpSerialization, OtlpLogger, OtlpTracer } from "effect/unstable/observability"
 import { Atom } from "effect/unstable/reactivity"
 import * as Boundary from "liminal-util/Boundary"
 
+import { Stage } from "../index.ts"
 import * as BrowserPayer from "./BrowserPayer.ts"
 
 const OtlpLive = Stage.pipe(

@@ -26,7 +26,7 @@ export interface Builder_<R> extends Pipeable.Pipeable {
 
 export interface Builder<R> extends Builder_<R> {
   (
-    template?: TemplateStringsArray,
+    template?: TemplateStringsArray | string,
     ...substitutions: ReadonlyArray<unknown>
   ): Effect.Effect<typeof Required.Type, S.SchemaError, R>
 }
@@ -50,17 +50,26 @@ const make = <R>(
 ): Builder<R> => {
   const { url, extensionsEntries: extensions } = builder
   return Object.assign(
-    Effect.fnUntraced(function* (template?: TemplateStringsArray, ...substitutions: ReadonlyArray<unknown>) {
+    Effect.fnUntraced(function* (template?: TemplateStringsArray | string, ...substitutions: ReadonlyArray<unknown>) {
       return {
         x402Version: 2,
         accepts,
         resource: {
           url,
-          ...(template ? { description: String.stripMargin(globalThis.String.raw(template, ...substitutions)) } : {}),
+          ...(template
+            ? {
+                description:
+                  typeof template === "string"
+                    ? template
+                    : String.stripMargin(globalThis.String.raw(template, ...substitutions)),
+              }
+            : {}),
         },
         extensions: yield* Effect.all(
           extensionEntries?.map(([{ identifier, payload: Payload }, payload]) =>
-            S.encodeEffect(Payload)(payload).pipe(Effect.map((encoded) => [identifier, encoded] as const)),
+            S.encodeEffect(S.toCodecJson(Payload))(payload).pipe(
+              Effect.map((encoded) => [identifier, encoded] as const),
+            ),
           ) ?? [],
           { concurrency: "unbounded" },
         ).pipe(Effect.map(Record.fromEntries)) as Effect.Effect<never, S.SchemaError, R>,

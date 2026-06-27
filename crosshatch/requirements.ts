@@ -1,16 +1,18 @@
-import { ChainId, Address, Asset } from "crosshatch"
 import { Schema as S, Record, Duration } from "effect"
 
+import { Address } from "./Address.ts"
 import { usdToAtomic, usdFromNumber } from "./Amount.ts"
+import { Asset } from "./Asset.ts"
+import { ChainId } from "./ChainId.ts"
 import type { PhysicalAsset } from "./PhysicalAsset.ts"
 
 export const Requirements = S.Struct({
   amount: S.String,
-  asset: Asset.Asset,
+  asset: Asset,
   extra: S.Record(S.String, S.Unknown).pipe(S.optional),
   maxTimeoutSeconds: S.Number,
-  network: ChainId.ChainId,
-  payTo: Address.Address,
+  network: ChainId,
+  payTo: Address,
   scheme: S.Literals(["exact", "upto"]),
 })
 
@@ -24,7 +26,7 @@ export const group = <A extends PhysicalAsset>(
     amount: number
     recipients: {
       [K in keyof A]: {
-        [K2 in keyof A[K]]+?: typeof Address.Address.Type | undefined
+        [K2 in keyof A[K]]+?: typeof Address.Type | undefined
       }
     }
     ttl?: Duration.Input | undefined
@@ -36,22 +38,17 @@ export const group = <A extends PhysicalAsset>(
       (acc, [reference, payTo]) => {
         const deployment = asset[namespace]![reference]!
         const { name, version } = deployment
-        return [
-          ...acc,
-          ...(payTo
-            ? [
-                {
-                  amount: usdToAtomic(usdFromNumber(amount), deployment),
-                  asset: Asset.Asset.make(deployment.asset),
-                  maxTimeoutSeconds,
-                  network: ChainId.ChainId.make(`${namespace}:${reference}`),
-                  payTo,
-                  scheme: "exact",
-                  extra: { name, version },
-                } satisfies typeof Requirements.Type,
-              ]
-            : []),
-        ]
+        return payTo
+          ? acc.concat({
+              amount: usdToAtomic(usdFromNumber(amount), deployment),
+              asset: Asset.make(deployment.asset),
+              maxTimeoutSeconds,
+              network: ChainId.make(`${namespace}:${reference}`),
+              payTo,
+              scheme: "exact",
+              extra: { name, version },
+            })
+          : acc
       },
       [] as ReadonlyArray<typeof Requirements.Type>,
     ),

@@ -1,11 +1,11 @@
 import { embed } from "@crosshatch/widget/embed"
 import { Finished } from "@crosshatch/widget/self"
 import type { StandardSchemaV1 } from "@standard-schema/spec"
-import { Stage } from "crosshatch"
 import { Data, Effect, pipe, Schema as S, SchemaGetter, Stream } from "effect"
 import { UrlParams } from "effect/unstable/http"
 import * as Boundary from "liminal-util/Boundary"
 
+import { Stage } from "../index.ts"
 import { Allowance } from "./Allowance.ts"
 import { LinkChallengeId } from "./LinkChallengeId.ts"
 import { PrerequisitesUnmetError } from "./Prerequisite.ts"
@@ -33,7 +33,7 @@ const widget = <Payload extends S.Codec<any, any>, Item extends S.Codec<any, any
   const standard = S.toStandardSchemaV1(
     S.Struct({ x: Payload }).pipe(
       S.decodeTo(S.toType(payload), {
-        decode: SchemaGetter.transform(({ x }) => x),
+        decode: SchemaGetter.transform((input) => (input as { readonly x: Payload["Type"] }).x), // TODO
         encode: SchemaGetter.transform((x) => ({ x })),
       }),
     ),

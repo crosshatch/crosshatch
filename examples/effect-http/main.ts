@@ -1,6 +1,5 @@
-import { settle, Required, Requirements } from "crosshatch"
+import { settle, Required, Requirements, PaymentId } from "crosshatch"
 import { EvmAddress } from "crosshatch/Evm"
-import { PaymentId } from "crosshatch/extensions"
 import { Http402Middleware, Http402Payload, EXPOSED_HEADERS } from "crosshatch/Http402"
 import { USDC } from "crosshatch/KnownAsset"
 import { Layer, Effect } from "effect"

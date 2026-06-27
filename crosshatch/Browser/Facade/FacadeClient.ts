@@ -1,8 +1,7 @@
 import { Schema as S } from "effect"
 import { Client } from "liminal"
 
-import { PaymentId } from "../../extensions/extensions.ts"
-import { TraceConfig, Required, Payload } from "../../index.ts"
+import { PaymentId, TraceConfig, Required, Payload } from "../../index.ts"
 import { LinkChallengeId } from "../LinkChallengeId.ts"
 import { ProposeError } from "../ProposeError.ts"
 

@@ -56,7 +56,7 @@ export const embed = <Item extends S.Codec<any, any>>({
       Object.assign(iframe, {
         sandbox: DEFAULT_SANDBOX,
         allow,
-        src: src,
+        src,
         referrerPolicy: "no-referrer",
         ...(className ? { className } : {}),
       })

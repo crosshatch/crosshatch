@@ -1,6 +1,7 @@
 import { Context, Deferred, Effect, Layer, Schema as S } from "effect"
 
-import { Extension, Payload } from "../index.ts"
+import * as Extension from "./Extension.ts"
+import type { Payload } from "./Payload.ts"
 
 export const PaymentId = S.String.check(S.isLengthBetween(16, 128), S.isPattern(/^[a-zA-Z0-9_-]+$/)).pipe(
   S.brand("PaymentId"),
@@ -30,13 +31,15 @@ export class Lookup extends Context.Service<
   Lookup,
   {
     readonly make: Effect.Effect<typeof PaymentId.Type>
-    readonly await: (paymentId: typeof PaymentId.Type) => Effect.Effect<typeof Payload.Payload.Type, NoSuchPaymentError>
-    readonly resolve: (
-      paymentId: typeof PaymentId.Type,
-      payload: typeof Payload.Payload.Type,
-    ) => Effect.Effect<void, NoSuchPaymentError>
+
+    readonly await: (paymentId: typeof PaymentId.Type) => Effect.Effect<typeof Payload.Type, NoSuchPaymentError>
+
+    readonly resolve: (config: {
+      readonly paymentId: typeof PaymentId.Type
+      readonly payload: typeof Payload.Type
+    }) => Effect.Effect<void, NoSuchPaymentError>
   }
->()("crosshatch/extensions/PaymentId/Lookup") {}
+>()("crosshatch/PaymentId/Lookup") {}
 
 export const deferred = Effect.fnUntraced(function* (lookup: Lookup["Service"]) {
   const paymentId = yield* lookup.make
@@ -46,11 +49,11 @@ export const deferred = Effect.fnUntraced(function* (lookup: Lookup["Service"]) 
 
 export const layerMemory = Layer.effect(
   Lookup,
-  Effect.gen(function* () {
-    const invoices: Record<typeof PaymentId.Type, Deferred.Deferred<typeof Payload.Payload.Type>> = {}
+  Effect.sync(() => {
+    const invoices: Record<typeof PaymentId.Type, Deferred.Deferred<typeof Payload.Type>> = {}
     return {
       make: Effect.gen(function* () {
-        const deferred = yield* Deferred.make<typeof Payload.Payload.Type>()
+        const deferred = yield* Deferred.make<typeof Payload.Type>()
         const paymentId = PaymentId.make(crypto.randomUUID())
         invoices[paymentId] = deferred
         return paymentId
@@ -62,7 +65,7 @@ export const layerMemory = Layer.effect(
         }
         return yield* Deferred.await(invoice)
       }),
-      resolve: Effect.fnUntraced(function* (paymentId, payload) {
+      resolve: Effect.fnUntraced(function* ({ paymentId, payload }) {
         const deferred = invoices[paymentId]
         if (!deferred) {
           return yield* new NoSuchPaymentError({ paymentId })

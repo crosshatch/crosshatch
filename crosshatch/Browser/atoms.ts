@@ -1,8 +1,8 @@
-import { Amount } from "crosshatch"
 import { Effect, Match, Cause } from "effect"
 import { Atom } from "effect/unstable/reactivity"
 import * as Boundary from "liminal-util/Boundary"
 
+import { Amount } from "../index.ts"
 import { Stage } from "../Stage.ts"
 import { FacadeClient } from "./Facade/Facade.ts"
 import { atomRuntime } from "./runtime.ts"

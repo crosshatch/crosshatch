@@ -1,9 +1,9 @@
 import * as Host from "@crosshatch/widget/Host"
 import { BrowserWorker, BrowserStream } from "@effect/platform-browser"
-import { Stage } from "crosshatch"
 import { Effect, Fiber, Layer, Stream, Schema as S, Schedule } from "effect"
 import * as Boundary from "liminal-util/Boundary"
 
+import { Stage } from "../../index.ts"
 import { FacadeIntroduction, RequestFacadeIntroduction } from "./handshake.ts"
 
 export const layer = Effect.gen(function* () {
