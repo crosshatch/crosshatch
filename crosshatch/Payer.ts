@@ -1,9 +1,11 @@
 import { Context, Effect, Layer } from "effect"
 
 import type { Chain } from "./Chain.ts"
-import { CreatePayloadError, CreateTraceError } from "./errors.ts"
-import type { TraceConfig } from "./Trace.ts"
-import type { Payload, Required } from "./X402/X402.ts"
+import { CreatePayloadError, CreateTraceError, NoSuchSupportedAssetError, RequirementSelectionError } from "./errors.ts"
+import type { Payload } from "./Payload.ts"
+import type { Required } from "./Required.ts"
+import { SelectRequirements } from "./SelectRequirements.ts"
+import type { TraceConfig } from "./traced.ts"
 
 export class Payer extends Context.Service<
   Payer,
@@ -12,16 +14,24 @@ export class Payer extends Context.Service<
 
     readonly createPayload: (config: {
       readonly traceId?: string | undefined
-      readonly required: typeof Required.Required.Type
-    }) => Effect.Effect<{ readonly payload: typeof Payload.Payload.Type }, CreatePayloadError>
+      readonly required: typeof Required.Type
+    }) => Effect.Effect<
+      { readonly payload: typeof Payload.Type },
+      RequirementSelectionError | NoSuchSupportedAssetError | CreatePayloadError
+    >
   }
 >()("crosshatch/Payer") {}
 
-// TODO: configurable selection mechanism.
-export const layerChain = (chain: Chain) =>
-  Layer.succeed(Payer, {
-    createPayload: ({ required }) =>
-      chain.createPayload({
-        requirements: required.accepts[0],
-      }),
-  })
+export const layer = (chain: Chain) =>
+  Layer.effect(
+    Payer,
+    Effect.gen(function* () {
+      const { select } = yield* SelectRequirements
+      return {
+        createPayload: Effect.fnUntraced(function* ({ required }) {
+          const { accepted } = yield* select(required)
+          return yield* chain.createPayload({ requirements: accepted })
+        }),
+      }
+    }),
+  )

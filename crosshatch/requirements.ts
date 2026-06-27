@@ -1,11 +1,20 @@
-import { Address, ChainId, Asset } from "crosshatch"
-import { Requirements } from "crosshatch/X402"
-import { Record, Duration } from "effect"
+import { ChainId, Address, Asset } from "crosshatch"
+import { Schema as S, Record, Duration } from "effect"
 
 import { usdToAtomic, usdFromNumber } from "./Amount.ts"
 import type { PhysicalAsset } from "./PhysicalAsset.ts"
 
-export const requirements = <A extends PhysicalAsset>(
+export const Requirements = S.Struct({
+  amount: S.String,
+  asset: Asset.Asset,
+  extra: S.Record(S.String, S.Unknown).pipe(S.optional),
+  maxTimeoutSeconds: S.Number,
+  network: ChainId.ChainId,
+  payTo: Address.Address,
+  scheme: S.Literals(["exact", "upto"]),
+})
+
+export const group = <A extends PhysicalAsset>(
   asset: A,
   {
     amount,
@@ -20,7 +29,7 @@ export const requirements = <A extends PhysicalAsset>(
     }
     ttl?: Duration.Input | undefined
   },
-): ReadonlyArray<typeof Requirements.Requirements.Type> => {
+): ReadonlyArray<typeof Requirements.Type> => {
   const maxTimeoutSeconds = ttl ? Math.ceil(Duration.fromInputUnsafe(ttl).pipe(Duration.toSeconds)) : 300
   return Record.toEntries(recipients).flatMap(([namespace, references]) =>
     Record.toEntries(references).reduce(
@@ -39,12 +48,12 @@ export const requirements = <A extends PhysicalAsset>(
                   payTo,
                   scheme: "exact",
                   extra: { name, version },
-                } satisfies typeof Requirements.Requirements.Type,
+                } satisfies typeof Requirements.Type,
               ]
             : []),
         ]
       },
-      [] as ReadonlyArray<typeof Requirements.Requirements.Type>,
+      [] as ReadonlyArray<typeof Requirements.Type>,
     ),
   )
 }

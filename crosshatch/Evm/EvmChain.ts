@@ -1,10 +1,8 @@
-import { Redacted } from "effect"
-import { Effect } from "effect"
+import { Redacted, Effect, Config } from "effect"
 import { Mnemonic } from "ox"
 import { privateKeyToAccount } from "viem/accounts"
 
-import * as Chain from "../Chain.ts"
-import { Requirements } from "../X402/X402.ts"
+import { Requirements, Chain } from "../index.ts"
 import * as Erc3009Payload from "./Erc3009Payload.ts"
 import type { EvmSigner } from "./EvmSigner.ts"
 import * as Permit2Payload from "./Permit2Payload.ts"
@@ -32,3 +30,6 @@ export const fromSigner = (signer: EvmSigner): Chain.Chain => ({
 
 export const fromMnemonic = (mnemonic: Redacted.Redacted<string>) =>
   fromSigner(privateKeyToAccount(Mnemonic.toPrivateKey(Redacted.value(mnemonic), { as: "Hex" })))
+
+export const fromMnemonicConfig = (mnemonicConfig: Config.Config<Redacted.Redacted<string>>) =>
+  mnemonicConfig.pipe(Effect.map(fromMnemonic))

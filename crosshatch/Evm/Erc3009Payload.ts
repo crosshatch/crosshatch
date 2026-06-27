@@ -1,8 +1,7 @@
 import { Effect, Schema as S } from "effect"
 import { getAddress, toHex } from "viem"
 
-import { CreatePayloadError } from "../errors.ts"
-import { Requirements } from "../X402/X402.ts"
+import { CreatePayloadError, Requirements } from "../index.ts"
 import type { EvmSigner } from "./EvmSigner.ts"
 
 const Erc3009Authorization = S.Struct({

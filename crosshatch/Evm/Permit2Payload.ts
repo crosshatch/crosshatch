@@ -1,7 +1,7 @@
 import { Effect, Schema as S } from "effect"
 import { getAddress, toHex } from "viem"
 
-import type { Requirements } from "../X402/X402.ts"
+import type { Requirements } from "../index.ts"
 import type { EvmSigner } from "./EvmSigner.ts"
 
 const Permit2Authorization = S.Struct({

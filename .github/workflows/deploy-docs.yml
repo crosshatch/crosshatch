@@ -28,8 +28,6 @@ jobs:
           git -c url.https://github.com/.insteadOf=git@github.com: -C liminal submodule update --init --depth 1 konfik
       - uses: crosshatch/konfik/.github/actions/configure_environment@main
       - run: pnpm build
-      - run: pnpm exec vocs build
-        working-directory: docs
       - uses: crosshatch/konfik/.github/actions/alchemize@main
         with:
           working-directory: docs

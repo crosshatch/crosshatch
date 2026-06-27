@@ -1,6 +1,6 @@
 import { CredentialsFromEnv } from "@distilled.cloud/coinbase"
+import { Facilitator } from "crosshatch"
 import { EXPOSED_HEADERS } from "crosshatch/Http402"
-import { FacilitatorApi } from "crosshatch/X402"
 import { Layer, Effect } from "effect"
 import { Worker } from "effect-workerd"
 import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
@@ -12,7 +12,7 @@ import { FacilitatorLive } from "./FacilitatorLive/FacilitatorLive.ts"
 
 export default Worker.make({
   handler: Layer.mergeAll(
-    HttpApiBuilder.layer(FacilitatorApi, { openapiPath: "/openapi.json" }),
+    HttpApiBuilder.layer(Facilitator.FacilitatorApi, { openapiPath: "/openapi.json" }),
     HttpRouter.add("GET", "/health", () => Effect.succeed(HttpServerResponse.text("ok"))),
   ).pipe(
     Layer.provide(

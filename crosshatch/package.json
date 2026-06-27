@@ -20,10 +20,11 @@
     "./*": "./*.ts",
     "./Browser": "./Browser/Browser.ts",
     "./Evm": "./Evm/Evm.ts",
+    "./extensions": "./extensions/extensions.ts",
     "./Facade": "./Facade/Facade.ts",
     "./Http402": "./Http402/Http402.ts",
+    "./KnownAsset": "./KnownAsset/KnownAsset.ts",
     "./Svm": "./Svm/Svm.ts",
-    "./X402": "./X402/X402.ts",
     "./internal": "./internal/internal.ts",
     "./package.json": "./package.json"
   },
@@ -33,10 +34,11 @@
       "./*": "./dist/*/index.js",
       "./Browser": "./dist/Browser/Browser.js",
       "./Evm": "./dist/Evm/Evm.js",
+      "./extensions": "./dist/extensions.js",
       "./Facade": "./dist/Facade/Facade.js",
       "./Http402": "./dist/Http402/Http402.js",
+      "./KnownAsset": "./dist/KnownAsset/KnownAsset.js",
       "./Svm": "./dist/Svm/Svm.js",
-      "./X402": "./dist/X402/X402.js",
       "./internal": "./dist/internal/internal.js",
       "./package.json": "./package.json"
     }

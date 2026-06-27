@@ -1,8 +1,7 @@
-import { ChainId, Chain, Asset } from "crosshatch"
-import { Requirements } from "crosshatch/X402"
-import { Record, Effect, Context } from "effect"
+import { Chain, Asset } from "crosshatch"
+import { Record, Context } from "effect"
 
-import { NoSuchSupportedAssetError } from "./errors.ts"
+export type PhysicalAssetLookup = Record<string, PhysicalAsset>
 
 export type PhysicalAsset = Record<string, Record<string, Deployment>>
 
@@ -15,24 +14,3 @@ export interface Deployment {
   readonly version: string
   readonly service: Context.ServiceClass<any, any, Chain.Chain>
 }
-
-export const getFirstSupported = Effect.fnUntraced(function* (
-  supported: Record<string, PhysicalAsset>,
-  accepts: ReadonlyArray<typeof Requirements.Requirements.Type>,
-) {
-  for (const asset of Object.values(supported)) {
-    for (const [namespace, references] of Object.entries(asset)) {
-      for (const [reference, deployment] of Object.entries(references)) {
-        const network = ChainId.ChainId.make(`${namespace}:${reference}`)
-        for (const accepted of accepts) {
-          if (network === accepted.network && deployment.asset === accepted.asset) {
-            return { accepted, deployment, network }
-          }
-        }
-      }
-    }
-  }
-  return yield* new NoSuchSupportedAssetError({
-    notFound: accepts.map(({ network: chainId, asset }) => ({ chainId, asset })),
-  })
-})

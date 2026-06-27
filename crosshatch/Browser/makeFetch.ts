@@ -1,7 +1,7 @@
 import { Effect, Encoding, flow, Schema as S, Data } from "effect"
 import * as Boundary from "liminal-util/Boundary"
 
-import { Required } from "../X402/X402.ts"
+import { Required } from "../Required.ts"
 import * as Facade from "./Facade/Facade.ts"
 import type { ProposeError } from "./ProposeError.ts"
 import { managedRuntime } from "./runtime.ts"
@@ -24,10 +24,10 @@ export const makeFetch =
       const required = yield* header
         ? Encoding.decodeBase64String(header).pipe(
             Effect.fromResult,
-            Effect.flatMap(flow(JSON.parse, S.decodeUnknownEffect(S.toType(Required.Required)))),
+            Effect.flatMap(flow(JSON.parse, S.decodeUnknownEffect(S.toType(Required)))),
           )
         : Effect.promise(() => response.json()).pipe(
-            Effect.flatMap(S.decodeUnknownEffect(S.toType(Required.Required))),
+            Effect.flatMap(S.decodeUnknownEffect(S.toType(Required))),
             Effect.filterOrFail(({ x402Version }) => x402Version === 1),
           )
       const make = Facade.FacadeClient.fn("Propose")({ required }).pipe(

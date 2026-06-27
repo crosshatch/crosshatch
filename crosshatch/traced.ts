@@ -1,9 +1,25 @@
-import { Data, Effect, String } from "effect"
+import { Option, Data, String, Schema as S, Context, Effect, flow } from "effect"
 
 import { Payer } from "./Payer.ts"
-import { Trace } from "./Trace.ts"
 
-export class NoSuchTraceError extends Data.TaggedError("NoSuchTraceError")<{}> {}
+export const TraceConfig = S.Struct({
+  traceId: S.String,
+  name: S.String,
+  description: S.String,
+})
+
+export class Trace extends Context.Service<Trace, typeof TraceConfig.Type>()("crosshatch/Trace") {}
+
+export const TraceId = Effect.serviceOption(Trace).pipe(
+  Effect.map(
+    flow(
+      Option.map(({ traceId }) => traceId),
+      Option.getOrUndefined,
+    ),
+  ),
+)
+
+export class NoSurroundingTraceError extends Data.TaggedError("NoSurroundingTraceError")<{}> {}
 
 export const traced =
   (name: string) =>
@@ -13,7 +29,7 @@ export const traced =
       const traceId = yield* Effect.currentSpan.pipe(
         Effect.map(({ traceId }) => traceId),
         Effect.catchTags({
-          NoSuchElementError: () => new NoSuchTraceError(),
+          NoSuchElementError: () => new NoSurroundingTraceError(),
         }),
       )
       const trace = {

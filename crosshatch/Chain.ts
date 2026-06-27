@@ -1,16 +1,13 @@
 import { type Effect, Context } from "effect"
 
 import type { CreatePayloadError } from "./errors.ts"
-import type { Payload, Requirements } from "./X402/X402.ts"
+import type { Payload } from "./Payload.ts"
+import type { Requirements } from "./Requirements.ts"
 
 export interface Chain {
-  readonly createPayload: ({
-    requirements,
-  }: {
-    readonly requirements: typeof Requirements.Requirements.Type
-  }) => Effect.Effect<
+  readonly createPayload: ({ requirements }: { readonly requirements: typeof Requirements.Type }) => Effect.Effect<
     {
-      readonly payload: typeof Payload.Payload.Type
+      readonly payload: typeof Payload.Type
     },
     CreatePayloadError
   >

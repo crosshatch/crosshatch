@@ -1,11 +1,11 @@
 import { verifyX402Payment } from "@distilled.cloud/coinbase"
-import { FacilitatorApi } from "crosshatch/X402"
+import { Facilitator } from "crosshatch"
 import { Effect } from "effect"
 
 import { handler } from "./_common.ts"
 
 export const handleVerify = handler(
-  FacilitatorApi,
+  Facilitator.FacilitatorApi,
   "facilitator",
   "verify",
   ({ payload: { paymentPayload, paymentRequirements } }) =>

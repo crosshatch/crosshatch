@@ -25,3 +25,8 @@ export class CreatePayloadError extends Data.TaggedError("CreatePayloadError")<{
 
 // TODO: schema-ify
 export class CreateTraceError extends Data.TaggedError("CreateTraceError")<{ readonly cause: unknown }> {}
+
+export class RequirementSelectionError extends S.TaggedErrorClass<RequirementSelectionError>()(
+  "RequirementSelectionError",
+  {},
+) {}

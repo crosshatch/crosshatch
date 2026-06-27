@@ -2,7 +2,8 @@ import { ChainId } from "crosshatch"
 import { Effect, Data } from "effect"
 import * as Boundary from "liminal-util/Boundary"
 
-import { type Payload, FacilitatorClient } from "./X402/X402.ts"
+import { FacilitatorClient } from "./Facilitator/Facilitator.ts"
+import { Payload } from "./Payload.ts"
 
 export class SettlementError extends Data.TaggedError("SettlementError")<{
   readonly cause: unknown
@@ -14,7 +15,7 @@ export interface Settlement {
 }
 
 export const settle = Effect.fnUntraced(
-  function* ({ payload }: { readonly payload: typeof Payload.Payload.Type }) {
+  function* ({ payload }: { readonly payload: typeof Payload.Type }) {
     const facilitator = yield* FacilitatorClient.getOrDefault
     const { accepted: paymentRequirements } = payload
     const response = yield* facilitator

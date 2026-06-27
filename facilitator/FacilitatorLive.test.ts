@@ -1,16 +1,18 @@
 import { CredentialsFromEnv } from "@distilled.cloud/coinbase"
 import { NodeHttpClient, NodeHttpServer } from "@effect/platform-node"
 import { describe, it, assert } from "@effect/vitest"
-import { KnownAsset, requirements } from "crosshatch"
+import { Requirements, Facilitator } from "crosshatch"
 import { EvmChain, EvmAddress } from "crosshatch/Evm"
-import { FacilitatorApi } from "crosshatch/X402"
+import { USDC } from "crosshatch/KnownAsset"
 import { Config, Effect, Layer } from "effect"
 import { HttpRouter } from "effect/unstable/http"
 import { HttpApiBuilder, HttpApiClient } from "effect/unstable/httpapi"
 
 import { FacilitatorLive } from "./FacilitatorLive/FacilitatorLive.ts"
 
-const Live = HttpRouter.serve(HttpApiBuilder.layer(FacilitatorApi).pipe(Layer.provide(FacilitatorLive))).pipe(
+const Live = HttpRouter.serve(
+  HttpApiBuilder.layer(Facilitator.FacilitatorApi).pipe(Layer.provide(FacilitatorLive)),
+).pipe(
   Layer.provide(NodeHttpClient.layerFetch),
   Layer.provideMerge(Layer.mergeAll(NodeHttpServer.layerTest, CredentialsFromEnv)),
 )
@@ -20,7 +22,7 @@ describe(import.meta.url, () => {
     "verifies and settles a freshly signed EVM x402 payment",
     Effect.fn(function* () {
       const seed = yield* Config.redacted("EVM_SEED_PHRASE")
-      const paymentRequirements = requirements(KnownAsset.USDC, {
+      const paymentRequirements = Requirements.group(USDC, {
         amount: 0.01,
         recipients: {
           eip155: {
@@ -32,7 +34,7 @@ describe(import.meta.url, () => {
       const { payload: paymentPayload } = yield* chain.createPayload({
         requirements: paymentRequirements,
       })
-      const client = yield* HttpApiClient.make(FacilitatorApi)
+      const client = yield* HttpApiClient.make(Facilitator.FacilitatorApi)
       const verified = yield* client.facilitator.verify({
         payload: { paymentRequirements, paymentPayload },
       })
