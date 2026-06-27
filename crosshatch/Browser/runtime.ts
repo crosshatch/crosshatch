@@ -9,8 +9,9 @@ import * as BrowserPayer from "./BrowserPayer.ts"
 
 const OtlpLive = Stage.pipe(
   Effect.map(({ name, url }) =>
-    name !== "prod"
-      ? Layer.mergeAll(
+    name === "prod"
+      ? Layer.empty
+      : Layer.mergeAll(
           OtlpLogger.layer({
             url: url("otel/v1/logs"),
             resource: { serviceName: "crosshatch-lib" },
@@ -19,8 +20,7 @@ const OtlpLive = Stage.pipe(
             url: url("otel/v1/traces"),
             resource: { serviceName: "crosshatch-lib" },
           }),
-        ).pipe(Layer.provide(OtlpSerialization.layerJson))
-      : Layer.empty,
+        ).pipe(Layer.provide(OtlpSerialization.layerJson)),
   ),
   Layer.unwrap,
 )
