@@ -5,7 +5,7 @@ import { Data, Effect, pipe, Schema as S, SchemaGetter, Stream } from "effect"
 import { UrlParams } from "effect/unstable/http"
 import * as Boundary from "liminal-util/Boundary"
 
-import { Stage } from "../index.ts"
+import { Stage } from "../Stage.ts"
 import { Allowance } from "./Allowance.ts"
 import { LinkChallengeId } from "./LinkChallengeId.ts"
 import { PrerequisitesUnmetError } from "./Prerequisite.ts"

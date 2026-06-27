@@ -4,7 +4,7 @@ import { OtlpSerialization, OtlpLogger, OtlpTracer } from "effect/unstable/obser
 import { Atom } from "effect/unstable/reactivity"
 import * as Boundary from "liminal-util/Boundary"
 
-import { Stage } from "../index.ts"
+import { Stage } from "../Stage.ts"
 import * as BrowserPayer from "./BrowserPayer.ts"
 
 const OtlpLive = Stage.pipe(

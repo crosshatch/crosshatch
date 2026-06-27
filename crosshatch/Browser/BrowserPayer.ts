@@ -1,11 +1,12 @@
 import { Effect, Layer, flow } from "effect"
 import { Client } from "liminal"
 
-import { CreateTraceError, CreatePayloadError, Payer } from "../index.ts"
+import { CreateTraceError, CreatePayloadError } from "../errors.ts"
+import { Payer } from "../Payer.ts"
 import { FacadeClient, reducers, FacadeWorker } from "./Facade/Facade.ts"
 
 export const layer = Layer.effect(
-  Payer.Payer,
+  Payer,
   Effect.gen(function* () {
     const client = yield* FacadeClient
     const fn = Client.fn(client)
@@ -18,7 +19,7 @@ export const layer = Layer.effect(
         fn("Propose"),
         Effect.mapError((cause) => new CreatePayloadError({ cause })),
       ),
-    } satisfies Payer.Payer["Service"]
+    } satisfies Payer["Service"]
   }),
 ).pipe(
   Layer.provideMerge(

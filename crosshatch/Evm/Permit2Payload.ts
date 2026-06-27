@@ -1,7 +1,7 @@
 import { Effect, Schema as S } from "effect"
 import { getAddress, toHex } from "viem"
 
-import type { Requirements } from "../index.ts"
+import type { Requirements } from "../Requirements.ts"
 import type { EvmSigner } from "./EvmSigner.ts"
 
 const Permit2Authorization = S.Struct({
@@ -47,10 +47,7 @@ const permit2WitnessTypes = {
   ],
 } as const
 
-export const make = Effect.fnUntraced(function* (
-  signer: EvmSigner,
-  requirement: typeof Requirements.Requirements.Type,
-) {
+export const make = Effect.fnUntraced(function* (signer: EvmSigner, requirement: typeof Requirements.Type) {
   const now = Math.floor(Date.now() / 1000)
   const chainId = parseInt(requirement.network.split(":")[1]!)
   const nonce = BigInt(toHex(crypto.getRandomValues(new Uint8Array(32)))).toString()

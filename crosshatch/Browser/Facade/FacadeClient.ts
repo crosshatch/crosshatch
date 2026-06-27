@@ -1,7 +1,10 @@
 import { Schema as S } from "effect"
 import { Client } from "liminal"
 
-import { PaymentId, TraceConfig, Required, Payload } from "../../index.ts"
+import { Payload } from "../../Payload.ts"
+import { PaymentId } from "../../PaymentId.ts"
+import { Required } from "../../Required.ts"
+import { TraceConfig } from "../../traced.ts"
 import { LinkChallengeId } from "../LinkChallengeId.ts"
 import { ProposeError } from "../ProposeError.ts"
 
@@ -26,11 +29,11 @@ export class FacadeClient extends Client.Service<FacadeClient>()("crosshatch/Fac
     Propose: {
       payload: S.Struct({
         traceId: S.String.pipe(S.optional),
-        required: Required.Required,
-        paymentId: PaymentId.PaymentId.pipe(S.optional),
+        required: Required,
+        paymentId: PaymentId.pipe(S.optional),
       }),
       success: S.Struct({
-        payload: Payload.Payload,
+        payload: Payload,
       }),
       failure: ProposeError,
     },

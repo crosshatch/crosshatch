@@ -3,7 +3,7 @@ import { BrowserWorker, BrowserStream } from "@effect/platform-browser"
 import { Effect, Fiber, Layer, Stream, Schema as S, Schedule } from "effect"
 import * as Boundary from "liminal-util/Boundary"
 
-import { Stage } from "../../index.ts"
+import { Stage } from "../../Stage.ts"
 import { FacadeIntroduction, RequestFacadeIntroduction } from "./handshake.ts"
 
 export const layer = Effect.gen(function* () {

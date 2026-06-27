@@ -1,7 +1,8 @@
 import { Effect, Schema as S } from "effect"
 import { getAddress, toHex } from "viem"
 
-import { CreatePayloadError, Requirements } from "../index.ts"
+import { CreatePayloadError } from "../errors.ts"
+import { Requirements } from "../Requirements.ts"
 import type { EvmSigner } from "./EvmSigner.ts"
 
 const Erc3009Authorization = S.Struct({
@@ -29,10 +30,7 @@ const authorizationTypes = {
   ],
 } as const
 
-export const make = Effect.fnUntraced(function* (
-  signer: EvmSigner,
-  requirement: typeof Requirements.Requirements.Type,
-) {
+export const make = Effect.fnUntraced(function* (signer: EvmSigner, requirement: typeof Requirements.Type) {
   if (!requirement.extra?.name || !requirement.extra?.version) {
     // TODO: inner schema error
     return yield* new CreatePayloadError({})

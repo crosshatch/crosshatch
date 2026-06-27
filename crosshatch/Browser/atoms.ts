@@ -2,7 +2,7 @@ import { Effect, Match, Cause } from "effect"
 import { Atom } from "effect/unstable/reactivity"
 import * as Boundary from "liminal-util/Boundary"
 
-import { Amount } from "../index.ts"
+import { Usd } from "../Amount.ts"
 import { Stage } from "../Stage.ts"
 import { FacadeClient } from "./Facade/Facade.ts"
 import { atomRuntime } from "./runtime.ts"
@@ -41,7 +41,7 @@ export const openAtom = atomRuntime.fn<void>()(
           : LinkWidget.host({
               challengeId,
               allowance: {
-                amount: Amount.Usd.make(10_000_000n),
+                amount: Usd.make(10_000_000n),
                 window: "Week",
               },
               ...common,
