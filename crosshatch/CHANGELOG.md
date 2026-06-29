@@ -1,5 +1,13 @@
 # crosshatch
 
+## 0.0.3
+
+### Patch Changes
+
+- [#44](https://github.com/crosshatch/crosshatch/pull/44)
+  [`b3482ec`](https://github.com/crosshatch/crosshatch/commit/b3482ece53b2ea68f5e7ab3d7a5505871b834476) Thanks
+  @harrysolovay! - Revamp payment required builder.
+
 ## 0.0.2
 
 ### Patch Changes
