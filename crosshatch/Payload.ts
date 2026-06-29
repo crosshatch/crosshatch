@@ -15,7 +15,13 @@ export const Payload = S.Struct({
   resource: ResourceInfo.pipe(S.optional),
 })
 
-export const make = Effect.fnUntraced(function* (required: typeof Required.Type, traceId_?: string) {
+export const make = Effect.fnUntraced(function* ({
+  required,
+  traceId: traceId_,
+}: {
+  readonly required: typeof Required.Type
+  readonly traceId?: string | undefined
+}) {
   const { createTrace, createPayload } = yield* Payer
   const traceId = traceId_ ?? (yield* createTrace ? TraceId : Effect.undefined)
   return yield* createPayload({ required, traceId })

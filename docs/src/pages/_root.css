@@ -1,5 +1,9 @@
 @import "liminal-util/vocs.css";
 
+body:has(.crosshatch-landing) {
+  --vocs-spacing-content: 80rem;
+}
+
 [data-v-logo-text]::before {
   content: "";
   width: 1.25rem;

@@ -1,0 +1,120 @@
+# Payload
+
+`Payload` is Crosshatch's utilities for working with the x402 `PaymentPayload` object.
+
+If `Required` is the invoice format of x402, `Payload` is the signed check. It is what a payer creates after reading a
+payment-required invoice and deciding how to pay it. The server or facilitator can then verify that signed check against
+the selected requirement and settle the payment.
+
+## Shape
+
+Crosshatch models the x402 payment payload as `Payload`:
+
+```ts
+import { Payload } from "crosshatch"
+
+type Payload = typeof Payload.Payload.Type
+```
+
+Conceptually, it has this shape:
+
+```ts
+type Payload = {
+  x402Version: 2
+  accepted: {
+    scheme: "exact" | "upto"
+    network: string
+    asset: string
+    amount: string
+    payTo: string
+    maxTimeoutSeconds: number
+    extra?: Record<string, unknown>
+  }
+  payload: Record<string, unknown>
+  resource?: {
+    url?: string
+    description?: string
+    mimeType?: string
+  }
+  extensions?: Record<string, unknown>
+}
+```
+
+The stable envelope says which invoice entry was accepted. The inner `payload` field is chain-specific. For EVM
+payments, for example, it may contain an EIP-3009 transfer authorization or a Permit2 authorization plus signature.
+
+## Making a Payload
+
+Use `Payload.make` when you have a `Required` invoice and want to construct the signed payment payload for it.
+
+```ts
+import { Payload, Required, Requirements } from "crosshatch"
+import { EvmAddress } from "crosshatch/Evm"
+import { USDC } from "crosshatch/KnownAsset"
+import { Effect } from "effect"
+
+const program = Effect.gen(function* () {
+  const required = yield* Required.empty({
+    url: "https://example-merchant.com/paid",
+  }).pipe(
+    Required.accept(
+      Requirements.group(USDC, {
+        amount: 0.01,
+        recipients: {
+          eip155: {
+            8453: yield* EvmAddress.config("PAY_TO_EVM"),
+          },
+        },
+      }),
+    ),
+  )`Access to the paid resource.`
+
+  const { payload } = yield* Payload.make({ required })
+
+  return payload
+})
+```
+
+`Payload.make({ required })` returns an Effect because creating a payment payload may need to select a supported
+requirement, read wallet configuration, sign typed data, and encode chain-specific payload fields.
+
+## The `Payer` Requirement
+
+`Payload.make` does not know which wallet, account, chain, or requirement-selection policy your application wants to
+use. Instead, calling it introduces a `Payer` service requirement into the Effect.
+
+```ts
+import { Payer } from "crosshatch"
+
+const { createTrace, createPayload } = yield * Payer.Payer
+```
+
+At runtime, the provided `Payer` decides which `required.accepts` entry to pay and how to produce the signed payload.
+For the built-in EVM flow, the `Payer` delegates requirement selection to a `Treasurer`, then asks the selected chain
+service to create the concrete payload.
+
+```ts
+import { Payer, Treasurer } from "crosshatch"
+import { EvmChain } from "crosshatch/Evm"
+import { USDC } from "crosshatch/KnownAsset"
+import { Effect, Layer, Redacted } from "effect"
+
+const payerLayer = Payer.layer(
+  EvmChain.fromMnemonic(Redacted.make("test test test test test test test test test test test junk")),
+).pipe(Layer.provide(Treasurer.layerFirstSupported({ USDC })))
+
+const runnable = program.pipe(Effect.provide(payerLayer))
+```
+
+This section is only concerned with `Payload.make`; the `Payer` service itself is covered later.
+
+## Trace IDs
+
+The argument to `Payload.make` can optionally include a `traceId` to share with the payer service. This is potentially
+useful for associating groups of payments, as well as in dispute resolution.
+
+```ts
+Effect.gen(function* () {
+  const { payload } = yield* Payload.make({ required, traceId })
+})
+```

@@ -31,7 +31,7 @@ export interface Builder<R> extends Builder_<R> {
   ): Effect.Effect<typeof Required.Type, S.SchemaError, R>
 }
 
-export const empty = ({ url }: { readonly url: string }): Builder_<never> => ({
+export const builder = ({ url }: { readonly url: string }): Builder_<never> => ({
   url,
   pipe() {
     return Pipeable.pipeArguments(this, arguments)

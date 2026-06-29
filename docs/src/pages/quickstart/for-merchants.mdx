@@ -1,0 +1,55 @@
+---
+title: Merchant Quickstart
+description: Use Crosshatch to monetize an HTTP service with x402 payment requirements and settlement.
+---
+
+# Merchant Quickstart
+
+Use this guide when your service needs to charge clients for access to a resource.
+
+Crosshatch helps merchants declare payment requirements, return 402 responses, read payment payloads, and settle paid
+requests.
+
+## Protect a Route
+
+Declare what the resource costs and return a 402 response when the request does not include a payment payload.
+
+```ts
+import { Required, Requirements } from "crosshatch"
+import { Http402Payload } from "crosshatch/Http402"
+import { USDC } from "crosshatch/KnownAsset"
+import { Effect } from "effect"
+
+const route = Effect.gen(function* () {
+  const payload = yield* Http402Payload.Http402Payload
+
+  if (!payload) {
+    const required = yield* Required.builder({
+      url: "https://merchant.example",
+    }).pipe(
+      Required.accept(
+        Requirements.group(USDC, {
+          amount: 0.01,
+          recipients: {
+            eip155: { 8453: "0x..." },
+          },
+        }),
+      ),
+    )`Access to the paid resource.`
+
+    return yield* Http402Payload.require(required)
+  }
+
+  return payload
+})
+```
+
+## Settle a Payment
+
+After receiving a payment payload, settle it before returning the paid resource.
+
+```ts
+import { settle } from "crosshatch"
+
+yield * settle({ payload })
+```

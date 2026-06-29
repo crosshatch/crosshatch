@@ -13,7 +13,7 @@ export default Worker.make({
     Effect.gen(function* () {
       const payload = yield* Http402Payload.Http402Payload
       if (!payload) {
-        const required = yield* Required.empty({
+        const required = yield* Required.builder({
           url: "https://example-merchant.com",
         }).pipe(
           Required.extend(PaymentId.PaymentIdExtension, {

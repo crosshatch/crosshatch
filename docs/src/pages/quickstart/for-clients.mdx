@@ -1,0 +1,34 @@
+---
+title: Client Quickstart
+description: Use Crosshatch to consume paid x402 services from a client or buyer application.
+---
+
+# Client Quickstart
+
+Use this guide when your application needs to access paid x402 resources.
+
+Crosshatch helps clients read payment requirements, create payment payloads, and retry requests with the payment
+attached.
+
+## Fetch a Paid Resource
+
+Crosshatch can wrap `globalThis.fetch` so 402 responses from x402 merchants are handled automatically.
+
+```ts
+import "crosshatch/fetch"
+
+const response = await fetch("https://merchant.example/resource")
+```
+
+## Create a Payment Payload
+
+When you need more control, create a payment payload directly from payment requirements.
+
+```ts
+import { Effect } from "effect"
+import { propose } from "crosshatch"
+
+const program = Effect.gen(function* () {
+  const { payload } = yield* propose({ required }) // [!code focus]
+})
+```

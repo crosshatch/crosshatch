@@ -1,0 +1,79 @@
+# Payment Required
+
+`Required` is Crosshatch's schema and builder for the x402 `PaymentRequired` response.
+
+You can think of this as the "invoice" format of x402. It is the description a server returns when a client asks for a
+paid resource without providing payment. The client reads the invoice, selects one of the accepted payment requirements,
+creates a [payment payload](/payload), and retries the request with that payment attached.
+
+## Shape
+
+Crosshatch models the x402 payment-required object as `Required`:
+
+```ts
+import { Required } from "crosshatch"
+
+type Required = typeof Required.Required.Type
+```
+
+Within a `Required` value is the `accepts` field, which describes the way(s) that the client can pay the invoice: the
+scheme, network, asset, amount, recipient, timeout, and any chain-specific metadata needed to validate settlement.
+
+## Building a Required
+
+Start with `Required.builder`, then pipe builder operations into it. `Required.accept` adds one or more acceptable
+payment requirements, and `Required.extend` adds x402 extension payloads.
+
+```ts
+import { Required, Requirements, PaymentId } from "crosshatch"
+import { EvmAddress } from "crosshatch/Evm"
+import { USDC } from "crosshatch/KnownAsset"
+import { Effect } from "effect"
+
+const makeRequired = Effect.gen(function* () {
+  return yield* Required.builder({
+    url: "https://example-merchant.com/paid",
+  }).pipe(
+    Required.extend(PaymentId.PaymentIdExtension, {
+      required: true,
+    }),
+    Required.accept(
+      Requirements.group(USDC, {
+        amount: 0.01,
+        recipients: {
+          eip155: {
+            8453: yield* EvmAddress.config("PAY_TO_EVM"),
+          },
+        },
+      }),
+    ),
+  )`
+  | Access to the paid resource.
+  | This invoice is for a single request to /paid.
+  `
+})
+```
+
+The tagged template at the end supplies `resource.description`. Crosshatch strips the leading margin, so multi-line
+descriptions stay legible in source.
+
+## Requirements Groups
+
+`Requirements.group` turns a `PhysicalAsset` into one or more x402 payment requirements. For example, `USDC` may contain
+deployments for multiple EVM chains. The `recipients` object chooses which deployments this invoice accepts and which
+address should receive payment on each chain.
+
+```ts
+Requirements.group(USDC, {
+  amount: 0.01,
+  recipients: {
+    eip155: {
+      8453: payToOnBase,
+    },
+  },
+})
+```
+
+The USD amount is converted into the asset's atomic units using the selected deployment's decimals. The resulting
+requirement includes the CAIP-2 network id, token asset id, recipient address, timeout, and metadata such as asset name
+and version.

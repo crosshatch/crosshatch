@@ -7,60 +7,51 @@ showLogo: false
 ---
 
 import { Card, HomePage } from "vocs"
+import { Bot, UserRound } from "lucide-react"
+import { CopyPromptButton } from "../CopyPromptButton"
+import { PROMPT } from "../PROMPT"
 
-<HomePage.Root>
-  <HomePage.Logo />
+<HomePage.Root className="crosshatch-landing">
 
-<HomePage.Tagline>Everything x402 for Effect.</HomePage.Tagline>
+<HomePage.Logo />
+
+<HomePage.Tagline>Effect-native x402</HomePage.Tagline>
 
 <HomePage.Description>
-  Build paid HTTP, RPC, agent, and app workflows with x402 schemas, Effect-native payment helpers, facilitator clients,
-  settlement utilities, tracing, and an optional embedded browser wallet.
+  Crosshatch is a stablecoin payments toolkit: typed x402 and CAIP schemas, payment requirement and payload builders,
+  Effect Integrations (HTTP, RPC, AI, Atom), and utilities for cross-network stablecoin interop.
 </HomePage.Description>
 
 <HomePage.Buttons>
+  <CopyPromptButton prompt={PROMPT}>
+    For Coding Agents
+    <Bot className="ml-2 size-4 stroke-1" />
+  </CopyPromptButton>
   <HomePage.Button href="/quickstart" variant="accent">
-    Get started
+    For Humans
+    <UserRound className="ml-2 size-4 stroke-1" />
   </HomePage.Button>
-  <HomePage.Button href="/x402/schemas">Explore the toolkit</HomePage.Button>
 </HomePage.Buttons>
 
-  <div className="vocs:grid vocs:w-full vocs:max-w-5xl vocs:grid-cols-1 vocs:gap-4 vocs:text-left vocs:md:grid-cols-2 vocs:lg:grid-cols-3">
-    <Card
-      title="Core x402 Toolkit"
-      description="Use Effect Schema definitions for payment requirements, payloads, resources, versions, and CAIP identifiers."
-      icon="box"
-      to="/x402/schemas"
-    />
-    <Card
-      title="HTTP 402"
-      description="Return and consume standards-compatible 402 responses with Effect HTTP middleware and headers."
-      icon="receipt"
-      to="/http/effect-http"
-    />
-    <Card
-      title="Effect Integrations"
-      description="Add payment requirements to Effect RPC, AI, sockets, and other Effect-native service boundaries."
-      icon="plug"
-      to="/effect/rpc"
-    />
-    <Card
-      title="Facilitation"
-      description="Verify payloads, query supported schemes, and settle x402 payments through facilitator APIs."
-      icon="badge-dollar-sign"
-      to="/facilitation"
-    />
-    <Card
-      title="Settlement Patterns"
-      description="Choose granular settlement, deposit flows, or traceable merchant-side payment accounting."
-      icon="store"
-      to="/merchants/granular-settlement"
-    />
-    <Card
-      title="Browser Wallet"
-      description="Use the included embedded wallet export when you need app-scoped allowances, widgets, and automatic paid fetch."
-      icon="wallet"
-      to="/browser-wallet"
-    />
-  </div>
+<div className="vocs:grid vocs:w-full vocs:max-w-7xl vocs:grid-cols-1 vocs:gap-4 vocs:text-left vocs:md:grid-cols-2 vocs:lg:grid-cols-3">
+  <Card title="Effect Schemas" description="Schemas for x402, CAIP identifiers and cross-chain asset deployments." />
+  <Card
+    title="Require Payment"
+    description="Declare what a resource costs, which assets and chains are accepted and who gets paid."
+  />
+  <Card title="Payload Creation" description="Create x402 payment payloads for supported chain architectures." />
+  <Card
+    title="Realtime streaming payments through Effect RPC."
+    description="Use x402 payment requirements and payloads to exchange value during Effect RPC sessions."
+  />
+  <Card
+    title="Experiment with micropayments"
+    description="x402 micropayments may enable entirely new application categories."
+  />
+  <Card
+    title="Stablecoin Interop"
+    description="Work with known stablecoins through one payment model across supported networks."
+  />
+</div>
+
 </HomePage.Root>

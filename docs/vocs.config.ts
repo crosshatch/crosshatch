@@ -14,10 +14,19 @@ export default defineConfig({
       text: "Documentation",
     },
     {
-      text: "Wallet",
-      link: "https://crosshatch.dev",
-      external: true,
+      text: `v${PackageJson.version}`,
+      items: [
+        {
+          text: "Changelog",
+          link: "/changelog",
+        },
+      ],
     },
+    // {
+    //   text: "Wallet",
+    //   link: "https://crosshatch.dev",
+    //   external: true,
+    // },
   ],
   iconUrl: "https://crosshatch.dev/favicon.ico",
   banner: {
@@ -30,73 +39,61 @@ export default defineConfig({
   sidebar: {
     "/": [
       {
-        text: "Start Here",
+        text: "Introduction",
         items: [
-          { text: "Overview", link: "/" },
-          { text: "Quickstart", link: "/quickstart" },
-          { text: "x402 Lifecycle", link: "/lifecycle" },
-          { text: "Why Crosshatch?", link: "/why" },
+          {
+            text: "Quickstart",
+            link: "/quickstart",
+            items: [
+              { text: "Prerequisites", link: "/quickstart/prerequisites" },
+              { text: "For Clients", link: "/quickstart/for-clients" },
+              { text: "For Merchants", link: "/quickstart/for-merchants" },
+            ],
+          },
+          { text: "Lifecycle", link: "/lifecycle" },
+          { text: "Background", link: "/background" },
         ],
       },
       {
-        text: "Core x402 Toolkit",
+        text: "Core Types",
         items: [
-          { text: "Schemas", link: "/x402/schemas" },
-          { text: "Requirements", link: "/x402/requirements" },
-          { text: "Payment Payloads", link: "/x402/payloads" },
-          { text: "Amounts & Assets", link: "/x402/assets" },
-          { text: "CAIP Identifiers", link: "/x402/caip" },
+          { text: "Asset", link: "/asset" },
+          { text: "Required", link: "/required" },
+          { text: "Payload", link: "/payload" },
         ],
       },
       {
-        text: "HTTP 402",
+        text: "Clients",
         items: [
-          { text: "Effect HTTP", link: "/http/effect-http" },
-          { text: "Middleware", link: "/http/middleware" },
-          { text: "Headers", link: "/http/headers" },
-          { text: "Custom Servers", link: "/http/custom" },
+          { text: "Payer Service", link: "/payer" },
+          { text: "Fetch", link: "/fetch" },
+          { text: "Effect HTTP Client", link: "/effect-http-client" },
+          { text: "Effect AI", link: "/effect-ai" },
+          { text: "Effect Atom", link: "/effect-atom" },
         ],
       },
       {
-        text: "Effect Integrations",
+        text: "Merchants",
         items: [
-          { text: "Effect RPC", link: "/effect/rpc" },
-          { text: "Effect AI", link: "/effect/ai" },
-          { text: "Effect Sockets", link: "/effect/sockets" },
-          { text: "Tracing", link: "/effect/tracing" },
+          { text: "Effect HTTP", link: "/effect-http" },
+          { text: "Effect RPC", link: "/effect-rpc" },
+          { text: "Effect Socket", link: "/effect-socket" },
         ],
       },
       {
-        text: "Facilitation",
+        text: "Settlement",
         items: [
-          { text: "Overview", link: "/facilitation" },
-          { text: "Verify", link: "/facilitation/verify" },
-          { text: "Settle", link: "/facilitation/settle" },
-          { text: "Supported Payments", link: "/facilitation/supported" },
-          { text: "Custom Facilitator", link: "/facilitation/custom" },
+          { text: "Facilitation", link: "/facilitation" },
+          { text: "Immediate Settlement", link: "/immediate-settlement" },
+          { text: "Deposit | Rebate", link: "/deposit-rebate" },
         ],
       },
       {
-        text: "Settlement Patterns",
+        text: "Observability",
         items: [
-          { text: "Granular Settlement", link: "/merchants/granular-settlement" },
-          { text: "Deposit + Rebate", link: "/merchants/deposit-rebate" },
-          { text: "OpenTelemetry", link: "/merchants/opentelemetry" },
+          { text: "OpenTelemetry", link: "/otel" },
+          { text: "Payment Identifiers", link: "/payment-identifiers" },
         ],
-      },
-      {
-        text: "Browser Wallet",
-        items: [
-          { text: "Overview", link: "/browser-wallet" },
-          { text: "Fetch Wrapper", link: "/browser-wallet/fetch" },
-          { text: "Allowances", link: "/allowances" },
-          { text: "Escalations", link: "/escalations" },
-          { text: "Widgets", link: "/browser-wallet/widgets" },
-        ],
-      },
-      {
-        text: "Development",
-        items: [{ text: "Local Development", link: "/development" }],
       },
     ],
     "/articles": [
