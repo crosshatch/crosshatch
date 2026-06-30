@@ -2,6 +2,26 @@
 
 body:has(.crosshatch-landing) {
   --vocs-spacing-content: 80rem;
+
+  background:
+    radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.16), transparent 34rem),
+    radial-gradient(circle at 18% 18%, rgb(80 180 255 / 0.22), transparent 30rem),
+    radial-gradient(circle at 82% 12%, rgb(120 90 255 / 0.24), transparent 34rem),
+    linear-gradient(180deg, #08111f 0%, #070b14 46%, #05070c 100%);
+  background-attachment: fixed;
+}
+
+body:has(.crosshatch-landing)::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    linear-gradient(rgb(255 255 255 / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.035) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: linear-gradient(to bottom, black, transparent 75%);
 }
 
 [data-v-logo-text]::before {

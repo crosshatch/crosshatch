@@ -1,0 +1,27 @@
+## Extensions
+
+The extension system lets merchants ask clients for additional data to submit alongside the means of payment.
+
+Extensions are useful when the merchant needs context that is specific to a payment requirement but does not belong in
+the chain-level transfer authorization itself. For example, a merchant might request an idempotency key, a client trace
+identifier, a fulfillment hint, an account reference, or another structured value that helps the merchant process the
+paid request safely.
+
+In this way, the merchant can call into the client through the requirement. The requirement does not only say "pay this
+amount"; it can also say "include this extra data when you pay." The client then returns the requested extension data in
+the payment payload, together with the signed payment authorization.
+
+## Example: Payment Identifiers
+
+Payment-specific identifiers are especially important because paid resources often need safe retry behavior.
+
+A merchant may include a payment-required-specific idempotency key so that repeated submissions of the same payload can
+be recognized as the same purchase attempt. This is useful when the client retries after a network interruption, when
+the merchant needs to correlate verification with fulfillment, or when settlement completes before the original
+transport response reaches the client.
+
+The merchant may also request that the client provide its own identifier. Client-provided identifiers are useful for
+observability because the client can correlate payment creation, payload submission, facilitator verification, and
+resource delivery across its own systems. They are also useful for retrieving previously paid resources: the client can
+return with the same identifier and the merchant can look up the earlier paid exchange instead of requiring a new
+payment.

@@ -1,5 +1,6 @@
 "use client"
 
+import { Check } from "lucide-react"
 import * as React from "react"
 
 export const CopyPromptButton = (props: {
@@ -13,7 +14,7 @@ export const CopyPromptButton = (props: {
   const onClick = async () => {
     await navigator.clipboard.writeText(prompt)
     setCopied(true)
-    window.setTimeout(() => setCopied(false), 2000)
+    window.setTimeout(() => setCopied(false), 5000)
   }
 
   return (
@@ -22,7 +23,14 @@ export const CopyPromptButton = (props: {
       type="button"
       {...{ onClick }}
     >
-      {copied ? "Copied Prompt" : children}
+      {copied ? (
+        <>
+          Copied Prompt
+          <Check className="ml-2 size-4 stroke-1" />
+        </>
+      ) : (
+        children
+      )}
     </button>
   )
 }

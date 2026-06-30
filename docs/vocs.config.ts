@@ -60,6 +60,7 @@ export default defineConfig({
           { text: "Asset", link: "/asset" },
           { text: "Required", link: "/required" },
           { text: "Payload", link: "/payload" },
+          { text: "Extension", link: "/extension" },
         ],
       },
       {

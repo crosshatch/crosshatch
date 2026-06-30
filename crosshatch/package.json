@@ -13,6 +13,9 @@
     "url": "https://github.com/crosshatch/crosshatch.git",
     "directory": "packages/crosshatch"
   },
+  "bin": {
+    "crosshatch": "./dist/main.js"
+  },
   "type": "module",
   "sideEffects": false,
   "exports": {

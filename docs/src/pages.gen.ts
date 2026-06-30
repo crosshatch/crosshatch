@@ -9,6 +9,7 @@ type Page =
   | { path: '/articles'; render: 'static' }
   | { path: '/asset'; render: 'static' }
   | { path: '/background'; render: 'static' }
+  | { path: '/changelog'; render: 'static' }
   | { path: '/deposit-rebate'; render: 'static' }
   | { path: '/effect-ai'; render: 'static' }
   | { path: '/effect-atom'; render: 'static' }
@@ -16,6 +17,7 @@ type Page =
   | { path: '/effect-http'; render: 'static' }
   | { path: '/effect-rpc'; render: 'static' }
   | { path: '/effect-socket'; render: 'static' }
+  | { path: '/extensions'; render: 'static' }
   | { path: '/facilitation'; render: 'static' }
   | { path: '/fetch'; render: 'static' }
   | { path: '/immediate-settlement'; render: 'static' }
