@@ -1,6 +1,7 @@
 {
   "include": [],
   "references": [
+    { "path": "./@crosshatch/alchemy" },
     { "path": "./@crosshatch/widget" },
     { "path": "./crosshatch" },
     { "path": "./docs" },

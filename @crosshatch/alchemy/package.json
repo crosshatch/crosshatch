@@ -1,8 +1,8 @@
 {
-  "name": "@crosshatch/widget",
-  "version": "0.0.2",
+  "name": "@crosshatch/alchemy",
+  "version": "0.0.0",
   "private": false,
-  "description": "Widgeting, fidgeting, gadgeting.",
+  "description": "Crosshatch Alchemy utilities.",
   "homepage": "https://crosshatch.dev",
   "bugs": {
     "url": "https://github.com/crosshatch/crosshatch/issues"
@@ -11,7 +11,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/crosshatch/crosshatch.git",
-    "directory": "@crosshatch/widget"
+    "directory": "@crosshatch/alchemy"
   },
   "type": "module",
   "sideEffects": false,
@@ -20,11 +20,13 @@
   },
   "publishConfig": {
     "exports": {
-      "./*": "./dist/*.js"
+      ".": "./dist/index.js"
     }
   },
-  "peerDependencies": {
-    "@effect/platform-browser": "catalog:",
+  "dependencies": {
+    "@distilled.cloud/cloudflare": "0.27.0",
+    "alchemy": "catalog:",
+    "crosshatch": "workspace:*",
     "effect": "catalog:"
   }
 }

@@ -45,13 +45,12 @@ export default defineConfig({
             text: "Quickstart",
             link: "/quickstart",
             items: [
-              { text: "Prerequisites", link: "/quickstart/prerequisites" },
               { text: "For Clients", link: "/quickstart/for-clients" },
               { text: "For Merchants", link: "/quickstart/for-merchants" },
             ],
           },
-          { text: "Lifecycle", link: "/lifecycle" },
           { text: "Background", link: "/background" },
+          { text: "Lifecycle", link: "/lifecycle" },
         ],
       },
       {

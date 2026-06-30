@@ -10,19 +10,84 @@ Use this guide when your application needs to access paid x402 resources.
 Crosshatch helps clients read payment requirements, create payment payloads, and retry requests with the payment
 attached.
 
+## Stablecoin Setup
+
+> This step is only relevant if you do not already have a seed phrase and/or stablecoin deposited in one of the derived
+> chain-specific signers.
+
+The following command will create a Crosshatch user profile (signing capability) and help you (optional) onramp some USD
+Coin on Base (the primary network of the initial x402 build-out).
+
+```sh
+crosshatch profile add
+```
+
+> Your mnemonics are encrypted with a per-mnemonic X25519 private key, stored in your system keychain via
+> [keyring-node](https://github.com/Brooooooklyn/keyring-node).
+
+If you already have a mnemonic with some corresponding funds, you can set it up like so.
+
+```sh
+crosshatch profile add --mnemonic <mnemonic>
+```
+
+## For Future Reference
+
+You can access the decrypted phrase using the `mnemonic show` subcommand.
+
+```sh
+crosshatch profile reveal-mnemonic
+```
+
 ## Fetch a Paid Resource
 
-Crosshatch can wrap `globalThis.fetch` so 402 responses from x402 merchants are handled automatically.
+Provide the Crosshatch `Payer.layerEnv`, the underlying `HttpClient` of which intercepts and pays 402s with your
+Crosshatch profile.
 
 ```ts
-import "crosshatch/fetch"
+import { HttpClient, Payer } from "crosshatch"
+import { Effect, Layer } from "effect"
 
-const response = await fetch("https://merchant.example/resource")
+const program = Effect.gen(function* () {
+  const client = yield* HttpClient.HttpClient
+  const { json } = yield* HttpClientRequest.post("https://blockrun.ai/api/v1/chat/completions"").pipe(
+    HttpClientRequest.acceptJson,
+    HttpClientRequest.bodyJsonUnsafe({
+      model: "openai/gpt-5.5",
+      messages: [{ role: "user", content: "Hello Crosshatch." }],
+    }),
+    client.execute,
+  )
+  return yield* json
+}).pipe(HttpClient.pipe(Layer.provide(Payer.layerEnv)))
+```
+
+## Higher-level Clients
+
+The example above can be simplified via Effect AI.
+
+```ts
+import { HttpClient, Payer, LanguageModel402 } from "crosshatch"
+import { Effect, Layer } from "effect"
+import { LanguageModel } from "effect/unstable/ai"
+
+const program = Effect.gen(function* () {
+  const model = yield* LanguageModel.LanguageModel
+  return yield* model.generateText({
+    prompt: "Hello Crosshatch.",
+  })
+}).pipe(
+  LanguageModel402.layer({
+    model: "openai/gpt-5.5",
+    url: "https://blockrun.ai/api/v1/chat/completions",
+  }).pipe(Layer.provide(Payer.layerEnv)),
+)
 ```
 
 ## Create a Payment Payload
 
-When you need more control, create a payment payload directly from payment requirements.
+When you need more control, drop down to the raw x402 spec and create a payment payload directly from payment
+requirements.
 
 ```ts
 import { Effect } from "effect"

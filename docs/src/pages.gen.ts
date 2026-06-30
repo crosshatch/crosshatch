@@ -17,7 +17,7 @@ type Page =
   | { path: '/effect-http'; render: 'static' }
   | { path: '/effect-rpc'; render: 'static' }
   | { path: '/effect-socket'; render: 'static' }
-  | { path: '/extensions'; render: 'static' }
+  | { path: '/extension'; render: 'static' }
   | { path: '/facilitation'; render: 'static' }
   | { path: '/fetch'; render: 'static' }
   | { path: '/immediate-settlement'; render: 'static' }
@@ -36,7 +36,6 @@ type Page =
   | { path: '/quickstart/for-clients'; render: 'static' }
   | { path: '/quickstart/for-merchants'; render: 'static' }
   | { path: '/quickstart'; render: 'static' }
-  | { path: '/quickstart/prerequisites'; render: 'static' }
   | { path: '/required'; render: 'static' }
   | { path: '/terms'; render: 'static' }
 

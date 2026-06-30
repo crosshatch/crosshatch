@@ -22,6 +22,7 @@
     ".": "./index.ts",
     "./*": "./*.ts",
     "./Browser": "./Browser/Browser.ts",
+    "./Crypto": "./Crypto/Crypto.ts",
     "./Evm": "./Evm/Evm.ts",
     "./Facade": "./Facade/Facade.ts",
     "./Http402": "./Http402/Http402.ts",
@@ -35,6 +36,7 @@
       ".": "./dist/index.js",
       "./*": "./dist/*/index.js",
       "./Browser": "./dist/Browser/Browser.js",
+      "./Crypto": "./dist/Crypto/Crypto.js",
       "./Evm": "./dist/Evm/Evm.js",
       "./Facade": "./dist/Facade/Facade.js",
       "./Http402": "./dist/Http402/Http402.js",
@@ -47,6 +49,7 @@
   "peerDependencies": {
     "@crosshatch/widget": "workspace:*",
     "@effect/platform-browser": "catalog:",
+    "@napi-rs/keyring": "catalog:",
     "@standard-schema/spec": "catalog:",
     "effect": "catalog:",
     "liminal": "workspace:*",

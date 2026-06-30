@@ -3,16 +3,19 @@
 import { NodeServices } from "@effect/platform-node"
 import { Cause, Effect } from "effect"
 import { Command } from "effect/unstable/cli"
+import { FetchHttpClient } from "effect/unstable/http"
 
-import { mnemonic } from "./commands/mnemonic.ts"
+import { profile } from "./commands/profile.ts"
+import { CrosshatchClient } from "./Crosshatch.ts"
 import PackageJson from "./package.json" with { type: "json" }
 
 Command.make("crosshatch").pipe(
-  Command.withSubcommands([mnemonic]),
+  Command.withSubcommands([profile]),
   Command.run({
     version: PackageJson.version,
   }),
-  Effect.provide(NodeServices.layer),
+  Effect.provide([NodeServices.layer, CrosshatchClient.layer]),
+  Effect.provide(FetchHttpClient.layer),
   Effect.onError((cause) => Effect.logError(Cause.pretty(cause))),
   Effect.runFork,
 )

@@ -2,8 +2,17 @@ import * as Os from "node:os"
 
 import { Schema as S, FileSystem, Path, Effect } from "effect"
 
+import { Address } from "../Address.ts"
+import { Envelope } from "../Crypto/Crypto.ts"
+
 export const UserConfig = S.Struct({
-  mnemonics: S.Record(S.String, S.Redacted(S.String).pipe(S.mutableKey)),
+  profiles: S.Record(
+    S.String,
+    S.Struct({
+      address: Address,
+      mnemonic: Envelope.Asymmetric,
+    }).pipe(S.mutableKey),
+  ),
 })
 
 export const configDir = Effect.gen(function* () {

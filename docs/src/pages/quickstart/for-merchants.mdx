@@ -10,9 +10,15 @@ Use this guide when your service needs to charge clients for access to a resourc
 Crosshatch helps merchants declare payment requirements, return 402 responses, read payment payloads, and settle paid
 requests.
 
+## Merchant Treasury
+
+Consider using [Splits Teams](https://teams.splits.org/) to manage the treasury or shared pot of funds that receives
+revenue.
+
 ## Protect a Route
 
-Declare what the resource costs and return a 402 response when the request does not include a payment payload.
+Declare what the resource costs and return a 402 response when the request does not include a payment payload. This
+example uses HTTP, but Crosshatch is not limited to HTTP; route protection is just one integration path.
 
 ```ts
 import { Required, Requirements } from "crosshatch"
