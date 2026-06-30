@@ -51,6 +51,7 @@ catalog:
   "@x402/evm": ^2.0.0
   "@x402/svm": ^2.0.0
   alchemy: 2.0.0-beta.59
+  asciify-engine: ^1.0.118
   babel-plugin-react-compiler: ^1.0.0
   class-variance-authority: ^0.7.1
   clsx: ^2.1.1

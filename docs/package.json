@@ -9,6 +9,7 @@
     "@effect/atom-react": "catalog:",
     "@types/react": "catalog:",
     "alchemy": "catalog:",
+    "asciify-engine": "catalog:",
     "crosshatch": "workspace:*",
     "effect": "catalog:",
     "effect-workerd": "workspace:*",
