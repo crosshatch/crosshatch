@@ -1,20 +1,20 @@
 # Background
 
-The web has always had a place reserved for payment: HTTP `402 Payment Required`. For most of its history, that status code
-was more aspiration than infrastructure. Internet payments instead grew around accounts, cards, subscriptions, prepaid
-credits, invoices, and platform-specific wallets.
+The web has always had a place reserved for payment: HTTP `402 Payment Required`. For most of its history, that status
+code was more aspiration than infrastructure. Internet payments instead grew around accounts, cards, subscriptions,
+prepaid credits, invoices, and platform-specific wallets.
 
 Micropayments have been proposed for decades, but rarely became mainstream. Fees were too high, settlement was too slow,
 setup was too heavy, and the payment flow was not native to the request-response shape of the web.
 
-[x402](https://www.x402.org/) revisits that old idea with new conditions. Its canonical HTTP path uses `402` to communicate
-payment requirements, then lets the client attach a signed payment payload before access, work, or settlement proceeds.
-The same requirements-and-payload model can apply beyond a single client-to-merchant HTTP exchange.
+[x402](https://www.x402.org/) revisits that old idea with new conditions. Its canonical HTTP path uses `402` to
+communicate payment requirements, then lets the client attach a signed payment payload before access, work, or
+settlement proceeds. The same requirements-and-payload model can apply beyond a single client-to-merchant HTTP exchange.
 
-This is plausible now because of stablecoin rails: low-cost networks, fast settlement, programmable wallets, and widely used
-assets such as USDC. Coinbase frames x402 as instant stablecoin payments over HTTP; Cloudflare's pay-per-crawl work points
-at a similar future for charging automated consumers.
+This is plausible now because of stablecoin rails: low-cost networks, fast settlement, programmable wallets, and widely
+used assets such as USDC. Coinbase frames x402 as instant stablecoin payments over HTTP; Cloudflare's pay-per-crawl work
+points at a similar future for charging automated consumers.
 
 x402 does not imply every service should be rebuilt around micropayments. It makes the question testable: where are
-usage-based pricing, agentic purchasing, paid data access, or service-to-service settlement actually better than existing
-models?
+usage-based pricing, agentic purchasing, paid data access, or service-to-service settlement actually better than
+existing models?

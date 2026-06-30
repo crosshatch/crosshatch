@@ -50,7 +50,7 @@ import { Effect, Layer } from "effect"
 
 const program = Effect.gen(function* () {
   const client = yield* HttpClient.HttpClient
-  const { json } = yield* HttpClientRequest.post("https://blockrun.ai/api/v1/chat/completions"").pipe(
+  const { json } = yield* HttpClientRequest.post("https://blockrun.ai/api/v1/chat/completions").pipe(
     HttpClientRequest.acceptJson,
     HttpClientRequest.bodyJsonUnsafe({
       model: "openai/gpt-5.5",
