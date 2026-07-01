@@ -24,11 +24,10 @@ export const profileRevealMnemonic = Command.make("reveal-mnemonic", {
         return yield* new ProfileNotFoundError({ profile })
       }
       const secretEntry = new Entry("crosshatch", profile)
-      const secret = yield* UndefinedOr.match(secretEntry.getSecret() ?? undefined, {
+      const privateKey = yield* UndefinedOr.match(secretEntry.getSecret() ?? undefined, {
         onUndefined: () => new ProfileSecretNotFoundError({ profile }),
-        onDefined: (value) => Effect.succeed(new Uint8Array(value)),
+        onDefined: (value) => X25519PrivateKey.fromPkcs8(new Uint8Array(value)),
       })
-      const privateKey = yield* X25519PrivateKey.fromPkcs8(secret)
       const mnemonicEncoded = yield* X25519PrivateKey.decrypt(privateKey, envelope)
       yield* Console.log(new TextDecoder().decode(mnemonicEncoded))
     }),

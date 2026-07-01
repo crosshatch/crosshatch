@@ -1,7 +1,7 @@
 {
   "name": "@crosshatch/alchemy",
   "version": "0.0.0",
-  "private": false,
+  "private": true,
   "description": "Crosshatch Alchemy utilities.",
   "homepage": "https://crosshatch.dev",
   "bugs": {
@@ -16,7 +16,7 @@
   "type": "module",
   "sideEffects": false,
   "exports": {
-    "./*": "./*.ts"
+    ".": "./index.ts"
   },
   "publishConfig": {
     "exports": {
@@ -24,7 +24,6 @@
     }
   },
   "dependencies": {
-    "@distilled.cloud/cloudflare": "0.27.0",
     "alchemy": "catalog:",
     "crosshatch": "workspace:*",
     "effect": "catalog:"

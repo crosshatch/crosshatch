@@ -2,12 +2,12 @@ import { Entry } from "@napi-rs/keyring"
 import { Effect, Console, Redacted, Data, Option, UndefinedOr, flow } from "effect"
 import { Command, Argument, Prompt } from "effect/unstable/cli"
 
-import { CrosshatchClient } from "../Crosshatch.ts"
 import * as X25519Pair from "../Crypto/X25519Pair.ts"
 import * as X25519PrivateKey from "../Crypto/X25519PrivateKey.ts"
 import * as X25519PublicKey from "../Crypto/X25519PublicKey.ts"
 import { EvmAddress } from "../Evm/Evm.ts"
 import { CaAccountId } from "../internal/CaAccountId.ts"
+import { CrosshatchClient } from "../internal/CrosshatchClient.ts"
 import * as Mnemonic from "../Mnemonic.ts"
 import * as UserConfig from "./UserConfig.ts"
 
@@ -34,14 +34,13 @@ export const profileAdd = Command.make("add", {
         config = { profiles: {} }
       }
       const secretEntry = new Entry("crosshatch", profile)
-      const { publicKey } = yield* UndefinedOr.match(config.profiles[profile], {
+      const publicKey = yield* UndefinedOr.match(config.profiles[profile], {
         onUndefined: Effect.fnUntraced(function* () {
-          const pair = yield* X25519Pair.random({
+          const { privateKey, publicKey } = yield* X25519Pair.random({
             extractable: true,
           })
-          const privateKey = yield* X25519PrivateKey.toPkcs8(pair.privateKey)
-          secretEntry.setSecret(privateKey)
-          return pair
+          yield* X25519PrivateKey.toPkcs8(privateKey).pipe(Effect.map((v) => secretEntry.setSecret(v)))
+          return publicKey
         }),
         onDefined: () => new ProfileAlreadyExistsError({ profile }),
       })
@@ -56,13 +55,13 @@ export const profileAdd = Command.make("add", {
       yield* UserConfig.write(config)
       yield* Console.log(Redacted.value(mnemonic))
       const shouldOnramp = yield* Prompt.confirm({
-        message: "Would you like to go through a Coinbase onramp?",
+        message: "Would you like to onramp some USDC into your new account?",
       })
       if (shouldOnramp) {
         const amount = yield* Prompt.float({
-          message: "How much would you like to buy?",
+          message: "How much would you like to onramp?",
           default: 10,
-          min: 0,
+          min: 1,
         })
         const chx = yield* CrosshatchClient
         const { onrampUrl } = yield* chx.onramp.session({
