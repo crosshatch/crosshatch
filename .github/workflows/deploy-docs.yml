@@ -19,6 +19,7 @@ concurrency:
 
 jobs:
   alchemize:
+    if: false # TODO: reenable
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
