@@ -34,7 +34,7 @@ export default Worker.make({
         | What is this charge for?
         | How does it fit into the current flow?
         `
-        return yield* Http402Payload.require(required)
+        return yield* Http402Payload.require({ required })
       }
       yield* settle({ payload })
       return HttpServerResponse.text("The paid resource.")

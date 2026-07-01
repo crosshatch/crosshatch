@@ -1,0 +1,16 @@
+{
+  "name": "@crosshatch-examples/effect-rpc",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "alchemy dev"
+  },
+  "dependencies": {
+    "@cloudflare/workers-types": "catalog:",
+    "alchemy": "catalog:",
+    "crosshatch": "workspace:*",
+    "effect": "catalog:",
+    "effect-workerd": "workspace:*",
+    "vitest": "catalog:"
+  }
+}

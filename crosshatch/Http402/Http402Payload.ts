@@ -10,7 +10,7 @@ export class Http402Payload extends Context.Service<Http402Payload, typeof Paylo
   "crosshatch/http/Http402/Payload",
 ) {}
 
-export const require = Effect.fnUntraced(function* (required: typeof Required.Type) {
+export const require = Effect.fnUntraced(function* ({ required }: { readonly required: typeof Required.Type }) {
   const traceId = yield* TraceId
   const paymentRequired = yield* S.encodeEffect(RequiredFromBase64JsonString)(required)
   return HttpServerResponse.empty({

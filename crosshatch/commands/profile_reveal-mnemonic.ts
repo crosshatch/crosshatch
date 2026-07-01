@@ -2,7 +2,7 @@ import { Entry } from "@napi-rs/keyring"
 import { Console, Data, Effect, UndefinedOr } from "effect"
 import { Command, Argument } from "effect/unstable/cli"
 
-import { X25519PrivateKey } from "../Crypto/Crypto.ts"
+import * as X25519PrivateKey from "../Crypto/X25519PrivateKey.ts"
 import * as UserConfig from "./UserConfig.ts"
 
 export class ProfileNotFoundError extends Data.TaggedError("ProfileNotFoundError")<{

@@ -3,7 +3,9 @@ import { Effect, Console, Redacted, Data, Option, UndefinedOr, flow } from "effe
 import { Command, Argument, Prompt } from "effect/unstable/cli"
 
 import { CrosshatchClient } from "../Crosshatch.ts"
-import { X25519Pair, X25519PrivateKey, X25519PublicKey } from "../Crypto/Crypto.ts"
+import * as X25519Pair from "../Crypto/X25519Pair.ts"
+import * as X25519PrivateKey from "../Crypto/X25519PrivateKey.ts"
+import * as X25519PublicKey from "../Crypto/X25519PublicKey.ts"
 import { EvmAddress } from "../Evm/Evm.ts"
 import { CaAccountId } from "../internal/CaAccountId.ts"
 import * as Mnemonic from "../Mnemonic.ts"

@@ -3,14 +3,14 @@ import * as Os from "node:os"
 import { Schema as S, FileSystem, Path, Effect } from "effect"
 
 import { Address } from "../Address.ts"
-import { Envelope } from "../Crypto/Crypto.ts"
+import { Asymmetric } from "../Crypto/Envelope.ts"
 
 export const UserConfig = S.Struct({
   profiles: S.Record(
     S.String,
     S.Struct({
       address: Address,
-      mnemonic: Envelope.Asymmetric,
+      mnemonic: Asymmetric,
     }).pipe(S.mutableKey),
   ),
 })
