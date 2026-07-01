@@ -2,9 +2,9 @@ import { BigDecimal, Effect, Option, Schema as S, Data } from "effect"
 
 import type { Deployment } from "./PhysicalAsset.ts"
 
-export const Atomic = S.String.check(S.isPattern(/^(0|[1-9]\d*)$/)).pipe(S.brand("Atomic"))
+export const Atomic = S.String.check(S.isPattern(/^(0|[1-9]\d*)$/)).pipe(S.brand("crosshatch/Atomic"))
 
-export const Usd = S.BigInt.check(S.isGreaterThanOrEqualToBigInt(0n)).pipe(S.brand("Usd"))
+export const Usd = S.BigInt.check(S.isGreaterThanOrEqualToBigInt(0n)).pipe(S.brand("crosshatch/Usd"))
 
 const MICROS_PER_USD = 1_000_000n
 const MICROS_PER_USD_DECIMAL = BigDecimal.make(MICROS_PER_USD, 0)

@@ -3,7 +3,7 @@ import { Mnemonic as OxMnemonic } from "ox"
 
 export const Mnemonic = S.String.check(
   S.isPattern(/^(?:(?:[a-z]+ ){11}|(?:[a-z]+ ){14}|(?:[a-z]+ ){17}|(?:[a-z]+ ){20}|(?:[a-z]+ ){23})[a-z]+$/),
-).pipe(S.brand("Mnemonic"))
+).pipe(S.brand("crosshatch/Mnemonic"))
 
 export const MnemonicRedacted = S.Redacted(Mnemonic)
 

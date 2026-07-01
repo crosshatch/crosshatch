@@ -4,12 +4,13 @@ import * as Extension from "./Extension.ts"
 import type { Payload } from "./Payload.ts"
 
 export const PaymentId = S.String.check(S.isLengthBetween(16, 128), S.isPattern(/^[a-zA-Z0-9_-]+$/)).pipe(
-  S.brand("PaymentId"),
+  S.brand("crosshatch/PaymentId"),
 )
 
 export const PaymentIdExtension = Extension.make("payment-identifier", {
   payload: S.Struct({
     required: S.Boolean,
+    id: PaymentId.pipe(S.optional),
   }),
   success: S.Union([
     S.Struct({

@@ -1,3 +1,4 @@
+export * as Cek from "./Cek.ts"
 export * as CryptoKey from "./CryptoKey.ts"
 export * as Ed25519Pair from "./Ed25519Pair.ts"
 export * as Ed25519PrivateKey from "./Ed25519PrivateKey.ts"

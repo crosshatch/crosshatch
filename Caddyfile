@@ -5,6 +5,16 @@ docs.crosshatch.dev.localhost {
 	reverse_proxy 127.0.0.1:4382
 }
 
+example-effect-http.crosshatch.dev.localhost {
+	tls internal
+	reverse_proxy 127.0.0.1:4385
+}
+
+example-effect-rpc.crosshatch.dev.localhost {
+	tls internal
+	reverse_proxy 127.0.0.1:4386
+}
+
 facilitator.crosshatch.dev.localhost {
 	tls internal
 	reverse_proxy 127.0.0.1:1337

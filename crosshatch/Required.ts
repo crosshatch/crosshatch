@@ -95,7 +95,7 @@ export const accept =
     })
 
 export const extend =
-  <K extends string, Payload extends S.Top, Success extends S.Top & { readonly Type: Success["Type"] }>(
+  <K extends string, Payload extends S.Top, Success extends S.Top & { readonly Type: Payload["Type"] }>(
     extension: Extension<K, Payload, Success>,
     payload: Payload["Type"],
   ) =>

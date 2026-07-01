@@ -18,9 +18,9 @@ describe(import.meta.url, () => {
     "public key serialization roundtrip",
     Effect.fn(function* () {
       const { publicKey } = yield* Ed25519Pair.random()
-      const raw = yield* CryptoKey.toBytes(publicKey.inner)
+      const raw = yield* CryptoKey.toBytes(publicKey)
       const hydrated = yield* Ed25519PublicKey.fromBytes(raw)
-      const raw2 = yield* CryptoKey.toBytes(hydrated.inner)
+      const raw2 = yield* CryptoKey.toBytes(hydrated)
       expect(raw).toEqual(raw2)
     }),
   )

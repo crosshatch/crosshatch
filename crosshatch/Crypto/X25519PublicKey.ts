@@ -2,14 +2,9 @@ import { Effect, Schema as S } from "effect"
 
 import * as CryptoKey from "./CryptoKey.ts"
 
-const TypeId = "crosshatch/Crypto/X25519PublicKey" as const
+export const X25519PublicKey = CryptoKey.CryptoKey.pipe(S.brand("crosshatch/X25519PublicKey"))
 
-export const X25519PublicKey = S.Struct({
-  [TypeId]: S.tag(TypeId),
-  inner: CryptoKey.CryptoKey,
-})
-
-export const encrypt = Effect.fn(function* ({ inner }: typeof X25519PublicKey.Type, value: Uint8Array) {
+export const encrypt = Effect.fnUntraced(function* (publicKey: typeof X25519PublicKey.Type, value: Uint8Array) {
   const eph = yield* Effect.promise(() =>
     crypto.subtle.generateKey({ name: "X25519" }, false, ["deriveKey", "deriveBits"]),
   )
@@ -17,7 +12,7 @@ export const encrypt = Effect.fn(function* ({ inner }: typeof X25519PublicKey.Ty
     crypto.subtle.deriveKey(
       {
         name: "X25519",
-        public: inner,
+        public: publicKey,
       },
       eph.privateKey,
       {
@@ -40,5 +35,5 @@ export const encrypt = Effect.fn(function* ({ inner }: typeof X25519PublicKey.Ty
 
 export const fromBytes = (raw: Uint8Array) =>
   Effect.promise(() => crypto.subtle.importKey("raw", raw.slice(), { name: "X25519" }, false, [])).pipe(
-    Effect.map((inner) => X25519PublicKey.make({ inner })),
+    Effect.map(X25519PublicKey.make),
   )

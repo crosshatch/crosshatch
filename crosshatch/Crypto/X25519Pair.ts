@@ -3,7 +3,7 @@ import { Effect, Schema as S } from "effect"
 import { X25519PrivateKey } from "./X25519PrivateKey.ts"
 import { X25519PublicKey } from "./X25519PublicKey.ts"
 
-const TypeId = "crosshatch/Crypto/X25519Pair" as const
+const TypeId = "crosshatch/X25519Pair" as const
 
 export const X25519Pair = S.Struct({
   [TypeId]: S.tag(TypeId),
@@ -17,8 +17,8 @@ export const random = (config?: { readonly extractable?: boolean | undefined }) 
   ).pipe(
     Effect.map(({ privateKey, publicKey }) =>
       X25519Pair.make({
-        privateKey: X25519PrivateKey.make({ inner: privateKey }),
-        publicKey: X25519PublicKey.make({ inner: publicKey }),
+        privateKey: X25519PrivateKey.make(privateKey),
+        publicKey: X25519PublicKey.make(publicKey),
       }),
     ),
   )
