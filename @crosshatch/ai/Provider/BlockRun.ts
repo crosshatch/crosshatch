@@ -22,9 +22,8 @@ export interface Options {
 }
 
 /**
- * Payment is not bundled: provide a paying fetch from the outside, e.g.
- * `model().pipe(Layer.provide(Headless.layerConfig(mnemonicConfig, KnownAsset)))`.
- * Without one, requests go out unpaid and fail at runtime with a 402.
+ * Nothing in the types requires a paying `Fetch` (e.g. `Headless.layerConfig`);
+ * without one in context, requests go out unpaid and 402 at runtime.
  */
 export const model = (options?: Options) => {
   const modelName = options?.model ?? DEFAULT_MODEL
@@ -35,14 +34,15 @@ export const model = (options?: Options) => {
       model: modelName,
       config: {
         // `max_output_tokens` is compat's name; it reaches the wire as
-        // `max_tokens`. Keys compat doesn't know pass through verbatim.
+        // `max_tokens`. Keys compat doesn't know pass through verbatim, and
+        // unset options are dropped by JSON serialization.
         max_output_tokens: options?.maxTokens ?? DEFAULT_MAX_TOKENS,
-        ...(options?.temperature !== undefined && { temperature: options.temperature }),
-        ...(options?.topP !== undefined && { top_p: options.topP }),
-        ...(options?.stop !== undefined && { stop: options.stop }),
-        ...(options?.reasoningEffort !== undefined && { reasoning_effort: options.reasoningEffort }),
-        ...(options?.thinking !== undefined && { thinking: options.thinking }),
-        ...(options?.promptCache !== undefined && { prompt_cache: options.promptCache }),
+        temperature: options?.temperature,
+        top_p: options?.topP,
+        stop: options?.stop,
+        reasoning_effort: options?.reasoningEffort,
+        thinking: options?.thinking,
+        prompt_cache: options?.promptCache,
       },
     }).pipe(Layer.provide(OpenAiClient.layer({ apiUrl: BLOCKRUN_API_URL })), Layer.provide(FetchHttpClient.layer)),
   )

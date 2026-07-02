@@ -17,9 +17,8 @@ export interface Options {
 }
 
 /**
- * Payment is not bundled: provide a paying fetch from the outside, e.g.
- * `model().pipe(Layer.provide(Headless.layerConfig(mnemonicConfig, KnownAsset)))`.
- * Without one, requests go out unpaid and fail at runtime with a 402.
+ * Nothing in the types requires a paying `Fetch` (e.g. `Headless.layerConfig`);
+ * without one in context, requests go out unpaid and 402 at runtime.
  */
 export const model = (options?: Options) => {
   const modelName = options?.model ?? DEFAULT_MODEL
@@ -29,11 +28,12 @@ export const model = (options?: Options) => {
     OpenAiLanguageModel.layer({
       model: modelName,
       config: {
-        // `max_output_tokens` is compat's name; it reaches the wire as `max_tokens`
+        // `max_output_tokens` is compat's name; it reaches the wire as
+        // `max_tokens`. Unset options are dropped by JSON serialization.
         max_output_tokens: options?.maxTokens ?? DEFAULT_MAX_TOKENS,
-        ...(options?.temperature !== undefined && { temperature: options.temperature }),
-        ...(options?.topP !== undefined && { top_p: options.topP }),
-        ...(options?.stop !== undefined && { stop: options.stop }),
+        temperature: options?.temperature,
+        top_p: options?.topP,
+        stop: options?.stop,
       },
     }).pipe(Layer.provide(OpenAiClient.layer({ apiUrl: TELNYX_API_URL })), Layer.provide(FetchHttpClient.layer)),
   )

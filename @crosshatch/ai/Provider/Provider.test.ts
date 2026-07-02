@@ -57,6 +57,17 @@ describe(import.meta.url, () => {
     assert.deepStrictEqual(body.thinking, { type: "enabled", budget_tokens: 1024 })
   })
 
+  it("omits unset options from the wire", async () => {
+    const { requests, layer: fetchLayer } = capturingFetch()
+    const layer = BlockRun.model().pipe(Layer.provide(fetchLayer))
+    await LanguageModel.generateText({ prompt: "hi" }).pipe(Effect.provide(layer), Effect.runPromise)
+
+    const body = requests[0]
+    assert.notProperty(body, "temperature")
+    assert.notProperty(body, "stop")
+    assert.notProperty(body, "reasoning_effort")
+  })
+
   it("maps Telnyx options onto the wire format", async () => {
     const { requests, layer: fetchLayer } = capturingFetch()
     const layer = Telnyx.model({
