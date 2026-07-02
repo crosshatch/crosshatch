@@ -1,41 +1,43 @@
 import * as Host from "@crosshatch/widget/Host"
 import { BrowserWorker, BrowserStream } from "@effect/platform-browser"
-import { Effect, Fiber, Layer, Stream, Schema as S, Schedule } from "effect"
-import type { Cause } from "effect"
-import type { Worker } from "effect/unstable/workers"
+import { Effect, Fiber, Layer, Stream, Schema as S, Schedule, Data } from "effect"
 import * as Boundary from "liminal-util/Boundary"
 
 import { Stage } from "../../Stage.ts"
 import { FacadeIntroduction, RequestFacadeIntroduction } from "./handshake.ts"
 
-export const layer: Layer.Layer<Worker.WorkerPlatform | Worker.Spawner, Cause.NoSuchElementError> = Effect.gen(
-  function* () {
-    yield* Host.hostListener.pipe(Effect.forkScoped)
-    const { url } = yield* Stage
-    const fiber = yield* BrowserStream.fromEventListenerWindow("message").pipe(
-      Stream.filter(({ data, origin }) => origin.startsWith(url()) && S.is(RequestFacadeIntroduction)(data)),
-      Stream.take(1),
-      Stream.runDrain,
-      Effect.forkScoped,
-    )
-    const iframe = document.createElement("iframe")
-    Object.assign(iframe, {
-      id: "crosshatch-enclave",
-      height: 1,
-      sandbox: "allow-scripts allow-same-origin",
-      src: url("enclave"),
-      width: 1,
-    })
-    Object.assign(iframe.style, { cssText })
-    document.body.appendChild(iframe)
-    yield* Fiber.join(fiber)
-    const context = yield* Effect.fromNullishOr(iframe.contentWindow)
-    const { port1, port2 } = new MessageChannel()
-    context.postMessage(FacadeIntroduction.make({}), url(), [port2])
-    yield* Effect.addFinalizer(() => Effect.sync(() => iframe.remove()))
-    return BrowserWorker.layer(() => port1)
-  },
-).pipe(
+export class FacadeWorkerError extends Data.TaggedError("FacadeWorkerError")<{
+  readonly cause: unknown
+}> {}
+
+export const layer = Effect.gen(function* () {
+  yield* Host.hostListener.pipe(Effect.forkScoped)
+  const { url } = yield* Stage
+  const fiber = yield* BrowserStream.fromEventListenerWindow("message").pipe(
+    Stream.filter(({ data, origin }) => origin.startsWith(url()) && S.is(RequestFacadeIntroduction)(data)),
+    Stream.take(1),
+    Stream.runDrain,
+    Effect.forkScoped,
+  )
+  const iframe = document.createElement("iframe")
+  Object.assign(iframe, {
+    id: "crosshatch-enclave",
+    height: 1,
+    sandbox: "allow-scripts allow-same-origin",
+    src: url("enclave"),
+    width: 1,
+  })
+  Object.assign(iframe.style, { cssText })
+  document.body.appendChild(iframe)
+  yield* Fiber.join(fiber)
+  const context = yield* Effect.fromNullishOr(iframe.contentWindow).pipe(
+    Effect.mapError((cause) => new FacadeWorkerError({ cause })),
+  )
+  const { port1, port2 } = new MessageChannel()
+  context.postMessage(FacadeIntroduction.make({}), url(), [port2])
+  yield* Effect.addFinalizer(() => Effect.sync(() => iframe.remove()))
+  return BrowserWorker.layer(() => port1)
+}).pipe(
   Boundary.span("make", import.meta.url),
   Effect.retry(Schedule.exponential("100 millis", 2).pipe(Schedule.jittered, Schedule.take(6))),
   Layer.unwrap,
