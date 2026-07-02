@@ -27,7 +27,7 @@ export const getFirstSupported = (supported: PhysicalAssetLookup) =>
   Effect.fnUntraced(function* (required: typeof Required.Type) {
     const { accepts } = required
     for (const asset of Object.values(supported)) {
-      for (const [namespace, references] of Object.entries(asset)) {
+      for (const [namespace, references] of Object.entries(asset.deployments)) {
         for (const [reference, deployment] of Object.entries(references)) {
           const network = ChainId.make(`${namespace}:${reference}`)
           for (const accepted of accepts) {

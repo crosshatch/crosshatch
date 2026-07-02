@@ -1,68 +1,89 @@
-import { BigDecimal, Effect, Option, Schema as S, Data } from "effect"
+import { BigDecimal, Data, Effect, Option, Schema as S, SchemaGetter } from "effect"
 
-import type { Deployment } from "./PhysicalAsset.ts"
+import type { Denomination } from "./PhysicalAsset.ts"
 
 export const Atomic = S.String.check(S.isPattern(/^(0|[1-9]\d*)$/)).pipe(S.brand("crosshatch/Atomic"))
 
-export const Usd = S.BigInt.check(S.isGreaterThanOrEqualToBigInt(0n)).pipe(S.brand("crosshatch/Usd"))
+export const Amount = S.BigDecimal.check(S.isGreaterThanOrEqualToBigDecimal(BigDecimal.fromBigInt(0n))).pipe(
+  S.brand("crosshatch/Amount"),
+)
 
-const MICROS_PER_USD = 1_000_000n
-const MICROS_PER_USD_DECIMAL = BigDecimal.make(MICROS_PER_USD, 0)
-
-const ceilDiv = (numerator: bigint, denominator: bigint) =>
-  numerator === 0n ? 0n : (numerator - 1n) / denominator + 1n
-
-const integerDecimalToBigInt = (decimal: BigDecimal.BigDecimal) =>
-  decimal.scale < 0 ? decimal.value * 10n ** BigInt(-decimal.scale) : decimal.value
-
-const atomicScale = ({ decimals }: Deployment) => 10n ** BigInt(decimals)
-
-export class InvalidUsdError extends Data.TaggedError("InvalidUsdError")<{
-  readonly input: string
+export class InvalidAmountError extends Data.TaggedError("InvalidAmountError")<{
+  readonly input: string | number | bigint | BigDecimal.BigDecimal
 }> {}
 
-export const parseUsd = (input: string): Effect.Effect<typeof Usd.Type, InvalidUsdError> =>
-  input.trim() === ""
-    ? new InvalidUsdError({ input })
-    : BigDecimal.fromString(input.trim().replace(/^\$/, "")).pipe(
+export type Input = number | bigint | string | BigDecimal.BigDecimal
+
+export const fromUnsafe = (input: Input): typeof Amount.Type => {
+  const decimal =
+    typeof input === "number"
+      ? Number.isFinite(input)
+        ? Option.getOrUndefined(BigDecimal.fromNumber(input))
+        : undefined
+      : typeof input === "bigint"
+        ? BigDecimal.fromBigInt(input)
+        : typeof input === "string"
+          ? input.trim() === ""
+            ? undefined
+            : Option.getOrUndefined(BigDecimal.fromString(input.trim()))
+          : input
+  if (decimal === undefined || BigDecimal.isNegative(decimal)) {
+    throw new InvalidAmountError({ input })
+  }
+  return Amount.make(decimal)
+}
+
+export const from = (input: Input): Effect.Effect<typeof Amount.Type, InvalidAmountError> =>
+  Effect.try({
+    try: () => fromUnsafe(input),
+    catch: (error) => error as InvalidAmountError,
+  })
+
+export const parse = (input: string): Effect.Effect<typeof Amount.Type, InvalidAmountError> => {
+  const trimmed = input.trim()
+  return trimmed === ""
+    ? new InvalidAmountError({ input })
+    : BigDecimal.fromString(trimmed).pipe(
         Option.match({
-          onNone: () => new InvalidUsdError({ input }),
-          onSome: (decimal) => {
-            if (BigDecimal.isNegative(decimal)) return new InvalidUsdError({ input })
-            const micros = BigDecimal.multiply(decimal, MICROS_PER_USD_DECIMAL)
-            if (!BigDecimal.isInteger(micros)) return new InvalidUsdError({ input })
-            return Effect.succeed(Usd.make(integerDecimalToBigInt(BigDecimal.normalize(micros))))
-          },
+          onNone: () => new InvalidAmountError({ input }),
+          onSome: (decimal) =>
+            BigDecimal.isNegative(decimal) ? new InvalidAmountError({ input }) : Effect.succeed(Amount.make(decimal)),
         }),
       )
-
-export const formatUsd = (amount: typeof Usd.Type): string => {
-  const dollars = amount / MICROS_PER_USD
-  const micros = amount % MICROS_PER_USD
-  if (micros === 0n) return dollars.toString()
-  return `${dollars}.${micros.toString().padStart(6, "0").replace(/0+$/, "")}`
 }
 
-export const displayUsd = (amount: typeof Usd.Type): string => {
-  const dollars = amount / MICROS_PER_USD
-  const micros = amount % MICROS_PER_USD
-  return `$${dollars}.${(micros / 100n).toString().padStart(4, "0")}`
+export interface AtomicUnit {
+  readonly decimals: number
+  readonly rounding?: BigDecimal.RoundingMode | undefined
 }
 
-export const usdToAtomic = (amount: typeof Usd.Type, assetDeployment: Deployment): typeof Atomic.Type =>
-  Atomic.make(ceilDiv(amount * atomicScale(assetDeployment), MICROS_PER_USD).toString())
+export const toAtomic = (amount: typeof Amount.Type, unit: AtomicUnit): typeof Atomic.Type => {
+  const rounded = BigDecimal.normalize(
+    BigDecimal.round(amount, {
+      scale: unit.decimals,
+      mode: unit.rounding ?? "ceil",
+    }),
+  )
+  return Atomic.make((rounded.value * 10n ** BigInt(unit.decimals - rounded.scale)).toString())
+}
 
-export const atomicToUsd = (amount: typeof Atomic.Type, assetDeployment: Deployment): typeof Usd.Type =>
-  Usd.make(ceilDiv(BigInt(amount) * MICROS_PER_USD, atomicScale(assetDeployment)))
+export const fromAtomic = (atomic: typeof Atomic.Type, unit: AtomicUnit): typeof Amount.Type =>
+  Amount.make(BigDecimal.make(BigInt(atomic), unit.decimals))
 
-export const usdFromNumber = (amount: number): typeof Usd.Type => {
-  if (!Number.isFinite(amount) || amount < 0) {
-    throw new InvalidUsdError({ input: String(amount) })
-  }
+export const atomic = (unit: AtomicUnit) =>
+  Atomic.pipe(
+    S.decodeTo(Amount, {
+      decode: SchemaGetter.transform((value) => fromAtomic(value, unit)),
+      encode: SchemaGetter.transform((value) => toAtomic(Amount.make(value), unit)),
+    }),
+  )
 
-  const micros = amount * Number(MICROS_PER_USD)
-  if (!Number.isSafeInteger(micros)) {
-    throw new InvalidUsdError({ input: String(amount) })
-  }
-  return Usd.make(BigInt(micros))
+export const format = (amount: typeof Amount.Type): string => BigDecimal.format(BigDecimal.normalize(amount))
+
+export const display = (amount: typeof Amount.Type, { displayDecimals }: Denomination): string => {
+  const rounded = BigDecimal.normalize(BigDecimal.round(amount, { scale: displayDecimals, mode: "floor" }))
+  const units = rounded.value * 10n ** BigInt(displayDecimals - rounded.scale)
+  const scale = 10n ** BigInt(displayDecimals)
+  const fraction = displayDecimals === 0 ? "" : `.${(units % scale).toString().padStart(displayDecimals, "0")}`
+  return `${units / scale}${fraction}`
 }

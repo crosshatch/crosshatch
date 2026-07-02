@@ -1,53 +1,97 @@
 import { assert, describe, it } from "@effect/vitest"
-import { Effect } from "effect"
+import { BigDecimal, Effect, Schema as S } from "effect"
 
+import { Address } from "./Address.ts"
 import * as Amount from "./Amount.ts"
-import type { Deployment } from "./PhysicalAsset.ts"
+import { KnownAsset } from "./index.ts"
+import { usdDenomination } from "./PhysicalAsset.ts"
+import { group } from "./Requirements.ts"
 
-const EXAMPLE = { decimals: 6 } as never as Deployment
+const USD = usdDenomination("USD")
+
+const assertAmount = (actual: typeof Amount.Amount.Type, expected: string) =>
+  assert.isTrue(
+    BigDecimal.equals(actual, BigDecimal.fromStringUnsafe(expected)),
+    `expected ${BigDecimal.format(actual)} to equal ${expected}`,
+  )
 
 describe(import.meta.url, () => {
   it.effect(
-    "parses decimal dollar input as micros",
+    "parses decimal input",
     Effect.fn(function* () {
-      assert.strictEqual(yield* Amount.parseUsd("10"), Amount.Usd.make(10_000_000n))
-      assert.strictEqual(yield* Amount.parseUsd("1.5"), Amount.Usd.make(1_500_000n))
-      assert.strictEqual(yield* Amount.parseUsd("0.000001"), Amount.Usd.make(1n))
+      assertAmount(yield* Amount.parse("10"), "10")
+      assertAmount(yield* Amount.parse("1.5"), "1.5")
+      assertAmount(yield* Amount.parse("0.000001"), "0.000001")
     }),
   )
 
   it.effect(
-    "rejects invalid dollar input",
+    "rejects invalid input",
     Effect.fn(function* () {
-      yield* Amount.parseUsd("").pipe(Effect.flip)
-      yield* Amount.parseUsd("-1").pipe(Effect.flip)
-      yield* Amount.parseUsd("1.0000001").pipe(Effect.flip)
-      yield* Amount.parseUsd("not-a-number").pipe(Effect.flip)
+      yield* Amount.parse("").pipe(Effect.flip)
+      yield* Amount.parse("-1").pipe(Effect.flip)
+      yield* Amount.parse("not-a-number").pipe(Effect.flip)
+      yield* Amount.parse("$1").pipe(Effect.flip)
+      yield* Amount.from(-1).pipe(Effect.flip)
+      yield* Amount.from(Infinity).pipe(Effect.flip)
+      yield* Amount.from(NaN).pipe(Effect.flip)
+      yield* Amount.from(-1n).pipe(Effect.flip)
     }),
   )
 
-  it("formats micros as dollars", () => {
-    assert.strictEqual(Amount.formatUsd(Amount.Usd.make(10_000_000n)), "10")
-    assert.strictEqual(Amount.formatUsd(Amount.Usd.make(1_500_000n)), "1.5")
-    assert.strictEqual(Amount.formatUsd(Amount.Usd.make(1n)), "0.000001")
+  it("constructs from numbers, bigints, strings, and decimals", () => {
+    assertAmount(Amount.fromUnsafe(0.01), "0.01")
+    assertAmount(Amount.fromUnsafe(10n), "10")
+    assertAmount(Amount.fromUnsafe("1.5"), "1.5")
+    assertAmount(Amount.fromUnsafe(BigDecimal.fromStringUnsafe("2.5")), "2.5")
+    assert.throws(() => Amount.fromUnsafe(-0.01), Amount.InvalidAmountError)
   })
 
-  it("displays micros as fixed dollar amounts", () => {
-    assert.strictEqual(Amount.displayUsd(Amount.Usd.make(20_000_000n)), "$20.0000")
-    assert.strictEqual(Amount.displayUsd(Amount.Usd.make(1_500_000n)), "$1.5000")
-    assert.strictEqual(Amount.displayUsd(Amount.Usd.make(1n)), "$0.0000")
-    assert.strictEqual(Amount.displayUsd(Amount.Usd.make(1_234_567n)), "$1.2345")
+  it("converts nominal amounts to atomic units", () => {
+    assert.strictEqual(Amount.toAtomic(Amount.fromUnsafe(1), { decimals: 6 }), "1000000")
+    assert.strictEqual(Amount.toAtomic(Amount.fromUnsafe(1), { decimals: 18 }), `1${"0".repeat(18)}`)
+    assert.strictEqual(Amount.toAtomic(Amount.fromUnsafe(0), { decimals: 6 }), "0")
+    assert.strictEqual(Amount.toAtomic(Amount.fromUnsafe("0.0000001"), { decimals: 6 }), "1")
+    assert.strictEqual(Amount.toAtomic(Amount.fromUnsafe("0.0000001"), { decimals: 6, rounding: "floor" }), "0")
   })
 
-  it("converts atomic units using ceiling micros", () => {
-    assert.strictEqual(Amount.atomicToUsd(Amount.Atomic.make("1000000"), EXAMPLE), Amount.Usd.make(1_000_000n))
-    assert.strictEqual(Amount.atomicToUsd(Amount.Atomic.make("1"), EXAMPLE), Amount.Usd.make(1n))
+  it("converts atomic units to nominal amounts losslessly", () => {
+    assertAmount(Amount.fromAtomic(Amount.Atomic.make("1000000"), { decimals: 6 }), "1")
+    assertAmount(Amount.fromAtomic(Amount.Atomic.make("1"), { decimals: 18 }), "0.000000000000000001")
+    const original = Amount.fromUnsafe("1.000000000000000001")
+    assertAmount(
+      Amount.fromAtomic(Amount.toAtomic(original, { decimals: 18 }), { decimals: 18 }),
+      "1.000000000000000001",
+    )
   })
 
-  it("converts micros to atomic units using ceiling units", () => {
-    const wholeDollars = { ...EXAMPLE, decimals: 0 }
-    assert.strictEqual(Amount.usdToAtomic(Amount.Usd.make(1_000_000n), EXAMPLE), Amount.Atomic.make("1000000"))
-    assert.strictEqual(Amount.usdToAtomic(Amount.Usd.make(1000n), EXAMPLE), Amount.Atomic.make("1000"))
-    assert.strictEqual(Amount.usdToAtomic(Amount.Usd.make(1n), wholeDollars), Amount.Atomic.make("1"))
+  it.effect(
+    "round-trips through the atomic schema codec",
+    Effect.fn(function* () {
+      const codec = Amount.atomic({ decimals: 6 })
+      const decoded = yield* S.decodeEffect(codec)(Amount.Atomic.make("1500000"))
+      assertAmount(decoded, "1.5")
+      assert.strictEqual(yield* S.encodeEffect(codec)(decoded), "1500000")
+    }),
+  )
+
+  it("formats nominal amounts", () => {
+    assert.strictEqual(Amount.format(Amount.fromUnsafe(10)), "10")
+    assert.strictEqual(Amount.format(Amount.fromUnsafe("1.50")), "1.5")
+    assert.strictEqual(Amount.format(Amount.fromUnsafe("0.000001")), "0.000001")
+  })
+
+  it("displays amounts per denomination", () => {
+    assert.strictEqual(Amount.display(Amount.fromUnsafe(20), USD), "20.00")
+    assert.strictEqual(Amount.display(Amount.fromUnsafe("1.5"), USD), "1.50")
+    assert.strictEqual(Amount.display(Amount.fromUnsafe("1.239"), USD), "1.23")
+  })
+
+  it("scales grouped requirements by deployment decimals", () => {
+    const payTo = Address.make("0x0000000000000000000000000000000000000001")
+    const [sixDecimals] = group(KnownAsset.USDC, { amount: 0.01, recipients: { eip155: { 8453: payTo } } })
+    assert.strictEqual(sixDecimals!.amount, "10000")
+    const [eighteenDecimals] = group(KnownAsset.MUSD, { amount: 0.01, recipients: { eip155: { 31612: payTo } } })
+    assert.strictEqual(eighteenDecimals!.amount, `1${"0".repeat(16)}`)
   })
 })
