@@ -240,6 +240,9 @@ importers:
 
   '@crosshatch/ai':
     dependencies:
+      '@effect/ai-openai-compat':
+        specifier: 'catalog:'
+        version: 4.0.0-beta.90(effect@4.0.0-beta.90)
       crosshatch:
         specifier: workspace:*
         version: link:../../crosshatch

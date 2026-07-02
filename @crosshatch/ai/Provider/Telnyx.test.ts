@@ -2,7 +2,7 @@ import { assert, describe, it } from "@effect/vitest"
 import { Effect, Layer, Stream } from "effect"
 import { LanguageModel } from "effect/unstable/ai"
 
-import { capturingFetch, chatCompletion, sseFetch } from "../TestKit.ts"
+import { capturingFetch, chatChunk, chatCompletion, sseFetch } from "../TestKit.ts"
 import * as Telnyx from "./Telnyx.ts"
 
 describe(import.meta.url, () => {
@@ -25,12 +25,12 @@ describe(import.meta.url, () => {
     assert.deepStrictEqual(body.stop, ["END"])
   })
 
-  it("supports streaming when enabled", async () => {
+  it("streams text", async () => {
     const { requests, layer: fetchLayer } = sseFetch([
-      `{"id":"c1","choices":[{"index":0,"delta":{"content":"Hi"}}]}`,
-      `{"id":"c1","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}`,
+      chatChunk({ role: "assistant", content: "Hi" }),
+      chatChunk({}, "stop"),
     ])
-    const layer = Telnyx.model({ streaming: true }).pipe(Layer.provide(fetchLayer))
+    const layer = Telnyx.model().pipe(Layer.provide(fetchLayer))
 
     const parts = await LanguageModel.streamText({ prompt: "hi" }).pipe(
       Stream.runCollect,

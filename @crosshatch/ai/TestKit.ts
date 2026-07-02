@@ -20,6 +20,19 @@ export const capturingFetch = (body: unknown) => {
 }
 
 /**
+ * A fetch stub that replies to every request with an OpenAI-style error body
+ * at the given HTTP status.
+ */
+export const errorFetch = (status: number) => {
+  const fetch: typeof globalThis.fetch = async () =>
+    new Response(JSON.stringify({ error: { message: "boom" } }), {
+      status,
+      headers: { "content-type": "application/json" },
+    })
+  return Layer.succeed(FetchHttpClient.Fetch, fetch)
+}
+
+/**
  * A minimal chat-completions response body around the given message.
  */
 export const chatCompletion = (message: unknown, finishReason: string = "stop") => ({
@@ -32,13 +45,26 @@ export const chatCompletion = (message: unknown, finishReason: string = "stop") 
 })
 
 /**
+ * A chat-completions streaming chunk around the given delta. `id`, `model`,
+ * and `created` are always present: the compat client validates chunks
+ * against the spec and silently drops any that lack them.
+ */
+export const chatChunk = (delta: unknown, finishReason?: string) => ({
+  id: "chatcmpl-test",
+  object: "chat.completion.chunk",
+  created: 1,
+  model: "test-model",
+  choices: [{ index: 0, delta, ...(finishReason !== undefined && { finish_reason: finishReason }) }],
+})
+
+/**
  * A fetch stub that captures every request body and replies with the given
  * JSON payloads framed as standard `data: `-prefixed SSE events, terminated
  * by `data: [DONE]`.
  */
-export const sseFetch = (events: ReadonlyArray<string>) => {
+export const sseFetch = (events: ReadonlyArray<unknown>) => {
   const requests: Array<any> = []
-  const body = [...events.map((event) => `data: ${event}`), "data: [DONE]", ""].join("\n\n")
+  const body = [...events.map((event) => `data: ${JSON.stringify(event)}`), "data: [DONE]", ""].join("\n\n")
   const fetch: typeof globalThis.fetch = async (input, init) => {
     const request = input instanceof Request ? input : new Request(input, init)
     requests.push(await request.clone().json())

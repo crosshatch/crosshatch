@@ -1,5 +1,4 @@
 export * as Adapter from "./Adapter/Adapter.ts"
-export * as OpenAiChatCompletions from "./Adapter/OpenAiChatCompletions.ts"
 export * as SingleMessage from "./Adapter/SingleMessage.ts"
 export * as BlockRun from "./Provider/BlockRun.ts"
 export * as Elfa from "./Provider/Elfa.ts"
