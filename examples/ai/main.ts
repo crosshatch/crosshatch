@@ -4,7 +4,7 @@ import { Mnemonic } from "crosshatch"
 import * as Headless from "crosshatch/Headless"
 import * as KnownAsset from "crosshatch/KnownAsset"
 import { Console, Effect, Schema as S, Stdio, Stream } from "effect"
-import { LanguageModel, Model, Prompt, Tool, Toolkit } from "effect/unstable/ai"
+import { Chat, Model, type Response, Tool, Toolkit } from "effect/unstable/ai"
 
 const WeatherToolkit = Toolkit.make(
   Tool.make("get_weather", {
@@ -24,35 +24,38 @@ const Forecast = S.Struct({
   conditions: S.String,
 })
 
+const printText = <E, R>(parts: Stream.Stream<Response.StreamPart<any>, E, R>) =>
+  Effect.gen(function* () {
+    const stdio = yield* Stdio.Stdio
+    yield* parts.pipe(
+      Stream.filter((part) => part.type === "text-delta"),
+      Stream.map((part) => part.delta),
+      Stream.run(stdio.stdout({ endOnDone: false })),
+    )
+    // the last streamed delta carries no trailing newline
+    yield* Console.log("\n")
+  })
+
 Effect.gen(function* () {
   const provider = yield* Model.ProviderName
   const modelName = yield* Model.ModelName
   yield* Console.log(`── ${provider}/${modelName}, paid per request over x402 ──\n`)
 
-  const stdio = yield* Stdio.Stdio
-  yield* Console.log("• streaming:")
-  yield* LanguageModel.streamText({ prompt: "Tell me a knock knock joke." }).pipe(
-    Stream.filter((part) => part.type === "text-delta"),
-    Stream.map((part) => part.delta),
-    Stream.run(stdio.stdout({ endOnDone: false })),
-  )
+  const chat = yield* Chat.empty
+  yield* chat.streamText({ prompt: "Tell me a knock knock joke." }).pipe(printText)
 
-  yield* Console.log("\n\n• tool calling:")
-  const question = "What's the weather in Tokyo? Use the get_weather tool."
-  const called = yield* LanguageModel.generateText({ prompt: question, toolkit: WeatherToolkit })
-  const answered = yield* LanguageModel.generateText({
-    prompt: Prompt.concat(Prompt.make(question), Prompt.fromResponseParts(called.content)),
+  yield* chat.generateText({
+    prompt: "What's the weather in Tokyo? Use the get_weather tool.",
     toolkit: WeatherToolkit,
   })
-  yield* Console.log(answered.text)
+  yield* chat.streamText({ prompt: [], toolkit: WeatherToolkit }).pipe(printText)
 
-  yield* Console.log("\n• structured output:")
-  const forecast = yield* LanguageModel.generateObject({
-    prompt: "Invent a plausible spring forecast for Reykjavik.",
+  const forecast = yield* chat.generateObject({
+    prompt: "Summarize that weather report as a forecast object.",
     objectName: "forecast",
     schema: Forecast,
   })
-  yield* Console.log(`${forecast.value.city}: ${forecast.value.temperature}°C, ${forecast.value.conditions}`)
+  yield* Console.log(forecast.value)
 }).pipe(
   Effect.provide([
     BlockRun.model({ model: "openai/gpt-4o-mini", maxTokens: 1024, temperature: 0.3 }),
