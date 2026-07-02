@@ -4,8 +4,8 @@ import { AiError, LanguageModel, Prompt, Tool, Toolkit } from "effect/unstable/a
 import { FetchHttpClient } from "effect/unstable/http"
 
 import { capturingFetch, chatCompletion, sseFetch } from "../TestKit.ts"
-import * as SingleMessage from "./SingleMessage.ts"
 import * as OpenAiChatCompletions from "./OpenAiChatCompletions.ts"
+import * as SingleMessage from "./SingleMessage.ts"
 
 const stubFetch =
   (body: unknown): typeof globalThis.fetch =>
@@ -18,9 +18,7 @@ const toolCallCompletion = chatCompletion(
   {
     role: "assistant",
     content: null,
-    tool_calls: [
-      { id: "call_1", type: "function", function: { name: "get_weather", arguments: `{"city":"Tokyo"}` } },
-    ],
+    tool_calls: [{ id: "call_1", type: "function", function: { name: "get_weather", arguments: `{"city":"Tokyo"}` } }],
   },
   "tool_calls",
 )
@@ -214,9 +212,7 @@ describe(import.meta.url, () => {
   })
 
   it("serializes undefined tool results as explicit JSON null content", async () => {
-    const { requests, layer: fetchLayer } = capturingFetch(
-      chatCompletion({ role: "assistant", content: "Done." }),
-    )
+    const { requests, layer: fetchLayer } = capturingFetch(chatCompletion({ role: "assistant", content: "Done." }))
     const layer = openAiChatLayer.pipe(Layer.provide(fetchLayer))
     const prompt = Prompt.make([
       { role: "user", content: "Ring the bell." },
@@ -273,9 +269,7 @@ describe(import.meta.url, () => {
   })
 
   it("sends sampling options and extra body fields", async () => {
-    const { requests, layer: fetchLayer } = capturingFetch(
-      chatCompletion({ role: "assistant", content: "ok" }),
-    )
+    const { requests, layer: fetchLayer } = capturingFetch(chatCompletion({ role: "assistant", content: "ok" }))
     const layer = OpenAiChatCompletions.layer({
       id: "TestClient",
       apiUrl: "https://provider.test/v1",
@@ -304,10 +298,7 @@ describe(import.meta.url, () => {
       }),
     )
     const layer = openAiChatLayer.pipe(Layer.provide(fetchLayer))
-    const response = await LanguageModel.generateText({ prompt: "2+2?" }).pipe(
-      Effect.provide(layer),
-      Effect.runPromise,
-    )
+    const response = await LanguageModel.generateText({ prompt: "2+2?" }).pipe(Effect.provide(layer), Effect.runPromise)
 
     assert.strictEqual(response.reasoningText, "2 + 2 means adding two and two.")
     assert.strictEqual(response.text, "The answer is 4.")

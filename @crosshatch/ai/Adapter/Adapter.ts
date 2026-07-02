@@ -185,8 +185,7 @@ export const layer = <W, I>(config: {
       return yield* LanguageModel.make({
         generateText,
         streamText: streamText
-          ? (options) =>
-              streamText(options, httpClient).pipe(Stream.mapError(toAiError(config.id, "streamText")))
+          ? (options) => streamText(options, httpClient).pipe(Stream.mapError(toAiError(config.id, "streamText")))
           : () => Stream.fail(streamingUnsupported(config.id, "streamText")),
         codecTransformer: config.codecTransformer,
       })

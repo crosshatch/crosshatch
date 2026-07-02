@@ -357,11 +357,7 @@ export const layer = (config: {
     buildRequest: (options) => Effect.succeed(buildBody(options)),
     ...(config.streaming && {
       streamText: (options: LanguageModel.ProviderOptions, httpClient: HttpClient.HttpClient) =>
-        streamChat(
-          url,
-          { ...buildBody(options), stream: true, stream_options: { include_usage: true } },
-          httpClient,
-        ),
+        streamChat(url, { ...buildBody(options), stream: true, stream_options: { include_usage: true } }, httpClient),
     }),
     codecTransformer: OpenAiStructuredOutput.toCodecOpenAI,
     response: {
