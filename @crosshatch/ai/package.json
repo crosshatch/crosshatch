@@ -24,7 +24,6 @@
     }
   },
   "dependencies": {
-    "@effect/ai-openai": "catalog:",
     "crosshatch": "workspace:*",
     "effect": "catalog:"
   },
