@@ -227,7 +227,7 @@ describe(import.meta.url, () => {
       disableToolCallResolution: true,
     }).pipe(Stream.runCollect, Effect.provide(layer), Effect.runPromise)
 
-    const toolCall = Array.from(parts).find((part) => part.type === "tool-call") as any
+    const toolCall = Array.from(parts).find((part) => part.type === "tool-call")
     assert.deepStrictEqual(toolCall?.params, {})
   })
 
@@ -386,7 +386,7 @@ describe(import.meta.url, () => {
       disableToolCallResolution: true,
     }).pipe(Stream.runCollect, Effect.provide(layer), Effect.runPromise)
 
-    const partList = Array.from(parts) as Array<any>
+    const partList = Array.from(parts)
     const toolCall = partList.find((part) => part.type === "tool-call")
     assert.strictEqual(toolCall?.id, "call_1")
     assert.strictEqual(toolCall?.name, "get_weather")
@@ -410,7 +410,7 @@ describe(import.meta.url, () => {
     )
 
     assert.deepStrictEqual(requests[0].stream_options, { include_usage: true })
-    const finish = Array.from(parts).find((part) => part.type === "finish") as any
+    const finish = Array.from(parts).find((part) => part.type === "finish")
     assert.strictEqual(finish?.reason, "stop")
     assert.strictEqual(finish?.usage.inputTokens.total, 3)
     assert.strictEqual(finish?.usage.outputTokens.total, 5)
@@ -440,10 +440,10 @@ describe(import.meta.url, () => {
     const partList = Array.from(parts)
     const text = partList
       .filter((part) => part.type === "text-delta")
-      .map((part) => (part as any).delta)
+      .map((part) => part.delta)
       .join("")
     assert.strictEqual(text, "Hi")
-    const finish = partList.find((part) => part.type === "finish") as any
+    const finish = partList.find((part) => part.type === "finish")
     assert.strictEqual(finish?.reason, "stop")
   })
 

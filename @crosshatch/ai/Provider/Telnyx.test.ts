@@ -41,7 +41,7 @@ describe(import.meta.url, () => {
     assert.strictEqual(requests[0].stream, true)
     const text = Array.from(parts)
       .filter((part) => part.type === "text-delta")
-      .map((part) => (part as any).delta)
+      .map((part) => part.delta)
       .join("")
     assert.strictEqual(text, "Hi")
   })
