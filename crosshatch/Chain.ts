@@ -19,6 +19,8 @@ export interface Chain {
   >
 }
 
+// TODO: model as true service subclass
+// readonly address: S.Top & { readonly Type: string & Brand.Brand<string> }
 export const Service =
   <Self>() =>
   <Id extends string>(id: Id) =>

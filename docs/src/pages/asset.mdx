@@ -61,16 +61,18 @@ for Base, Polygon, Arbitrum, or any other supported network.
 Crosshatch ships known asset definitions. These are ready-to-use `PhysicalAsset` values for common tokens.
 
 ```ts
-import { USDC, USDCE, USDT0 } from "crosshatch/KnownAsset"
+import { KnownAsset } from "crosshatch"
+
+const { USDC, USDCE, USDT0 } = KnownAsset
 ```
 
 Each export is a `PhysicalAsset`. For example, `USDC` contains multiple EVM deployments under the `eip155` namespace:
 
 ```ts
-import { USDC } from "crosshatch/KnownAsset"
+import { KnownAsset } from "crosshatch"
 
-const baseUsdc = USDC.eip155[8453]
-const polygonUsdc = USDC.eip155[137]
+const baseUsdc = KnownAsset.USDC.eip155[8453]
+const polygonUsdc = KnownAsset.USDC.eip155[137]
 ```
 
 Those two values refer to different physical token contracts, but they are grouped under the same logical Crosshatch

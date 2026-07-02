@@ -25,7 +25,6 @@
     "./Crypto": "./Crypto/Crypto.ts",
     "./Evm": "./Evm/Evm.ts",
     "./Facade": "./Browser/Facade/Facade.ts",
-    "./KnownAsset": "./KnownAsset/KnownAsset.ts",
     "./Svm": "./Svm/Svm.ts",
     "./internal": "./internal/internal.ts",
     "./package.json": "./package.json"
@@ -38,7 +37,6 @@
       "./Crypto": "./dist/Crypto/Crypto.js",
       "./Evm": "./dist/Evm/Evm.js",
       "./Facade": "./dist/Browser/Facade/Facade.js",
-      "./KnownAsset": "./dist/KnownAsset/KnownAsset.js",
       "./Svm": "./dist/Svm/Svm.js",
       "./internal": "./dist/internal/internal.js",
       "./package.json": "./package.json"

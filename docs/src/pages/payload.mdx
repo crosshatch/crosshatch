@@ -48,9 +48,8 @@ payments, for example, it may contain an EIP-3009 transfer authorization or a Pe
 Use `Payload.make` when you have a `Required` invoice and want to construct the signed payment payload for it.
 
 ```ts
-import { Payload, Required, Requirements } from "crosshatch"
+import { Payload, Required, Requirements, KnownAsset } from "crosshatch"
 import { EvmAddress } from "crosshatch/Evm"
-import { USDC } from "crosshatch/KnownAsset"
 import { Effect } from "effect"
 
 const program = Effect.gen(function* () {
@@ -58,7 +57,7 @@ const program = Effect.gen(function* () {
     url: "https://example-merchant.com/paid",
   }).pipe(
     Required.accept(
-      Requirements.group(USDC, {
+      Requirements.group(KnownAsset.USDC, {
         amount: 0.01,
         recipients: {
           eip155: {
@@ -94,14 +93,19 @@ For the built-in EVM flow, the `Payer` delegates requirement selection to a `Tre
 service to create the concrete payload.
 
 ```ts
-import { Payer, Treasurer } from "crosshatch"
+import { Payer, Treasurer, KnownAsset } from "crosshatch"
 import { EvmChain } from "crosshatch/Evm"
-import { USDC } from "crosshatch/KnownAsset"
 import { Effect, Layer, Redacted } from "effect"
 
 const payerLayer = Payer.layer(
   EvmChain.fromMnemonic(Redacted.make("test test test test test test test test test test test junk")),
-).pipe(Layer.provide(Treasurer.layerFirstSupported({ USDC })))
+).pipe(
+  Layer.provide(
+    Treasurer.layerFirstSupported({
+      USDC: KnownAsset.USDC,
+    }),
+  ),
+)
 
 const runnable = program.pipe(Effect.provide(payerLayer))
 ```

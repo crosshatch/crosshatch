@@ -1,6 +1,5 @@
-import { settle, Required, Requirements, PaymentId, Http402 } from "crosshatch"
+import { Facilitator, Required, Requirements, PaymentId, Http402, KnownAsset } from "crosshatch"
 import { EvmAddress } from "crosshatch/Evm"
-import { USDC } from "crosshatch/KnownAsset"
 import { Layer, Effect } from "effect"
 import { Worker } from "effect-workerd"
 import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
@@ -19,7 +18,7 @@ export default Worker.make({
             required: true,
           }),
           Required.accept(
-            Requirements.group(USDC, {
+            Requirements.group(KnownAsset.USDC, {
               amount: 0.01,
               recipients: {
                 eip155: {
@@ -35,7 +34,7 @@ export default Worker.make({
         `
         return yield* Http402.require({ required })
       }
-      yield* settle({ payload })
+      yield* Facilitator.settle({ payload })
       return HttpServerResponse.text("The paid resource.")
     }),
   ).pipe(

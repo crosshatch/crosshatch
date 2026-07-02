@@ -1,30 +1,23 @@
-import { Schema as S } from "effect"
-import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
+import { Effect, Schema as S } from "effect"
 
-import { Payload } from "../Payload.ts"
-import { Requirements } from "../Requirements.ts"
+import type { Payload } from "../Payload.ts"
+import { FacilitatorClient } from "./FacilitatorClient.ts"
 
-export const Verify = HttpApiEndpoint.post("verify", "/verify", {
-  payload: S.Struct({
-    paymentPayload: Payload,
-    paymentRequirements: Requirements,
-  }),
-  success: S.Union([
-    S.Struct({
-      isValid: S.tag(true),
-      payer: S.String.pipe(S.optional),
-      extensions: S.Record(S.String, S.Unknown).pipe(S.optional),
-    }),
-    S.Struct({
-      isValid: S.tag(false),
-      invalidReason: S.String.pipe(S.optional),
-      invalidMessage: S.String.pipe(S.optional),
-    }),
-  ]),
-}).annotate(
-  OpenApi.Description,
-  `
-    Verifies a payment authorization without executing the transaction on the blockchain.
-    Returns whether the payment is valid, along with any invalidity reasons.
-  `,
-)
+export class VerificationError extends S.TaggedErrorClass<VerificationError>()("VerificationError", {
+  invalidReason: S.String.pipe(S.optional),
+  invalidMessage: S.String.pipe(S.optional),
+}) {}
+
+export const verify = Effect.fnUntraced(function* ({ payload }: { readonly payload: typeof Payload.Type }) {
+  const facilitator = yield* FacilitatorClient
+  const { accepted: paymentRequirements } = payload
+  const response = yield* facilitator.verify({
+    payload: {
+      paymentPayload: payload,
+      paymentRequirements,
+    },
+  })
+  if (!response.isValid) {
+    return yield* new VerificationError(response)
+  }
+})

@@ -25,9 +25,8 @@ Start with `Required.builder`, then pipe builder operations into it. `Required.a
 payment requirements, and `Required.extend` adds x402 extension payloads.
 
 ```ts
-import { Required, Requirements, PaymentId } from "crosshatch"
+import { Required, Requirements, PaymentId, KnownAsset } from "crosshatch"
 import { EvmAddress } from "crosshatch/Evm"
-import { USDC } from "crosshatch/KnownAsset"
 import { Effect } from "effect"
 
 const makeRequired = Effect.gen(function* () {
@@ -38,7 +37,7 @@ const makeRequired = Effect.gen(function* () {
       required: true,
     }),
     Required.accept(
-      Requirements.group(USDC, {
+      Requirements.group(KnownAsset.USDC, {
         amount: 0.01,
         recipients: {
           eip155: {
