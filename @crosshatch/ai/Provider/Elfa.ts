@@ -1,9 +1,10 @@
 import { Config, Effect, Schema as S } from "effect"
+import { Model } from "effect/unstable/ai"
 
 import * as CustomJsonAdapter from "../Adapter/CustomJson.ts"
 
 const ELFA_API_URL = "https://api.elfa.ai/x402/v2"
-export const MODEL = "elfa-chat"
+const MODEL = "elfa-chat"
 
 const ElfaChatResponse = S.Struct({
   data: S.Struct({
@@ -13,7 +14,7 @@ const ElfaChatResponse = S.Struct({
 
 const getSpeed = Config.string("ELFA_SPEED").pipe(Effect.orElseSucceed(() => "expert"))
 
-export const layer = CustomJsonAdapter.layer({
+const layer = CustomJsonAdapter.layer({
   id: "ElfaClient",
   apiUrl: ELFA_API_URL,
   endpoint: "/chat",
@@ -29,3 +30,5 @@ export const layer = CustomJsonAdapter.layer({
     message: ({ data }) => data.message,
   },
 })
+
+export const model = Model.make("elfa", MODEL, layer)

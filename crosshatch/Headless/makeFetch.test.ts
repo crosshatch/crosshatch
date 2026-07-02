@@ -32,7 +32,9 @@ const runtime = ManagedRuntime.make(
   }),
 )
 
-const stubFetch = (...responses: ReadonlyArray<(init?: RequestInit) => Response>): { calls: RequestInit[] } & typeof globalThis.fetch => {
+const stubFetch = (
+  ...responses: ReadonlyArray<(init?: RequestInit) => Response>
+): { calls: RequestInit[] } & typeof globalThis.fetch => {
   const calls: RequestInit[] = []
   return Object.assign(
     async (_input: RequestInfo | URL, init?: RequestInit) => {

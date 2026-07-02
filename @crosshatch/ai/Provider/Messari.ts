@@ -1,9 +1,10 @@
 import { Effect, Schema as S } from "effect"
+import { Model } from "effect/unstable/ai"
 
 import * as CustomJsonAdapter from "../Adapter/CustomJson.ts"
 
 const MESSARI_API_URL = "https://api.messari.io/ai/v2"
-export const MODEL = "messari"
+const MODEL = "messari"
 
 const MessariChatResponse = S.Struct({
   data: S.Struct({
@@ -16,7 +17,7 @@ const MessariChatResponse = S.Struct({
   }),
 })
 
-export const layer = CustomJsonAdapter.layer({
+const layer = CustomJsonAdapter.layer({
   id: "MessariClient",
   apiUrl: MESSARI_API_URL,
   endpoint: "/chat/completions",
@@ -31,8 +32,8 @@ export const layer = CustomJsonAdapter.layer({
   response: {
     schema: MessariChatResponse,
     message: ({ data }) =>
-      data.messages.find((message) => message.role === "assistant")?.content ??
-      data.messages.at(-1)?.content ??
-      "",
+      data.messages.find((message) => message.role === "assistant")?.content ?? data.messages.at(-1)?.content ?? "",
   },
 })
+
+export const model = Model.make("messari", MODEL, layer)
