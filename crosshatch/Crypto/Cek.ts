@@ -39,7 +39,7 @@ export const fromPrfv = Effect.fnUntraced(function* (value: Uint8Array) {
   ).pipe(Effect.map(Cek.make))
 })
 
-export const encrypt = Effect.fn(function* (cek: typeof Cek.Type, value: Uint8Array) {
+export const encrypt = Effect.fnUntraced(function* (cek: typeof Cek.Type, value: Uint8Array) {
   const iv = crypto.getRandomValues(new Uint8Array(12))
   const cv = yield* Effect.promise(() =>
     crypto.subtle.encrypt(

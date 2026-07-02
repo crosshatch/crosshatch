@@ -5,7 +5,10 @@ import type { Asymmetric } from "./Envelope.ts"
 
 export const X25519PrivateKey = CryptoKey.CryptoKey.pipe(S.brand("crosshatch/X25519PrivateKey"))
 
-export const decrypt = Effect.fn(function* (privateKey: typeof X25519PrivateKey.Type, value: typeof Asymmetric.Type) {
+export const decrypt = Effect.fnUntraced(function* (
+  privateKey: typeof X25519PrivateKey.Type,
+  value: typeof Asymmetric.Type,
+) {
   const ephPublicKey = yield* Effect.promise(() =>
     crypto.subtle.importKey("raw", value.encrypter.slice(), { name: "X25519" }, false, []),
   )
