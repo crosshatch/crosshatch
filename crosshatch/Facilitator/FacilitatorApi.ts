@@ -1,8 +1,8 @@
 import { HttpApi, HttpApiGroup } from "effect/unstable/httpapi"
 
-import { SettleEndpoint } from "./endpoints/settle.ts"
-import { SupportedEndpoint } from "./endpoints/supported.ts"
-import { VerifyEndpoint } from "./endpoints/verify.ts"
+import { SettleEndpoint } from "./endpoints/SettleEndpoint.ts"
+import { SupportedEndpoint } from "./endpoints/SupportedEndpoint.ts"
+import { VerifyEndpoint } from "./endpoints/VerifyEndpoint.ts"
 
 export class FacilitatorApiGroup extends HttpApiGroup.make("facilitator")
   .add(VerifyEndpoint)
