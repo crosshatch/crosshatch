@@ -6,8 +6,14 @@ const TELNYX_API_URL = "https://x402.telnyx.com/v1"
 export const DEFAULT_MODEL = "MiniMaxAI/MiniMax-M2.7"
 const DEFAULT_MAX_TOKENS = 512
 
-export const model = (modelName: string = DEFAULT_MODEL, options?: { readonly maxTokens?: number }) =>
-  Model.make(
+export interface Options {
+  readonly model?: string
+  readonly maxTokens?: number
+}
+
+export const model = (options?: Options) => {
+  const modelName = options?.model ?? DEFAULT_MODEL
+  return Model.make(
     "telnyx",
     modelName,
     OpenAiChatCompletions.layer({
@@ -17,3 +23,4 @@ export const model = (modelName: string = DEFAULT_MODEL, options?: { readonly ma
       maxTokens: options?.maxTokens ?? DEFAULT_MAX_TOKENS,
     }),
   )
+}

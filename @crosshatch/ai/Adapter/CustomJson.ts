@@ -30,7 +30,7 @@ export const layer = <W, I>(config: {
   Adapter.layer({
     id: config.id,
     url: `${config.apiUrl}${config.endpoint}`,
-    buildRequest: (prompt) => config.buildRequest({ message: toMessage(prompt) }),
+    buildRequest: (options) => config.buildRequest({ message: toMessage(options.prompt) }),
     response: {
       schema: config.response.schema,
       toParts: (response) =>

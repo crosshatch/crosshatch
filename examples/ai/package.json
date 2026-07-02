@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "@crosshatch/ai": "workspace:*",
+    "@effect/platform-node": "catalog:",
     "crosshatch": "workspace:*",
     "effect": "catalog:"
   }
