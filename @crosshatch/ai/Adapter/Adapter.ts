@@ -165,7 +165,9 @@ export const layer = <W, I>(config: {
   Layer.effect(
     LanguageModel.LanguageModel,
     Effect.gen(function* () {
-      const httpClient = yield* HttpClient.HttpClient
+      // non-2xx replies (402 payment failure, 429, 5xx) must fail with their
+      // status, not fall through to a decode error or an empty SSE stream
+      const httpClient = HttpClient.filterStatusOk(yield* HttpClient.HttpClient)
       const decode = S.decodeUnknownEffect(config.response.schema)
       const streamText = config.streamText
 

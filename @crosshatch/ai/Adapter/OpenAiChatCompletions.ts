@@ -7,8 +7,9 @@
  * fabricating fake Responses-API bodies just to have the library parse back
  * text we already held.
  */
-import { Effect, Schema as S, Stream } from "effect"
+import { Effect, Schema as S, SchemaTransformation, Stream } from "effect"
 import { OpenAiStructuredOutput, Tool, type LanguageModel, type Prompt, type Response } from "effect/unstable/ai"
+import { Sse } from "effect/unstable/encoding"
 import { HttpBody, type HttpClient, type HttpClientError } from "effect/unstable/http"
 
 import * as Adapter from "./Adapter.ts"
@@ -49,7 +50,9 @@ export const toChatMessages = (prompt: Prompt.Prompt): Array<ChatMessage> =>
         return [
           {
             role: "assistant",
-            content: text.length > 0 ? text : null,
+            // `content: null` is only valid alongside `tool_calls`; a turn
+            // with neither (e.g. truncated mid-reasoning) must stay ""
+            content: text.length > 0 || toolCalls.length === 0 ? text : null,
             ...(toolCalls.length > 0 && { tool_calls: toolCalls }),
           },
         ]
@@ -60,10 +63,25 @@ export const toChatMessages = (prompt: Prompt.Prompt): Array<ChatMessage> =>
           .map((part) => ({
             role: "tool",
             tool_call_id: part.id,
-            content: JSON.stringify(part.result),
+            // void tool results stringify to undefined, which would drop the
+            // required `content` key from the serialized message
+            content: JSON.stringify(part.result ?? null),
           }))
     }
   })
+
+// vLLM/Mistral-style backends emit `arguments: ""` for zero-parameter tools,
+// which plain JSON parsing would reject, losing the whole (paid) response.
+const ToolCallArguments = S.String.pipe(
+  S.decodeTo(
+    S.String,
+    SchemaTransformation.transform({
+      decode: (text) => (text.trim().length === 0 ? "{}" : text),
+      encode: (text) => text,
+    }),
+  ),
+  S.decodeTo(S.Unknown, SchemaTransformation.fromJsonString),
+)
 
 // Only the fields we read; providers differ in which optional OpenAI fields
 // they include, so everything else is ignored.
@@ -82,7 +100,7 @@ const ChatCompletion = S.Struct({
                 id: S.String,
                 function: S.Struct({
                   name: S.String,
-                  arguments: S.UnknownFromJsonString,
+                  arguments: ToolCallArguments,
                 }),
               }),
             ),
@@ -119,8 +137,6 @@ const toToolChoice = (choice: LanguageModel.ProviderOptions["toolChoice"]) => {
   return choice.mode ?? "auto"
 }
 
-// Tool-call deltas are not accumulated: streamed tool calling is untested on
-// the x402 providers, so those chunks are ignored rather than half-decoded.
 const ChatCompletionChunk = S.Struct({
   id: S.optional(S.String),
   model: S.optional(S.String),
@@ -130,6 +146,22 @@ const ChatCompletionChunk = S.Struct({
         S.Struct({
           content: S.optional(S.NullOr(S.String)),
           reasoning_content: S.optional(S.NullOr(S.String)),
+          tool_calls: S.optional(
+            S.NullOr(
+              S.Array(
+                S.Struct({
+                  index: S.optional(S.Number),
+                  id: S.optional(S.NullOr(S.String)),
+                  function: S.optional(
+                    S.Struct({
+                      name: S.optional(S.NullOr(S.String)),
+                      arguments: S.optional(S.NullOr(S.String)),
+                    }),
+                  ),
+                }),
+              ),
+            ),
+          ),
         }),
       ),
       finish_reason: S.optional(S.NullOr(S.String)),
@@ -147,7 +179,7 @@ const ChatCompletionChunk = S.Struct({
 
 const decodeChunk = S.decodeUnknownEffect(S.fromJsonString(ChatCompletionChunk))
 
-const DATA_PREFIX = "data: "
+const decodeToolArguments = S.decodeUnknownEffect(ToolCallArguments)
 
 const streamChat = (
   url: string,
@@ -159,14 +191,25 @@ const streamChat = (
       let metadataEmitted = false
       let reasoningOpen = false
       let textOpen = false
-      return response.stream.pipe(
+      let finishReason: string | undefined
+      let usage: { readonly prompt_tokens: number; readonly completion_tokens: number } | undefined
+      const toolCalls = new Map<number, { id?: string; name?: string; arguments: string }>()
+
+      const deltas = response.stream.pipe(
         Stream.decodeText(),
-        Stream.splitLines,
-        Stream.filter((line) => line.startsWith(DATA_PREFIX) && line !== `${DATA_PREFIX}[DONE]`),
-        Stream.mapEffect((line) => decodeChunk(line.slice(DATA_PREFIX.length))),
+        Stream.pipeThroughChannel(Sse.decode()),
+        // a `retry:` directive halts the SSE parser; end the stream and let
+        // the trailing finish part below close the response
+        Stream.catchTag("Retry", () => Stream.empty),
+        Stream.filter((event) => event.data !== "[DONE]"),
+        Stream.mapEffect((event) => decodeChunk(event.data)),
         Stream.flatMap((chunk) => {
           const parts: Array<Response.StreamPartEncoded> = []
           const choice = chunk.choices[0]
+          // spec-compliant providers deliver usage in a trailing chunk with
+          // empty `choices`, after the one carrying `finish_reason`
+          if (chunk.usage != null) usage = chunk.usage
+          if (choice?.finish_reason != null) finishReason = choice.finish_reason
           if (!metadataEmitted && (chunk.id !== undefined || chunk.model !== undefined)) {
             metadataEmitted = true
             parts.push({
@@ -197,30 +240,45 @@ const streamChat = (
             }
             parts.push({ type: "text-delta", id: "text-1", delta: textDelta })
           }
-          if (choice?.finish_reason != null) {
-            if (reasoningOpen) {
-              reasoningOpen = false
-              parts.push({ type: "reasoning-end", id: "reasoning-1" })
-            }
-            if (textOpen) {
-              textOpen = false
-              parts.push({ type: "text-end", id: "text-1" })
-            }
-            parts.push(
-              Adapter.finishPart({
-                finishReason: toFinishReason(choice.finish_reason),
-                usage: chunk.usage
-                  ? {
-                      inputTokens: chunk.usage.prompt_tokens,
-                      outputTokens: chunk.usage.completion_tokens,
-                    }
-                  : undefined,
-              }),
-            )
+          for (const [position, delta] of (choice?.delta?.tool_calls ?? []).entries()) {
+            const key = delta.index ?? position
+            const call = toolCalls.get(key) ?? { arguments: "" }
+            if (delta.id != null) call.id = delta.id
+            if (delta.function?.name != null) call.name = delta.function.name
+            if (delta.function?.arguments != null) call.arguments += delta.function.arguments
+            toolCalls.set(key, call)
           }
           return Stream.fromIterable(parts)
         }),
       )
+
+      // tool calls and the finish part are only complete once the stream ends
+      const ending = Stream.unwrap(
+        Effect.gen(function* () {
+          const parts: Array<Response.StreamPartEncoded> = []
+          if (reasoningOpen) parts.push({ type: "reasoning-end", id: "reasoning-1" })
+          if (textOpen) parts.push({ type: "text-end", id: "text-1" })
+          for (const [, call] of [...toolCalls.entries()].sort(([a], [b]) => a - b)) {
+            if (call.id === undefined || call.name === undefined) continue
+            const params = yield* decodeToolArguments(call.arguments)
+            parts.push({ type: "tool-call", id: call.id, name: call.name, params, providerExecuted: false })
+          }
+          parts.push(
+            Adapter.finishPart({
+              finishReason: toFinishReason(finishReason),
+              usage: usage
+                ? {
+                    inputTokens: usage.prompt_tokens,
+                    outputTokens: usage.completion_tokens,
+                  }
+                : undefined,
+            }),
+          )
+          return Stream.fromIterable(parts)
+        }),
+      )
+
+      return Stream.concat(deltas, ending)
     }),
   )
 
@@ -237,6 +295,19 @@ const toFinishReason = (reason: string | null | undefined): Response.FinishReaso
     default:
       return "unknown"
   }
+}
+
+/**
+ * The caller-tunable options shared by every provider that speaks the
+ * chat-completions protocol; providers extend this with their own extras.
+ */
+export interface Options {
+  readonly model?: string
+  readonly maxTokens?: number
+  readonly temperature?: number
+  readonly topP?: number
+  readonly stop?: ReadonlyArray<string>
+  readonly streaming?: boolean
 }
 
 /**
@@ -286,7 +357,11 @@ export const layer = (config: {
     buildRequest: (options) => Effect.succeed(buildBody(options)),
     ...(config.streaming && {
       streamText: (options: LanguageModel.ProviderOptions, httpClient: HttpClient.HttpClient) =>
-        streamChat(url, { ...buildBody(options), stream: true }, httpClient),
+        streamChat(
+          url,
+          { ...buildBody(options), stream: true, stream_options: { include_usage: true } },
+          httpClient,
+        ),
     }),
     codecTransformer: OpenAiStructuredOutput.toCodecOpenAI,
     response: {
