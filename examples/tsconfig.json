@@ -1,4 +1,9 @@
 {
   "include": [],
-  "references": [{ "path": "./effect-http" }, { "path": "./effect-rpc" }, { "path": "./headless" }]
+  "references": [
+    { "path": "./ai" },
+    { "path": "./effect-http" },
+    { "path": "./effect-rpc" },
+    { "path": "./headless" }
+  ]
 }

@@ -16,6 +16,7 @@ catalog:
   "@cloudflare/worker-bundler": ^0.1.2
   "@cloudflare/workers-types": ^4.20260414.1
   "@distilled.cloud/coinbase": ^0.27.0
+  "@effect/ai-openai": 4.0.0-beta.90
   "@effect/ai-openai-compat": 4.0.0-beta.90
   "@effect/atom-react": 4.0.0-beta.90
   "@effect/language-service": 0.86.2

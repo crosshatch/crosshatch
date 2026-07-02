@@ -1,0 +1,13 @@
+{
+  "name": "@crosshatch-examples/ai",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file=../../.env main.ts"
+  },
+  "dependencies": {
+    "@crosshatch/ai": "workspace:*",
+    "crosshatch": "workspace:*",
+    "effect": "catalog:"
+  }
+}

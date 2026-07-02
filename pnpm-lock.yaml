@@ -21,6 +21,9 @@ catalogs:
     '@distilled.cloud/coinbase':
       specifier: ^0.27.0
       version: 0.27.0
+    '@effect/ai-openai':
+      specifier: 4.0.0-beta.90
+      version: 4.0.0-beta.90
     '@effect/ai-openai-compat':
       specifier: 4.0.0-beta.90
       version: 4.0.0-beta.90
@@ -238,6 +241,25 @@ importers:
         specifier: 'catalog:'
         version: 4.1.4(@types/node@25.9.4)(@vitest/coverage-v8@4.1.9)(happy-dom@20.10.6)(vite@8.1.0(@types/node@25.9.4)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
 
+  '@crosshatch/ai':
+    dependencies:
+      '@effect/ai-openai':
+        specifier: 'catalog:'
+        version: 4.0.0-beta.90(effect@4.0.0-beta.90)
+      crosshatch:
+        specifier: workspace:*
+        version: link:../../crosshatch
+      effect:
+        specifier: 'catalog:'
+        version: 4.0.0-beta.90
+    devDependencies:
+      '@effect/vitest':
+        specifier: 'catalog:'
+        version: 4.0.0-beta.90(effect@4.0.0-beta.90)(vitest@4.1.4(@types/node@26.0.1)(@vitest/coverage-v8@4.1.9(@vitest/browser@4.1.9)(vitest@4.1.4))(happy-dom@20.10.6)(vite@8.1.0(@types/node@26.0.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)))
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.4(@types/node@26.0.1)(@vitest/coverage-v8@4.1.9(@vitest/browser@4.1.9)(vitest@4.1.4))(happy-dom@20.10.6)(vite@8.1.0(@types/node@26.0.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+
   '@crosshatch/alchemy':
     dependencies:
       alchemy:
@@ -342,6 +364,18 @@ importers:
       waku:
         specifier: 'catalog:'
         version: 1.0.0-beta.3(@types/node@25.9.4)(babel-plugin-react-compiler@1.0.0)(esbuild@0.28.1)(jiti@2.7.0)(react-dom@19.2.7(react@19.2.7))(react-server-dom-webpack@19.2.7(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(webpack@5.108.1(esbuild@0.28.1)))(react@19.2.7)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+
+  examples/ai:
+    dependencies:
+      '@crosshatch/ai':
+        specifier: workspace:*
+        version: link:../../@crosshatch/ai
+      crosshatch:
+        specifier: workspace:*
+        version: link:../../crosshatch
+      effect:
+        specifier: 'catalog:'
+        version: 4.0.0-beta.90
 
   examples/effect-http:
     dependencies:
@@ -1190,6 +1224,11 @@ packages:
 
   '@effect/ai-openai-compat@4.0.0-beta.90':
     resolution: {integrity: sha512-ClgcVKYC+3SOyKcwwlV3hx75n491ZMM+zLsRo2g03nNUJwq55Rf6nKU05vCr2GgnC8AdHSZV97k/M5PPekCZIg==}
+    peerDependencies:
+      effect: ^4.0.0-beta.90
+
+  '@effect/ai-openai@4.0.0-beta.90':
+    resolution: {integrity: sha512-aWWXah1esZXITvkIHFh/zdERknLdMnDaz7VubaE8Seduk51vEilLXK+h7cMm6uIl7RtF5v9+3+hkmEPFsIWH/w==}
     peerDependencies:
       effect: ^4.0.0-beta.90
 
@@ -7436,6 +7475,10 @@ snapshots:
     dependencies:
       effect: 4.0.0-beta.90
 
+  '@effect/ai-openai@4.0.0-beta.90(effect@4.0.0-beta.90)':
+    dependencies:
+      effect: 4.0.0-beta.90
+
   '@effect/atom-react@4.0.0-beta.90(effect@4.0.0-beta.90)(react@19.2.7)(scheduler@0.27.0)':
     dependencies:
       effect: 4.0.0-beta.90
@@ -7478,6 +7521,11 @@ snapshots:
     dependencies:
       effect: 4.0.0-beta.90
       vitest: 4.1.4(@types/node@25.9.4)(@vitest/coverage-v8@4.1.9(@vitest/browser@4.1.9)(vitest@4.1.4))(happy-dom@20.10.6)(vite@8.1.0(@types/node@25.9.4)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+
+  '@effect/vitest@4.0.0-beta.90(effect@4.0.0-beta.90)(vitest@4.1.4(@types/node@26.0.1)(@vitest/coverage-v8@4.1.9(@vitest/browser@4.1.9)(vitest@4.1.4))(happy-dom@20.10.6)(vite@8.1.0(@types/node@26.0.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)))':
+    dependencies:
+      effect: 4.0.0-beta.90
+      vitest: 4.1.4(@types/node@26.0.1)(@vitest/coverage-v8@4.1.9(@vitest/browser@4.1.9)(vitest@4.1.4))(happy-dom@20.10.6)(vite@8.1.0(@types/node@26.0.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
 
   '@effect/vitest@4.0.0-beta.90(effect@4.0.0-beta.90)(vitest@4.1.4)':
     dependencies:

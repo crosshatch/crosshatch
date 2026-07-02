@@ -1,0 +1,35 @@
+{
+  "name": "@crosshatch/ai",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Effect LanguageModel over x402-paywalled AI providers, paid via Crosshatch.",
+  "homepage": "https://crosshatch.dev",
+  "bugs": {
+    "url": "https://github.com/crosshatch/crosshatch/issues"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/crosshatch/crosshatch.git",
+    "directory": "@crosshatch/ai"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./index.ts"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@effect/ai-openai": "catalog:",
+    "crosshatch": "workspace:*",
+    "effect": "catalog:"
+  },
+  "devDependencies": {
+    "@effect/vitest": "catalog:",
+    "vitest": "catalog:"
+  }
+}
