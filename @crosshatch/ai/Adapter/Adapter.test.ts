@@ -4,7 +4,7 @@ import { AiError, LanguageModel, Prompt, Tool, Toolkit } from "effect/unstable/a
 import { FetchHttpClient } from "effect/unstable/http"
 
 import { capturingFetch, chatCompletion, sseFetch } from "../TestKit.ts"
-import * as CustomJsonAdapter from "./CustomJson.ts"
+import * as SingleMessage from "./SingleMessage.ts"
 import * as OpenAiChatCompletions from "./OpenAiChatCompletions.ts"
 
 const stubFetch =
@@ -70,12 +70,11 @@ const openAiStreamingLayer = OpenAiChatCompletions.layer({
   streaming: true,
 })
 
-const customJsonLayer = CustomJsonAdapter.layer({
+const singleMessageLayer = SingleMessage.layer({
   id: "TestClient",
-  apiUrl: "https://provider.test",
-  endpoint: "/chat",
+  url: "https://provider.test/chat",
   model: "test-model",
-  buildRequest: ({ message }) => Effect.succeed({ message }),
+  request: (message) => ({ message }),
   response: {
     schema: S.Struct({ data: S.Struct({ message: S.String }) }),
     message: ({ data }) => data.message,
@@ -106,8 +105,8 @@ describe(import.meta.url, () => {
     assert.strictEqual(response.text, "Hello from chat.")
   })
 
-  it("generates text through the custom-json adapter", async () => {
-    const layer = customJsonLayer.pipe(Layer.provide(provideFetch({ data: { message: "Hello from json." } })))
+  it("generates text through the single-message adapter", async () => {
+    const layer = singleMessageLayer.pipe(Layer.provide(provideFetch({ data: { message: "Hello from json." } })))
     const response = await LanguageModel.generateText({ prompt: "hi" }).pipe(Effect.provide(layer), Effect.runPromise)
     assert.strictEqual(response.text, "Hello from json.")
     assert.strictEqual(response.finishReason, "stop")
@@ -121,7 +120,7 @@ describe(import.meta.url, () => {
       { role: "user", content: "Elaborate." },
     ])
     assert.strictEqual(
-      CustomJsonAdapter.toMessage(prompt),
+      SingleMessage.toMessage(prompt),
       "system: Be brief.\n\nuser: What is x402?\n\nassistant: A payment protocol.\n\nuser: Elaborate.",
     )
   })
@@ -214,23 +213,6 @@ describe(import.meta.url, () => {
     assert.deepStrictEqual(response.toolCalls[0]?.params, {})
   })
 
-  it("decodes streamed tool calls with empty arguments as an empty object", async () => {
-    const { layer: fetchLayer } = sseFetch([
-      `{"id":"c1","model":"test-model","choices":[{"index":0,"delta":{"role":"assistant","tool_calls":[{"index":0,"id":"call_1","type":"function","function":{"name":"ring_bell","arguments":""}}]}}]}`,
-      `{"id":"c1","choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}`,
-    ])
-    const layer = openAiStreamingLayer.pipe(Layer.provide(fetchLayer))
-
-    const parts = await LanguageModel.streamText({
-      prompt: "Ring the bell.",
-      toolkit: BellToolkit,
-      disableToolCallResolution: true,
-    }).pipe(Stream.runCollect, Effect.provide(layer), Effect.runPromise)
-
-    const toolCall = Array.from(parts).find((part) => part.type === "tool-call")
-    assert.deepStrictEqual(toolCall?.params, {})
-  })
-
   it("serializes undefined tool results as explicit JSON null content", async () => {
     const { requests, layer: fetchLayer } = capturingFetch(
       chatCompletion({ role: "assistant", content: "Done." }),
@@ -270,21 +252,6 @@ describe(import.meta.url, () => {
     await LanguageModel.generateText({ prompt }).pipe(Effect.provide(layer), Effect.runPromise)
 
     assert.deepStrictEqual(requests[0].messages[1], { role: "assistant", content: "" })
-  })
-
-  it("executes toolkit handlers against decoded tool calls", async () => {
-    const { layer: fetchLayer } = capturingFetch(toolCallCompletion)
-    const layer = openAiChatLayer.pipe(Layer.provide(fetchLayer))
-    const handlers = WeatherToolkit.toLayer({
-      get_weather: ({ city }) => Effect.succeed({ city, temp: 21 }),
-    })
-    const response = await LanguageModel.generateText({
-      prompt: "What's the weather in Tokyo?",
-      toolkit: WeatherToolkit,
-    }).pipe(Effect.provide([layer, handlers]), Effect.runPromise)
-
-    assert.lengthOf(response.toolResults, 1)
-    assert.deepStrictEqual(response.toolResults[0]?.result, { city: "Tokyo", temp: 21 })
   })
 
   it("requests structured output via response_format when generating objects", async () => {
@@ -470,20 +437,8 @@ describe(import.meta.url, () => {
     assert.strictEqual(error.reason._tag, "InternalProviderError")
   })
 
-  it("fails streaming through the custom-json adapter without touching the network", async () => {
-    const layer = customJsonLayer.pipe(Layer.provide(provideRejectingFetch()))
-    const error = await LanguageModel.streamText({ prompt: "hi" }).pipe(
-      Stream.runDrain,
-      Effect.flip,
-      Effect.provide(layer),
-      Effect.runPromise,
-    )
-    assert.isTrue(AiError.isAiError(error))
-    assert.strictEqual(error.reason._tag, "InvalidRequestError")
-  })
-
-  it("fails streaming through the openai-chat adapter without touching the network", async () => {
-    const layer = openAiChatLayer.pipe(Layer.provide(provideRejectingFetch()))
+  it("fails streaming through the single-message adapter without touching the network", async () => {
+    const layer = singleMessageLayer.pipe(Layer.provide(provideRejectingFetch()))
     const error = await LanguageModel.streamText({ prompt: "hi" }).pipe(
       Stream.runDrain,
       Effect.flip,

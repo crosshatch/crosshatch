@@ -1,7 +1,7 @@
-import { Effect, Schema as S } from "effect"
+import { Schema as S } from "effect"
 import { Model } from "effect/unstable/ai"
 
-import * as CustomJsonAdapter from "../Adapter/CustomJson.ts"
+import * as SingleMessage from "../Adapter/SingleMessage.ts"
 
 const MESSARI_API_URL = "https://api.messari.io/ai/v2"
 const MODEL = "messari"
@@ -17,20 +17,21 @@ const MessariChatResponse = S.Struct({
   }),
 })
 
-const layer = CustomJsonAdapter.layer({
+const layer = SingleMessage.layer({
   id: "MessariClient",
-  apiUrl: MESSARI_API_URL,
-  endpoint: "/chat/completions",
+  url: `${MESSARI_API_URL}/chat/completions`,
   model: MODEL,
-  buildRequest: ({ message }) =>
-    Effect.succeed({
-      messages: [{ role: "user", content: message }],
-      response_format: "markdown",
-      stream: false,
-      verbosity: "succinct",
-    }),
+  request: (message) => ({
+    messages: [{ role: "user", content: message }],
+    response_format: "markdown",
+    stream: false,
+    verbosity: "succinct",
+  }),
   response: {
     schema: MessariChatResponse,
+    // the reply comes back as a chat-history array: prefer the message tagged
+    // assistant, fall back to the last one, and degrade to empty text (not an
+    // error) if the array is somehow empty
     message: ({ data }) =>
       data.messages.find((message) => message.role === "assistant")?.content ?? data.messages.at(-1)?.content ?? "",
   },

@@ -1,4 +1,4 @@
-import type { Effect, Schema as S } from "effect"
+import { Effect, type Schema as S } from "effect"
 import type { Prompt } from "effect/unstable/ai"
 
 import * as Adapter from "./Adapter.ts"
@@ -13,15 +13,14 @@ export const toMessage = (prompt: Prompt.Prompt): string =>
     .join("\n\n")
 
 /**
- * A `LanguageModel` for providers with a bespoke request/response JSON chat
- * endpoint. See `Adapter.layer` for the payment contract.
+ * A `LanguageModel` for providers whose JSON chat endpoint exchanges a single
+ * message string each way. See `Adapter.layer` for the payment contract.
  */
 export const layer = <W, I>(config: {
   readonly id: string
-  readonly apiUrl: string
-  readonly endpoint: string
+  readonly url: string
   readonly model: string
-  readonly buildRequest: (input: { readonly message: string }) => Effect.Effect<unknown>
+  readonly request: (message: string) => unknown
   readonly response: {
     readonly schema: S.Codec<W, I>
     readonly message: (response: W) => string
@@ -29,8 +28,8 @@ export const layer = <W, I>(config: {
 }) =>
   Adapter.layer({
     id: config.id,
-    url: `${config.apiUrl}${config.endpoint}`,
-    buildRequest: (options) => config.buildRequest({ message: toMessage(options.prompt) }),
+    url: config.url,
+    buildRequest: (options) => Effect.succeed(config.request(toMessage(options.prompt))),
     response: {
       schema: config.response.schema,
       toParts: (response) =>
