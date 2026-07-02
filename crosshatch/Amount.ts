@@ -1,7 +1,5 @@
 import { BigDecimal, Data, Effect, Option, Schema as S, SchemaGetter } from "effect"
 
-import type { Denomination } from "./PhysicalAsset.ts"
-
 export const Atomic = S.String.check(S.isPattern(/^(0|[1-9]\d*)$/)).pipe(S.brand("crosshatch/Atomic"))
 
 export const Amount = S.BigDecimal.check(S.isGreaterThanOrEqualToBigDecimal(BigDecimal.fromBigInt(0n))).pipe(
@@ -80,10 +78,10 @@ export const atomic = (unit: AtomicUnit) =>
 
 export const format = (amount: typeof Amount.Type): string => BigDecimal.format(BigDecimal.normalize(amount))
 
-export const display = (amount: typeof Amount.Type, { displayDecimals }: Denomination): string => {
-  const rounded = BigDecimal.normalize(BigDecimal.round(amount, { scale: displayDecimals, mode: "floor" }))
-  const units = rounded.value * 10n ** BigInt(displayDecimals - rounded.scale)
-  const scale = 10n ** BigInt(displayDecimals)
-  const fraction = displayDecimals === 0 ? "" : `.${(units % scale).toString().padStart(displayDecimals, "0")}`
+export const display = (amount: typeof Amount.Type, decimals: number): string => {
+  const rounded = BigDecimal.normalize(BigDecimal.round(amount, { scale: decimals, mode: "floor" }))
+  const units = rounded.value * 10n ** BigInt(decimals - rounded.scale)
+  const scale = 10n ** BigInt(decimals)
+  const fraction = decimals === 0 ? "" : `.${(units % scale).toString().padStart(decimals, "0")}`
   return `${units / scale}${fraction}`
 }

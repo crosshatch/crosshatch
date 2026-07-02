@@ -13,14 +13,12 @@ export interface PhysicalAsset {
 export interface Denomination {
   readonly symbol: string
   readonly peg: "USD"
-  readonly displayDecimals: number
 }
 
 export const usdDenomination = <const Symbol extends string>(symbol: Symbol) =>
   ({
     symbol,
     peg: "USD",
-    displayDecimals: 2,
   }) as const satisfies Denomination
 
 export interface Deployment {

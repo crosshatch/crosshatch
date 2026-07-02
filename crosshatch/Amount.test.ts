@@ -4,10 +4,7 @@ import { BigDecimal, Effect, Schema as S } from "effect"
 import { Address } from "./Address.ts"
 import * as Amount from "./Amount.ts"
 import { KnownAsset } from "./index.ts"
-import { usdDenomination } from "./PhysicalAsset.ts"
 import { group } from "./Requirements.ts"
-
-const USD = usdDenomination("USD")
 
 const assertAmount = (actual: typeof Amount.Amount.Type, expected: string) =>
   assert.isTrue(
@@ -81,10 +78,11 @@ describe(import.meta.url, () => {
     assert.strictEqual(Amount.format(Amount.fromUnsafe("0.000001")), "0.000001")
   })
 
-  it("displays amounts per denomination", () => {
-    assert.strictEqual(Amount.display(Amount.fromUnsafe(20), USD), "20.00")
-    assert.strictEqual(Amount.display(Amount.fromUnsafe("1.5"), USD), "1.50")
-    assert.strictEqual(Amount.display(Amount.fromUnsafe("1.239"), USD), "1.23")
+  it("displays amounts at a fixed precision", () => {
+    assert.strictEqual(Amount.display(Amount.fromUnsafe(20), 2), "20.00")
+    assert.strictEqual(Amount.display(Amount.fromUnsafe("1.5"), 2), "1.50")
+    assert.strictEqual(Amount.display(Amount.fromUnsafe("1.239"), 2), "1.23")
+    assert.strictEqual(Amount.display(Amount.fromUnsafe("1.9"), 0), "1")
   })
 
   it("scales grouped requirements by deployment decimals", () => {

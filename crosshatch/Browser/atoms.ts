@@ -34,6 +34,7 @@ export const openAtom = atomRuntime.fn<void>()(
     const common = { referrer: location.href }
     const { url } = yield* Stage
     const internal = origin.startsWith(url())
+    const amount = yield* Amount.from(10)
     yield* Match.valueTags(state, {
       Challenged: ({ challengeId }) =>
         internal
@@ -41,7 +42,7 @@ export const openAtom = atomRuntime.fn<void>()(
           : LinkWidget.host({
               challengeId,
               allowance: {
-                amount: Amount.fromUnsafe(10),
+                amount,
                 window: "Week",
               },
               ...common,
