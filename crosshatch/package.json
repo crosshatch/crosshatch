@@ -27,6 +27,7 @@
     "./Facade": "./Facade/Facade.ts",
     "./Http402": "./Http402/Http402.ts",
     "./KnownAsset": "./KnownAsset/KnownAsset.ts",
+    "./Headless": "./Headless/Headless.ts",
     "./Svm": "./Svm/Svm.ts",
     "./internal": "./internal/internal.ts",
     "./package.json": "./package.json"
@@ -41,6 +42,7 @@
       "./Facade": "./dist/Facade/Facade.js",
       "./Http402": "./dist/Http402/Http402.js",
       "./KnownAsset": "./dist/KnownAsset/KnownAsset.js",
+      "./Headless": "./dist/Headless/Headless.js",
       "./Svm": "./dist/Svm/Svm.js",
       "./internal": "./dist/internal/internal.js",
       "./package.json": "./package.json"
