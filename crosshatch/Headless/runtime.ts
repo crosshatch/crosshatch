@@ -7,7 +7,10 @@ import type { PhysicalAssetLookup } from "../PhysicalAsset.ts"
 import * as Treasurer from "../Treasurer.ts"
 import { makeFetch } from "./makeFetch.ts"
 
-export const fromMnemonic = (mnemonic: Redacted.Redacted<string>, supported: PhysicalAssetLookup) =>
+export const fromMnemonic = (
+  mnemonic: Redacted.Redacted<string>,
+  supported: PhysicalAssetLookup,
+): ManagedRuntime.ManagedRuntime<Payer.Payer, never> =>
   ManagedRuntime.make(
     Payer.layer(EvmChain.fromMnemonic(mnemonic)).pipe(Layer.provide(Treasurer.layerFirstSupported(supported))),
   )
