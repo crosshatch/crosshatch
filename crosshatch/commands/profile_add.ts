@@ -46,7 +46,7 @@ export const profileAdd = Command.make("add", {
       })
       mnemonic ??= yield* Mnemonic.random
       const mnemonicEncoded = new TextEncoder().encode(Redacted.value(mnemonic))
-      const address = EvmAddress.toAddress(mnemonic)
+      const address = EvmAddress.fromMnemonic(mnemonic)
       const envelope = yield* X25519PublicKey.encrypt(publicKey, mnemonicEncoded)
       config.profiles[profile] = {
         address,

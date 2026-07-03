@@ -11,8 +11,8 @@ export const CROSSHATCH_TRACE_ID = "x-crosshatch-trace-id" as const
 
 export const EXPOSED_HEADERS = [PAYMENT_REQUIRED, CROSSHATCH_TRACE_ID] as const
 
-export class Http402Payload extends Context.Service<Http402Payload, typeof Payload.Type | undefined>()(
-  "crosshatch/http/Http402/Payload",
+export class Payload402 extends Context.Service<Payload402, typeof Payload.Type | undefined>()(
+  "crosshatch/HttpServer402/Payload402",
 ) {}
 
 export const require = Effect.fnUntraced(function* ({ required }: { readonly required: typeof Required.Type }) {
@@ -26,7 +26,7 @@ export const require = Effect.fnUntraced(function* ({ required }: { readonly req
   })
 })
 
-export const layer = HttpRouter.middleware<{ readonly provides: Http402Payload }>()(
+export const layer = HttpRouter.middleware<{ readonly provides: Payload402 }>()(
   (httpEffect) =>
     Effect.gen(function* () {
       const request = yield* HttpServerRequest.HttpServerRequest
@@ -37,7 +37,7 @@ export const layer = HttpRouter.middleware<{ readonly provides: Http402Payload }
           : S.decodeUnknownOption(S.StringFromBase64.pipe(S.decodeTo(S.fromJsonString(S.toCodecJson(Payload)))))(
               header,
             ).pipe(Option.getOrUndefined)
-      return yield* Effect.provideService(httpEffect, Http402Payload, payload)
+      return yield* Effect.provideService(httpEffect, Payload402, payload)
     }),
   { global: true },
 )

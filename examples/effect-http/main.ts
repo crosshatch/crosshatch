@@ -1,4 +1,4 @@
-import { Facilitator, Required, Requirements, PaymentId, Http402, KnownAsset } from "crosshatch"
+import { Facilitator, Required, Requirements, PaymentId, HttpServer402, KnownAsset } from "crosshatch"
 import { EvmAddress } from "crosshatch/Evm"
 import { Layer, Effect } from "effect"
 import { Worker } from "effect-workerd"
@@ -9,7 +9,7 @@ export default Worker.make({
     "GET",
     "/paid",
     Effect.gen(function* () {
-      const payload = yield* Http402.Http402Payload
+      const payload = yield* HttpServer402.Payload402
       if (!payload) {
         const required = yield* Required.builder({
           url: "https://example-merchant.com",
@@ -32,7 +32,7 @@ export default Worker.make({
         | What is this charge for?
         | How does it fit into the current flow?
         `
-        return yield* Http402.require({ required })
+        return yield* HttpServer402.require({ required })
       }
       yield* Facilitator.settle({ payload })
       return HttpServerResponse.text("The paid resource.")
@@ -43,9 +43,9 @@ export default Worker.make({
         allowedHeaders: ["*"],
         allowedMethods: ["*"],
         allowedOrigins: ["*"],
-        exposedHeaders: Http402.EXPOSED_HEADERS,
+        exposedHeaders: HttpServer402.EXPOSED_HEADERS,
       }),
-      Http402.layer,
+      HttpServer402.layer,
     ]),
     HttpRouter.toHttpEffect,
     Effect.flatten,

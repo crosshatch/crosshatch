@@ -12,6 +12,10 @@
       "cache": false,
       "persistent": true
     },
+    "//#motel": {
+      "cache": false,
+      "persistent": true
+    },
     "//#aliases": {
       "cache": false,
       "persistent": true
