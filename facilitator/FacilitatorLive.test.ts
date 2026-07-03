@@ -3,7 +3,7 @@ import { NodeHttpClient, NodeHttpServer } from "@effect/platform-node"
 import { describe, it, assert } from "@effect/vitest"
 import { Requirements, Facilitator, KnownAsset } from "crosshatch"
 import { EvmChain, EvmAddress } from "crosshatch/Evm"
-import { Config, Effect, Layer } from "effect"
+import { Config, Effect, Layer, Array, flow } from "effect"
 import { HttpRouter } from "effect/unstable/http"
 import { HttpApiBuilder, HttpApiClient } from "effect/unstable/httpapi"
 
@@ -21,14 +21,14 @@ describe(import.meta.url, () => {
     "verifies and settles a freshly signed EVM x402 payment",
     Effect.fn(function* () {
       const seed = yield* Config.redacted("EVM_SEED_PHRASE")
-      const paymentRequirements = (yield* Requirements.group(KnownAsset.USDC, {
+      const paymentRequirements = yield* Requirements.group(KnownAsset.USDC, {
         amount: 0.01,
         recipients: {
           eip155: {
             8453: yield* EvmAddress.config("PAY_TO_EVM"),
           },
         },
-      }))[0]!
+      }).pipe(Effect.flatMap(flow(Array.head, Effect.fromOption)))
       const chain = EvmChain.fromMnemonic(seed)
       const { payload: paymentPayload } = yield* chain.createPayload({
         accepted: paymentRequirements,
