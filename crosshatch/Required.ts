@@ -1,5 +1,6 @@
-import { String, Pipeable, Schema as S, Array, Record, Effect } from "effect"
+import { String, Pipeable, Schema as S, Record, Effect } from "effect"
 
+import { InvalidAmountError } from "./Amount.ts"
 import type { Extension } from "./Extension.ts"
 import { Requirements } from "./Requirements.ts"
 import { ResourceInfo } from "./ResourceInfo.ts"
@@ -17,18 +18,24 @@ export const RequiredFromBase64JsonString = S.StringFromBase64.pipe(
   S.decodeTo(S.fromJsonString(S.toCodecJson(Required))),
 )
 
+export type AcceptsInput =
+  | typeof Requirements.Type
+  | Effect.Effect<typeof Requirements.Type, InvalidAmountError>
+  | Array<typeof Requirements.Type>
+  | Effect.Effect<Array<typeof Requirements.Type>, InvalidAmountError>
+
 export interface Builder_<R> extends Pipeable.Pipeable {
   readonly ""?: [R]
   readonly url: string
   readonly extensionsEntries?: ReadonlyArray<[Extension.Any, unknown]> | undefined
-  readonly accepts?: ReadonlyArray<typeof Requirements.Type> | undefined
+  readonly acceptsInputs?: ReadonlyArray<AcceptsInput> | undefined
 }
 
 export interface Builder<R> extends Builder_<R> {
   (
     template?: TemplateStringsArray | string,
     ...substitutions: ReadonlyArray<unknown>
-  ): Effect.Effect<typeof Required.Type, S.SchemaError, R>
+  ): Effect.Effect<typeof Required.Type, S.SchemaError | InvalidAmountError, R>
 }
 
 export const builder = ({ url }: { readonly url: string }): Builder_<never> => ({
@@ -41,10 +48,10 @@ export const builder = ({ url }: { readonly url: string }): Builder_<never> => (
 const make = <R>(
   builder: Builder_<R>,
   {
-    accepts,
+    acceptsInputs,
     extensionEntries,
   }: {
-    readonly accepts: ReadonlyArray<typeof Requirements.Type>
+    readonly acceptsInputs: ReadonlyArray<AcceptsInput>
     readonly extensionEntries: ReadonlyArray<[Extension.Any, unknown]>
   },
 ): Builder<R> => {
@@ -53,7 +60,9 @@ const make = <R>(
     Effect.fnUntraced(function* (template?: TemplateStringsArray | string, ...substitutions: ReadonlyArray<unknown>) {
       return {
         x402Version: 2,
-        accepts,
+        accepts: yield* Effect.forEach(acceptsInputs, (v) => (Effect.isEffect(v) ? v : Effect.succeed(v))).pipe(
+          Effect.map((v) => v.flat()),
+        ),
         resource: {
           url,
           ...(template
@@ -77,7 +86,7 @@ const make = <R>(
     }),
     {
       url,
-      accepts,
+      acceptsInputs,
       extensionsEntries: extensions,
       pipe() {
         return Pipeable.pipeArguments(this, arguments)
@@ -87,10 +96,10 @@ const make = <R>(
 }
 
 export const accept =
-  (...accepts_: ReadonlyArray<typeof Requirements.Type | ReadonlyArray<typeof Requirements.Type>>) =>
+  (...acceptsInputs: ReadonlyArray<AcceptsInput>) =>
   <R>(builder: Builder_<R>): Builder<R> =>
     make(builder, {
-      accepts: [...(builder.accepts ?? []), ...Array.flatMap(accepts_, Array.ensure)],
+      acceptsInputs: [...(builder.acceptsInputs ?? []), ...acceptsInputs],
       extensionEntries: builder.extensionsEntries ?? [],
     })
 
@@ -101,6 +110,6 @@ export const extend =
   ) =>
   <R>(builder: Builder_<R>): Builder<R | Payload["EncodingServices"]> =>
     make(builder, {
-      accepts: builder.accepts ?? [],
+      acceptsInputs: builder.acceptsInputs ?? [],
       extensionEntries: [...(builder.extensionsEntries ?? []), [extension, payload]],
     })

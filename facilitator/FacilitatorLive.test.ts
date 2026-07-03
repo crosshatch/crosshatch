@@ -21,14 +21,14 @@ describe(import.meta.url, () => {
     "verifies and settles a freshly signed EVM x402 payment",
     Effect.fn(function* () {
       const seed = yield* Config.redacted("EVM_SEED_PHRASE")
-      const paymentRequirements = Requirements.group(KnownAsset.USDC, {
+      const paymentRequirements = (yield* Requirements.group(KnownAsset.USDC, {
         amount: 0.01,
         recipients: {
           eip155: {
             8453: yield* EvmAddress.config("PAY_TO_EVM"),
           },
         },
-      })[0]!
+      }))[0]!
       const chain = EvmChain.fromMnemonic(seed)
       const { payload: paymentPayload } = yield* chain.createPayload({
         accepted: paymentRequirements,

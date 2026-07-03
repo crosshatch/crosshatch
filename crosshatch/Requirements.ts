@@ -1,4 +1,4 @@
-import { Schema as S, Record, Duration } from "effect"
+import { Effect, Schema as S, Record, Duration } from "effect"
 
 import { Address } from "./Address.ts"
 import * as Amount from "./Amount.ts"
@@ -16,24 +16,24 @@ export const Requirements = S.Struct({
   scheme: S.Literals(["exact", "upto"]),
 })
 
-export const group = <A extends PhysicalAsset>(
+export const group = Effect.fnUntraced(function* <A extends PhysicalAsset>(
   asset: A,
   {
     amount,
     recipients,
     ttl,
   }: {
-    amount: Amount.Input
-    recipients: {
-      [K in keyof A["deployments"]]: {
-        [K2 in keyof A["deployments"][K]]+?: typeof Address.Type | undefined
+    readonly amount: Amount.Input
+    readonly recipients: {
+      readonly [K in keyof A["deployments"]]: {
+        readonly [K2 in keyof A["deployments"][K]]+?: typeof Address.Type | undefined
       }
     }
-    ttl?: Duration.Input | undefined
+    readonly ttl?: Duration.Input | undefined
   },
-): ReadonlyArray<typeof Requirements.Type> => {
+) {
   const maxTimeoutSeconds = ttl ? Math.ceil(Duration.fromInputUnsafe(ttl).pipe(Duration.toSeconds)) : 300
-  const nominal = Amount.fromUnsafe(amount)
+  const nominal = yield* Amount.from(amount)
   return Record.toEntries(recipients).flatMap(([namespace, references]) =>
     Record.toEntries(references).reduce(
       (acc, [reference, payTo]) => {
@@ -54,4 +54,4 @@ export const group = <A extends PhysicalAsset>(
       [] as ReadonlyArray<typeof Requirements.Type>,
     ),
   )
-}
+})

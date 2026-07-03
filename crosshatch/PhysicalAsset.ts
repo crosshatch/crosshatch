@@ -6,20 +6,10 @@ import type { Chain } from "./Chain.ts"
 export type PhysicalAssetLookup = Record<string, PhysicalAsset>
 
 export interface PhysicalAsset {
-  readonly denomination: Denomination
+  readonly symbol: string
+  readonly peg: string
   readonly deployments: Record<string, Record<string, Deployment>>
 }
-
-export interface Denomination {
-  readonly symbol: string
-  readonly peg: "USD"
-}
-
-export const usdDenomination = <const Symbol extends string>(symbol: Symbol) =>
-  ({
-    symbol,
-    peg: "USD",
-  }) as const satisfies Denomination
 
 export interface Deployment {
   readonly asset: typeof Asset.Type

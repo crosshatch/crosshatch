@@ -1,8 +1,9 @@
 import { EvmChain, EvmAsset } from "../Evm/Evm.ts"
-import { type PhysicalAsset, usdDenomination } from "../PhysicalAsset.ts"
+import { type PhysicalAsset } from "../PhysicalAsset.ts"
 
 export const USDCE = {
-  denomination: usdDenomination("USDC.e"),
+  peg: "USD",
+  symbol: "USDC.e",
   deployments: {
     eip155: {
       36900: {

@@ -6,14 +6,14 @@ export const Amount = S.BigDecimal.check(S.isGreaterThanOrEqualToBigDecimal(BigD
   S.brand("crosshatch/Amount"),
 )
 
-export class InvalidAmountError extends Data.TaggedError("InvalidAmountError")<{
-  readonly input: string | number | bigint | BigDecimal.BigDecimal
-}> {}
-
 export type Input = number | bigint | string | BigDecimal.BigDecimal
 
-export const fromUnsafe = (input: Input): typeof Amount.Type => {
-  const decimal =
+export class InvalidAmountError extends Data.TaggedError("InvalidAmountError")<{
+  readonly input: Input
+}> {}
+
+export const from = Effect.fnUntraced(function* (input: Input) {
+  const v =
     typeof input === "number"
       ? Number.isFinite(input)
         ? Option.getOrUndefined(BigDecimal.fromNumber(input))
@@ -25,17 +25,11 @@ export const fromUnsafe = (input: Input): typeof Amount.Type => {
             ? undefined
             : Option.getOrUndefined(BigDecimal.fromString(input.trim()))
           : input
-  if (decimal === undefined || BigDecimal.isNegative(decimal)) {
-    throw new InvalidAmountError({ input })
+  if (v === undefined || BigDecimal.isNegative(v)) {
+    return yield* new InvalidAmountError({ input })
   }
-  return Amount.make(decimal)
-}
-
-export const from = (input: Input): Effect.Effect<typeof Amount.Type, InvalidAmountError> =>
-  Effect.try({
-    try: () => fromUnsafe(input),
-    catch: (error) => error as InvalidAmountError,
-  })
+  return Amount.make(v)
+})
 
 export const parse = (input: string): Effect.Effect<typeof Amount.Type, InvalidAmountError> => {
   const trimmed = input.trim()
