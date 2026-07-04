@@ -14,7 +14,7 @@ export const layer = Effect.gen(function* () {
   yield* Host.hostListener.pipe(Effect.forkScoped)
   const { url } = yield* Stage
   const fiber = yield* BrowserStream.fromEventListenerWindow("message").pipe(
-    Stream.filter(({ data, origin }) => origin.startsWith(url()) && S.is(RequestFacadeIntroduction)(data)),
+    Stream.filter(({ data, origin }) => origin.startsWith(url("link")) && S.is(RequestFacadeIntroduction)(data)),
     Stream.take(1),
     Stream.runDrain,
     Effect.forkScoped,
@@ -24,7 +24,7 @@ export const layer = Effect.gen(function* () {
     id: "crosshatch-enclave",
     height: 1,
     sandbox: "allow-scripts allow-same-origin",
-    src: url("enclave"),
+    src: url("link", "enclave"),
     width: 1,
   })
   Object.assign(iframe.style, { cssText })
@@ -34,7 +34,7 @@ export const layer = Effect.gen(function* () {
     Effect.mapError((cause) => new FacadeWorkerError({ cause })),
   )
   const { port1, port2 } = new MessageChannel()
-  context.postMessage(FacadeIntroduction.make({}), url(), [port2])
+  context.postMessage(FacadeIntroduction.make({}), url("link"), [port2])
   yield* Effect.addFinalizer(() => Effect.sync(() => iframe.remove()))
   return BrowserWorker.layer(() => port1)
 }).pipe(

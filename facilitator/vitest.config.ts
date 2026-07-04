@@ -7,7 +7,7 @@ import config from "../../konfik/vitest.ts"
 
 export default mergeConfig(config, {
   test: {
-    name: "@crosshatch/facilitator",
+    name: "facilitator.crosshatch.dev",
     env: loadEnv("test", Process.cwd(), ""),
   },
 } satisfies ViteUserConfig)

@@ -13,11 +13,11 @@ const OtlpLive = Stage.pipe(
       ? Layer.empty
       : Layer.mergeAll(
           OtlpLogger.layer({
-            url: url("otel/v1/logs"),
+            url: url("link", "otel/v1/logs"),
             resource: { serviceName: "crosshatch-lib" },
           }),
           OtlpTracer.layer({
-            url: url("otel/v1/traces"),
+            url: url("link", "otel/v1/traces"),
             resource: { serviceName: "crosshatch-lib" },
           }),
         ).pipe(Layer.provide(OtlpSerialization.layerJson)),

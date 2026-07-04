@@ -33,7 +33,7 @@ export const openAtom = atomRuntime.fn<void>()(
     const state = yield* get.result(stateAtom)
     const common = { referrer: location.href }
     const { url } = yield* Stage
-    const internal = origin.startsWith(url())
+    const internal = origin.startsWith(url("link"))
     const amount = yield* Amount.from(10)
     yield* Match.valueTags(state, {
       Challenged: ({ challengeId }) =>

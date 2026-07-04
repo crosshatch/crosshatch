@@ -6,9 +6,9 @@ import * as X25519Pair from "../Crypto/X25519Pair.ts"
 import * as X25519PrivateKey from "../Crypto/X25519PrivateKey.ts"
 import * as X25519PublicKey from "../Crypto/X25519PublicKey.ts"
 import { EvmAddress } from "../Evm/Evm.ts"
-import { CaAccountId } from "../internal/CaAccountId.ts"
-import { CrosshatchClient } from "../internal/CrosshatchClient.ts"
 import * as Mnemonic from "../Mnemonic.ts"
+import { CaAccountId } from "../Ramp/CaAccountId.ts"
+import { RampClient } from "../Ramp/RampClient.ts"
 import * as UserConfig from "./UserConfig.ts"
 
 export class ProfileAlreadyExistsError extends Data.TaggedError("ProfileAlreadyExistsError")<{
@@ -63,8 +63,8 @@ export const profileAdd = Command.make("add", {
           default: 10,
           min: 1,
         })
-        const chx = yield* CrosshatchClient
-        const { onrampUrl } = yield* chx.onramp.session({
+        const ramp = yield* RampClient
+        const { onrampUrl } = yield* ramp.onramp({
           payload: {
             amount,
             provider: "Coinbase",

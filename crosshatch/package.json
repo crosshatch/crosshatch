@@ -25,8 +25,8 @@
     "./Crypto": "./Crypto/Crypto.ts",
     "./Evm": "./Evm/Evm.ts",
     "./Facade": "./Browser/Facade/Facade.ts",
+    "./Ramp": "./Ramp/Ramp.ts",
     "./Svm": "./Svm/Svm.ts",
-    "./internal": "./internal/internal.ts",
     "./package.json": "./package.json"
   },
   "publishConfig": {
@@ -37,8 +37,8 @@
       "./Crypto": "./dist/Crypto/Crypto.js",
       "./Evm": "./dist/Evm/Evm.js",
       "./Facade": "./dist/Browser/Facade/Facade.js",
+      "./Ramp": "./dist/Ramp/Ramp.js",
       "./Svm": "./dist/Svm/Svm.js",
-      "./internal": "./dist/internal/internal.js",
       "./package.json": "./package.json"
     }
   },

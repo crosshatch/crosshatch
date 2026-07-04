@@ -11,7 +11,7 @@ export default Alchemy.Stack(
     providers: Layer.mergeAll(Cloudflare.providers(), GitHub.providers()),
   },
   docs({
-    domain: "docs.crosshatch.dev",
+    domain: "crosshatch.dev",
     devPort: 4382,
   }).pipe(Effect.asVoid),
 )

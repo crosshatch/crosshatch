@@ -3,9 +3,9 @@ import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "effect/unstable/httpapi"
 
 import { CaAccountId } from "./CaAccountId.ts"
 
-export class CrosshatchApi extends HttpApi.make("crosshatch").add(
-  HttpApiGroup.make("onramp").add(
-    HttpApiEndpoint.post("session", "/session", {
+export class RampApi extends HttpApi.make("crosshatch_ramp").add(
+  HttpApiGroup.make("ramp").add(
+    HttpApiEndpoint.post("onramp", "/onramp", {
       payload: S.Struct({
         provider: S.Literals(["ApplePay", "Stripe", "Coinbase"]),
         amount: S.Int.check(S.isGreaterThan(0)),

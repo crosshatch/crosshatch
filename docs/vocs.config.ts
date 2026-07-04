@@ -35,7 +35,7 @@ export default defineConfig({
     href: "https://discord.gg/CSXCRUKjh9",
     variant: "tip",
   },
-  baseUrl: "https://docs.crosshatch.dev",
+  baseUrl: "https://crosshatch.dev",
   sidebar: {
     "/": [
       {
