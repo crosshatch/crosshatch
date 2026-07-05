@@ -8,7 +8,7 @@ import { Stage } from "../Stage.ts"
 
 const resource = { serviceName: "crosshatch-lib" }
 
-export const OtlpLive = Stage.pipe(
+const OtlpLive = Stage.pipe(
   Effect.map(({ name, url }) =>
     name === "prod"
       ? Otlp.layer({

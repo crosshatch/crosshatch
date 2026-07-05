@@ -10,13 +10,12 @@ export const handleSupported = handler(Facilitator.FacilitatorApi, "facilitator"
       Effect.forEach(
         kinds,
         Effect.fn(function* (kind) {
-          const { x402Version, ...rest } = kind
-          const { network, ...rest2 } = rest
+          const { x402Version, network, ...rest } = kind
           return yield* S.decodeUnknownEffect(ChainId.ChainId)(network).pipe(
             Effect.map((network) => ({
               x402Version: 2 as const,
               network,
-              ...rest2,
+              ...rest,
             })),
           )
         }),
