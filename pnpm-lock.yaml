@@ -273,6 +273,9 @@ importers:
       '@effect/platform-browser':
         specifier: 'catalog:'
         version: 4.0.0-beta.90(effect@4.0.0-beta.90)
+      '@effect/platform-node':
+        specifier: 'catalog:'
+        version: 4.0.0-beta.90(effect@4.0.0-beta.90)(ioredis@5.11.1)
       '@napi-rs/keyring':
         specifier: 'catalog:'
         version: 1.3.0

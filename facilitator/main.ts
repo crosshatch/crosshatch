@@ -1,5 +1,5 @@
 import { CredentialsFromEnv } from "@distilled.cloud/coinbase"
-import { Facilitator, HttpServer402 } from "crosshatch"
+import { Http, Facilitator } from "crosshatch"
 import { Layer, Effect } from "effect"
 import { Worker } from "effect-workerd"
 import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
@@ -21,7 +21,7 @@ export default Worker.make({
             allowedHeaders: ["*"],
             allowedMethods: ["*"],
             allowedOrigins: ["*"],
-            exposedHeaders: HttpServer402.EXPOSED_HEADERS,
+            exposedHeaders: Http.EXPOSED_HEADERS,
           }),
         ),
       ),

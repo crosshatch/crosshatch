@@ -14,7 +14,7 @@
     "directory": "packages/crosshatch"
   },
   "bin": {
-    "crosshatch": "./dist/main.js"
+    "crosshatch": "./dist/Cli/main.js"
   },
   "type": "module",
   "sideEffects": false,
@@ -45,6 +45,7 @@
   "peerDependencies": {
     "@crosshatch/widget": "workspace:*",
     "@effect/platform-browser": "catalog:",
+    "@effect/platform-node": "catalog:",
     "@napi-rs/keyring": "catalog:",
     "@standard-schema/spec": "catalog:",
     "effect": "catalog:",

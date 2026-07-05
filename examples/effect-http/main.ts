@@ -1,4 +1,4 @@
-import { Facilitator, Required, Requirements, PaymentId, HttpServer402, KnownAsset } from "crosshatch"
+import { Facilitator, Required, Requirements, PaymentId, Http, KnownAsset } from "crosshatch"
 import { EvmAddress } from "crosshatch/Evm"
 import { Layer, Effect } from "effect"
 import { Worker } from "effect-workerd"
@@ -9,8 +9,9 @@ export default Worker.make({
     "GET",
     "/paid",
     Effect.gen(function* () {
-      const payload = yield* HttpServer402.Payload402
+      const payload = yield* Http.ResolvedPayload
       if (!payload) {
+        const PAY_TO_EVM = yield* EvmAddress.config("PAY_TO_EVM")
         const required = yield* Required.builder({
           url: "https://example-merchant.com",
         }).pipe(
@@ -20,11 +21,7 @@ export default Worker.make({
           Required.accept(
             Requirements.group(KnownAsset.USDC, {
               amount: 0.01,
-              recipients: {
-                eip155: {
-                  8453: yield* EvmAddress.config("PAY_TO_EVM"),
-                },
-              },
+              recipients: { eip155: { 8453: PAY_TO_EVM } },
             }),
           ),
         )`
@@ -32,10 +29,10 @@ export default Worker.make({
         | What is this charge for?
         | How does it fit into the current flow?
         `
-        return yield* HttpServer402.require({ required })
+        return yield* Http.require({ required })
       }
-      yield* Facilitator.settle({ payload })
-      return HttpServerResponse.text("The paid resource.")
+      const settlement = yield* Facilitator.settle({ payload })
+      return yield* HttpServerResponse.text("The paid resource.").pipe(Http.addSettlement(settlement))
     }),
   ).pipe(
     Layer.provide([
@@ -43,9 +40,9 @@ export default Worker.make({
         allowedHeaders: ["*"],
         allowedMethods: ["*"],
         allowedOrigins: ["*"],
-        exposedHeaders: HttpServer402.EXPOSED_HEADERS,
+        exposedHeaders: Http.EXPOSED_HEADERS,
       }),
-      HttpServer402.layer,
+      Http.layerMiddleware,
     ]),
     HttpRouter.toHttpEffect,
     Effect.flatten,

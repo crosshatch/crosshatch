@@ -15,6 +15,8 @@ export const Payload = S.Struct({
   resource: ResourceInfo.pipe(S.optional),
 })
 
+export const PayloadFromBase64JsonString = S.StringFromBase64.pipe(S.decodeTo(S.fromJsonString(S.toCodecJson(Payload))))
+
 export const make = Effect.fnUntraced(function* ({
   required,
   traceId: traceId_,

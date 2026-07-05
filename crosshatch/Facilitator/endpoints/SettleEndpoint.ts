@@ -2,28 +2,37 @@ import { Schema as S, String } from "effect"
 import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 
 import { ChainId } from "../../ChainId.ts"
+import * as Extra from "../../Extra.ts"
 import { Payload } from "../../Payload.ts"
 import { Requirements } from "../../Requirements.ts"
 
-export const SettleEndpoint = HttpApiEndpoint.post("settle", "/settle", {
-  payload: S.Struct({
-    paymentPayload: Payload,
-    paymentRequirements: Requirements,
+export const SettlePayload = S.Struct({
+  paymentPayload: Payload,
+  paymentRequirements: Requirements,
+})
+
+export const SettleResponse = S.Union([
+  S.Struct({
+    success: S.tag(true),
+    payer: S.String.pipe(S.optional),
+    transaction: S.String,
+    network: ChainId,
+    extensions: S.Record(S.String, S.Unknown).pipe(S.optional),
   }),
-  success: S.Union([
-    S.Struct({
-      success: S.tag(true),
-      payer: S.String.pipe(S.optional),
-      transaction: S.String,
-      network: ChainId,
-      extensions: S.Record(S.String, S.Unknown).pipe(S.optional),
-    }),
-    S.Struct({
-      success: S.tag(false),
-      errorReason: S.String.pipe(S.optional),
-      errorMessage: S.String.pipe(S.optional),
-    }),
-  ]),
+  S.Struct({
+    success: S.tag(false),
+    errorReason: S.String.pipe(S.optional),
+    errorMessage: S.String.pipe(S.optional),
+  }),
+]).mapMembers(Extra.assign)
+
+export const SettleResponseFromBase64JsonString = S.StringFromBase64.pipe(
+  S.decodeTo(S.fromJsonString(S.toCodecJson(SettleResponse))),
+)
+
+export const SettleEndpoint = HttpApiEndpoint.post("settle", "/settle", {
+  payload: SettlePayload,
+  success: SettleResponse,
 }).annotate(
   OpenApi.Description,
   String.stripMargin(`

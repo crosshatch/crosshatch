@@ -13,7 +13,7 @@ import { PrerequisitesUnmetError } from "./Prerequisite.ts"
 export type Widget<Payload extends S.Codec<any, any>> = {
   Payload: Payload["Type"]
   standard: StandardSchemaV1<{ readonly x: string }, Payload["Type"]>
-  host: (input: Payload["Type"]) => Effect.Effect<void, WidgetError, any>
+  host: (input: Payload["Type"]) => Effect.Effect<void, WidgetError>
 }
 
 export class WidgetError extends Data.TaggedError("WidgetError")<{

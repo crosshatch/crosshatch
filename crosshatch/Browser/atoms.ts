@@ -4,18 +4,20 @@ import * as Boundary from "liminal-util/Boundary"
 
 import * as Amount from "../Amount.ts"
 import { Stage } from "../Stage.ts"
+import * as BrowserPayer from "./BrowserPayer.ts"
 import { FacadeClient } from "./Facade/Facade.ts"
-import { atomRuntime } from "./runtime.ts"
 import { ActivityWidget, IdWidget, LinkWidget } from "./Widgets.ts"
 
-export const stateAtom = atomRuntime.atom(FacadeClient.state).pipe(
+const runtime = Atom.runtime(BrowserPayer.layer)
+
+export const stateAtom = runtime.atom(FacadeClient.state).pipe(
   Atom.keepAlive,
   Atom.mapResult(({ status }) => status),
 )
 
 export const isLinkedAtom = stateAtom.pipe(Atom.mapResult((v) => v._tag === "Linked"))
 
-export const challengedAtom = atomRuntime.atom((ctx) =>
+export const challengedAtom = runtime.atom((ctx) =>
   ctx.result(stateAtom).pipe(
     Effect.filterOrFail(
       (v) => v._tag === "Challenged",
@@ -24,11 +26,11 @@ export const challengedAtom = atomRuntime.atom((ctx) =>
   ),
 )
 
-export const rescindAtom = atomRuntime.fn(FacadeClient.fn("Rescind"))
+export const rescindAtom = runtime.fn(FacadeClient.fn("Rescind"))
 
-export const proposeAtom = atomRuntime.fn(FacadeClient.fn("Propose"))
+export const proposeAtom = runtime.fn(FacadeClient.fn("Propose"))
 
-export const openAtom = atomRuntime.fn<void>()(
+export const openAtom = runtime.fn<void>()(
   Effect.fnUntraced(function* (_, get) {
     const state = yield* get.result(stateAtom)
     const common = { referrer: location.href }

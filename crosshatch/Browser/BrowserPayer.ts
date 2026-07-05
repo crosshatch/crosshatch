@@ -4,6 +4,7 @@ import { Client } from "liminal"
 import { CreateTraceError, CreatePayloadError } from "../errors.ts"
 import { Payer } from "../Payer.ts"
 import { FacadeClient, reducers, FacadeWorker } from "./Facade/Facade.ts"
+import { PrerequisitesWidget } from "./Widgets.ts"
 
 export const layer = Layer.effect(
   Payer,
@@ -15,8 +16,16 @@ export const layer = Layer.effect(
         fn("CreateTrace"),
         Effect.mapError((cause) => new CreateTraceError({ cause })),
       ),
-      createPayload: flow(
-        fn("Propose"),
+      createPayload: Effect.fnUntraced(
+        function* ({ traceId, required }) {
+          const propose = fn("Propose")({ traceId, required })
+          const { payload } = yield* propose.pipe(
+            Effect.catchTags({
+              PrerequisitesUnmetError: flow(PrerequisitesWidget.host, Effect.andThen(propose)),
+            }),
+          )
+          return { payload }
+        },
         Effect.mapError((cause) => new CreatePayloadError({ cause })),
       ),
     } satisfies Payer["Service"]

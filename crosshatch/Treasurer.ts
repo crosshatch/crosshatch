@@ -22,10 +22,9 @@ export class Treasurer extends Context.Service<
   }
 >()("crosshatch/SelectRequirements") {}
 
-// TODO: extensions
 export const getFirstSupported = (supported: PhysicalAssetLookup) =>
   Effect.fnUntraced(function* (required: typeof Required.Type) {
-    const { accepts } = required
+    const { accepts, extensions } = required
     for (const asset of Object.values(supported)) {
       for (const [namespace, references] of Object.entries(asset.deployments)) {
         for (const [reference, deployment] of Object.entries(references)) {
@@ -33,7 +32,10 @@ export const getFirstSupported = (supported: PhysicalAssetLookup) =>
           for (const accepted of accepts) {
             if (network === accepted.network && deployment.asset === accepted.asset) {
               return {
-                config: { accepted },
+                config: {
+                  accepted,
+                  ...(extensions && { extensions }),
+                },
                 deployment,
               }
             }
