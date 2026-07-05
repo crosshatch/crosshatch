@@ -6,28 +6,26 @@ import { PrPreviewComment } from "liminal-util/alchemicals/PrComment"
 import { WorkerConfig } from "liminal-util/alchemicals/WorkerConfig"
 
 export default Alchemy.Stack(
-  "crosshatch-facilitator",
+  "crosshatch-otel",
   {
     state: Cloudflare.state(),
     providers: Layer.mergeAll(Cloudflare.providers(), Github.providers()),
   },
   Effect.gen(function* () {
     const base = yield* WorkerConfig({
-      domain: "facilitator.crosshatch.dev",
+      domain: "otel.crosshatch.dev",
     })
     const CROSSHATCH_STAGE = yield* Alchemy.Stage
     const { url } = yield* Cloudflare.Worker("Entry", {
       ...base,
       dev: {
         host: "127.0.0.1",
-        port: 1337,
+        port: 1338,
         strictPort: true,
       },
       main: "main.ts",
       env: {
         CROSSHATCH_STAGE,
-        CDP_API_KEY_ID: Config.string("CDP_API_KEY_ID"),
-        CDP_API_KEY_SECRET: Config.redacted("CDP_API_KEY_SECRET"),
         OTEL_EXPORTER_OTLP_ENDPOINT: Config.string("OTEL_EXPORTER_OTLP_ENDPOINT"),
         OTEL_EXPORTER_OTLP_HEADERS: Config.redacted("OTEL_EXPORTER_OTLP_HEADERS"),
         OTEL_LOGS_EXPORTER: "otlp",
@@ -35,6 +33,6 @@ export default Alchemy.Stack(
         OTEL_TRACES_EXPORTER: "otlp",
       },
     })
-    yield* PrPreviewComment({ name: "Facilitator", url })
+    yield* PrPreviewComment({ name: "CLI Otel", url })
   }),
 )

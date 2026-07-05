@@ -1,0 +1,14 @@
+{
+  "extends": "../konfik/tsconfig.base",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "dist"
+  },
+  "include": ["."],
+  "exclude": ["dist", "vitest.config.ts"],
+  "references": [
+    { "path": "../liminal/effect-workerd" },
+    { "path": "../liminal/liminal" },
+    { "path": "../liminal/liminal-util" }
+  ]
+}

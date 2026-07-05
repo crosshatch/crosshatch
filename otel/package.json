@@ -1,0 +1,17 @@
+{
+  "name": "otel.crosshatch.dev",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "alchemy dev --env-file ../.env"
+  },
+  "dependencies": {
+    "alchemy": "catalog:",
+    "crosshatch": "workspace:*",
+    "effect": "catalog:",
+    "effect-workerd": "workspace:*",
+    "liminal": "workspace:",
+    "liminal-util": "workspace:",
+    "vitest": "catalog:"
+  }
+}

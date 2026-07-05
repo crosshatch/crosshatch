@@ -7,6 +7,7 @@ packages:
   - liminal/*
   - liminal/examples/*
   - liminal/examples/*/*
+  - otel
 
 catalog:
   "@changesets/changelog-github": ^0.7.0
