@@ -11,8 +11,8 @@ export const handleSettle = handler(
   ({ payload: { paymentPayload, paymentRequirements } }) =>
     settleX402Payment({
       x402Version: 2,
-      paymentPayload,
-      paymentRequirements,
+      paymentPayload: paymentPayload as never,
+      paymentRequirements: paymentRequirements as never,
     }).pipe(
       Effect.flatMap(({ network, ...rest }) =>
         S.decodeUnknownEffect(ChainId.ChainId)(network).pipe(Effect.map((network) => ({ network, ...rest }))),

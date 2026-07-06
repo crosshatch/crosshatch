@@ -11,7 +11,7 @@ export const handleVerify = handler(
   ({ payload: { paymentPayload, paymentRequirements } }) =>
     verifyX402Payment({
       x402Version: 2,
-      paymentPayload,
-      paymentRequirements,
+      paymentPayload: paymentPayload as never,
+      paymentRequirements: paymentRequirements as never,
     }).pipe(Effect.orDie),
 )

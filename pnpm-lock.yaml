@@ -19,8 +19,8 @@ catalogs:
       specifier: ^4.20260414.1
       version: 4.20260626.1
     '@distilled.cloud/coinbase':
-      specifier: ^0.27.0
-      version: 0.27.0
+      specifier: ^0.28.1
+      version: 0.28.1
     '@effect/ai-openai-compat':
       specifier: 4.0.0-beta.90
       version: 4.0.0-beta.90
@@ -410,7 +410,7 @@ importers:
     dependencies:
       '@distilled.cloud/coinbase':
         specifier: 'catalog:'
-        version: 0.27.0(effect@4.0.0-beta.90)
+        version: 0.28.1(effect@4.0.0-beta.90)
       alchemy:
         specifier: 'catalog:'
         version: 2.0.0-beta.60(@effect/platform-bun@4.0.0-beta.90(effect@4.0.0-beta.90))(@effect/platform-node@4.0.0-beta.90(effect@4.0.0-beta.90)(ioredis@5.11.1))(@types/node@25.9.4)(@types/react@19.2.17)(effect@4.0.0-beta.90)(react-devtools-core@7.0.1)(vite@8.1.2(@types/node@25.9.4)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(vitest@4.1.4(@opentelemetry/api@1.9.1)(@types/node@25.9.4)(@vitest/coverage-v8@4.1.9(@vitest/browser@4.1.9)(vitest@4.1.4))(happy-dom@20.10.6)(vite@8.1.2(@types/node@25.9.4)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)))(workerd@1.20260617.1)(ws@8.21.0)
@@ -1142,13 +1142,8 @@ packages:
     peerDependencies:
       effect: '>=4.0.0-beta.66 || >=4.0.0'
 
-  '@distilled.cloud/coinbase@0.27.0':
-    resolution: {integrity: sha512-Rd3w/zYl21CvAJY9rNUSMtffdUNXNHDh93RtJVRUAUjhWqrh1UYwVCl9NY1sgZa3cvtOZ3EeA2JDhvQRKMC4zw==}
-    peerDependencies:
-      effect: '>=4.0.0-beta.66 || >=4.0.0'
-
-  '@distilled.cloud/core@0.27.0':
-    resolution: {integrity: sha512-Ak5e9k14i8PZCEOGlY64famKs9rFjRxpXnnhWRsLIESCOI6YRIggY9BWbHVBRQcRrGWm4rukR9Zmym/irfSrCA==}
+  '@distilled.cloud/coinbase@0.28.1':
+    resolution: {integrity: sha512-P6//06qiBIOFsTWT8MMj3yF9tk44pMRVItWp6tqCtsFw0zRBfV0Hc2hElfe6KzhtuFEfWzMlN0yPV0JFxerIyw==}
     peerDependencies:
       effect: '>=4.0.0-beta.66 || >=4.0.0'
 
@@ -7960,13 +7955,9 @@ snapshots:
       '@distilled.cloud/core': 0.28.1(effect@4.0.0-beta.90)
       effect: 4.0.0-beta.90
 
-  '@distilled.cloud/coinbase@0.27.0(effect@4.0.0-beta.90)':
+  '@distilled.cloud/coinbase@0.28.1(effect@4.0.0-beta.90)':
     dependencies:
-      '@distilled.cloud/core': 0.27.0(effect@4.0.0-beta.90)
-      effect: 4.0.0-beta.90
-
-  '@distilled.cloud/core@0.27.0(effect@4.0.0-beta.90)':
-    dependencies:
+      '@distilled.cloud/core': 0.28.1(effect@4.0.0-beta.90)
       effect: 4.0.0-beta.90
 
   '@distilled.cloud/core@0.28.1(effect@4.0.0-beta.90)':
