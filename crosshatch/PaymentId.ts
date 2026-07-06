@@ -7,7 +7,7 @@ export const PaymentId = S.String.check(S.isLengthBetween(16, 128), S.isPattern(
 )
 
 export class PaymentIdExtension extends Extension.Service<PaymentIdExtension>()("crosshatch/PaymentId", {
-  name: "payment-identifier",
+  identifier: "payment-identifier",
   payload: S.Struct({
     required: S.Boolean,
     id: PaymentId.pipe(S.optional),

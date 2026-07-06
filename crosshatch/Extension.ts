@@ -9,7 +9,7 @@ export type Service<Success extends S.Top> = Success["Type"] | undefined
 export interface Extension<
   Self,
   Id extends string,
-  Name extends string,
+  Identifier extends string,
   ExtensionPayload extends S.Top,
   Success extends S.Top & { readonly Type: ExtensionPayload["Type"] },
 > extends Context.Service<Self, Service<Success>> {
@@ -17,7 +17,7 @@ export interface Extension<
 
   readonly [TypeId]: typeof TypeId
 
-  readonly name: Name
+  readonly identifier: Identifier
 
   readonly payload: ExtensionPayload
 
@@ -38,17 +38,17 @@ export const Service =
   <Self>() =>
   <
     Id extends string,
-    Name extends string,
+    Identifier extends string,
     ExtensionPayload extends S.Top,
     Success extends S.Top & { readonly Type: ExtensionPayload["Type"] },
   >(
     id: Id,
     definition: {
-      readonly name: Name
+      readonly identifier: Identifier
       readonly payload: ExtensionPayload
       readonly success: Success
     },
-  ): Extension<Self, Id, Name, ExtensionPayload, Success> => {
+  ): Extension<Self, Id, Identifier, ExtensionPayload, Success> => {
     const tag = Context.Service<Self, Service<Success>>()(id)
     const { success } = definition
 
@@ -56,7 +56,7 @@ export const Service =
       Layer.effect(
         tag,
         Effect.gen(function* () {
-          const entry = payload?.extensions?.[definition.name]
+          const entry = payload?.extensions?.[definition.identifier]
           if (entry) {
             return yield* S.decodeUnknownEffect(success)(entry)
           }
