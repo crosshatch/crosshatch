@@ -7,7 +7,7 @@ const TypeId = "~crosshatch/Extension" as const
 
 export type Service<Success extends S.Top> = Success["Type"] | undefined
 
-export const ExtensionValues = S.Record(S.String, S.Json)
+export const ExtensionsInfo = S.Record(S.String, S.Json)
 
 export interface Extension<
   Self,

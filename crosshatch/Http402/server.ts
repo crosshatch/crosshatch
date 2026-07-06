@@ -29,11 +29,10 @@ export const addResponseHeader =
       Effect.map((v) => HttpServerResponse.setHeader(PAYMENT_RESPONSE, v)(response)),
     )
 
-// TODO: deal with this
 export const layerMiddleware = <X extends ReadonlyArray<Extension.Any>>(
   config?: { readonly extensions: X } | undefined,
 ) =>
-  HttpRouter.middleware<{ readonly provides: ResolvedPayload }>()(
+  HttpRouter.middleware<{ readonly provides: ResolvedPayload | InstanceType<X[number]> }>()(
     (httpEffect) =>
       Effect.gen(function* () {
         const { headers } = yield* HttpServerRequest.HttpServerRequest

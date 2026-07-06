@@ -1,7 +1,7 @@
 import { String, Schema as S, Effect, Context } from "effect"
 
 import { InvalidAmountError } from "./Amount.ts"
-import { type Extension, ExtensionValues } from "./Extension.ts"
+import { type Extension, ExtensionsInfo } from "./Extension.ts"
 import { Requirements, type RequirementsLike } from "./Requirements.ts"
 import { ResourceInfo } from "./ResourceInfo.ts"
 import { Version } from "./Version.ts"
@@ -11,7 +11,7 @@ export const Required = S.Struct({
   resource: ResourceInfo,
   accepts: S.Array(Requirements),
   error: S.String.pipe(S.optional),
-  extensions: ExtensionValues.pipe(S.optional),
+  extensions: ExtensionsInfo.pipe(S.optional),
 })
 
 export const RequiredFromBase64JsonString = S.StringFromBase64.pipe(

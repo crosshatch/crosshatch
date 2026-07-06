@@ -8,4 +8,4 @@ export class AssetConfigurationRef extends Context.Service<AssetConfigurationRef
   "crosshatch/AssetConfigurationRef",
 ) {}
 
-export const layer = (lookup: AssetConfiguration) => Layer.effect(AssetConfigurationRef, Ref.make(lookup))
+export const layer = (config: AssetConfiguration) => Layer.effect(AssetConfigurationRef, Ref.make(config))

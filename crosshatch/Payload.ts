@@ -1,6 +1,6 @@
 import { Effect, Schema as S } from "effect"
 
-import { ExtensionValues } from "./Extension.ts"
+import { ExtensionsInfo } from "./Extension.ts"
 import { Payer } from "./Payer.ts"
 import type { Required } from "./Required.ts"
 import { Requirements } from "./Requirements.ts"
@@ -10,7 +10,7 @@ import { Version } from "./Version.ts"
 export const Payload = S.Struct({
   x402Version: Version,
   accepted: Requirements,
-  extensions: ExtensionValues.pipe(S.optional),
+  extensions: ExtensionsInfo.pipe(S.optional),
   payload: S.Record(S.String, S.Unknown),
   resource: ResourceInfo.pipe(S.optional),
 })

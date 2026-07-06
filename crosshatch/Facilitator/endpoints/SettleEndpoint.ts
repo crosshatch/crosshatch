@@ -2,7 +2,7 @@ import { Schema as S, String } from "effect"
 import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 
 import { ChainId } from "../../ChainId.ts"
-import { ExtensionValues } from "../../Extension.ts"
+import { ExtensionsInfo } from "../../Extension.ts"
 import * as Extra from "../../Extra.ts"
 import { Payload } from "../../Payload.ts"
 import { Requirements } from "../../Requirements.ts"
@@ -18,7 +18,7 @@ export const SettleResponse = S.Union([
     payer: S.String.pipe(S.optional),
     transaction: S.String,
     network: ChainId,
-    extensions: ExtensionValues.pipe(S.optional),
+    extensions: ExtensionsInfo.pipe(S.optional),
   }),
   S.Struct({
     success: S.tag(false),
