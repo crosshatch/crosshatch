@@ -23,18 +23,14 @@ export class Bridge extends Context.Service<
   }
 >()("crosshatch/Bridge") {}
 
-export const propose = Effect.fnUntraced(function* ({
-  required,
-  traceId,
-}: {
+export const propose = Effect.fnUntraced(function* (config: {
   readonly traceId?: string | undefined
   readonly required: typeof Required.Type
 }) {
   const { createTrace, propose } = yield* Bridge
-  return yield* propose({
-    traceId: traceId ?? (yield* createTrace ? TraceId : Effect.undefined),
-    required,
-  })
+  const traceId = config.traceId ?? (yield* createTrace ? TraceId : Effect.undefined)
+  const { required } = config
+  return yield* propose({ traceId, required })
 })
 
 export const TraceConfig = S.Struct({

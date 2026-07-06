@@ -88,12 +88,12 @@ export class ExtensionRegistry extends Context.Reference<
 export const layerHandler = Effect.fnUntraced(function* <
   Self,
   Id extends string,
-  Name extends string,
+  Identifier extends string,
   ExtensionPayload extends Extension.Payload,
   Success extends Extension.Success<ExtensionPayload>,
   R,
 >(
-  extension: Extension<Self, Id, Name, ExtensionPayload, Success>,
+  extension: Extension<Self, Id, Identifier, ExtensionPayload, Success>,
   f: (payload: ExtensionPayload["Type"]) => Effect.Effect<Success["Type"], never, R>,
 ) {
   const registry = yield* ExtensionRegistry
@@ -105,10 +105,10 @@ export const layerHandler = Effect.fnUntraced(function* <
 export const decodeRequired = Effect.fnUntraced(function* <
   Self,
   Id extends string,
-  Name extends string,
+  Identifier extends string,
   ExtensionPayload extends Extension.Payload,
   Success extends Extension.Success<ExtensionPayload>,
->(extension: Extension<Self, Id, Name, ExtensionPayload, Success>, required: typeof Required.Type) {
+>(extension: Extension<Self, Id, Identifier, ExtensionPayload, Success>, required: typeof Required.Type) {
   const { identifier, payload: Payload } = extension
   return yield* S.decodeUnknownEffect(Payload)(required.extensions?.[identifier])
 })

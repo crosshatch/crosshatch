@@ -10,6 +10,8 @@ export class PaymentIdNotFoundError extends S.TaggedErrorClass<PaymentIdNotFound
 export class PaymentIdLookup extends Context.Service<
   PaymentIdLookup,
   {
+    readonly make: Effect.Effect<typeof PaymentId.Type>
+
     readonly await: (paymentId: typeof PaymentId.Type) => Effect.Effect<typeof Payload.Type, PaymentIdNotFoundError>
 
     readonly resolve: (config: {
