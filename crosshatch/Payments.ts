@@ -1,28 +1,24 @@
-import { Context, Deferred, Effect, Layer, Schema as S } from "effect"
+import { Cause, Context, Deferred, Effect, Layer } from "effect"
 
+import { PaymentId } from "./extensions/PaymentId.ts"
 import type { Payload } from "./Payload.ts"
-import { PaymentId } from "./PaymentId.ts"
 
-export class PaymentIdNotFoundError extends S.TaggedErrorClass<PaymentIdNotFoundError>()("PaymentIdNotFoundError", {
-  paymentId: PaymentId,
-}) {}
-
-export class PaymentIdLookup extends Context.Service<
-  PaymentIdLookup,
+export class Payments extends Context.Service<
+  Payments,
   {
     readonly make: Effect.Effect<typeof PaymentId.Type>
 
-    readonly await: (paymentId: typeof PaymentId.Type) => Effect.Effect<typeof Payload.Type, PaymentIdNotFoundError>
+    readonly await: (paymentId: typeof PaymentId.Type) => Effect.Effect<typeof Payload.Type, Cause.NoSuchElementError>
 
     readonly resolve: (config: {
       readonly paymentId: typeof PaymentId.Type
       readonly payload: typeof Payload.Type
-    }) => Effect.Effect<void, PaymentIdNotFoundError>
+    }) => Effect.Effect<void, Cause.NoSuchElementError>
   }
->()("crosshatch/PaymentIdLookup") {}
+>()("crosshatch/Payments") {}
 
 export const layerMemory = Layer.effect(
-  PaymentIdLookup,
+  Payments,
   Effect.sync(() => {
     const invoices: Record<typeof PaymentId.Type, Deferred.Deferred<typeof Payload.Type>> = {}
     return {
@@ -35,14 +31,14 @@ export const layerMemory = Layer.effect(
       await: Effect.fnUntraced(function* (paymentId) {
         const invoice = invoices[paymentId]
         if (!invoice) {
-          return yield* new PaymentIdNotFoundError({ paymentId })
+          return yield* new Cause.NoSuchElementError()
         }
         return yield* Deferred.await(invoice)
       }),
       resolve: Effect.fnUntraced(function* ({ paymentId, payload }) {
         const deferred = invoices[paymentId]
         if (!deferred) {
-          return yield* new PaymentIdNotFoundError({ paymentId })
+          return yield* new Cause.NoSuchElementError()
         }
         delete invoices[paymentId]
         yield* Deferred.succeed(deferred, payload)

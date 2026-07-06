@@ -1,6 +1,7 @@
 import { Schema as S, String } from "effect"
 import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 
+import { ExtensionValues } from "../../Extension.ts"
 import * as Extra from "../../Extra.ts"
 import { Payload } from "../../Payload.ts"
 import { Requirements } from "../../Requirements.ts"
@@ -14,7 +15,7 @@ export const VerifyResponse = S.Union([
   S.Struct({
     isValid: S.tag(true),
     payer: S.String.pipe(S.optional),
-    extensions: S.Record(S.String, S.Unknown).pipe(S.optional),
+    extensions: ExtensionValues.pipe(S.optional),
   }),
   S.Struct({
     isValid: S.tag(false),

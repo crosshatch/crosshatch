@@ -1,4 +1,4 @@
-import { Facilitator, Required, Requirements, PaymentId, Http402, KnownAssets } from "crosshatch"
+import { Facilitator, Required, Requirements, Http402, KnownAssets, PaymentIdExtension } from "crosshatch"
 import { EvmAddress } from "crosshatch/Evm"
 import { Layer, Effect } from "effect"
 import { Worker } from "effect-workerd"
@@ -21,7 +21,7 @@ export default Worker.make({
         | How does it fit into the current flow?
         |
         `.pipe(
-          Required.extend(PaymentId.PaymentIdExtension, {
+          Required.extend(PaymentIdExtension, {
             required: true,
           }),
           Required.accept(
@@ -44,7 +44,9 @@ export default Worker.make({
         allowedOrigins: ["*"],
         exposedHeaders: Http402.EXPOSED_HEADERS,
       }),
-      Http402.layerMiddleware(),
+      Http402.layerMiddleware({
+        extensions: [PaymentIdExtension],
+      }),
     ]),
     HttpRouter.toHttpEffect,
     Effect.flatten,

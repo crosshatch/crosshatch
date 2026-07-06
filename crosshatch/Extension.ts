@@ -1,4 +1,4 @@
-import { Schema as S, Context, Layer, Effect, Scope, flow } from "effect"
+import { Schema as S, Context, Layer, Effect, Scope, flow, Cause } from "effect"
 
 import type { Payload } from "./Payload.ts"
 import type { Required } from "./Required.ts"
@@ -7,58 +7,57 @@ const TypeId = "~crosshatch/Extension" as const
 
 export type Service<Success extends S.Top> = Success["Type"] | undefined
 
+export const ExtensionValues = S.Record(S.String, S.Json)
+
 export interface Extension<
   Self,
   Id extends string,
   Identifier extends string,
-  ExtensionPayload extends Extension.Payload,
-  Success extends Extension.Success<ExtensionPayload>,
-> extends Context.Service<Self, Service<Success>> {
-  new (_: never): Context.ServiceClass.Shape<Id, Service<Success>>
+  Info extends Extension.Info,
+  Echo extends Extension.Echo<Info>,
+> extends Context.Service<Self, Service<Echo>> {
+  new (_: never): Context.ServiceClass.Shape<Id, Service<Echo>>
 
   readonly [TypeId]: typeof TypeId
 
   readonly identifier: Identifier
 
-  readonly payload: ExtensionPayload
+  readonly info: Info
 
-  readonly success: Success
+  readonly echo: Echo
 
   readonly layer: ({
     payload,
   }: {
     readonly payload: typeof Payload.Type | undefined
-  }) => Layer.Layer<Self, S.SchemaError, Exclude<Success["DecodingServices"], Scope.Scope>>
+  }) => Layer.Layer<Self, S.SchemaError, Exclude<Echo["DecodingServices"], Scope.Scope>>
+
+  readonly ensure: Effect.Effect<Echo["Type"], Cause.NoSuchElementError, Self>
 }
 
 export declare namespace Extension {
-  export type Payload = S.Top & { readonly DecodingServices: never }
+  export type Info = S.Top & { readonly DecodingServices: never }
 
-  export type Success<T extends S.Top> = T & {
+  export type Echo<T extends S.Top> = T & {
     readonly Type: T["Type"]
     readonly EncodingServices: never
   }
 
-  export type Any = Extension<any, string, string, Payload, Success<Payload>>
+  export type Any = Extension<any, string, string, Info, Echo<Info>>
 }
 
 export const Service =
   <Self>() =>
-  <
-    Id extends string,
-    Identifier extends string,
-    ExtensionPayload extends Extension.Payload,
-    Success extends Extension.Success<ExtensionPayload>,
-  >(
+  <Id extends string, Identifier extends string, Info extends Extension.Info, Success extends Extension.Echo<Info>>(
     id: Id,
     definition: {
       readonly identifier: Identifier
-      readonly payload: ExtensionPayload
-      readonly success: Success
+      readonly info: Info
+      readonly echo: Success
     },
-  ): Extension<Self, Id, Identifier, ExtensionPayload, Success> => {
+  ): Extension<Self, Id, Identifier, Info, Success> => {
     const tag = Context.Service<Self, Service<Success>>()(id)
-    const { success } = definition
+    const { echo } = definition
 
     const layer = ({ payload }: { readonly payload: typeof Payload.Type | undefined }) =>
       Layer.effect(
@@ -66,16 +65,19 @@ export const Service =
         Effect.gen(function* () {
           const entry = payload?.extensions?.[definition.identifier]
           if (entry) {
-            return yield* S.decodeUnknownEffect(S.toCodecJson(success))(entry)
+            return yield* S.decodeUnknownEffect(S.toCodecJson(echo))(entry)
           }
           return
         }),
       )
 
+    const ensure = Effect.flatMap(tag, Effect.fromNullishOr)
+
     return Object.assign(tag, {
       [TypeId]: TypeId,
       ...definition,
       layer,
+      ensure,
     })
   }
 
@@ -89,12 +91,12 @@ export const layerHandler = Effect.fnUntraced(function* <
   Self,
   Id extends string,
   Identifier extends string,
-  ExtensionPayload extends Extension.Payload,
-  Success extends Extension.Success<ExtensionPayload>,
+  Info extends Extension.Info,
+  Success extends Extension.Echo<Info>,
   R,
 >(
-  extension: Extension<Self, Id, Identifier, ExtensionPayload, Success>,
-  f: (payload: ExtensionPayload["Type"]) => Effect.Effect<Success["Type"], never, R>,
+  extension: Extension<Self, Id, Identifier, Info, Success>,
+  f: (payload: Info["Type"]) => Effect.Effect<Success["Type"], never, R>,
 ) {
   const registry = yield* ExtensionRegistry
   const context = yield* Effect.context<R>()
@@ -106,9 +108,9 @@ export const decodeRequired = Effect.fnUntraced(function* <
   Self,
   Id extends string,
   Identifier extends string,
-  ExtensionPayload extends Extension.Payload,
-  Success extends Extension.Success<ExtensionPayload>,
->(extension: Extension<Self, Id, Identifier, ExtensionPayload, Success>, required: typeof Required.Type) {
-  const { identifier, payload: Payload } = extension
-  return yield* S.decodeUnknownEffect(Payload)(required.extensions?.[identifier])
+  Info extends Extension.Info,
+  Echo extends Extension.Echo<Info>,
+>(extension: Extension<Self, Id, Identifier, Info, Echo>, required: typeof Required.Type) {
+  const { identifier, info } = extension
+  return yield* S.decodeUnknownEffect(info)(required.extensions?.[identifier])
 })

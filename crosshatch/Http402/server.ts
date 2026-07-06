@@ -29,6 +29,7 @@ export const addResponseHeader =
       Effect.map((v) => HttpServerResponse.setHeader(PAYMENT_RESPONSE, v)(response)),
     )
 
+// TODO: deal with this
 export const layerMiddleware = <X extends ReadonlyArray<Extension.Any>>(
   config?: { readonly extensions: X } | undefined,
 ) =>
