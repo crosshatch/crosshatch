@@ -44,14 +44,12 @@ export class RequiredBuilder<E, R, X> extends Effectable.Class<typeof Required.T
       x402Version: 2,
       resource: {
         url,
-        ...(template
-          ? {
-              description:
-                typeof template === "string"
-                  ? template
-                  : String.stripMargin(globalThis.String.raw(template, ...(substitutions ?? []))),
-            }
-          : {}),
+        ...(template && {
+          description:
+            typeof template === "string"
+              ? template
+              : String.stripMargin(globalThis.String.raw(template, ...(substitutions ?? []))),
+        }),
       },
       accepts: yield* Effect.forEach(acceptsInputs ?? [], (v) => (Effect.isEffect(v) ? v : Effect.succeed(v))).pipe(
         Effect.map((v) => v.flat()),
@@ -90,15 +88,18 @@ export const extend =
     Self,
     K extends string,
     Name extends string,
-    Payload extends S.Top,
-    Success extends S.Top & { readonly Type: Payload["Type"] },
+    ExtensionPayload extends S.Top & { readonly DecodingServices: never },
+    Success extends S.Top & {
+      readonly Type: ExtensionPayload["Type"]
+      readonly EncodingServices: never
+    },
   >(
-    extension: Extension<Self, K, Name, Payload, Success>,
-    payload: Payload["Type"],
+    extension: Extension<Self, K, Name, ExtensionPayload, Success>,
+    payload: ExtensionPayload["Type"],
   ) =>
   <E, R, X extends Extension.Any>(
     builder: RequiredBuilder<E, R, X>,
-  ): RequiredBuilder<E | S.SchemaError, R | Payload["EncodingServices"], X | Self> =>
+  ): RequiredBuilder<E | S.SchemaError, R | ExtensionPayload["EncodingServices"], X | Self> =>
     new RequiredBuilder({
       ...builder.config,
       acceptsInputs: builder.config.acceptsInputs ?? [],

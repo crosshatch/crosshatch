@@ -10,7 +10,7 @@ export interface Extension<
   Self,
   Id extends string,
   Identifier extends string,
-  ExtensionPayload extends S.Top,
+  ExtensionPayload extends S.Top & { readonly DecodingServices: never },
   Success extends S.Top & { readonly Type: ExtensionPayload["Type"] },
 > extends Context.Service<Self, Service<Success>> {
   new (_: never): Context.ServiceClass.Shape<Id, Service<Success>>
@@ -31,7 +31,13 @@ export interface Extension<
 }
 
 export declare namespace Extension {
-  export type Any = Extension<any, string, string, S.Top, S.Top>
+  export type Any = Extension<
+    any,
+    string,
+    string,
+    S.Top & { readonly DecodingServices: never },
+    S.Top & { readonly EncodingServices: never }
+  >
 }
 
 export const Service =
@@ -39,8 +45,11 @@ export const Service =
   <
     Id extends string,
     Identifier extends string,
-    ExtensionPayload extends S.Top,
-    Success extends S.Top & { readonly Type: ExtensionPayload["Type"] },
+    ExtensionPayload extends S.Top & { readonly DecodingServices: never },
+    Success extends S.Top & {
+      readonly Type: ExtensionPayload["Type"]
+      readonly EncodingServices: never
+    },
   >(
     id: Id,
     definition: {
@@ -58,7 +67,7 @@ export const Service =
         Effect.gen(function* () {
           const entry = payload?.extensions?.[definition.identifier]
           if (entry) {
-            return yield* S.decodeUnknownEffect(success)(entry)
+            return yield* S.decodeUnknownEffect(S.toCodecJson(success))(entry)
           }
           return
         }),
@@ -81,8 +90,11 @@ export const layerHandler = Effect.fnUntraced(function* <
   Self,
   Id extends string,
   Name extends string,
-  ExtensionPayload extends S.Top,
-  Success extends S.Top & { readonly Type: ExtensionPayload["Type"] },
+  ExtensionPayload extends S.Top & { readonly DecodingServices: never },
+  Success extends S.Top & {
+    readonly Type: ExtensionPayload["Type"]
+    readonly EncodingServices: never
+  },
   R,
 >(
   extension: Extension<Self, Id, Name, ExtensionPayload, Success>,

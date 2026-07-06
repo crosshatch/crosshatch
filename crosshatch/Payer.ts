@@ -32,20 +32,21 @@ export const layer = (chain: Chain) =>
           const { extensions: payloads = {} } = required
           const extensions = yield* Effect.forEach(
             Record.toEntries(payloads),
-            Effect.fnUntraced(function* ([name, payload]) {
-              const extension = registry.entries().find(([extension]) => extension.name === name)
-              if (!extension) {
-                return
-              }
-              const [{ payload: Payload }, f] = extension
-              const parsed = yield* S.decodeUnknownEffect(Payload)(payload).pipe(
-                Effect.catchTags({
-                  SchemaError: () => Effect.undefined,
-                }),
-              ) as Effect.Effect<unknown> // TODO: more consideration around R
-              const result = yield* f(parsed)
-              return [name, result] as const
-            }),
+            Effect.fnUntraced(
+              function* ([name, payload]) {
+                const extension = registry.entries().find(([extension]) => extension.name === name)
+                if (!extension) {
+                  return
+                }
+                const [{ payload: Payload, success: Success }, f] = extension
+                const parsed = yield* S.decodeUnknownEffect(S.toCodecJson(Payload))(payload)
+                const result = yield* f(parsed).pipe(Effect.flatMap(S.encodeEffect(S.toCodecJson(Success))))
+                return [name, result] as const
+              },
+              Effect.catchTags({
+                SchemaError: () => Effect.undefined,
+              }),
+            ),
             { concurrency: "unbounded" },
           ).pipe(Effect.map(flow(Array.filter(Predicate.isNotUndefined), Record.fromEntries)))
           return yield* chain.createPayload({ accepted, extensions })

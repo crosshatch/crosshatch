@@ -8,9 +8,8 @@ import { Payload, PayloadFromBase64JsonString } from "../Payload.ts"
 import { Required, RequiredFromBase64JsonString } from "../Required.ts"
 import { PAYMENT_REQUIRED, CROSSHATCH_TRACE_ID, PAYMENT_SIGNATURE, PAYMENT_RESPONSE } from "./constants.ts"
 
-// TODO: schema + context service possible?
 export class ResolvedPayload extends Context.Service<ResolvedPayload, typeof Payload.Type | undefined>()(
-  "crosshatch/Http/ResolvedPayload",
+  "crosshatch/Http402/ResolvedPayload",
 ) {}
 
 export const require = Effect.fnUntraced(function* ({ required }: { readonly required: typeof Required.Type }) {
