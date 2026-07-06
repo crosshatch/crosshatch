@@ -2,6 +2,7 @@ import { Effect, Schema as S, Record, Duration } from "effect"
 
 import { Address } from "./Address.ts"
 import * as Amount from "./Amount.ts"
+import type { InvalidAmountError } from "./Amount.ts"
 import { Asset } from "./Asset.ts"
 import { ChainId } from "./ChainId.ts"
 import type { PhysicalAsset } from "./PhysicalAsset.ts"
@@ -15,6 +16,12 @@ export const Requirements = S.Struct({
   payTo: Address,
   scheme: S.Literals(["exact", "upto"]),
 })
+
+export type RequirementsLike =
+  | typeof Requirements.Type
+  | Effect.Effect<typeof Requirements.Type, InvalidAmountError>
+  | Array<typeof Requirements.Type>
+  | Effect.Effect<Array<typeof Requirements.Type>, InvalidAmountError>
 
 export const group = Effect.fnUntraced(function* <A extends PhysicalAsset>(
   asset: A,

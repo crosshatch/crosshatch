@@ -1,9 +1,7 @@
-import type { Context } from "effect"
+import { Context } from "effect"
 
 import type { Asset } from "./Asset.ts"
 import type { Chain } from "./Chain.ts"
-
-export type PhysicalAssetLookup = Record<string, PhysicalAsset>
 
 export interface PhysicalAsset {
   readonly symbol: string

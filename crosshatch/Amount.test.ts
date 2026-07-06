@@ -1,10 +1,7 @@
 import { assert, describe, it } from "@effect/vitest"
 import { BigDecimal, Effect, Schema as S } from "effect"
 
-import { Address } from "./Address.ts"
-import * as Amount from "./Amount.ts"
-import { KnownAsset } from "./index.ts"
-import { group } from "./Requirements.ts"
+import { Address, Amount, KnownAssets, Requirements } from "./index.ts"
 
 const assertAmount = (actual: typeof Amount.Amount.Type, expected: string) =>
   assert.isTrue(
@@ -104,10 +101,13 @@ describe(import.meta.url, () => {
   it(
     "scales grouped requirements by deployment decimals",
     Effect.fn(function* () {
-      const payTo = Address.make("0x0000000000000000000000000000000000000001")
-      const [sixDecimals] = yield* group(KnownAsset.USDC, { amount: 0.01, recipients: { eip155: { 8453: payTo } } })
+      const payTo = Address.Address.make("0x0000000000000000000000000000000000000001")
+      const [sixDecimals] = yield* Requirements.group(KnownAssets.USDC, {
+        amount: 0.01,
+        recipients: { eip155: { 8453: payTo } },
+      })
       assert.strictEqual(sixDecimals!.amount, "10000")
-      const [eighteenDecimals] = yield* group(KnownAsset.MUSD, {
+      const [eighteenDecimals] = yield* Requirements.group(KnownAssets.MUSD, {
         amount: 0.01,
         recipients: { eip155: { 31612: payTo } },
       })

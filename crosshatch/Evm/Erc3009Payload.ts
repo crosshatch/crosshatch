@@ -1,7 +1,7 @@
 import { Effect, Schema as S } from "effect"
 import { getAddress, toHex } from "viem"
 
-import { CreatePayloadError } from "../errors.ts"
+import { CreatePayloadError } from "../Payer.ts"
 import { Requirements } from "../Requirements.ts"
 import type { EvmSigner } from "./EvmSigner.ts"
 

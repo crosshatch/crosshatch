@@ -1,8 +1,8 @@
-import { String, Pipeable, Schema as S, Record, Effect } from "effect"
+import { String, Schema as S, Record, Effect, Context, Effectable } from "effect"
 
 import { InvalidAmountError } from "./Amount.ts"
 import type { Extension } from "./Extension.ts"
-import { Requirements } from "./Requirements.ts"
+import { Requirements, type RequirementsLike } from "./Requirements.ts"
 import { ResourceInfo } from "./ResourceInfo.ts"
 import { Version } from "./Version.ts"
 
@@ -18,98 +18,89 @@ export const RequiredFromBase64JsonString = S.StringFromBase64.pipe(
   S.decodeTo(S.fromJsonString(S.toCodecJson(Required))),
 )
 
-export type AcceptsInput =
-  | typeof Requirements.Type
-  | Effect.Effect<typeof Requirements.Type, InvalidAmountError>
-  | Array<typeof Requirements.Type>
-  | Effect.Effect<Array<typeof Requirements.Type>, InvalidAmountError>
+export type BuilderExtensionEntry<X> = readonly [X, unknown]
 
-export interface Builder_<R> extends Pipeable.Pipeable {
-  readonly ""?: [R]
-  readonly url: string
-  readonly extensionsEntries?: ReadonlyArray<[Extension.Any, unknown]> | undefined
-  readonly acceptsInputs?: ReadonlyArray<AcceptsInput> | undefined
+export interface BuilderConfig<X> {
+  readonly template?: TemplateStringsArray | string | undefined
+  readonly substitutions: ReadonlyArray<unknown>
+  readonly extensionsEntries?: ReadonlyArray<BuilderExtensionEntry<X>> | undefined
+  readonly acceptsInputs?: ReadonlyArray<RequirementsLike> | undefined
 }
 
-export interface Builder<R> extends Builder_<R> {
-  (
-    template?: TemplateStringsArray | string,
-    ...substitutions: ReadonlyArray<unknown>
-  ): Effect.Effect<typeof Required.Type, S.SchemaError | InvalidAmountError, R>
-}
+export class RequiredBuilder<E, R, X> extends Effectable.Class<typeof Required.Type, E, R> {
+  readonly "": [X]
+  readonly config
+  constructor(config: BuilderConfig<X>) {
+    super()
+    this.config = config
+  }
 
-export const builder = ({ url }: { readonly url: string }): Builder_<never> => ({
-  url,
-  pipe() {
-    return Pipeable.pipeArguments(this, arguments)
-  },
-})
-
-const make = <R>(
-  builder: Builder_<R>,
-  {
-    acceptsInputs,
-    extensionEntries,
-  }: {
-    readonly acceptsInputs: ReadonlyArray<AcceptsInput>
-    readonly extensionEntries: ReadonlyArray<[Extension.Any, unknown]>
-  },
-): Builder<R> => {
-  const { url, extensionsEntries: extensions } = builder
-  return Object.assign(
-    Effect.fnUntraced(function* (template?: TemplateStringsArray | string, ...substitutions: ReadonlyArray<unknown>) {
-      return {
-        x402Version: 2,
-        accepts: yield* Effect.forEach(acceptsInputs, (v) => (Effect.isEffect(v) ? v : Effect.succeed(v))).pipe(
-          Effect.map((v) => v.flat()),
-        ),
-        resource: {
-          url,
-          ...(template
-            ? {
-                description:
-                  typeof template === "string"
-                    ? template
-                    : String.stripMargin(globalThis.String.raw(template, ...substitutions)),
-              }
-            : {}),
-        },
-        extensions: yield* Effect.all(
-          extensionEntries?.map(([{ identifier, payload: Payload }, payload]) =>
-            S.encodeEffect(S.toCodecJson(Payload))(payload).pipe(
-              Effect.map((encoded) => [identifier, encoded] as const),
-            ),
-          ) ?? [],
-          { concurrency: "unbounded" },
-        ).pipe(Effect.map(Record.fromEntries)) as Effect.Effect<never, S.SchemaError, R>,
-      } satisfies typeof Required.Type
-    }),
-    {
-      url,
-      acceptsInputs,
-      extensionsEntries: extensions,
-      pipe() {
-        return Pipeable.pipeArguments(this, arguments)
+  override override = Effect.gen({ self: this }, function* () {
+    const url = yield* RequiredUrl
+    const {
+      config: { template, substitutions, acceptsInputs, extensionsEntries },
+    } = this
+    return {
+      x402Version: 2,
+      resource: {
+        url,
+        ...(template
+          ? {
+              description:
+                typeof template === "string"
+                  ? template
+                  : String.stripMargin(globalThis.String.raw(template, ...(substitutions ?? []))),
+            }
+          : {}),
       },
-    } satisfies Builder_<R>,
-  )
+      accepts: yield* Effect.forEach(acceptsInputs ?? [], (v) => (Effect.isEffect(v) ? v : Effect.succeed(v))).pipe(
+        Effect.map((v) => v.flat()),
+      ) as never as Effect.Effect<ReadonlyArray<typeof Requirements.Type>, never>,
+      extensions: yield* Effect.all(
+        extensionsEntries?.map(([extension, payload]) => {
+          const { name, payload: Payload } = extension as Extension.Any
+          return S.encodeEffect(S.toCodecJson(Payload))(payload).pipe(Effect.map((encoded) => [name, encoded] as const))
+        }) ?? [],
+        { concurrency: "unbounded" },
+      ).pipe(Effect.map(Record.fromEntries)) as Effect.Effect<never, never, R>,
+    } satisfies typeof Required.Type
+  })
 }
+
+export class RequiredUrl extends Context.Reference<string | undefined>("crosshatch/RequiredUrl", {
+  defaultValue: () => undefined,
+}) {}
+
+export const make = (
+  template?: TemplateStringsArray | string,
+  ...substitutions: ReadonlyArray<unknown>
+): RequiredBuilder<never, never, never> => new RequiredBuilder({ template, substitutions })
 
 export const accept =
-  (...acceptsInputs: ReadonlyArray<AcceptsInput>) =>
-  <R>(builder: Builder_<R>): Builder<R> =>
-    make(builder, {
-      acceptsInputs: [...(builder.acceptsInputs ?? []), ...acceptsInputs],
-      extensionEntries: builder.extensionsEntries ?? [],
+  (...acceptsInputs: ReadonlyArray<RequirementsLike>) =>
+  <E, R, X>(builder: RequiredBuilder<E, R, X>): RequiredBuilder<E | InvalidAmountError, R, X> =>
+    new RequiredBuilder({
+      ...builder.config,
+      acceptsInputs: [...(builder.config.acceptsInputs ?? []), ...acceptsInputs],
+      extensionsEntries: builder.config.extensionsEntries ?? [],
     })
 
 export const extend =
-  <K extends string, Payload extends S.Top, Success extends S.Top & { readonly Type: Payload["Type"] }>(
-    extension: Extension<K, Payload, Success>,
+  <
+    Self,
+    K extends string,
+    Name extends string,
+    Payload extends S.Top,
+    Success extends S.Top & { readonly Type: Payload["Type"] },
+  >(
+    extension: Extension<Self, K, Name, Payload, Success>,
     payload: Payload["Type"],
   ) =>
-  <R>(builder: Builder_<R>): Builder<R | Payload["EncodingServices"]> =>
-    make(builder, {
-      acceptsInputs: builder.acceptsInputs ?? [],
-      extensionEntries: [...(builder.extensionsEntries ?? []), [extension, payload]],
+  <E, R, X extends Extension.Any>(
+    builder: RequiredBuilder<E, R, X>,
+  ): RequiredBuilder<E | S.SchemaError, R | Payload["EncodingServices"], X | Self> =>
+    new RequiredBuilder({
+      ...builder.config,
+      acceptsInputs: builder.config.acceptsInputs ?? [],
+      extensionsEntries: [...(builder.config.extensionsEntries ?? []), [extension, payload]] as never,
     })

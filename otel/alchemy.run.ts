@@ -33,6 +33,6 @@ export default Alchemy.Stack(
         OTEL_TRACES_EXPORTER: "otlp",
       },
     })
-    yield* PrPreviewComment({ name: "CLI Otel", url })
+    yield* PrPreviewComment({ name: "Otel", url })
   }),
 )

@@ -5,7 +5,7 @@ import { Payer } from "../Payer.ts"
 import { PayloadFromBase64JsonString } from "../Payload.ts"
 import { RequiredFromBase64JsonString } from "../Required.ts"
 import { runtime } from "../runtime.ts"
-import { CROSSHATCH_TRACE_ID, PAYMENT_REQUIRED, PAYMENT_SIGNATURE } from "./constants.ts"
+import { PAYMENT_REQUIRED, PAYMENT_SIGNATURE } from "./constants.ts"
 
 export class PaymentAlreadyAttemptedError extends Data.TaggedError("PaymentAlreadyAttemptedError")<{}> {}
 
@@ -32,8 +32,7 @@ export const layerFetch = Effect.gen(function* () {
         return yield* new NoSuchRequiredError()
       }
       const required = yield* S.decodeUnknownEffect(RequiredFromBase64JsonString)(requiredHeader)
-      const traceId = response.headers.get(CROSSHATCH_TRACE_ID) ?? undefined
-      const { payload } = yield* payer.createPayload({ required, traceId })
+      const { payload } = yield* payer.createPayload({ required })
       const encoded = yield* S.encodeEffect(PayloadFromBase64JsonString)(payload)
       retry.headers.set(PAYMENT_SIGNATURE, encoded)
       return yield* Effect.promise(() => fetch(retry))

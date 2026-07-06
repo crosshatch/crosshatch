@@ -1,0 +1,10 @@
+{
+  "name": "@crosshatch-examples/headless",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@cloudflare/workers-types": "catalog:",
+    "crosshatch": "workspace:*",
+    "effect": "catalog:"
+  }
+}

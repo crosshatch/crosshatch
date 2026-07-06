@@ -4,7 +4,6 @@ import { Payer } from "./Payer.ts"
 import type { Required } from "./Required.ts"
 import { Requirements } from "./Requirements.ts"
 import { ResourceInfo } from "./ResourceInfo.ts"
-import { TraceId } from "./traced.ts"
 import { Version } from "./Version.ts"
 
 export const Payload = S.Struct({
@@ -17,14 +16,7 @@ export const Payload = S.Struct({
 
 export const PayloadFromBase64JsonString = S.StringFromBase64.pipe(S.decodeTo(S.fromJsonString(S.toCodecJson(Payload))))
 
-export const make = Effect.fnUntraced(function* ({
-  required,
-  traceId: traceId_,
-}: {
-  readonly required: typeof Required.Type
-  readonly traceId?: string | undefined
-}) {
-  const { createTrace, createPayload } = yield* Payer
-  const traceId = traceId_ ?? (yield* createTrace ? TraceId : Effect.undefined)
-  return yield* createPayload({ required, traceId })
+export const make = Effect.fnUntraced(function* ({ required }: { readonly required: typeof Required.Type }) {
+  const { createPayload } = yield* Payer
+  return yield* createPayload({ required })
 })

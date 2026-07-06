@@ -1,10 +1,10 @@
 import { Schema as S } from "effect"
 import { Client } from "liminal"
 
+import { TraceConfig } from "../../Bridge.ts"
 import { Payload } from "../../Payload.ts"
 import { PaymentId } from "../../PaymentId.ts"
 import { Required } from "../../Required.ts"
-import { TraceConfig } from "../../traced.ts"
 import { LinkChallengeId } from "../LinkChallengeId.ts"
 import { ProposeError } from "../ProposeError.ts"
 

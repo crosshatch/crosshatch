@@ -1,4 +1,4 @@
-import { Facilitator, Required, Requirements, PaymentId, Http, KnownAsset } from "crosshatch"
+import { Facilitator, Required, Requirements, PaymentId, Http, KnownAssets } from "crosshatch"
 import { EvmAddress } from "crosshatch/Evm"
 import { Layer, Effect } from "effect"
 import { Worker } from "effect-workerd"
@@ -12,23 +12,25 @@ export default Worker.make({
       const payload = yield* Http.ResolvedPayload
       if (!payload) {
         const PAY_TO_EVM = yield* EvmAddress.config("PAY_TO_EVM")
-        const required = yield* Required.builder({
-          url: "https://example-merchant.com",
-        }).pipe(
+        const required = yield* Required.make`
+        |
+        | Description of the charge here.
+        |
+        | What is this charge for?
+        |
+        | How does it fit into the current flow?
+        |
+        `.pipe(
           Required.extend(PaymentId.PaymentIdExtension, {
             required: true,
           }),
           Required.accept(
-            Requirements.group(KnownAsset.USDC, {
+            Requirements.group(KnownAssets.USDC, {
               amount: 0.01,
               recipients: { eip155: { 8453: PAY_TO_EVM } },
             }),
           ),
-        )`
-        | Description of the charge here.
-        | What is this charge for?
-        | How does it fit into the current flow?
-        `
+        )
         return yield* Http.require({ required })
       }
       const settlement = yield* Facilitator.settle({ payload })
@@ -42,7 +44,7 @@ export default Worker.make({
         allowedOrigins: ["*"],
         exposedHeaders: Http.EXPOSED_HEADERS,
       }),
-      Http.layerMiddleware,
+      Http.layerMiddleware(),
     ]),
     HttpRouter.toHttpEffect,
     Effect.flatten,
