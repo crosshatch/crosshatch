@@ -2,7 +2,6 @@ import { Context, Deferred, Effect, Layer, Schema as S } from "effect"
 
 import type { Payload } from "./Payload.ts"
 import { PaymentId } from "./PaymentId.ts"
-import type { Required } from "./Required.ts"
 
 export class PaymentIdNotFoundError extends S.TaggedErrorClass<PaymentIdNotFoundError>()("PaymentIdNotFoundError", {
   paymentId: PaymentId,
@@ -19,19 +18,6 @@ export class PaymentIdLookup extends Context.Service<
     }) => Effect.Effect<void, PaymentIdNotFoundError>
   }
 >()("crosshatch/PaymentIdLookup") {}
-
-export const deferred = Effect.fnUntraced(function* ({
-  lookup,
-  required,
-}: {
-  readonly lookup: PaymentIdLookup["Service"]
-  readonly required: typeof Required.Type
-}) {
-  // TODO
-  console.log(required)
-  const paymentId = null! as typeof PaymentId.Type
-  return yield* lookup.await(paymentId).pipe(Effect.forkChild)
-})
 
 export const layerMemory = Layer.effect(
   PaymentIdLookup,

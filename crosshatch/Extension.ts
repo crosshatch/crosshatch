@@ -1,6 +1,7 @@
 import { Schema as S, Context, Layer, Effect, Scope, flow } from "effect"
 
 import type { Payload } from "./Payload.ts"
+import type { Required } from "./Required.ts"
 
 const TypeId = "~crosshatch/Extension" as const
 
@@ -60,13 +61,16 @@ export const Service =
     const { success } = definition
 
     const layer = ({ payload }: { readonly payload: typeof Payload.Type | undefined }) =>
-      Effect.gen(function* () {
-        const entry = payload?.extensions?.[definition.identifier]
-        if (entry) {
-          return yield* S.decodeUnknownEffect(S.toCodecJson(success))(entry)
-        }
-        return
-      }).pipe(Layer.effect(tag))
+      Layer.effect(
+        tag,
+        Effect.gen(function* () {
+          const entry = payload?.extensions?.[definition.identifier]
+          if (entry) {
+            return yield* S.decodeUnknownEffect(S.toCodecJson(success))(entry)
+          }
+          return
+        }),
+      )
 
     return Object.assign(tag, {
       [TypeId]: TypeId,
@@ -97,3 +101,14 @@ export const layerHandler = Effect.fnUntraced(function* <
   registry.set(extension, flow(f, Effect.provide(Layer.succeedContext(context)), Effect.scoped))
   return Layer.empty
 }, Layer.unwrap)
+
+export const decodeRequired = Effect.fnUntraced(function* <
+  Self,
+  Id extends string,
+  Name extends string,
+  ExtensionPayload extends Extension.Payload,
+  Success extends Extension.Success<ExtensionPayload>,
+>(extension: Extension<Self, Id, Name, ExtensionPayload, Success>, required: typeof Required.Type) {
+  const { identifier, payload: Payload } = extension
+  return yield* S.decodeUnknownEffect(Payload)(required.extensions?.[identifier])
+})

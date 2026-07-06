@@ -11,19 +11,18 @@ import { FacilitatorLive } from "./FacilitatorLive/FacilitatorLive.ts"
 
 export default Worker.make({
   handler: Layer.mergeAll(
-    HttpApiBuilder.layer(Facilitator.FacilitatorApi, { openapiPath: "/openapi.json" }),
+    HttpApiBuilder.layer(Facilitator.FacilitatorApi, { openapiPath: "/openapi.json" }).pipe(
+      Layer.provide(FacilitatorLive),
+    ),
     HttpRouter.add("GET", "/health", () => Effect.succeed(HttpServerResponse.text("ok"))),
+    FacilitatorLive,
   ).pipe(
     Layer.provide(
-      FacilitatorLive.pipe(
-        Layer.provide(
-          HttpRouter.cors({
-            allowedHeaders: ["*"],
-            allowedMethods: ["*"],
-            allowedOrigins: ["*"],
-          }),
-        ),
-      ),
+      HttpRouter.cors({
+        allowedHeaders: ["*"],
+        allowedMethods: ["*"],
+        allowedOrigins: ["*"],
+      }),
     ),
     Boundary.layer("handler", import.meta.url),
     HttpRouter.toHttpEffect,

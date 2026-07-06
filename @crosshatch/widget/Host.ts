@@ -21,21 +21,24 @@ export const hostListener = Effect.suspend(() =>
   ),
 )
 
-export const layer = Effect.gen(function* () {
-  const deferred = yield* Deferred.make<string>()
-  const scope = yield* Scope.make()
-  yield* BrowserStream.fromEventListenerWindow("message").pipe(
-    Stream.runForEach(
-      Effect.fnUntraced(function* ({ data, origin }) {
-        if (S.is(HostIntroduction)(data)) {
-          yield* Deferred.succeed(deferred, origin)
-          yield* Scope.close(scope, Exit.void)
-        }
-      }),
-    ),
-    Effect.forkScoped,
-    Scope.provide(scope),
-  )
-  parent.postMessage(RequestHostIntroduction.make({}), "*")
-  return yield* Deferred.await(deferred)
-}).pipe(Layer.effect(Host))
+export const layer = Layer.effect(
+  Host,
+  Effect.gen(function* () {
+    const deferred = yield* Deferred.make<string>()
+    const scope = yield* Scope.make()
+    yield* BrowserStream.fromEventListenerWindow("message").pipe(
+      Stream.runForEach(
+        Effect.fnUntraced(function* ({ data, origin }) {
+          if (S.is(HostIntroduction)(data)) {
+            yield* Deferred.succeed(deferred, origin)
+            yield* Scope.close(scope, Exit.void)
+          }
+        }),
+      ),
+      Effect.forkScoped,
+      Scope.provide(scope),
+    )
+    parent.postMessage(RequestHostIntroduction.make({}), "*")
+    return yield* Deferred.await(deferred)
+  }),
+)

@@ -13,8 +13,8 @@ export class FacilitatorClient extends Context.Reference<
     }).pipe(Effect.provide(FetchHttpClient.layer), Effect.runSync)["facilitator"],
 }) {
   static readonly layer = ({ baseUrl }: { readonly baseUrl: string }) =>
-    HttpApiClient.make(FacilitatorApi, { baseUrl }).pipe(
-      Effect.map(({ facilitator }) => facilitator),
-      Layer.effect(this),
+    Layer.effect(
+      this,
+      HttpApiClient.make(FacilitatorApi, { baseUrl }).pipe(Effect.map(({ facilitator }) => facilitator)),
     )
 }

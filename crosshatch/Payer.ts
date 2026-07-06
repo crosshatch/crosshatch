@@ -34,15 +34,15 @@ export const layer = (chain: Chain) =>
           const extensions = yield* Effect.forEach(
             Record.toEntries(payloads),
             Effect.fnUntraced(
-              function* ([name, payload]) {
-                const extension = registry.entries().find(([extension]) => extension.name === name)
+              function* ([identifier, payload]) {
+                const extension = registry.entries().find(([extension]) => extension.identifier === identifier)
                 if (!extension) {
                   return
                 }
                 const [{ payload: Payload, success: Success }, f] = extension
                 const parsed = yield* S.decodeUnknownEffect(S.toCodecJson(Payload))(payload)
                 const result = yield* f(parsed).pipe(Effect.flatMap(S.encodeEffect(S.toCodecJson(Success))))
-                return [name, result] as const
+                return [identifier, result] as const
               },
               Effect.catchTags({
                 SchemaError: () => Effect.undefined,
