@@ -30,9 +30,9 @@ export const layer = (chain: Chain) =>
       return {
         createPayload: Effect.fnUntraced(function* ({ required }) {
           const { accepted } = yield* accept({ assetConfigurationRef, required })
-          const { extensions: payloads = {} } = required
+          const { extensions: infos = {} } = required
           const extensions = yield* Effect.forEach(
-            Record.toEntries(payloads),
+            Record.toEntries(infos),
             Effect.fnUntraced(
               function* ([identifier, info]) {
                 const extension = registry.entries().find(([extension]) => extension.identifier === identifier)

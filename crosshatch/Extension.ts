@@ -112,5 +112,5 @@ export const decodeRequired = Effect.fnUntraced(function* <
   Echo extends Extension.Echo<Info>,
 >(extension: Extension<Self, Id, Identifier, Info, Echo>, required: typeof Required.Type) {
   const { identifier, info } = extension
-  return yield* S.decodeUnknownEffect(info)(required.extensions?.[identifier])
+  return yield* S.decodeUnknownEffect(S.toCodecJson(info))(required.extensions?.[identifier])
 })
