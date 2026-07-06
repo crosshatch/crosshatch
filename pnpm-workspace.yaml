@@ -52,7 +52,7 @@ catalog:
   "@x402/core": ^2.3.0
   "@x402/evm": ^2.0.0
   "@x402/svm": ^2.0.0
-  alchemy: https://pkg.ing/alchemy/62f05d3
+  alchemy: 2.0.0-beta.60
   asciify-engine: ^1.0.118
   babel-plugin-react-compiler: ^1.0.0
   class-variance-authority: ^0.7.1
