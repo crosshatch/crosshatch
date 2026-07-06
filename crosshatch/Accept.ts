@@ -18,6 +18,7 @@ export class Accept extends Context.Reference<{
   }) => Effect.Effect<
     {
       readonly accepted: typeof Requirements.Type
+      readonly chainId: typeof ChainId.Type
       readonly deployment: Deployment
     },
     AcceptError
@@ -30,10 +31,10 @@ export class Accept extends Context.Reference<{
       for (const asset of Object.values(assetConfiguration)) {
         for (const [namespace, references] of Object.entries(asset.deployments)) {
           for (const [reference, deployment] of Object.entries(references)) {
-            const network = ChainId.make(`${namespace}:${reference}`)
+            const chainId = ChainId.make(`${namespace}:${reference}`)
             for (const accepted of accepts) {
-              if (network === accepted.network && deployment.asset === accepted.asset) {
-                return { accepted, deployment }
+              if (chainId === accepted.network && deployment.asset === accepted.asset) {
+                return { accepted, chainId, deployment }
               }
             }
           }

@@ -23,7 +23,7 @@ export const require = Effect.fnUntraced(function* ({ required }: { readonly req
   })
 })
 
-export const withSettlement =
+export const addResponseHeader =
   (settlement: typeof SettleResponse.Type) => (response: HttpServerResponse.HttpServerResponse) =>
     S.encodeEffect(SettleResponseFromBase64JsonString)(settlement).pipe(
       Effect.map((v) => HttpServerResponse.setHeader(PAYMENT_RESPONSE, v)(response)),

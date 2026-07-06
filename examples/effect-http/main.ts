@@ -34,7 +34,7 @@ export default Worker.make({
         return yield* Http402.require({ required })
       }
       const settlement = yield* Facilitator.settle({ payload })
-      return yield* HttpServerResponse.text("The paid resource.").pipe(Http402.withSettlement(settlement))
+      return yield* HttpServerResponse.text("The paid resource.").pipe(Http402.addResponseHeader(settlement))
     }),
   ).pipe(
     Layer.provide([

@@ -1,4 +1,4 @@
-import { Schema as S, Context, Layer, Effect, Scope } from "effect"
+import { Schema as S, Context, Layer, Effect, Scope, flow } from "effect"
 
 import type { Payload } from "./Payload.ts"
 
@@ -10,8 +10,8 @@ export interface Extension<
   Self,
   Id extends string,
   Identifier extends string,
-  ExtensionPayload extends S.Top & { readonly DecodingServices: never },
-  Success extends S.Top & { readonly Type: ExtensionPayload["Type"] },
+  ExtensionPayload extends Extension.Payload,
+  Success extends Extension.Success<ExtensionPayload>,
 > extends Context.Service<Self, Service<Success>> {
   new (_: never): Context.ServiceClass.Shape<Id, Service<Success>>
 
@@ -31,13 +31,14 @@ export interface Extension<
 }
 
 export declare namespace Extension {
-  export type Any = Extension<
-    any,
-    string,
-    string,
-    S.Top & { readonly DecodingServices: never },
-    S.Top & { readonly EncodingServices: never }
-  >
+  export type Payload = S.Top & { readonly DecodingServices: never }
+
+  export type Success<T extends S.Top> = T & {
+    readonly Type: T["Type"]
+    readonly EncodingServices: never
+  }
+
+  export type Any = Extension<any, string, string, Payload, Success<Payload>>
 }
 
 export const Service =
@@ -45,11 +46,8 @@ export const Service =
   <
     Id extends string,
     Identifier extends string,
-    ExtensionPayload extends S.Top & { readonly DecodingServices: never },
-    Success extends S.Top & {
-      readonly Type: ExtensionPayload["Type"]
-      readonly EncodingServices: never
-    },
+    ExtensionPayload extends Extension.Payload,
+    Success extends Extension.Success<ExtensionPayload>,
   >(
     id: Id,
     definition: {
@@ -62,16 +60,13 @@ export const Service =
     const { success } = definition
 
     const layer = ({ payload }: { readonly payload: typeof Payload.Type | undefined }) =>
-      Layer.effect(
-        tag,
-        Effect.gen(function* () {
-          const entry = payload?.extensions?.[definition.identifier]
-          if (entry) {
-            return yield* S.decodeUnknownEffect(S.toCodecJson(success))(entry)
-          }
-          return
-        }),
-      )
+      Effect.gen(function* () {
+        const entry = payload?.extensions?.[definition.identifier]
+        if (entry) {
+          return yield* S.decodeUnknownEffect(S.toCodecJson(success))(entry)
+        }
+        return
+      }).pipe(Layer.effect(tag))
 
     return Object.assign(tag, {
       [TypeId]: TypeId,
@@ -90,17 +85,15 @@ export const layerHandler = Effect.fnUntraced(function* <
   Self,
   Id extends string,
   Name extends string,
-  ExtensionPayload extends S.Top & { readonly DecodingServices: never },
-  Success extends S.Top & {
-    readonly Type: ExtensionPayload["Type"]
-    readonly EncodingServices: never
-  },
+  ExtensionPayload extends Extension.Payload,
+  Success extends Extension.Success<ExtensionPayload>,
   R,
 >(
   extension: Extension<Self, Id, Name, ExtensionPayload, Success>,
   f: (payload: ExtensionPayload["Type"]) => Effect.Effect<Success["Type"], never, R>,
 ) {
   const registry = yield* ExtensionRegistry
-  registry.set(extension, f as never)
+  const context = yield* Effect.context<R>()
+  registry.set(extension, flow(f, Effect.provide(Layer.succeedContext(context)), Effect.scoped))
   return Layer.empty
 }, Layer.unwrap)

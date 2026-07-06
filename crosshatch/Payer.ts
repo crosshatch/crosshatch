@@ -14,6 +14,7 @@ export class Payer extends Context.Service<
   Payer,
   {
     readonly createPayload: (config: {
+      readonly traceId?: string | undefined
       readonly required: typeof Required.Type
     }) => Effect.Effect<{ readonly payload: typeof Payload.Type }, AcceptError | CreatePayloadError>
   }

@@ -2,4 +2,4 @@ import { Schema as S } from "effect"
 
 import { PrerequisitesUnmetError } from "./Prerequisite.ts"
 
-export const ProposeError = S.Union([PrerequisitesUnmetError])
+export const BrowserProposeError = S.Union([PrerequisitesUnmetError])

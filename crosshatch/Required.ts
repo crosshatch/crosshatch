@@ -90,11 +90,8 @@ export const extend =
     Self,
     K extends string,
     Name extends string,
-    ExtensionPayload extends S.Top & { readonly DecodingServices: never },
-    Success extends S.Top & {
-      readonly Type: ExtensionPayload["Type"]
-      readonly EncodingServices: never
-    },
+    ExtensionPayload extends Extension.Payload,
+    Success extends Extension.Success<ExtensionPayload>,
   >(
     extension: Extension<Self, K, Name, ExtensionPayload, Success>,
     payload: ExtensionPayload["Type"],
