@@ -1,4 +1,4 @@
-import { Facilitator, Required, Requirements, PaymentId, Http, KnownAssets } from "crosshatch"
+import { Facilitator, Required, Requirements, PaymentId, Http402, KnownAssets } from "crosshatch"
 import { EvmAddress } from "crosshatch/Evm"
 import { Layer, Effect } from "effect"
 import { Worker } from "effect-workerd"
@@ -9,7 +9,7 @@ export default Worker.make({
     "GET",
     "/paid",
     Effect.gen(function* () {
-      const payload = yield* Http.ResolvedPayload
+      const payload = yield* Http402.ResolvedPayload
       if (!payload) {
         const PAY_TO_EVM = yield* EvmAddress.config("PAY_TO_EVM")
         const required = yield* Required.make`
@@ -31,10 +31,10 @@ export default Worker.make({
             }),
           ),
         )
-        return yield* Http.require({ required })
+        return yield* Http402.require({ required })
       }
       const settlement = yield* Facilitator.settle({ payload })
-      return yield* HttpServerResponse.text("The paid resource.").pipe(Http.addSettlement(settlement))
+      return yield* HttpServerResponse.text("The paid resource.").pipe(Http402.withSettlement(settlement))
     }),
   ).pipe(
     Layer.provide([
@@ -42,9 +42,9 @@ export default Worker.make({
         allowedHeaders: ["*"],
         allowedMethods: ["*"],
         allowedOrigins: ["*"],
-        exposedHeaders: Http.EXPOSED_HEADERS,
+        exposedHeaders: Http402.EXPOSED_HEADERS,
       }),
-      Http.layerMiddleware(),
+      Http402.layerMiddleware(),
     ]),
     HttpRouter.toHttpEffect,
     Effect.flatten,
