@@ -21,27 +21,25 @@ Declare what the resource costs and return a 402 response when the request does 
 example uses HTTP, but Crosshatch is not limited to HTTP; route protection is just one integration path.
 
 ```ts
-import { Http402, Required, Requirements, KnownAsset } from "crosshatch"
+import { Http402, Required, Requirements, KnownAssets } from "crosshatch"
 import { Effect } from "effect"
 
 const route = Effect.gen(function* () {
-  const payload = yield* Http402.Http402Payload
+  const payload = yield* Http402.ResolvedPayload
 
   if (!payload) {
-    const required = yield* Required.builder({
-      url: "https://merchant.example",
-    }).pipe(
+    const required = yield* Required.make`Access to the paid resource.`.pipe(
       Required.accept(
-        Requirements.group(KnownAsset.USDC, {
+        Requirements.group(KnownAssets.USDC, {
           amount: 0.01,
           recipients: {
             eip155: { 8453: "0x..." },
           },
         }),
       ),
-    )`Access to the paid resource.`
+    )
 
-    return yield* Http402.require(required)
+    return yield* Http402.require({ required })
   }
 
   return payload

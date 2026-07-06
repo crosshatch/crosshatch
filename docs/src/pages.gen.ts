@@ -9,6 +9,7 @@ type Page =
   | { path: '/articles'; render: 'static' }
   | { path: '/asset'; render: 'static' }
   | { path: '/background'; render: 'static' }
+  | { path: '/bridge'; render: 'static' }
   | { path: '/changelog'; render: 'static' }
   | { path: '/deposit-rebate'; render: 'static' }
   | { path: '/effect-ai'; render: 'static' }

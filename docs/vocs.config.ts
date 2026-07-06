@@ -65,6 +65,7 @@ export default defineConfig({
       {
         text: "Clients",
         items: [
+          { text: "Bridge", link: "/bridge" },
           { text: "Payer Service", link: "/payer" },
           { text: "Fetch", link: "/fetch" },
           { text: "Effect HTTP Client", link: "/effect-http-client" },

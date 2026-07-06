@@ -1,1 +1,18 @@
 # Payer
+
+`Payer` is the service that turns a `Required` value into a signed x402 `Payload`.
+
+Local clients usually provide it with `Payer.layer(chain)`, plus asset metadata for requirement selection:
+
+```ts
+import { AssetConfiguration, KnownAssets, Payer } from "crosshatch"
+import { EvmChain } from "crosshatch/Evm"
+import { Layer, Redacted } from "effect"
+
+const payerLayer = Payer.layer(
+  EvmChain.fromMnemonic(Redacted.make("test test test test test test test test test test test junk")),
+).pipe(Layer.provide(AssetConfiguration.layer(KnownAssets)))
+```
+
+If payment creation should be delegated to another agent, provide `Payer.layerBridge` with a `Bridge` implementation.
+That keeps HTTP and `Payload.make` integrations Payer-based while allowing signing and user approval to live elsewhere.

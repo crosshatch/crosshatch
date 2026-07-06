@@ -1,0 +1,40 @@
+# Bridge
+
+`Bridge` is the client-side API for delegating payment proposal to another agent, such as a browser extension, hosted
+wallet, native app, or user-controlled approval surface.
+
+`Payer` is still the service that `Payload.make` and the HTTP client use to obtain a concrete x402 payload. The new
+split is that a `Payer` can either sign locally with a chain implementation, or be backed by a `Bridge` via
+`Payer.layerBridge`.
+
+## Propose A Payment
+
+```ts
+import { Bridge } from "crosshatch"
+import { Effect } from "effect"
+
+const program = Effect.gen(function* () {
+  const { payload } = yield* Bridge.propose({ required })
+})
+```
+
+`Bridge.propose` accepts a `Required` value and returns a signed `Payload`. When a trace is active, Crosshatch forwards
+the trace id to the bridge automatically.
+
+## Use A Bridge As A Payer
+
+```ts
+import { Bridge, Payer } from "crosshatch"
+import { Effect, Layer } from "effect"
+
+const BridgeLive = Layer.succeed(Bridge.Bridge, {
+  propose: ({ required, traceId }) =>
+    Effect.gen(function* () {
+      return yield* askWalletToPay({ required, traceId })
+    }),
+})
+
+const payerLayer = Payer.layerBridge.pipe(Layer.provide(BridgeLive))
+```
+
+Use this when the code consuming paid resources should not directly hold signing keys.

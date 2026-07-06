@@ -21,23 +21,24 @@ scheme, network, asset, amount, recipient, timeout, and any chain-specific metad
 
 ## Building a Required
 
-Start with `Required.builder`, then pipe builder operations into it. `Required.accept` adds one or more acceptable
-payment requirements, and `Required.extend` adds x402 extension payloads.
+Start with `Required.make`, then pipe builder operations into it. `Required.accept` adds one or more acceptable payment
+requirements, and `Required.extend` adds x402 extension payloads.
 
 ```ts
-import { Required, Requirements, PaymentId, KnownAsset } from "crosshatch"
+import { Required, Requirements, PaymentId, KnownAssets } from "crosshatch"
 import { EvmAddress } from "crosshatch/Evm"
 import { Effect } from "effect"
 
 const makeRequired = Effect.gen(function* () {
-  return yield* Required.builder({
-    url: "https://example-merchant.com/paid",
-  }).pipe(
+  return yield* Required.make`
+  | Access to the paid resource.
+  | This invoice is for a single request to /paid.
+  `.pipe(
     Required.extend(PaymentId.PaymentIdExtension, {
       required: true,
     }),
     Required.accept(
-      Requirements.group(KnownAsset.USDC, {
+      Requirements.group(KnownAssets.USDC, {
         amount: 0.01,
         recipients: {
           eip155: {
@@ -46,15 +47,12 @@ const makeRequired = Effect.gen(function* () {
         },
       }),
     ),
-  )`
-  | Access to the paid resource.
-  | This invoice is for a single request to /paid.
-  `
+  )
 })
 ```
 
-The tagged template at the end supplies `resource.description`. Crosshatch strips the leading margin, so multi-line
-descriptions stay legible in source.
+The description is passed first, either as a string or tagged template. Crosshatch strips the leading margin, so
+multi-line descriptions stay legible in source.
 
 ## Requirements Groups
 

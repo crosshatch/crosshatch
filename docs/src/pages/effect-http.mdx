@@ -18,15 +18,15 @@ Use this page when your merchant service is built with `effect/unstable/http`.
 
 ## Install The Middleware
 
-`Http402.layer` is an `HttpRouter` middleware. It reads `payment-signature` or `x-payment`, decodes the base64-encoded
-x402 payload, and provides it to the route as `Http402.Http402Payload`.
+`Http402.layerMiddleware()` is an `HttpRouter` middleware. It reads `payment-signature`, decodes the base64-encoded x402
+payload, and provides it to the route as `Http402.ResolvedPayload`.
 
 ```ts
 import { Http402 } from "crosshatch"
 import { Layer } from "effect"
 import { HttpRouter } from "effect/unstable/http"
 
-const app = HttpRouter.empty.pipe(Layer.provide(Http402.layer), HttpRouter.toHttpEffect)
+const app = HttpRouter.empty.pipe(Layer.provide(Http402.layerMiddleware()), HttpRouter.toHttpEffect)
 ```
 
 If the header is absent or cannot be decoded, the provided payload is `undefined`. Your route can then decide whether to
@@ -38,20 +38,18 @@ Inside the route, read the parsed payload service. If there is no payload, build
 `Http402.require({ required })`.
 
 ```ts
-import { Http402, Required, Requirements, KnownAsset } from "crosshatch"
+import { Http402, Required, Requirements, KnownAssets } from "crosshatch"
 import { EvmAddress } from "crosshatch/Evm"
 import { Effect } from "effect"
 import { HttpServerResponse } from "effect/unstable/http"
 
 const paidRoute = Effect.gen(function* () {
-  const payload = yield* Http402.Http402Payload
+  const payload = yield* Http402.ResolvedPayload
 
   if (!payload) {
-    const required = yield* Required.builder({
-      url: "https://merchant.example/paid",
-    }).pipe(
+    const required = yield* Required.make`Access to the paid resource.`.pipe(
       Required.accept(
-        Requirements.group(KnownAsset.USDC, {
+        Requirements.group(KnownAssets.USDC, {
           amount: 0.01,
           recipients: {
             eip155: {
@@ -60,7 +58,7 @@ const paidRoute = Effect.gen(function* () {
           },
         }),
       ),
-    )`Access to the paid resource.`
+    )
 
     return yield* Http402.require({ required })
   }
@@ -82,7 +80,7 @@ import { Effect } from "effect"
 import { HttpServerResponse } from "effect/unstable/http"
 
 const paidRoute = Effect.gen(function* () {
-  const payload = yield* Http402.Http402Payload
+  const payload = yield* Http402.ResolvedPayload
 
   if (!payload) {
     return yield* Http402.require({ required })
@@ -107,7 +105,7 @@ import { Effect } from "effect"
 import { HttpServerResponse } from "effect/unstable/http"
 
 const paidRoute = Effect.gen(function* () {
-  const payload = yield* Http402.Http402Payload
+  const payload = yield* Http402.ResolvedPayload
 
   if (!payload) {
     return yield* Http402.require({ required })
@@ -137,7 +135,7 @@ const app = router.pipe(
       allowedOrigins: ["*"],
       exposedHeaders: Http402.EXPOSED_HEADERS,
     }),
-    Http402.layer,
+    Http402.layerMiddleware(),
   ]),
   HttpRouter.toHttpEffect,
 )

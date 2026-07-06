@@ -41,12 +41,14 @@ crosshatch profile reveal-mnemonic
 
 ## Fetch a Paid Resource
 
-Provide the Crosshatch `Payer.layerEnv`, the underlying `HttpClient` of which intercepts and pays 402s with your
-Crosshatch profile.
+Provide `Http402.layerClient` with a `Payer` layer. The HTTP client intercepts 402 responses, asks the payer to create a
+payload, and retries with the payment attached.
 
 ```ts
-import { HttpClient, Payer } from "crosshatch"
+import { AssetConfiguration, Http402, KnownAssets, Mnemonic, Payer } from "crosshatch"
+import { EvmChain } from "crosshatch/Evm"
 import { Effect, Layer } from "effect"
+import { HttpClient, HttpClientRequest } from "effect/unstable/http"
 
 const program = Effect.gen(function* () {
   const client = yield* HttpClient.HttpClient
@@ -59,7 +61,13 @@ const program = Effect.gen(function* () {
     client.execute,
   )
   return yield* json
-}).pipe(HttpClient.pipe(Layer.provide(Payer.layerEnv)))
+}).pipe(
+  Effect.provide([
+    Http402.layerClient,
+    Mnemonic.config("MNEMONIC").pipe(Effect.map(EvmChain.fromMnemonic), Effect.map(Payer.layer), Layer.unwrap),
+    AssetConfiguration.layer(KnownAssets),
+  ]),
+)
 ```
 
 ## Higher-level Clients
@@ -67,7 +75,8 @@ const program = Effect.gen(function* () {
 The example above can be simplified via Effect AI.
 
 ```ts
-import { HttpClient, Payer, LanguageModel402 } from "crosshatch"
+import { AssetConfiguration, Http402, KnownAssets, Mnemonic, Payer, LanguageModel402 } from "crosshatch"
+import { EvmChain } from "crosshatch/Evm"
 import { Effect, Layer } from "effect"
 import { LanguageModel } from "effect/unstable/ai"
 
@@ -80,7 +89,13 @@ const program = Effect.gen(function* () {
   LanguageModel402.layer({
     model: "openai/gpt-5.5",
     url: "https://blockrun.ai/api/v1/chat/completions",
-  }).pipe(Layer.provide(Payer.layerEnv)),
+  }).pipe(
+    Layer.provide([
+      Http402.layerClient,
+      Mnemonic.config("MNEMONIC").pipe(Effect.map(EvmChain.fromMnemonic), Effect.map(Payer.layer), Layer.unwrap),
+      AssetConfiguration.layer(KnownAssets),
+    ]),
+  ),
 )
 ```
 
@@ -90,10 +105,10 @@ When you need more control, drop down to the raw x402 spec and create a payment 
 requirements.
 
 ```ts
+import { Bridge } from "crosshatch"
 import { Effect } from "effect"
-import { propose } from "crosshatch"
 
 const program = Effect.gen(function* () {
-  const { payload } = yield* propose({ required }) // [!code focus]
+  const { payload } = yield* Bridge.propose({ required }) // [!code focus]
 })
 ```

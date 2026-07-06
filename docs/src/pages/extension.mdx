@@ -1,4 +1,4 @@
-## Extensions
+# Extensions
 
 The extension system lets merchants ask clients for additional data to submit alongside the means of payment.
 
@@ -10,6 +10,69 @@ paid request safely.
 In this way, the merchant can call into the client through the requirement. The requirement does not only say "pay this
 amount"; it can also say "include this extra data when you pay." The client then returns the requested extension data in
 the payment payload, together with the signed payment authorization.
+
+## Defining An Extension
+
+Extensions are typed Effect services. The merchant publishes a request payload in the `Required` value, and the client
+returns a success payload in the `Payload` value.
+
+```ts
+import { Extension } from "crosshatch"
+import { Schema as S } from "effect"
+
+export class PaymentIdExtension extends Extension.Service<PaymentIdExtension>()("crosshatch/PaymentId", {
+  name: "payment-identifier",
+  payload: S.Struct({
+    required: S.Boolean,
+    id: S.String.pipe(S.optional),
+  }),
+  success: S.Struct({
+    required: S.Boolean,
+    id: S.String.pipe(S.optional),
+  }),
+}) {}
+```
+
+## Merchant API
+
+Merchants request extension data with `Required.extend` and decode returned extension data by installing the extension
+in the HTTP middleware.
+
+```ts
+import { Http402, PaymentId, Required } from "crosshatch"
+
+const required =
+  yield *
+  Required.make`Access to the paid resource.`.pipe(
+    Required.extend(PaymentId.PaymentIdExtension, {
+      required: true,
+    }),
+  )
+
+const middleware = Http402.layerMiddleware({
+  extensions: [PaymentId.PaymentIdExtension],
+})
+```
+
+Inside a protected route, `yield* PaymentId.PaymentIdExtension` returns the decoded extension data from the submitted
+payload, or `undefined` when the payload did not include it.
+
+## Client API
+
+Clients answer extension requests by registering handlers. A handler receives the decoded merchant request payload and
+returns the success payload that should be embedded in the payment payload.
+
+```ts
+import { Extension, PaymentId } from "crosshatch"
+import { Effect } from "effect"
+
+const paymentIdHandler = Extension.layerHandler(
+  PaymentId.PaymentIdExtension,
+  Effect.fn(function* ({ required, id }) {
+    return { required, id: id ?? crypto.randomUUID() }
+  }),
+)
+```
 
 ## Example: Payment Identifiers
 
