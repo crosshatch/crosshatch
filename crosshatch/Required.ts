@@ -76,12 +76,14 @@ export const make = (
 
 export const accept =
   (...acceptsInputs: ReadonlyArray<RequirementsLike>) =>
-  <E, R, X>(builder: RequiredBuilder<E, R, X>): RequiredBuilder<E | InvalidAmountError, R, X> =>
-    new RequiredBuilder({
-      ...builder.config,
-      acceptsInputs: [...(builder.config.acceptsInputs ?? []), ...acceptsInputs],
-      extensionsEntries: builder.config.extensionsEntries ?? [],
+  <E, R, X>(builder: RequiredBuilder<E, R, X>): RequiredBuilder<E | InvalidAmountError, R, X> => {
+    const { config } = builder
+    return new RequiredBuilder({
+      ...config,
+      acceptsInputs: [...(config.acceptsInputs ?? []), ...acceptsInputs],
+      extensionsEntries: config.extensionsEntries ?? [],
     })
+  }
 
 export const extend =
   <
@@ -99,9 +101,11 @@ export const extend =
   ) =>
   <E, R, X extends Extension.Any>(
     builder: RequiredBuilder<E, R, X>,
-  ): RequiredBuilder<E | S.SchemaError, R | ExtensionPayload["EncodingServices"], X | Self> =>
-    new RequiredBuilder({
-      ...builder.config,
-      acceptsInputs: builder.config.acceptsInputs ?? [],
-      extensionsEntries: [...(builder.config.extensionsEntries ?? []), [extension, payload]] as never,
+  ): RequiredBuilder<E | S.SchemaError, R | ExtensionPayload["EncodingServices"], X | Self> => {
+    const { config } = builder
+    return new RequiredBuilder({
+      ...config,
+      acceptsInputs: config.acceptsInputs ?? [],
+      extensionsEntries: [...(config.extensionsEntries ?? []), [extension, payload]] as never,
     })
+  }
