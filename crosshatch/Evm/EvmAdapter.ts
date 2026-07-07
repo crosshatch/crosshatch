@@ -13,17 +13,9 @@ export class EvmAdapter extends Context.Service<EvmAdapter, Adapter>()("crosshat
 export const layerSigner = (signer: EvmSigner): Layer.Layer<Adapter> =>
   Layer.succeed(
     Adapter,
-    Effect.fnUntraced(function* ({ accepted, extensions }) {
+    Effect.fnUntraced(function* ({ accepted }) {
       const method = accepted.extra?.assetTransferMethod ?? "eip3009"
-      const payload = yield* (method === "permit2" ? Permit2Payload.make : Erc3009Payload.make)(signer, accepted)
-      return {
-        payload: {
-          x402Version: 2,
-          payload,
-          accepted,
-          extensions,
-        },
-      }
+      return yield* (method === "permit2" ? Permit2Payload.make : Erc3009Payload.make)(signer, accepted)
     }),
   )
 

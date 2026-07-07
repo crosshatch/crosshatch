@@ -50,7 +50,10 @@ export const layer = Layer.effect(
           ),
           { concurrency: "unbounded" },
         ).pipe(Effect.map(flow(Array.filter(Predicate.isNotUndefined), Record.fromEntries)))
-        return yield* adapt({ accepted, extensions })
+        const payload = yield* adapt({ accepted })
+        return {
+          payload: { x402Version: 2, payload, accepted, extensions },
+        }
       }),
     }
   }),
