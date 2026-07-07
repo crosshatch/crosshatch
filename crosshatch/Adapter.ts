@@ -1,12 +1,14 @@
 import { Context, Layer, type Effect } from "effect"
 
 import type { CreatePayloadError } from "./Payer.ts"
+import type { Deployment } from "./PhysicalAsset.ts"
 import type { Requirements } from "./Requirements.ts"
 
 export class Adapter extends Context.Service<
   Adapter,
   (config: {
     readonly accepted: typeof Requirements.Type
+    readonly deployment: Deployment
   }) => Effect.Effect<Record<string, unknown>, CreatePayloadError>
 >()("crosshatch/Adapter") {}
 

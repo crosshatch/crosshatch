@@ -29,7 +29,7 @@ export const layer = Layer.effect(
     const registry = yield* ExtensionRegistry
     return {
       createPayload: Effect.fnUntraced(function* ({ required }) {
-        const { accepted } = yield* accept({ assetConfigurationRef, required })
+        const { accepted, deployment } = yield* accept({ assetConfigurationRef, required })
         const { extensions: infos = {} } = required
         const extensions = yield* Effect.forEach(
           Record.toEntries(infos),
@@ -50,7 +50,7 @@ export const layer = Layer.effect(
           ),
           { concurrency: "unbounded" },
         ).pipe(Effect.map(flow(Array.filter(Predicate.isNotUndefined), Record.fromEntries)))
-        const payload = yield* adapt({ accepted })
+        const payload = yield* adapt({ accepted, deployment })
         return {
           payload: { x402Version: 2, payload, accepted, extensions },
         }
