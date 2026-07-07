@@ -1,9 +1,7 @@
-import { Mnemonic, KnownAssets, Payer, AssetConfiguration } from "crosshatch"
-import { EvmChain } from "crosshatch/Evm"
-import { Effect, flow, Layer } from "effect"
+import { KnownAssets, Payer, AssetConfiguration } from "crosshatch"
+import { EvmAdapter } from "crosshatch/Evm"
+import { Layer } from "effect"
 
-export const PayerLive = Mnemonic.config("MNEMONIC").pipe(
-  Effect.map(flow(EvmChain.fromMnemonic, Payer.layer)),
-  Layer.unwrap,
-  Layer.provide(AssetConfiguration.layer(KnownAssets)),
+export const PayerLive = Payer.layer.pipe(
+  Layer.provide([EvmAdapter.layerMnemonicEnv, AssetConfiguration.layer(KnownAssets)]),
 )

@@ -1,4 +1,4 @@
-import { EvmChain, EvmAsset } from "../Evm/Evm.ts"
+import { EvmAdapter, EvmAsset } from "../Evm/Evm.ts"
 import { type PhysicalAsset } from "../PhysicalAsset.ts"
 
 export const MEGAUSDC = {
@@ -11,7 +11,7 @@ export const MEGAUSDC = {
         decimals: 18,
         name: "MegaUSD",
         version: "1",
-        service: EvmChain.EvmChain,
+        adapter: EvmAdapter.EvmAdapter,
       },
     },
   },

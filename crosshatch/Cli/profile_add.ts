@@ -19,7 +19,7 @@ export const profileAdd = Command.make("add", {
   profile: Argument.string("profile").pipe(Argument.withDefault("default")),
   mnemonic: Argument.string("mnemonic").pipe(
     Argument.optional,
-    Argument.map(flow(Option.map(Mnemonic.fromText), Option.getOrUndefined)),
+    Argument.map(flow(Option.map(Mnemonic.make), Option.getOrUndefined)),
   ),
 }).pipe(
   Command.withHandler(
