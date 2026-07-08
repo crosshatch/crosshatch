@@ -30,7 +30,7 @@ const authorizationTypes = {
   ],
 } as const
 
-export const make = Effect.fnUntraced(function* (signer: EvmSigner, requirement: typeof Requirements.Type) {
+export const make = Effect.fnUntraced(function* (signer: EvmSigner["Service"], requirement: typeof Requirements.Type) {
   if (!requirement.extra?.name || !requirement.extra?.version) {
     // TODO: inner schema error
     return yield* new CreatePayloadError({})

@@ -28,7 +28,7 @@ describe(import.meta.url, () => {
     Effect.fn(function* () {
       const required = yield* Required.make().pipe(
         Required.accept(
-          Requirements.group(KnownAssets.USDC, {
+          Requirements.asset(KnownAssets.USDC, {
             amount: 0.01,
             recipients: {
               eip155: {

@@ -49,7 +49,7 @@ const paidRoute = Effect.gen(function* () {
   if (!payload) {
     const required = yield* Required.make`Access to the paid resource.`.pipe(
       Required.accept(
-        Requirements.group(KnownAssets.USDC, {
+        Requirements.asset(KnownAssets.USDC, {
           amount: 0.01,
           recipients: {
             eip155: {

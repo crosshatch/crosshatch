@@ -25,7 +25,7 @@ export default Worker.make({
             required: true,
           }),
           Required.accept(
-            Requirements.group(KnownAssets.USDC, {
+            Requirements.asset(KnownAssets.USDC, {
               amount: 0.01,
               recipients: { eip155: { 8453: PAY_TO_EVM } },
             }),

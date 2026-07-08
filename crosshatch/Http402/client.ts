@@ -27,7 +27,7 @@ export const layerFetch = Layer.effect(
           return response
         }
         if (retry.headers.has(PAYMENT_SIGNATURE)) {
-          throw new PaymentAlreadyAttemptedError()
+          return yield* new PaymentAlreadyAttemptedError()
         }
         const traceId = response.headers.get(CROSSHATCH_TRACE_ID) ?? undefined
         const requiredHeader = response.headers.get(PAYMENT_REQUIRED)

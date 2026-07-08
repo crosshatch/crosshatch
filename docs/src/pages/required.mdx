@@ -38,7 +38,7 @@ const makeRequired = Effect.gen(function* () {
       required: true,
     }),
     Required.accept(
-      Requirements.group(KnownAssets.USDC, {
+      Requirements.asset(KnownAssets.USDC, {
         amount: 0.01,
         recipients: {
           eip155: {
@@ -56,12 +56,12 @@ multi-line descriptions stay legible in source.
 
 ## Requirements Groups
 
-`Requirements.group` turns a `PhysicalAsset` into one or more x402 payment requirements. For example, `USDC` may contain
+`Requirements.asset` turns a `PhysicalAsset` into one or more x402 payment requirements. For example, `USDC` may contain
 deployments for multiple EVM chains. The `recipients` object chooses which deployments this invoice accepts and which
 address should receive payment on each chain.
 
 ```ts
-Requirements.group(USDC, {
+Requirements.asset(USDC, {
   amount: 0.01,
   recipients: {
     eip155: {

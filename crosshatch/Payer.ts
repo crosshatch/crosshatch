@@ -24,13 +24,13 @@ export const layer = Layer.effect(
   Payer,
   Effect.gen(function* () {
     const { accept } = yield* Accept
-    const adapt = yield* Adapter
     const assetConfigurationRef = yield* AssetConfigurationRef
     const registry = yield* ExtensionRegistry
+    const adapt = yield* Adapter
     return {
       createPayload: Effect.fnUntraced(function* ({ required }) {
-        const { accepted, deployment } = yield* accept({ assetConfigurationRef, required })
         const { extensions: infos = {} } = required
+        const { accepted, deployment } = yield* accept({ assetConfigurationRef, required })
         const extensions = yield* Effect.forEach(
           Record.toEntries(infos),
           Effect.fnUntraced(

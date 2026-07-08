@@ -23,7 +23,7 @@ export type RequirementsLike =
   | Array<typeof Requirements.Type>
   | Effect.Effect<Array<typeof Requirements.Type>, InvalidAmountError>
 
-export const group = Effect.fnUntraced(function* <A extends PhysicalAsset>(
+export const asset = Effect.fnUntraced(function* <A extends PhysicalAsset>(
   asset: A,
   {
     amount,

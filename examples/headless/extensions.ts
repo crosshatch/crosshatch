@@ -26,7 +26,7 @@ const makeRequired = Effect.gen(function* () {
       required: true,
     }),
     Required.accept(
-      Requirements.group(KnownAssets.USDC, {
+      Requirements.asset(KnownAssets.USDC, {
         amount: 0.01,
         recipients: { eip155: { 8453: EVM_ADDRESS } },
         ttl: "1 minutes",

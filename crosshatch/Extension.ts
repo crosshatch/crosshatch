@@ -57,13 +57,13 @@ export const Service =
     },
   ): Extension<Self, Id, Identifier, Info, Success> => {
     const tag = Context.Service<Self, Service<Success>>()(id)
-    const { echo } = definition
+    const { echo, identifier } = definition
 
     const layer = ({ payload }: { readonly payload: typeof Payload.Type | undefined }) =>
       Layer.effect(
         tag,
         Effect.gen(function* () {
-          const entry = payload?.extensions?.[definition.identifier]
+          const entry = payload?.extensions?.[identifier]
           if (entry) {
             return yield* S.decodeUnknownEffect(S.toCodecJson(echo))(entry)
           }

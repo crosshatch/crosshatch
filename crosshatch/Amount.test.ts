@@ -102,12 +102,12 @@ describe(import.meta.url, () => {
     "scales grouped requirements by deployment decimals",
     Effect.fn(function* () {
       const payTo = Address.Address.make("0x0000000000000000000000000000000000000001")
-      const [sixDecimals] = yield* Requirements.group(KnownAssets.USDC, {
+      const [sixDecimals] = yield* Requirements.asset(KnownAssets.USDC, {
         amount: 0.01,
         recipients: { eip155: { 8453: payTo } },
       })
       assert.strictEqual(sixDecimals!.amount, "10000")
-      const [eighteenDecimals] = yield* Requirements.group(KnownAssets.MUSD, {
+      const [eighteenDecimals] = yield* Requirements.asset(KnownAssets.MUSD, {
         amount: 0.01,
         recipients: { eip155: { 31612: payTo } },
       })
