@@ -1,18 +1,19 @@
-import { Context, Effect, Layer, Option, Schema as S, Scope } from "effect"
+import { Context, Data, Effect, flow, Layer, Schema as S, Scope } from "effect"
 
-import type { CreatePayloadError } from "./Payer.ts"
+import type { PhysicalAssetDeployment } from "./Asset.ts"
 import type { Requirements } from "./Requirements.ts"
 
-export type Match<Extras, R> = (
-  requirements: typeof Requirements.Type,
-) => Effect.Effect<Option.Option<Extras>, never, R>
+export class CreatePayloadError extends Data.TaggedError("CreatePayloadError")<{ readonly cause?: unknown }> {}
 
-export type Make<Extras, R2> = (extras: Extras) => Effect.Effect<Record<string, unknown>, CreatePayloadError, R2>
+export type Adapt<R = never> = Effect.Effect<Record<string, S.Json>, CreatePayloadError, R>
 
-export interface Service {
-  readonly match: Match<unknown, never>
-  readonly make: Make<any, never>
-}
+export type Service<R = never, R2 = never> = ({
+  accepted,
+  deployment,
+}: {
+  readonly accepted: typeof Requirements.Type
+  readonly deployment: PhysicalAssetDeployment
+}) => Effect.Effect<Adapt<R> | undefined, S.SchemaError, R2>
 
 const TypeId = "~crosshatch/PayloadAdapter" as const
 
@@ -21,36 +22,31 @@ export interface PayloadAdapter<Self, Id extends string> extends Context.Service
 
   readonly [TypeId]: typeof TypeId
 
-  readonly layer: <Extras, R, R2>(
-    match: Match<Extras, R>,
-    make: Make<Extras, R2>,
-  ) => Layer.Layer<Self, S.SchemaError, Exclude<R | R2, Scope.Scope>>
+  readonly layer: <R, R2>(make: Service<R, R2>) => Layer.Layer<Self, never, Exclude<R | R2, Scope.Scope>>
 }
-
-export class AdapterRegistry extends Context.Reference<Map<Context.ServiceClass<any, any, Service>, Service>>(
-  "crosshatch/AdapterRegistry",
-  { defaultValue: () => new Map() },
-) {}
 
 export const Service =
   <Self>() =>
   <Id extends string>(id: Id): PayloadAdapter<Self, Id> => {
     const tag = Context.Service<Self, Service>()(id)
-    const layer = <Extras, R, R2>(
-      match: Match<Extras, R>,
-      make: Make<Extras, R2>,
-    ): Layer.Layer<Self, S.SchemaError, Exclude<R | R2, Scope.Scope>> =>
+    const layer = <R, R2>(f: Service<R, R2>): Layer.Layer<Self, never, Exclude<R | R2, Scope.Scope>> =>
       Layer.effect(
         tag,
         Effect.gen(function* () {
-          const registry = yield* AdapterRegistry
-          const adapter = { match, make } as never
-          registry.set(tag, adapter)
-          return adapter
+          const context = yield* Effect.context<R | R2>()
+          const provide = Effect.provide(Layer.succeedContext(context))
+          return flow(
+            f,
+            provide,
+            Effect.fnUntraced(function* (outer) {
+              const inner = yield* outer
+              if (inner) {
+                return inner.pipe(Effect.scoped, provide)
+              }
+              return undefined
+            }),
+          )
         }),
       )
-    return Object.assign(tag, {
-      [TypeId]: TypeId,
-      layer,
-    })
+    return Object.assign(tag, { [TypeId]: TypeId, layer })
   }

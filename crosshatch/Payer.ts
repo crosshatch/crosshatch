@@ -1,14 +1,11 @@
-import { Array, Schema as S, Context, Data, Effect, Layer, Record, Predicate, flow } from "effect"
+import { Array, Schema as S, Context, Effect, Layer, Record, Predicate, flow } from "effect"
 
 import { Accept, type AcceptError } from "./Accept.ts"
-import { Adapter } from "./Adapter.ts"
-import { AssetConfigurationRef } from "./AssetConfiguration.ts"
+import { CreatePayloadError } from "./Adapter.ts"
 import { Bridge } from "./Bridge.ts"
 import { ExtensionRegistry } from "./Extension.ts"
 import type { Payload } from "./Payload.ts"
 import type { Required } from "./Required.ts"
-
-export class CreatePayloadError extends Data.TaggedError("CreatePayloadError")<{ readonly cause?: unknown }> {}
 
 export class Payer extends Context.Service<
   Payer,
@@ -23,14 +20,13 @@ export class Payer extends Context.Service<
 export const layer = Layer.effect(
   Payer,
   Effect.gen(function* () {
-    const { accept } = yield* Accept
-    const assetConfigurationRef = yield* AssetConfigurationRef
+    const accept = yield* Accept
     const registry = yield* ExtensionRegistry
-    const adapt = yield* Adapter
     return {
       createPayload: Effect.fnUntraced(function* ({ required }) {
         const { extensions: infos = {} } = required
-        const { accepted, deployment } = yield* accept({ assetConfigurationRef, required })
+        const { accepted, adapt } = yield* accept({ required })
+        const payload = yield* adapt
         const extensions = yield* Effect.forEach(
           Record.toEntries(infos),
           Effect.fnUntraced(
@@ -50,7 +46,6 @@ export const layer = Layer.effect(
           ),
           { concurrency: "unbounded" },
         ).pipe(Effect.map(flow(Array.filter(Predicate.isNotUndefined), Record.fromEntries)))
-        const payload = yield* adapt({ accepted, deployment })
         return {
           payload: { x402Version: 2, payload, accepted, extensions },
         }

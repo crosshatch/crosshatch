@@ -1,6 +1,8 @@
-import { KnownAssets, Facilitator, Required, Requirements, Payload, Payer, AssetConfiguration } from "crosshatch"
-import { EvmAdapter, EvmAddress } from "crosshatch/Evm"
-import { Effect, Layer } from "effect"
+import { KnownAssets, Facilitator, Required, Requirements, Payload } from "crosshatch"
+import { EvmAddress } from "crosshatch/Evm"
+import { Effect } from "effect"
+
+import { PayerLive } from "./_common.ts"
 
 Effect.gen(function* () {
   const EVM_ADDRESS = yield* EvmAddress.config("PAY_TO_EVM")
@@ -19,7 +21,4 @@ Effect.gen(function* () {
   )
   const { payload } = yield* Payload.make({ required })
   yield* Facilitator.settle({ payload })
-}).pipe(
-  Effect.provide(Payer.layer.pipe(Layer.provide([EvmAdapter.layerMnemonicEnv, AssetConfiguration.layer(KnownAssets)]))),
-  Effect.runFork,
-)
+}).pipe(Effect.provide(PayerLive), Effect.runFork)
