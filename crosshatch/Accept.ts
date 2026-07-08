@@ -1,4 +1,4 @@
-import { Effect, Context, Ref, Schema as S } from "effect"
+import { Effect, Context, Ref, Schema as S, Option } from "effect"
 
 import { AssetConfigurationRef } from "./AssetConfiguration.ts"
 import { ChainId } from "./ChainId.ts"
@@ -32,9 +32,20 @@ export class Accept extends Context.Reference<{
         for (const [namespace, references] of Object.entries(asset.deployments)) {
           for (const [reference, deployment] of Object.entries(references)) {
             const chainId = ChainId.make(`${namespace}:${reference}`)
-            for (const accepted of accepts) {
-              if (chainId === accepted.network && deployment.asset === accepted.asset) {
-                return { accepted, chainId, deployment }
+            for (const requirements of accepts) {
+              if (chainId === requirements.network && deployment.asset === requirements.asset) {
+                for (const tag of deployment.adapters) {
+                  const adapter = yield* Effect.serviceOption(tag).pipe(Effect.map(Option.getOrUndefined))
+                  if (!adapter) {
+                    continue
+                  }
+                  yield* adapter.make(requirements)
+                  return {
+                    accepted: requirements,
+                    chainId,
+                    deployment,
+                  }
+                }
               }
             }
           }

@@ -54,11 +54,3 @@ export const Service =
       layer,
     })
   }
-
-// export class Adapter extends Context.Service<
-//   Adapter,
-//   (config: {
-//     readonly accepted: typeof Requirements.Type
-//     readonly deployment: Deployment
-//   }) => Effect.Effect<Record<string, unknown>, CreatePayloadError>
-// >()("crosshatch/Adapter") {}

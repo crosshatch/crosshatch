@@ -1,7 +1,5 @@
-import { Context } from "effect"
-
-import type { Adapter } from "./Adapter.ts"
-import type { Asset } from "./Asset.ts"
+import type { PayloadAdapter } from "./Adapter.ts"
+import { Asset } from "./Asset.ts"
 
 export interface PhysicalAsset {
   readonly symbol: string
@@ -14,5 +12,5 @@ export interface Deployment {
   readonly decimals: number
   readonly name: string
   readonly version: string
-  readonly adapter: Context.ServiceClass<any, any, Adapter>
+  readonly adapters: ReadonlyArray<PayloadAdapter<any, any>>
 }
