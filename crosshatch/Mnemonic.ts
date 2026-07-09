@@ -23,7 +23,7 @@ export const toLayer =
 export const toLayerText =
   <A>(mod: AdapterModule<A>) =>
   (mnemonicText: string) =>
-    toLayer(mod)(make(mnemonicText))
+    make(mnemonicText).pipe(toLayer(mod))
 
 export const toLayerConfig =
   <A>({ layerMnemonic }: AdapterModule<A>) =>

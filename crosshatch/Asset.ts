@@ -1,6 +1,6 @@
 import { Schema as S } from "effect"
 
-import type { PayloadAdapter } from "./Adapter.ts"
+import type { Adapter } from "./Adapter.ts"
 
 export const Asset = S.String.pipe(S.brand("crosshatch/Asset"))
 
@@ -17,5 +17,5 @@ export interface PhysicalAssetDeployment {
   readonly decimals: number
   readonly name: string
   readonly version: string
-  readonly adapters: ReadonlyArray<PayloadAdapter<any, any>>
+  readonly adapters: ReadonlyArray<Adapter<any, any>>
 }

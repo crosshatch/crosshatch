@@ -16,9 +16,9 @@ export type Service<R = never, R2 = never> = ({
   readonly deployment: PhysicalAssetDeployment
 }) => Effect.Effect<Adapt<R> | undefined, S.SchemaError, R2>
 
-const TypeId = "~crosshatch/PayloadAdapter" as const
+const TypeId = "~crosshatch/Adapter" as const
 
-export interface PayloadAdapter<Self, Id extends string> extends Context.Service<Self, Service> {
+export interface Adapter<Self, Id extends string> extends Context.Service<Self, Service> {
   new (_: never): Context.ServiceClass.Shape<Id, Service>
 
   readonly [TypeId]: typeof TypeId
@@ -28,21 +28,21 @@ export interface PayloadAdapter<Self, Id extends string> extends Context.Service
 
 export const Service =
   <Self>() =>
-  <Id extends string>(id: Id): PayloadAdapter<Self, Id> => {
+  <Id extends string>(id: Id): Adapter<Self, Id> => {
     const tag = Context.Service<Self, Service>()(id)
     const layer = <R, R2>(f: Service<R, R2>): Layer.Layer<Self, never, Exclude<R | R2, Scope.Scope>> =>
       Layer.effect(
         tag,
         Effect.gen(function* () {
-          const context = yield* Effect.context<R | R2>()
-          const provide = Effect.provide(Layer.succeedContext(context))
+          const context = yield* Effect.context<Exclude<R | R2, Scope.Scope>>()
+          const bound = flow(Effect.scoped, Effect.provide(Layer.succeedContext(context)))
           return flow(
             f,
-            provide,
+            bound,
             Effect.fnUntraced(function* (outer) {
               const inner = yield* outer
               if (inner) {
-                return inner.pipe(Effect.scoped, provide)
+                return inner.pipe(bound)
               }
               return undefined
             }),

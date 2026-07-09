@@ -39,7 +39,7 @@ export interface Extension<
   ) => Effect.Effect<Info["Type"], S.SchemaError, Info["DecodingServices"]>
 
   readonly decodePayload: (
-    required: typeof Payload.Type,
+    payload: typeof Payload.Type,
   ) => Effect.Effect<Echo["Type"], S.SchemaError, Echo["DecodingServices"]>
 }
 
