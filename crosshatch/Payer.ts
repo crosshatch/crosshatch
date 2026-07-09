@@ -24,8 +24,8 @@ export const layer = Layer.effect(
     const registry = yield* ExtensionRegistry
     return {
       createPayload: Effect.fnUntraced(function* ({ required }) {
-        const { extensions: infos = {} } = required
         const { accepted, adapt } = yield* accept({ required })
+        const { extensions: infos = {} } = required
         const payload = yield* adapt
         const extensions = yield* Effect.forEach(
           Record.toEntries(infos),

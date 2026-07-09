@@ -33,6 +33,14 @@ export interface Extension<
   }) => Layer.Layer<Self, S.SchemaError, Exclude<Echo["DecodingServices"], Scope.Scope>>
 
   readonly ensure: Effect.Effect<Echo["Type"], Cause.NoSuchElementError, Self>
+
+  readonly decodeRequired: (
+    required: typeof Required.Type,
+  ) => Effect.Effect<Info["Type"], S.SchemaError, Info["DecodingServices"]>
+
+  readonly decodePayload: (
+    required: typeof Payload.Type,
+  ) => Effect.Effect<Echo["Type"], S.SchemaError, Echo["DecodingServices"]>
 }
 
 export declare namespace Extension {
@@ -57,7 +65,7 @@ export const Service =
     },
   ): Extension<Self, Id, Identifier, Info, Success> => {
     const tag = Context.Service<Self, Service<Success>>()(id)
-    const { echo, identifier } = definition
+    const { info, echo, identifier } = definition
 
     const layer = ({ payload }: { readonly payload: typeof Payload.Type | undefined }) =>
       Layer.effect(
@@ -73,11 +81,19 @@ export const Service =
 
     const ensure = Effect.flatMap(tag, Effect.fromNullishOr)
 
+    const decodeRequired = (required: typeof Required.Type) =>
+      S.decodeUnknownEffect(S.toCodecJson(info))(required.extensions?.[identifier])
+
+    const decodePayload = (required: typeof Payload.Type) =>
+      S.decodeUnknownEffect(S.toCodecJson(echo))(required.extensions?.[identifier])
+
     return Object.assign(tag, {
       [TypeId]: TypeId,
       ...definition,
       layer,
       ensure,
+      decodeRequired,
+      decodePayload,
     })
   }
 
@@ -103,14 +119,3 @@ export const layerHandler = Effect.fnUntraced(function* <
   registry.set(extension, flow(f, Effect.provide(Layer.succeedContext(context)), Effect.scoped))
   return Layer.empty
 }, Layer.unwrap)
-
-export const decodeRequired = Effect.fnUntraced(function* <
-  Self,
-  Id extends string,
-  Identifier extends string,
-  Info extends Extension.Info,
-  Echo extends Extension.Echo<Info>,
->(extension: Extension<Self, Id, Identifier, Info, Echo>, required: typeof Required.Type) {
-  const { identifier, info } = extension
-  return yield* S.decodeUnknownEffect(S.toCodecJson(info))(required.extensions?.[identifier])
-})
