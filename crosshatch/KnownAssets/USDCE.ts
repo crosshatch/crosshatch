@@ -20,13 +20,6 @@ export const USDCE = {
         version: "2",
         adapters: [Erc3009.Erc3009Adapter, Permit2.Permit2Adapter],
       },
-      181228: {
-        asset: EvmAsset.EvmAsset.make("0x401eCb1D350407f13ba348573E5630B83638E30D"),
-        decimals: 6,
-        name: "Bridged USDC",
-        version: "2",
-        adapters: [Erc3009.Erc3009Adapter, Permit2.Permit2Adapter],
-      },
     },
   },
 } as const satisfies PhysicalAsset

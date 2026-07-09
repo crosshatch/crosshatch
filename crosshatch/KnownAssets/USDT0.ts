@@ -13,13 +13,6 @@ export const USDT0 = {
         version: "1",
         adapters: [Erc3009.Erc3009Adapter, Permit2.Permit2Adapter],
       },
-      2201: {
-        asset: EvmAsset.EvmAsset.make("0x78Cf24370174180738C5B8E352B6D14c83a6c9A9"),
-        decimals: 6,
-        name: "USDT0",
-        version: "1",
-        adapters: [Erc3009.Erc3009Adapter, Permit2.Permit2Adapter],
-      },
     },
   },
 } as const satisfies PhysicalAsset

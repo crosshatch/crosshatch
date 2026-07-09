@@ -1,14 +1,6 @@
-import {
-  KnownAssets,
-  Facilitator,
-  Required,
-  Requirements,
-  Payload,
-  Extension,
-  PaymentId,
-  PaymentIdExtension,
-} from "crosshatch"
+import { KnownAssets, Facilitator, Required, Requirements, Payload, Extension } from "crosshatch"
 import { EvmAddress } from "crosshatch/Evm"
+import { PaymentId } from "crosshatch/Extensions"
 import { Effect, Layer } from "effect"
 import { FetchHttpClient } from "effect/unstable/http"
 
@@ -22,7 +14,7 @@ const makeRequired = Effect.gen(function* () {
   | Description of the charge.
   |
   `.pipe(
-    Required.extend(PaymentIdExtension, {
+    Required.extend(PaymentId.PaymentIdExtension, {
       required: true,
     }),
     Required.accept(
@@ -46,11 +38,11 @@ Effect.gen(function* () {
     PayerLive.pipe(
       Layer.provide(
         Extension.layerHandler(
-          PaymentIdExtension,
+          PaymentId.PaymentIdExtension,
           Effect.fn(function* ({ required }) {
             return {
               required,
-              id: PaymentId.make(crypto.randomUUID()),
+              id: PaymentId.PaymentId.make(crypto.randomUUID()),
             }
           }),
         ),

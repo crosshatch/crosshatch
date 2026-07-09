@@ -13,13 +13,6 @@ export const MUSD = {
         version: "1",
         adapters: [Erc3009.Erc3009Adapter, Permit2.Permit2Adapter],
       },
-      31611: {
-        asset: EvmAsset.EvmAsset.make("0x118917a40FAF1CD7a13dB0Ef56C86De7973Ac503"),
-        decimals: 18,
-        name: "Mezo USD",
-        version: "1",
-        adapters: [Erc3009.Erc3009Adapter, Permit2.Permit2Adapter],
-      },
     },
   },
 } as const satisfies PhysicalAsset
