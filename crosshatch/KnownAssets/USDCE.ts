@@ -1,7 +1,5 @@
-import { EvmAsset } from "../Evm/Evm.ts"
-import { Erc3009Adapter } from "../payload_adapters/Erc3009.ts"
-import { Permit2Adapter } from "../payload_adapters/Permit2.ts"
-import { type PhysicalAsset } from "../PhysicalAsset.ts"
+import { type PhysicalAsset } from "../Asset.ts"
+import { EvmAsset, Erc3009, Permit2 } from "../Evm/Evm.ts"
 
 export const USDCE = {
   peg: "USD",
@@ -13,21 +11,21 @@ export const USDCE = {
         decimals: 6,
         name: "USDC.e",
         version: "2",
-        adapters: [Erc3009Adapter, Permit2Adapter],
+        adapters: [Erc3009.Erc3009Adapter, Permit2.Permit2Adapter],
       },
       190415: {
         asset: EvmAsset.EvmAsset.make("0x401eCb1D350407f13ba348573E5630B83638E30D"),
         decimals: 6,
         name: "Bridged USDC",
         version: "2",
-        adapters: [Erc3009Adapter, Permit2Adapter],
+        adapters: [Erc3009.Erc3009Adapter, Permit2.Permit2Adapter],
       },
       181228: {
         asset: EvmAsset.EvmAsset.make("0x401eCb1D350407f13ba348573E5630B83638E30D"),
         decimals: 6,
         name: "Bridged USDC",
         version: "2",
-        adapters: [Erc3009Adapter, Permit2Adapter],
+        adapters: [Erc3009.Erc3009Adapter, Permit2.Permit2Adapter],
       },
     },
   },

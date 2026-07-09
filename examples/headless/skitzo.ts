@@ -1,8 +1,7 @@
 import { KnownAssets, Facilitator, Required, Requirements, Payload } from "crosshatch"
+import { BrowserPayer } from "crosshatch/Browser"
 import { EvmAddress } from "crosshatch/Evm"
 import { Effect } from "effect"
-
-import { PayerLive } from "./_common.ts"
 
 Effect.gen(function* () {
   const EVM_ADDRESS = yield* EvmAddress.env
@@ -21,4 +20,4 @@ Effect.gen(function* () {
   )
   const { payload } = yield* Payload.make({ required })
   yield* Facilitator.settle({ payload })
-}).pipe(Effect.provide(PayerLive), Effect.runFork)
+}).pipe(Effect.provide(BrowserPayer.layer), Effect.runFork)

@@ -1,7 +1,5 @@
-import { EvmAsset } from "../Evm/Evm.ts"
-import { Erc3009Adapter } from "../payload_adapters/Erc3009.ts"
-import { Permit2Adapter } from "../payload_adapters/Permit2.ts"
-import { type PhysicalAsset } from "../PhysicalAsset.ts"
+import { type PhysicalAsset } from "../Asset.ts"
+import { EvmAsset, Permit2, Erc3009 } from "../Evm/Evm.ts"
 
 export const MEGAUSDC = {
   peg: "USD",
@@ -13,7 +11,7 @@ export const MEGAUSDC = {
         decimals: 18,
         name: "MegaUSD",
         version: "1",
-        adapters: [Erc3009Adapter, Permit2Adapter],
+        adapters: [Erc3009.Erc3009Adapter, Permit2.Permit2Adapter],
       },
     },
   },

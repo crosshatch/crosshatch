@@ -16,7 +16,7 @@ import { PayerLive } from "./_common.ts"
 
 // Merchants make the required with extension info.
 const makeRequired = Effect.gen(function* () {
-  const EVM_ADDRESS = yield* EvmAddress.config("PAY_TO_EVM")
+  const EVM_ADDRESS = yield* EvmAddress.env
   return yield* Required.make`
   |
   | Description of the charge.

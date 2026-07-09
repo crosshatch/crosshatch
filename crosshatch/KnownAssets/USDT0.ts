@@ -1,7 +1,5 @@
-import { EvmAsset } from "../Evm/Evm.ts"
-import { Erc3009Adapter } from "../payload_adapters/Erc3009.ts"
-import { Permit2Adapter } from "../payload_adapters/Permit2.ts"
-import { type PhysicalAsset } from "../PhysicalAsset.ts"
+import { type PhysicalAsset } from "../Asset.ts"
+import { EvmAsset, Erc3009, Permit2 } from "../Evm/Evm.ts"
 
 export const USDT0 = {
   peg: "USD",
@@ -13,14 +11,14 @@ export const USDT0 = {
         decimals: 6,
         name: "USDT0",
         version: "1",
-        adapters: [Erc3009Adapter, Permit2Adapter],
+        adapters: [Erc3009.Erc3009Adapter, Permit2.Permit2Adapter],
       },
       2201: {
         asset: EvmAsset.EvmAsset.make("0x78Cf24370174180738C5B8E352B6D14c83a6c9A9"),
         decimals: 6,
         name: "USDT0",
         version: "1",
-        adapters: [Erc3009Adapter, Permit2Adapter],
+        adapters: [Erc3009.Erc3009Adapter, Permit2.Permit2Adapter],
       },
     },
   },

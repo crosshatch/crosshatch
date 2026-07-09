@@ -1,6 +1,5 @@
-import { Erc3009, Permit2 } from "../Adapters/Adapters.ts"
-import { EvmAsset } from "../Evm/Evm.ts"
-import { type PhysicalAsset } from "../PhysicalAsset.ts"
+import { type PhysicalAsset } from "../Asset.ts"
+import { EvmAsset, Erc3009, Permit2 } from "../Evm/Evm.ts"
 
 export const USDC = {
   peg: "USD",

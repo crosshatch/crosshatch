@@ -1,8 +1,8 @@
 import { CredentialsFromEnv } from "@distilled.cloud/coinbase"
 import { NodeHttpClient, NodeHttpServer } from "@effect/platform-node"
 import { describe, it, assert } from "@effect/vitest"
-import { Requirements, Facilitator, KnownAssets, Payload, Required, Payer, AssetConfiguration } from "crosshatch"
-import { EvmAdapter, EvmAddress } from "crosshatch/Evm"
+import { Requirements, Facilitator, KnownAssets, Payload, Required, Payer, Mnemonic, Accept } from "crosshatch"
+import { EvmAddress, EvmSigner, Erc3009 } from "crosshatch/Evm"
 import { Effect, Layer } from "effect"
 import { HttpRouter } from "effect/unstable/http"
 import { HttpApiBuilder, HttpApiClient } from "effect/unstable/httpapi"
@@ -17,7 +17,13 @@ const Live = HttpRouter.serve(
     Layer.mergeAll(
       NodeHttpServer.layerTest,
       CredentialsFromEnv,
-      Payer.layer.pipe(Layer.provide([EvmAdapter.layerMnemonicEnv, AssetConfiguration.layer(KnownAssets)])),
+      Payer.layer.pipe(
+        Layer.provide(
+          Accept.layer(KnownAssets).pipe(
+            Layer.provide(Erc3009.layer.pipe(Layer.provide(Mnemonic.toLayerEnv(EvmSigner)))),
+          ),
+        ),
+      ),
     ),
   ),
 )

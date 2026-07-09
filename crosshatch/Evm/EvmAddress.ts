@@ -10,6 +10,8 @@ export const EvmAddress = S.TemplateLiteral([S.Literal("0x"), S.String])
 
 export const config = flow(Config.string, Config.map(S.decodeUnknownSync(EvmAddress)))
 
+export const env = config("EVM_ADDRESS")
+
 export const fromMnemonic = (mnemonic: typeof Mnemonic.Mnemonic.Type): typeof EvmAddress.Type => {
   const seed = OxMnemonic.toSeed(Redacted.value(mnemonic))
   const root = HdKey.fromSeed(seed)

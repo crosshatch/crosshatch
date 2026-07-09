@@ -1,6 +1,7 @@
 import { Context, Data, Effect, flow, Layer, Schema as S, Scope } from "effect"
 
 import type { PhysicalAssetDeployment } from "./Asset.ts"
+import type { Mnemonic } from "./Mnemonic.ts"
 import type { Requirements } from "./Requirements.ts"
 
 export class CreatePayloadError extends Data.TaggedError("CreatePayloadError")<{ readonly cause?: unknown }> {}
@@ -50,3 +51,7 @@ export const Service =
       )
     return Object.assign(tag, { [TypeId]: TypeId, layer })
   }
+
+export interface AdapterModule<A> {
+  readonly layerMnemonic: (mnemonic: typeof Mnemonic.Type) => Layer.Layer<A>
+}
