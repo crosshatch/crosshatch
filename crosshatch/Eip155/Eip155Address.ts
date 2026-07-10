@@ -5,7 +5,7 @@ import * as Address from "../Address.ts"
 import * as Mnemonic from "../Mnemonic.ts"
 import { brand } from "./_common.ts"
 
-/** EVM account address — `0x` followed by 20 bytes of hex. */
+/** EIP155 account address — `0x` followed by 20 bytes of hex. */
 export const Eip155Address = S.TemplateLiteral([S.Literal("0x"), S.String])
   .check(S.isPattern(/^0x[a-fA-F0-9]{40}$/))
   .pipe(Address.brand, brand)

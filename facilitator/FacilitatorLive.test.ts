@@ -30,7 +30,7 @@ const Live = HttpRouter.serve(
 
 describe(import.meta.url, () => {
   it.effect(
-    "verifies and settles a freshly signed EVM x402 payment",
+    "verifies and settles a freshly signed EIP155 x402 payment",
     Effect.fn(function* () {
       const required = yield* Required.make().pipe(
         Required.accept(

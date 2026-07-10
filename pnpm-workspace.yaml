@@ -49,9 +49,6 @@ catalog:
   "@vitest/coverage-v8": ^4.1.4
   "@vitest/expect": ^4.1.4
   "@vitest/web-worker": ^4.1.4
-  "@x402/core": ^2.3.0
-  "@x402/evm": ^2.0.0
-  "@x402/svm": ^2.0.0
   alchemy: 2.0.0-beta.60
   asciify-engine: ^1.0.118
   babel-plugin-react-compiler: ^1.0.0

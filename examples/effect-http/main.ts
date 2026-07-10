@@ -12,7 +12,7 @@ export default Worker.make({
     Effect.gen(function* () {
       const payload = yield* Http402.ResolvedPayload
       if (!payload) {
-        const PAY_TO_EIP155 = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EVM")
+        const PAY_TO_EIP155 = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
         const required = yield* Required.make`
         |
         | Description of the charge here.

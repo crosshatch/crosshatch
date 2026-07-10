@@ -42,4 +42,4 @@ jobs:
           OTEL_LOGS_EXPORTER: ${{ vars.OTEL_LOGS_EXPORTER }}
           OTEL_METRICS_EXPORTER: ${{ vars.OTEL_METRICS_EXPORTER }}
           OTEL_TRACES_EXPORTER: ${{ vars.OTEL_TRACES_EXPORTER }}
-          PAY_TO_EVM: ${{ vars.PAY_TO_EVM }}
+          PAY_TO_EIP155: ${{ vars.PAY_TO_EIP155 }}
