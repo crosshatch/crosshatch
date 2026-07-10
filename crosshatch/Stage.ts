@@ -25,8 +25,8 @@ export const Stage = Context.Reference<Stage>("crosshatch/Stage", {
   defaultValue: () =>
     Effect.gen(function* () {
       const raw =
-        (import.meta as { readonly env?: undefined | { VITE_PUBLIC_CROSSHATCH_STAGE?: string | undefined } }).env
-          ?.VITE_PUBLIC_CROSSHATCH_STAGE ??
+        (import.meta as { readonly env?: undefined | { readonly VITE_PUBLIC_CROSSHATCH_STAGE?: string | undefined } })
+          .env?.VITE_PUBLIC_CROSSHATCH_STAGE ??
         (yield* Config.string("CROSSHATCH_STAGE").pipe(
           Config.option,
           Config.map(Option.getOrUndefined),

@@ -4,9 +4,9 @@ import { Check } from "lucide-react"
 import * as React from "react"
 
 export const CopyPromptButton = (props: {
-  children: React.ReactNode
-  prompt: string
-  variant?: "default" | "accent"
+  readonly children: React.ReactNode
+  readonly prompt: string
+  readonly variant?: "default" | "accent"
 }) => {
   const { children, prompt } = props
   const [copied, setCopied] = React.useState(false)
