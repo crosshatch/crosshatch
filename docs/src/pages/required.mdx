@@ -25,9 +25,9 @@ Start with `Required.make`, then pipe builder operations into it. `Required.acce
 requirements, and `Required.extend` adds x402 extension payloads.
 
 ```ts
+import { Config, Effect } from "effect"
 import { Required, Requirements, PaymentId, KnownAssets } from "crosshatch"
-import { EvmAddress } from "crosshatch/Evm"
-import { Effect } from "effect"
+import { Eip155Address } from "crosshatch/Eip155"
 
 const makeRequired = Effect.gen(function* () {
   return yield* Required.make`
@@ -42,7 +42,7 @@ const makeRequired = Effect.gen(function* () {
         amount: 0.01,
         recipients: {
           eip155: {
-            8453: yield* EvmAddress.config("PAY_TO_EVM"),
+            8453: yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155"),
           },
         },
       }),
@@ -57,8 +57,8 @@ multi-line descriptions stay legible in source.
 ## Requirements Groups
 
 `Requirements.asset` turns a `PhysicalAsset` into one or more x402 payment requirements. For example, `USDC` may contain
-deployments for multiple EVM chains. The `recipients` object chooses which deployments this invoice accepts and which
-address should receive payment on each chain.
+deployments for multiple EIP-155 chains. The `recipients` object chooses which deployments this invoice accepts and
+which address should receive payment on each chain.
 
 ```ts
 Requirements.asset(USDC, {

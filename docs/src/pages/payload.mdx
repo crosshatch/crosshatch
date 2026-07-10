@@ -40,7 +40,7 @@ type Payload = {
 }
 ```
 
-The stable envelope says which invoice entry was accepted. The inner `payload` field is chain-specific. For EVM
+The stable envelope says which invoice entry was accepted. The inner `payload` field is chain-specific. For EIP-155
 payments, for example, it may contain an EIP-3009 transfer authorization or a Permit2 authorization plus signature.
 
 ## Making a Payload
@@ -48,9 +48,9 @@ payments, for example, it may contain an EIP-3009 transfer authorization or a Pe
 Use `Payload.make` when you have a `Required` invoice and want to construct the signed payment payload for it.
 
 ```ts
+import { Config, Effect } from "effect"
 import { Payload, Required, Requirements, KnownAssets } from "crosshatch"
-import { EvmAddress } from "crosshatch/Evm"
-import { Effect } from "effect"
+import { Eip155Address } from "crosshatch/Eip155"
 
 const program = Effect.gen(function* () {
   const required = yield* Required.make`Access to the paid resource.`.pipe(
@@ -59,7 +59,7 @@ const program = Effect.gen(function* () {
         amount: 0.01,
         recipients: {
           eip155: {
-            8453: yield* EvmAddress.config("PAY_TO_EVM"),
+            8453: yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155"),
           },
         },
       }),
@@ -87,17 +87,23 @@ const { createPayload } = yield * Payer.Payer
 ```
 
 At runtime, the provided `Payer` decides which `required.accepts` entry to pay and how to produce the signed payload.
-For the built-in EVM flow, the `Payer` uses the configured asset metadata to select a supported requirement, then asks
-the selected chain service to create the concrete payload.
+For the built-in EIP-155 flow, the `Payer` uses the configured asset metadata to select a supported requirement, then
+asks the selected adapter to create the concrete payload.
 
 ```ts
-import { AssetConfiguration, KnownAssets, Payer } from "crosshatch"
-import { EvmChain } from "crosshatch/Evm"
-import { Effect, Layer, Redacted } from "effect"
+import { Accept, KnownAssets, Mnemonic, Payer } from "crosshatch"
+import { Eip155Signer, Erc3009, Permit2 } from "crosshatch/Eip155"
+import { Effect, Layer } from "effect"
 
-const payerLayer = Payer.layer(
-  EvmChain.fromMnemonic(Redacted.make("test test test test test test test test test test test junk")),
-).pipe(Layer.provide(AssetConfiguration.layer(KnownAssets)))
+const payerLayer = Payer.layer.pipe(
+  Layer.provide(
+    Accept.layer(KnownAssets).pipe(
+      Layer.provide(
+        Layer.mergeAll(Erc3009.layer, Permit2.layer).pipe(Layer.provide(Mnemonic.toLayerEnv(Eip155Signer))),
+      ),
+    ),
+  ),
+)
 
 const runnable = program.pipe(Effect.provide(payerLayer))
 ```

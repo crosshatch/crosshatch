@@ -38,9 +38,9 @@ Inside the route, read the parsed payload service. If there is no payload, build
 `Http402.require({ required })`.
 
 ```ts
+import { Config, Effect } from "effect"
 import { Http402, Required, Requirements, KnownAssets } from "crosshatch"
-import { EvmAddress } from "crosshatch/Evm"
-import { Effect } from "effect"
+import { Eip155Address } from "crosshatch/Eip155"
 import { HttpServerResponse } from "effect/unstable/http"
 
 const paidRoute = Effect.gen(function* () {
@@ -53,7 +53,7 @@ const paidRoute = Effect.gen(function* () {
           amount: 0.01,
           recipients: {
             eip155: {
-              8453: yield* EvmAddress.config("PAY_TO_EVM"),
+              8453: yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155"),
             },
           },
         }),
