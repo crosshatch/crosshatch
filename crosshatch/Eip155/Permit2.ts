@@ -2,7 +2,7 @@ import { Effect } from "effect"
 import { getAddress, toHex, type Hex } from "viem"
 
 import * as Adapter from "../Adapter.ts"
-import { EvmSigner } from "./EvmSigner.ts"
+import { Eip155Signer } from "./Eip155Signer.ts"
 
 export class Permit2Adapter extends Adapter.Service<Permit2Adapter>()("crosshatch/Permit2") {}
 
@@ -50,7 +50,7 @@ const PERMIT2_ABI_TYPES = {
 export const layer = Permit2Adapter.layer(
   Effect.fnUntraced(function* ({ accepted }) {
     return Effect.gen(function* () {
-      const signer = yield* EvmSigner
+      const signer = yield* Eip155Signer
       const now = Math.floor(Date.now() / 1000)
       const chainId = parseInt(accepted.network.split(":")[1]!)
       const nonce = BigInt(toHex(crypto.getRandomValues(new Uint8Array(32)))).toString()

@@ -1,5 +1,5 @@
 import { type PhysicalAsset } from "../Asset.ts"
-import { EvmAsset, Erc3009, Permit2 } from "../Evm/Evm.ts"
+import { Eip155Asset, Erc3009, Permit2 } from "../Eip155/Eip155.ts"
 
 export const USDT0 = {
   peg: "USD",
@@ -7,7 +7,7 @@ export const USDT0 = {
   deployments: {
     eip155: {
       988: {
-        asset: EvmAsset.EvmAsset.make("0x779Ded0c9e1022225f8E0630b35a9b54bE713736"),
+        asset: Eip155Asset.Eip155Asset.make("0x779Ded0c9e1022225f8E0630b35a9b54bE713736"),
         decimals: 6,
         name: "USDT0",
         version: "1",

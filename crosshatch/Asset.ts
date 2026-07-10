@@ -2,6 +2,8 @@ import { Schema as S } from "effect"
 
 import type { Adapter } from "./Adapter.ts"
 
+export const brand = S.brand("crosshatch/Asset")
+
 export const Asset = S.String.pipe(S.brand("crosshatch/Asset"))
 
 export type AssetConfig = Readonly<Record<string, PhysicalAsset>>

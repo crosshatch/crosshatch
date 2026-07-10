@@ -1,10 +1,10 @@
 import { KnownAssets, Facilitator, Required, Requirements, Payload } from "crosshatch"
 import { BrowserPayer } from "crosshatch/Browser"
-import { EvmAddress } from "crosshatch/Evm"
-import { Effect } from "effect"
+import { Eip155Address } from "crosshatch/Eip155"
+import { Config, Effect } from "effect"
 
 Effect.gen(function* () {
-  const EVM_ADDRESS = yield* EvmAddress.env
+  const PAY_TO_EIP155 = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
   const required = yield* Required.make`
   |
   | Description of the charge.
@@ -13,7 +13,7 @@ Effect.gen(function* () {
     Required.accept(
       Requirements.asset(KnownAssets.USDC, {
         amount: 0.01,
-        recipients: { eip155: { 8453: EVM_ADDRESS } },
+        recipients: { eip155: { 8453: PAY_TO_EIP155 } },
         ttl: "1 minutes",
       }),
     ),

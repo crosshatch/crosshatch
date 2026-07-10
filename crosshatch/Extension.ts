@@ -65,7 +65,7 @@ export const Service =
     },
   ): Extension<Self, Id, Identifier, Info, Success> => {
     const tag = Context.Service<Self, Service<Success>>()(id)
-    const { info, echo, identifier } = definition
+    const { identifier, info, echo } = definition
 
     const layer = ({ payload }: { readonly payload: typeof Payload.Type | undefined }) =>
       Layer.effect(

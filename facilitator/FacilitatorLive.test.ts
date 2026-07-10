@@ -2,8 +2,8 @@ import { CredentialsFromEnv } from "@distilled.cloud/coinbase"
 import { NodeHttpClient, NodeHttpServer } from "@effect/platform-node"
 import { describe, it, assert } from "@effect/vitest"
 import { Requirements, Facilitator, KnownAssets, Payload, Required, Payer, Mnemonic, Accept } from "crosshatch"
-import { EvmAddress, EvmSigner, Erc3009 } from "crosshatch/Evm"
-import { Effect, Layer } from "effect"
+import { Eip155Address, Eip155Signer, Erc3009 } from "crosshatch/Eip155"
+import { Effect, Layer, Config } from "effect"
 import { HttpRouter } from "effect/unstable/http"
 import { HttpApiBuilder, HttpApiClient } from "effect/unstable/httpapi"
 
@@ -20,7 +20,7 @@ const Live = HttpRouter.serve(
       Payer.layer.pipe(
         Layer.provide(
           Accept.layer(KnownAssets).pipe(
-            Layer.provide(Erc3009.layer.pipe(Layer.provide(Mnemonic.toLayerEnv(EvmSigner)))),
+            Layer.provide(Erc3009.layer.pipe(Layer.provide(Mnemonic.toLayerEnv(Eip155Signer)))),
           ),
         ),
       ),
@@ -38,7 +38,7 @@ describe(import.meta.url, () => {
             amount: 0.01,
             recipients: {
               eip155: {
-                8453: yield* EvmAddress.config("PAY_TO_EVM"),
+                8453: yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155"),
               },
             },
           }),

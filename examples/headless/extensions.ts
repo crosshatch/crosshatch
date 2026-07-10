@@ -1,14 +1,14 @@
 import { KnownAssets, Facilitator, Required, Requirements, Payload, Extension } from "crosshatch"
-import { EvmAddress } from "crosshatch/Evm"
+import { Eip155Address } from "crosshatch/Eip155"
 import { PaymentId } from "crosshatch/Extensions"
-import { Effect, Layer } from "effect"
+import { Config, Effect, Layer } from "effect"
 import { FetchHttpClient } from "effect/unstable/http"
 
 import { PayerLive } from "./_common.ts"
 
 // Merchants make the required with extension info.
 const makeRequired = Effect.gen(function* () {
-  const EVM_ADDRESS = yield* EvmAddress.env
+  const PAY_TO_EIP155 = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
   return yield* Required.make`
   |
   | Description of the charge.
@@ -20,7 +20,7 @@ const makeRequired = Effect.gen(function* () {
     Required.accept(
       Requirements.asset(KnownAssets.USDC, {
         amount: 0.01,
-        recipients: { eip155: { 8453: EVM_ADDRESS } },
+        recipients: { eip155: { 8453: PAY_TO_EIP155 } },
         ttl: "1 minutes",
       }),
     ),

@@ -1,5 +1,5 @@
 import { type PhysicalAsset } from "../Asset.ts"
-import { EvmAsset, Erc3009, Permit2 } from "../Evm/Evm.ts"
+import { Eip155Asset, Erc3009, Permit2 } from "../Eip155/Eip155.ts"
 
 export const SBC = {
   peg: "USD",
@@ -7,7 +7,7 @@ export const SBC = {
   deployments: {
     eip155: {
       723487: {
-        asset: EvmAsset.EvmAsset.make("0x33ad9e4BD16B69B5BFdED37D8B5D9fF9aba014Fb"),
+        asset: Eip155Asset.Eip155Asset.make("0x33ad9e4BD16B69B5BFdED37D8B5D9fF9aba014Fb"),
         decimals: 6,
         name: "Stable Coin",
         version: "1",

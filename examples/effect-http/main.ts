@@ -1,7 +1,7 @@
 import { Facilitator, Required, Requirements, Http402, KnownAssets } from "crosshatch"
-import { EvmAddress } from "crosshatch/Evm"
+import { Eip155Address } from "crosshatch/Eip155"
 import { PaymentId } from "crosshatch/Extensions"
-import { Layer, Effect } from "effect"
+import { Layer, Effect, Config } from "effect"
 import { Worker } from "effect-workerd"
 import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
 
@@ -12,7 +12,7 @@ export default Worker.make({
     Effect.gen(function* () {
       const payload = yield* Http402.ResolvedPayload
       if (!payload) {
-        const PAY_TO_EVM = yield* EvmAddress.config("PAY_TO_EVM")
+        const PAY_TO_EIP155 = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EVM")
         const required = yield* Required.make`
         |
         | Description of the charge here.
@@ -28,7 +28,7 @@ export default Worker.make({
           Required.accept(
             Requirements.asset(KnownAssets.USDC, {
               amount: 0.01,
-              recipients: { eip155: { 8453: PAY_TO_EVM } },
+              recipients: { eip155: { 8453: PAY_TO_EIP155 } },
             }),
           ),
         )

@@ -4,7 +4,7 @@ import { privateKeyToAccount, type CustomSource } from "viem/accounts"
 
 import * as Mnemonic from "../Mnemonic.ts"
 
-export class EvmSigner extends Context.Service<EvmSigner, CustomSource>()("crosshatch/Evm/EvmSigner") {}
+export class Eip155Signer extends Context.Service<Eip155Signer, CustomSource>()("crosshatch/Eip155/Eip155Signer") {}
 
 export const layerMnemonic = (mnemonic: typeof Mnemonic.Mnemonic.Type) =>
-  Layer.succeed(EvmSigner, privateKeyToAccount(OxMnemonic.toPrivateKey(Redacted.value(mnemonic), { as: "Hex" })))
+  Layer.succeed(Eip155Signer, privateKeyToAccount(OxMnemonic.toPrivateKey(Redacted.value(mnemonic), { as: "Hex" })))

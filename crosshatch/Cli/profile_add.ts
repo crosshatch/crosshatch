@@ -5,7 +5,7 @@ import { Command, Argument, Prompt } from "effect/unstable/cli"
 import * as X25519Pair from "../Crypto/X25519Pair.ts"
 import * as X25519PrivateKey from "../Crypto/X25519PrivateKey.ts"
 import * as X25519PublicKey from "../Crypto/X25519PublicKey.ts"
-import { EvmAddress } from "../Evm/Evm.ts"
+import { Eip155Address } from "../Eip155/Eip155.ts"
 import * as Mnemonic from "../Mnemonic.ts"
 import { CaAccountId } from "../Ramp/CaAccountId.ts"
 import { RampClient } from "../Ramp/RampClient.ts"
@@ -46,7 +46,7 @@ export const profileAdd = Command.make("add", {
       })
       mnemonic ??= yield* Mnemonic.random
       const mnemonicEncoded = new TextEncoder().encode(Redacted.value(mnemonic))
-      const address = EvmAddress.fromMnemonic(mnemonic)
+      const address = Eip155Address.fromMnemonic(mnemonic)
       const envelope = yield* X25519PublicKey.encrypt(publicKey, mnemonicEncoded)
       config.profiles[profile] = {
         address,

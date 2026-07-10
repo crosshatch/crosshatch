@@ -1,4 +1,4 @@
-import { Layer, flow, Redacted, Effect, Schema as S, Config } from "effect"
+import { Layer, Redacted, Effect, Schema as S, Config } from "effect"
 import { Mnemonic as OxMnemonic } from "ox"
 
 import type { AdapterModule } from "./Adapter.ts"
@@ -9,25 +9,25 @@ export const MnemonicText = S.String.check(
 
 export const Mnemonic = S.Redacted(MnemonicText)
 
-export const make = flow(MnemonicText.make, Redacted.make)
+export const make = (text: string) => Redacted.make(MnemonicText.make(text))
 
-export const config = flow(Config.string, Config.map(make))
+export const config = (name: string) => Config.string(name).pipe(Config.map(make))
 
 export const random = Effect.sync(() => make(OxMnemonic.random(OxMnemonic.english)))
 
 export const toLayer =
-  <A>({ layerMnemonic }: AdapterModule<A>) =>
+  <A>(mod: AdapterModule<A>) =>
   (mnemonic: typeof Mnemonic.Type) =>
-    layerMnemonic(mnemonic)
+    mod.layerMnemonic(mnemonic)
 
 export const toLayerText =
   <A>(mod: AdapterModule<A>) =>
   (mnemonicText: string) =>
-    make(mnemonicText).pipe(toLayer(mod))
+    toLayer(mod)(make(mnemonicText))
 
 export const toLayerConfig =
-  <A>({ layerMnemonic }: AdapterModule<A>) =>
+  <A>(mod: AdapterModule<A>) =>
   (mnemonicConfig: Config.Config<typeof Mnemonic.Type>) =>
-    mnemonicConfig.pipe(Effect.map(layerMnemonic), Layer.unwrap)
+    mnemonicConfig.pipe(Effect.map(mod.layerMnemonic), Layer.unwrap)
 
 export const toLayerEnv = <A>(mod: AdapterModule<A>) => toLayerConfig(mod)(config("MNEMONIC"))

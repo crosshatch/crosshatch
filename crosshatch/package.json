@@ -23,7 +23,7 @@
     "./*": "./*.ts",
     "./Browser": "./Browser/Browser.ts",
     "./Crypto": "./Crypto/Crypto.ts",
-    "./Evm": "./Evm/Evm.ts",
+    "./Eip155": "./Eip155/Eip155.ts",
     "./Extensions": "./Extensions/Extensions.ts",
     "./Facade": "./Browser/Facade/Facade.ts",
     "./Ramp": "./Ramp/Ramp.ts",
@@ -33,10 +33,10 @@
   "publishConfig": {
     "exports": {
       ".": "./dist/index.js",
-      "./*": "./dist/*/index.js",
+      "./*": "./dist/*.js",
       "./Browser": "./dist/Browser/Browser.js",
       "./Crypto": "./dist/Crypto/Crypto.js",
-      "./Evm": "./dist/Evm/Evm.js",
+      "./Eip155": "./dist/Eip155/Eip155.js",
       "./Extensions": "./dist/Extensions/Extensions.js",
       "./Facade": "./dist/Browser/Facade/Facade.js",
       "./Ramp": "./dist/Ramp/Ramp.js",

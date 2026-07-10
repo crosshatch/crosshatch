@@ -2,7 +2,7 @@ import { Effect, Schema as S } from "effect"
 import { getAddress, toHex, type Hex } from "viem"
 
 import * as Adapter from "../Adapter.ts"
-import { EvmSigner } from "./EvmSigner.ts"
+import { Eip155Signer } from "./Eip155Signer.ts"
 
 export class Erc3009Adapter extends Adapter.Service<Erc3009Adapter>()("crosshatch/Erc3009Adapter") {}
 
@@ -42,7 +42,7 @@ export const layer = Erc3009Adapter.layer(
     return Effect.gen(function* () {
       const now = Math.floor(Date.now() / 1000)
       const chainId = parseInt(accepted.network.split(":")[1]!)
-      const signer = yield* EvmSigner
+      const signer = yield* Eip155Signer
       const authorization: Erc3009["authorization"] = {
         from: signer.address,
         to: getAddress(accepted.payTo) as Hex,
