@@ -4,6 +4,7 @@ import { HttpApiClient } from "effect/unstable/httpapi"
 
 import { FacilitatorApiGroup, FacilitatorApi } from "./FacilitatorApi.ts"
 
+/** @effect-expect-leaking [Mode] extends ["response-only"] ? never : never */
 export class FacilitatorClient extends Context.Reference<
   HttpApiClient.Client<typeof FacilitatorApiGroup>["facilitator"]
 >("crosshatch/FacilitatorClient", {

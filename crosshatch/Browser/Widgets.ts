@@ -2,7 +2,7 @@ import { embed } from "@crosshatch/widget/embed"
 import { Finished } from "@crosshatch/widget/self"
 import type { StandardSchemaV1 } from "@standard-schema/spec"
 import { Data, Effect, pipe, Schema as S, SchemaGetter, Stream } from "effect"
-import { UrlParams } from "effect/unstable/http"
+import { Url, UrlParams } from "effect/unstable/http"
 import * as Boundary from "liminal-util/Boundary"
 
 import { Stage } from "../Stage.ts"
@@ -45,11 +45,9 @@ const widget = <Payload extends S.Codec<any, any>, Item extends S.Codec<any, any
       Effect.flatMap(
         Effect.fn(function* (x) {
           const { url } = yield* Stage
-          const { href: src } = yield* UrlParams.makeUrl(
-            url("link", pathname),
-            UrlParams.make([["x", x]]),
-            undefined,
-          ).pipe(Effect.fromResult)
+          const { href: src } = yield* Url.make(url("link", pathname), UrlParams.make([["x", x]]), undefined).pipe(
+            Effect.fromResult,
+          )
           return embed({
             item: S.Union([item, Finished]),
             src,

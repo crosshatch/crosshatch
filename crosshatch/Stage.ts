@@ -2,7 +2,7 @@ import { Context, Config, Effect, Option, Schema as S } from "effect"
 
 export const StageName = S.Union([
   S.TemplateLiteral(["dev_", S.String]),
-  S.TemplateLiteral(["staging-", S.Number]),
+  S.TemplateLiteral(["staging-", S.Finite]),
   S.Literal("prod"),
 ])
 
@@ -34,9 +34,7 @@ export const Stage = Context.Reference<Stage>("crosshatch/Stage", {
             ConfigError: Effect.die,
           }),
         ))
-      const name = yield* S.decodeUnknownEffect(StageName)(raw).pipe(
-        Effect.catch(() => Effect.succeed("prod" as const)),
-      )
+      const name = yield* S.decodeUnknownEffect(StageName)(raw).pipe(Effect.orElseSucceed(() => "prod" as const))
       return make(name)
     }).pipe(Effect.runSync),
 })

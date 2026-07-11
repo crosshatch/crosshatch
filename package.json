@@ -1,13 +1,14 @@
 {
-  "name": "crosshatch",
+  "name": "crosshatch-root",
   "type": "module",
   "scripts": {
-    "prepare": "ts-patch install -s",
+    "prepare": "effect-tsgo patch",
     "build": "tsc -b",
     "watch": "tsc -b -w",
     "konfik": "node ./konfik/main.ts",
     "sync-repos": "pnpm konfik sync-repos",
     "clean": "pnpm konfik clean --ignore '**/repos'",
+    "format": "oxfmt --config ./.oxfmtrc.jsonc --disable-nested-config .",
     "dev": "trash liminal/node_modules || true && pnpm i --force && PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN=false turbo run //#watch //#aliases //#motel dev --filter=!./liminal/**",
     "aliases": "caddy run --config ./Caddyfile",
     "test": "vitest run",
@@ -18,8 +19,10 @@
     "@changesets/cli": "catalog:",
     "@effect/language-service": "catalog:",
     "@effect/platform-node": "catalog:",
+    "@effect/tsgo": "catalog:",
     "@effect/vitest": "catalog:",
     "@kitlangton/motel": "catalog:",
+    "@oxlint/plugins": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
@@ -36,10 +39,9 @@
     "oxfmt": "catalog:",
     "oxlint": "catalog:",
     "playwright": "catalog:",
-    "ts-patch": "catalog:",
     "turbo": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   },
-  "packageManager": "pnpm@11.10.0"
+  "packageManager": "pnpm@11.11.0"
 }

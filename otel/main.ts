@@ -8,7 +8,7 @@ import { ApiEnv } from "./ApiEnv.ts"
 
 export default Worker.make({
   handler: Layer.mergeAll(
-    OtlpProxy.layerFromConfig(),
+    OtlpProxy.layerFromConfig,
     HttpRouter.add("GET", "/health", () => Effect.succeed(HttpServerResponse.text("ok"))),
   ).pipe(HttpRouter.toHttpEffect, Effect.flatten),
   prelude: Layer.mergeAll(

@@ -39,7 +39,7 @@ export const layer = Effect.gen(function* () {
   return BrowserWorker.layer(() => port1)
 }).pipe(
   Boundary.span("make", import.meta.url),
-  Effect.retry(Schedule.exponential("100 millis", 2).pipe(Schedule.jittered, Schedule.take(6))),
+  Effect.retry(Schedule.exponential("100 millis", 2).pipe(Schedule.jittered, Schedule.upTo({ times: 6 }))),
   Layer.unwrap,
 )
 
