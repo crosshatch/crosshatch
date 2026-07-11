@@ -5,11 +5,11 @@ import { X25519PublicKey } from "./X25519PublicKey.ts"
 
 const TypeId = "crosshatch/X25519Pair" as const
 
-export const X25519Pair = S.Struct({
+export class X25519Pair extends S.Class<X25519Pair>("X25519Pair")({
   [TypeId]: S.tag(TypeId),
   privateKey: X25519PrivateKey,
   publicKey: X25519PublicKey,
-})
+}) {}
 
 export const random = (config?: { readonly extractable?: boolean | undefined }) =>
   Effect.promise(() =>
