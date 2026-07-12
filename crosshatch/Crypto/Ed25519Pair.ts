@@ -11,7 +11,7 @@ export class Ed25519Pair extends S.Class<Ed25519Pair>("Ed25519Pair")({
   publicKey: Ed25519PublicKey.Ed25519PublicKey,
 }) {}
 
-export const fromCryptoKeyPair = ({ privateKey, publicKey }: CryptoKeyPair) =>
+export const fromNative = ({ privateKey, publicKey }: CryptoKeyPair) =>
   Ed25519Pair.make({
     privateKey: Ed25519PrivateKey.Ed25519PrivateKey.make(privateKey),
     publicKey: Ed25519PublicKey.Ed25519PublicKey.make(publicKey),
@@ -20,7 +20,7 @@ export const fromCryptoKeyPair = ({ privateKey, publicKey }: CryptoKeyPair) =>
 export const random = (config?: { readonly extractable?: boolean | undefined }) =>
   Effect.promise(() =>
     crypto.subtle.generateKey({ name: "Ed25519" }, config?.extractable ?? false, ["sign", "verify"]),
-  ).pipe(Effect.map(fromCryptoKeyPair))
+  ).pipe(Effect.map(fromNative))
 
 export const fromSeed = (bytes: Uint8Array) =>
   Effect.all({
@@ -36,4 +36,8 @@ export const fromSeed = (bytes: Uint8Array) =>
       Effect.map((v) => Ed25519PublicKey.Ed25519PublicKey.make(v)),
     ),
     privateKey: Ed25519PrivateKey.fromSeed(bytes),
+<<<<<<< HEAD
   }).pipe(Effect.map((v) => Ed25519Pair.make(v)))
+=======
+  }).pipe(Effect.map((pair) => Ed25519Pair.make(pair)))
+>>>>>>> eb426be (add oxlint config, add misc. crypto tests)

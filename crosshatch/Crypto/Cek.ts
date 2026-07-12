@@ -1,6 +1,7 @@
 import { Effect, Schema as S } from "effect"
 
 import { CryptoKey } from "./CryptoKey.ts"
+import * as CryptoKey_ from "./CryptoKey.ts"
 import { Symmetric } from "./Envelope.ts"
 
 const AES_GCM = "AES-GCM"
@@ -11,12 +12,19 @@ export const Cek = CryptoKey.pipe(S.brand("crosshatch/Cek"))
 
 export const fromBytes = (bytes: Uint8Array) =>
   Effect.promise(() =>
+<<<<<<< HEAD
     crypto.subtle.importKey("raw", bytes.slice(), { name: AES_GCM }, false, ["encrypt", "decrypt"]),
   ).pipe(Effect.map((v) => Cek.make(v)))
+=======
+    crypto.subtle.importKey("raw", bytes.slice(), { name: AES_GCM }, true, ["encrypt", "decrypt"]),
+  ).pipe(Effect.map(Cek.make))
+>>>>>>> eb426be (add oxlint config, add misc. crypto tests)
+
+export const toBytes = (cek: typeof Cek.Type) => CryptoKey_.toBytes(cek)
 
 export const random = Effect.sync(() => crypto.getRandomValues(new Uint8Array(32))).pipe(Effect.flatMap(fromBytes))
 
-export const fromPrfv = Effect.fnUntraced(function* (value: Uint8Array) {
+export const fromPrf = Effect.fnUntraced(function* (value: Uint8Array) {
   const baseKey = yield* Effect.promise(() =>
     crypto.subtle.importKey("raw", value.slice(), "HKDF", false, ["deriveKey"]),
   )
@@ -33,7 +41,7 @@ export const fromPrfv = Effect.fnUntraced(function* (value: Uint8Array) {
         length: AES_KEY_BITS,
         name: AES_GCM,
       },
-      false,
+      true,
       ["encrypt", "decrypt"],
     ),
   ).pipe(Effect.map((v) => Cek.make(v)))

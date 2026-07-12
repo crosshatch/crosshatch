@@ -56,7 +56,7 @@ catalog:
   "@vitest/coverage-v8": ^4.1.4
   "@vitest/expect": ^4.1.4
   "@vitest/web-worker": ^4.1.4
-  alchemy: 2.0.0-beta.61
+  alchemy: https://pkg.ing/alchemy/546ca57
   "@effect/tsgo": 0.16.0
   asciify-engine: ^1.0.118
   babel-plugin-react-compiler: ^1.0.0

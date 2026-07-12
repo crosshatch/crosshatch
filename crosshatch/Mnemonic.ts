@@ -2,18 +2,15 @@ import { Layer, Redacted, Effect, Schema as S, Config, Context, Brand, flow } fr
 import { Mnemonic as OxMnemonic } from "ox"
 
 export const MnemonicText = S.String.check(
-  S.isPattern(/^(?:(?:[a-z]+ ){11}|(?:[a-z]+ ){14}|(?:[a-z]+ ){17}|(?:[a-z]+ ){20}|(?:[a-z]+ ){23})[a-z]+$/),
+  S.isPattern(/^(?:(?:[a-z]+ ){11}|(?:[a-z]+ ){14}|(?:[a-z]+ ){17}|(?:[a-z]+ ){20}|(?:[a-z]+ ){23})[a-z]+$/u),
 ).pipe(S.brand("crosshatch/Mnemonic"))
 
 const ID = "crosshatch/Mnemonic" as const
 
-type Mnemonic_ = [Redacted.Redacted<string & Brand.Brand<typeof ID>>][0]
+// oxlint-disable-next-line
+export interface Mnemonic extends Redacted.Redacted<string & Brand.Brand<typeof ID>> {}
 
-export interface Mnemonic extends S.Redacted<S.brand<S.String, typeof ID>>, Context.Service<Mnemonic, Mnemonic_> {
-  new (_: never): Context.ServiceClass.Shape<typeof ID, Mnemonic_>
-}
-
-export const Mnemonic: Mnemonic = Object.assign(Context.Service<Mnemonic, Mnemonic_>()(ID), S.Redacted(MnemonicText))
+export const Mnemonic = Object.assign(Context.Service<Mnemonic, Mnemonic>()(ID), S.Redacted(MnemonicText))
 
 export const fromText = (text: string) => Redacted.make(MnemonicText.make(text))
 

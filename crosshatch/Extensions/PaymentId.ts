@@ -2,7 +2,7 @@ import { Schema as S, Cause, Context, Deferred, Effect, Layer } from "effect"
 
 import { Extension, Payload } from "../index.ts"
 
-export const PaymentId = S.String.check(S.isLengthBetween(16, 128), S.isPattern(/^[a-zA-Z0-9_-]+$/)).pipe(
+export const PaymentId = S.String.check(S.isLengthBetween(16, 128), S.isPattern(/^[a-zA-Z0-9_-]+$/u)).pipe(
   S.brand("crosshatch/PaymentId"),
 )
 

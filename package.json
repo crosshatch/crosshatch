@@ -12,7 +12,8 @@
     "dev": "trash liminal/node_modules || true && pnpm i --force && PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN=false turbo run //#watch //#aliases //#motel dev --filter=!./liminal/**",
     "aliases": "caddy run --config ./Caddyfile",
     "test": "vitest run",
-    "motel": "motel"
+    "motel": "motel",
+    "lint": "oxlint --disable-nested-config"
   },
   "devDependencies": {
     "@changesets/changelog-github": "catalog:",

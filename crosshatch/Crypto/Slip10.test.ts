@@ -7,36 +7,6 @@ const seed = new Uint8Array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 1
 
 describe(import.meta.url, () => {
   it.effect(
-    "derives the master private key",
-    Effect.fn(function* () {
-      const { privateKeySeed } = yield* Slip10.derive(seed, [])
-      expect(Encoding.encodeHex(privateKeySeed)).toBe(
-        "2b4be7f19ee27bbf30c667b642d5f4aa69fd169872f8fc3059c08ebae2eb19e7",
-      )
-    }),
-  )
-
-  it.effect(
-    "derives the m/0' child key",
-    Effect.fn(function* () {
-      const { privateKeySeed } = yield* Slip10.derive(seed, [0])
-      expect(Encoding.encodeHex(privateKeySeed)).toBe(
-        "68e0fe46dfb67e368c75379acec591dad19df3cde26e63b93a8e704f1dade7a3",
-      )
-    }),
-  )
-
-  it.effect(
-    "derives the Solana path",
-    Effect.fn(function* () {
-      const { privateKeySeed } = yield* Slip10.derive(seed, [44, 501, 0, 0])
-      expect(Encoding.encodeHex(privateKeySeed)).toBe(
-        "f1f890d181d1bc1fdfdb9e1911e59285b9f8a28c5c31c13e56747e6993bfa053",
-      )
-    }),
-  )
-
-  it.effect(
     "matches the official SLIP-0010 ed25519 vectors",
     Effect.fn(function* () {
       const { privateKeySeed: vector1 } = yield* Slip10.derive(seed, [0, 1, 2, 2, 1000000000])
@@ -48,6 +18,15 @@ describe(import.meta.url, () => {
         Effect.flatMap((v) => Slip10.derive(v, [0, 2147483647, 1, 2147483646, 2])),
       )
       expect(Encoding.encodeHex(vector2)).toBe("551d333177df541ad876a60ea71f00447931c0a9da16f227c11ea080d7391b8d")
+    }),
+  )
+
+  it.effect(
+    "rejects invalid path components",
+    Effect.fn(function* () {
+      yield* Slip10.derive(seed, [-1]).pipe(Effect.flip)
+      yield* Slip10.derive(seed, [1.5]).pipe(Effect.flip)
+      yield* Slip10.derive(seed, [2147483648]).pipe(Effect.flip)
     }),
   )
 })

@@ -73,3 +73,6 @@
 [submodule "repos/ChainAgnostic/namespaces"]
 	path = repos/ChainAgnostic/namespaces
 	url = git@github.com:ChainAgnostic/namespaces.git
+[submodule "repos/tempoxyz/wallet-cli"]
+	path = repos/tempoxyz/wallet-cli
+	url = git@github.com:tempoxyz/wallet-cli.git

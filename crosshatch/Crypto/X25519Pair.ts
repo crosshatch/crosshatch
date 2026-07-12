@@ -11,14 +11,13 @@ export class X25519Pair extends S.Class<X25519Pair>("X25519Pair")({
   publicKey: X25519PublicKey,
 }) {}
 
+export const fromNative = ({ privateKey, publicKey }: CryptoKeyPair) =>
+  X25519Pair.make({
+    privateKey: X25519PrivateKey.make(privateKey),
+    publicKey: X25519PublicKey.make(publicKey),
+  })
+
 export const random = (config?: { readonly extractable?: boolean | undefined }) =>
   Effect.promise(() =>
     crypto.subtle.generateKey({ name: "X25519" }, config?.extractable ?? false, ["deriveKey", "deriveBits"]),
-  ).pipe(
-    Effect.map(({ privateKey, publicKey }) =>
-      X25519Pair.make({
-        privateKey: X25519PrivateKey.make(privateKey),
-        publicKey: X25519PublicKey.make(publicKey),
-      }),
-    ),
-  )
+  ).pipe(Effect.map(fromNative))

@@ -29,13 +29,13 @@ export const derive = Effect.fnUntraced(function* (seed: Uint8Array, path: Reado
       ),
     )(index)
   }
-  let node = yield* Hmac.mac(CURVE, seed.slice(), "SHA-512").pipe(Effect.map(parse))
+  let node = yield* Hmac.digest(CURVE, seed.slice(), "SHA-512").pipe(Effect.map(parse))
   for (const index of path) {
     const data = new Uint8Array(37)
     data[0] = 0
     data.set(node.privateKeySeed, 1)
     new DataView(data.buffer).setUint32(33, index + HARDENED, false)
-    node = yield* Hmac.mac(node.chainCode, data, "SHA-512").pipe(Effect.map(parse))
+    node = yield* Hmac.digest(node.chainCode, data, "SHA-512").pipe(Effect.map(parse))
   }
   return node
 })
