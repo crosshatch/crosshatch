@@ -23,8 +23,8 @@ describe(import.meta.url, () => {
       const dataB = new TextEncoder().encode("not crosshatching")
       const signature = yield* Ed25519PrivateKey.sign(pairA.privateKey, dataA)
       const differentMessageVerification = yield* Ed25519PublicKey.verify(pairA.publicKey, signature, dataB)
-      const differentKeyVerification = yield* Ed25519PublicKey.verify(pairB.publicKey, signature, dataA)
       expect(differentMessageVerification).toBeFalsy()
+      const differentKeyVerification = yield* Ed25519PublicKey.verify(pairB.publicKey, signature, dataA)
       expect(differentKeyVerification).toBeFalsy()
     }),
   )

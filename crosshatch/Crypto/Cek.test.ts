@@ -9,8 +9,7 @@ describe(import.meta.url, () => {
     Effect.fn(function* () {
       const cek = yield* Cek.random
       const data = new TextEncoder().encode("crosshatching")
-      const cv = yield* Cek.encrypt(cek, data)
-      const decrypted = yield* Cek.decrypt(cek, cv)
+      const decrypted = yield* Cek.decrypt(cek, yield* Cek.encrypt(cek, data))
       expect(decrypted).toStrictEqual(data)
     }),
   )
@@ -19,8 +18,7 @@ describe(import.meta.url, () => {
     Effect.fn(function* () {
       const cek = yield* Cek.random
       const raw = yield* Cek.toBytes(cek)
-      const hydrated = yield* Cek.fromBytes(raw)
-      const raw2 = yield* Cek.toBytes(hydrated)
+      const raw2 = yield* Cek.toBytes(yield* Cek.fromBytes(raw))
       expect(raw).toStrictEqual(raw2)
     }),
   )
