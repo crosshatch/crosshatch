@@ -19,7 +19,7 @@ export class Bridge extends Context.Service<
     readonly propose: (config: {
       readonly traceId?: string | undefined
       readonly required: typeof Required.Type
-    }) => Effect.Effect<{ readonly payload: typeof Payload.Type }, ProposeError>
+    }) => Effect.Effect<{ readonly payload: Payload }, ProposeError>
   }
 >()("crosshatch/Bridge") {}
 

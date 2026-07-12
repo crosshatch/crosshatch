@@ -1,4 +1,4 @@
-import { Context, Schema as S, Effect, Option, Layer } from "effect"
+import { Schema as S, Effect, Option, Layer } from "effect"
 import { Headers, HttpRouter, HttpServerRequest, HttpServerResponse } from "effect/unstable/http"
 
 import { TraceId } from "../Bridge.ts"
@@ -7,10 +7,6 @@ import { SettleResponse, SettleResponseFromBase64JsonString } from "../Facilitat
 import { Payload, PayloadFromBase64JsonString } from "../Payload.ts"
 import { Required, RequiredFromBase64JsonString } from "../Required.ts"
 import { PAYMENT_REQUIRED, CROSSHATCH_TRACE_ID, PAYMENT_SIGNATURE, PAYMENT_RESPONSE } from "./constants.ts"
-
-export class ResolvedPayload extends Context.Service<ResolvedPayload, typeof Payload.Type | undefined>()(
-  "crosshatch/Http402/ResolvedPayload",
-) {}
 
 export const require = Effect.fnUntraced(function* ({ required }: { readonly required: typeof Required.Type }) {
   const traceId = yield* TraceId
@@ -29,11 +25,11 @@ export const addResponseHeader =
       Effect.map((v) => HttpServerResponse.setHeader(PAYMENT_RESPONSE, v)(response)),
     )
 
-export const layerMiddleware = <X extends ReadonlyArray<Extension.Any>>(
+export const layerMiddleware = <X extends ReadonlyArray<Extension.Any> = []>(
   config?: { readonly extensions: X } | undefined,
 ) =>
-  HttpRouter.middleware<{ readonly provides: ResolvedPayload | InstanceType<X[number]> }>()(
-    (httpEffect) =>
+  HttpRouter.middleware<{ readonly provides: Payload | InstanceType<X[number]> }>()(
+    (effect) =>
       Effect.gen(function* () {
         const { headers } = yield* HttpServerRequest.HttpServerRequest
         const payload = Headers.get(PAYMENT_SIGNATURE)(headers).pipe(
@@ -41,10 +37,10 @@ export const layerMiddleware = <X extends ReadonlyArray<Extension.Any>>(
           Option.getOrUndefined,
         )
         const Live = Layer.mergeAll(
-          Layer.succeed(ResolvedPayload, payload),
+          Layer.succeed(Payload, payload),
           ...(config?.extensions?.map((v) => v.layer({ payload })) ?? []),
-        ) as Layer.Layer<X[number] | ResolvedPayload, S.SchemaError>
-        return yield* Effect.provide(httpEffect, Live)
+        ) as Layer.Layer<X[number] | Payload, S.SchemaError>
+        return yield* Effect.provide(effect, Live)
       }),
     { global: true },
   )

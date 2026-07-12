@@ -8,7 +8,7 @@ export class SettlementError extends S.TaggedErrorClass<SettlementError>()("Sett
   errorMessage: S.String.pipe(S.optional),
 }) {}
 
-export const settle = Effect.fnUntraced(function* ({ payload }: { readonly payload: typeof Payload.Type }) {
+export const settle = Effect.fnUntraced(function* ({ payload }: { readonly payload: Payload }) {
   const facilitator = yield* FacilitatorClient
   const { accepted: paymentRequirements } = payload
   const response = yield* facilitator.settle({

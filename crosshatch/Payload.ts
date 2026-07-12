@@ -1,4 +1,4 @@
-import { Effect, Schema as S } from "effect"
+import { Context, Effect, Schema as S } from "effect"
 
 import { ExtensionsInfo } from "./Extension.ts"
 import { Payer } from "./Payer.ts"
@@ -7,13 +7,24 @@ import { Requirements } from "./Requirements.ts"
 import { ResourceInfo } from "./ResourceInfo.ts"
 import { Version } from "./Version.ts"
 
-export const Payload = S.Struct({
-  x402Version: Version,
-  accepted: Requirements,
-  extensions: ExtensionsInfo.pipe(S.optional),
-  payload: S.Record(S.String, S.Unknown),
-  resource: ResourceInfo.pipe(S.optional),
-})
+export interface Payload {
+  readonly x402Version: typeof Version.Type
+  readonly accepted: typeof Requirements.Type
+  readonly extensions?: typeof ExtensionsInfo.Type | undefined
+  readonly payload: Record<string, unknown>
+  readonly resource?: typeof ResourceInfo.Type | undefined
+}
+
+export const Payload = Object.assign(
+  Context.Service<Payload, Payload | undefined>("crosshatch/Payload"),
+  S.Struct({
+    x402Version: Version,
+    accepted: Requirements,
+    extensions: ExtensionsInfo.pipe(S.optional),
+    payload: S.Record(S.String, S.Unknown),
+    resource: ResourceInfo.pipe(S.optional),
+  }),
+)
 
 export const PayloadFromBase64JsonString = S.StringFromBase64.pipe(S.decodeTo(S.fromJsonString(S.toCodecJson(Payload))))
 

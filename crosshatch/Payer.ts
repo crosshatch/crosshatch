@@ -13,7 +13,7 @@ export class Payer extends Context.Service<
     readonly createPayload: (config: {
       readonly traceId?: string | undefined
       readonly required: typeof Required.Type
-    }) => Effect.Effect<{ readonly payload: typeof Payload.Type }, AcceptError | CreatePayloadError>
+    }) => Effect.Effect<{ readonly payload: Payload }, AcceptError | CreatePayloadError>
   }
 >()("crosshatch/Payer") {}
 

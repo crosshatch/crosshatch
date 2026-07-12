@@ -1,4 +1,4 @@
-import { Facilitator, Required, Requirements, Http402, KnownAssets } from "crosshatch"
+import { Facilitator, Required, Requirements, Http402, KnownAssets, Payload } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
 import { PaymentId } from "crosshatch/Extensions"
 import { Layer, Effect, Config } from "effect"
@@ -10,7 +10,7 @@ export default Worker.make({
     "GET",
     "/paid",
     Effect.gen(function* () {
-      const payload = yield* Http402.ResolvedPayload
+      const payload = yield* Payload.Payload
       if (!payload) {
         const PAY_TO_EIP155 = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
         const required = yield* Required.make`

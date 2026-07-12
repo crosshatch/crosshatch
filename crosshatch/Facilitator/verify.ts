@@ -8,7 +8,7 @@ export class VerificationError extends S.TaggedErrorClass<VerificationError>()("
   invalidMessage: S.String.pipe(S.optional),
 }) {}
 
-export const verify = Effect.fnUntraced(function* ({ payload }: { readonly payload: typeof Payload.Type }) {
+export const verify = Effect.fnUntraced(function* ({ payload }: { readonly payload: Payload }) {
   const facilitator = yield* FacilitatorClient
   const { accepted: paymentRequirements } = payload
   const response = yield* facilitator.verify({

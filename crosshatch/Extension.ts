@@ -29,7 +29,7 @@ export interface Extension<
   readonly layer: ({
     payload,
   }: {
-    readonly payload: typeof Payload.Type | undefined
+    readonly payload: Payload | undefined
   }) => Layer.Layer<Self, S.SchemaError, Exclude<Echo["DecodingServices"], Scope.Scope>>
 
   readonly ensure: Effect.Effect<Echo["Type"], Cause.NoSuchElementError, Self>
@@ -38,9 +38,7 @@ export interface Extension<
     required: typeof Required.Type,
   ) => Effect.Effect<Info["Type"], S.SchemaError, Info["DecodingServices"]>
 
-  readonly decodePayload: (
-    payload: typeof Payload.Type,
-  ) => Effect.Effect<Echo["Type"], S.SchemaError, Echo["DecodingServices"]>
+  readonly decodePayload: (payload: Payload) => Effect.Effect<Echo["Type"], S.SchemaError, Echo["DecodingServices"]>
 }
 
 export declare namespace Extension {
@@ -67,7 +65,7 @@ export const Service =
     const tag = Context.Service<Self, Service<Success>>()(id)
     const { identifier, info, echo } = definition
 
-    const layer = ({ payload }: { readonly payload: typeof Payload.Type | undefined }) =>
+    const layer = ({ payload }: { readonly payload: Payload | undefined }) =>
       Layer.effect(
         tag,
         Effect.gen(function* () {
@@ -84,7 +82,7 @@ export const Service =
     const decodeRequired = (required: typeof Required.Type) =>
       S.decodeUnknownEffect(S.toCodecJson(info))(required.extensions?.[identifier])
 
-    const decodePayload = (required: typeof Payload.Type) =>
+    const decodePayload = (required: Payload) =>
       S.decodeUnknownEffect(S.toCodecJson(echo))(required.extensions?.[identifier])
 
     return Object.assign(tag, {
