@@ -4,7 +4,7 @@ import { PaymentId } from "crosshatch/Extensions"
 import { Config, Effect, Layer } from "effect"
 import { FetchHttpClient } from "effect/unstable/http"
 
-import { PayerLive } from "./_common.ts"
+import { PayerLive } from "./PayerLive.ts"
 
 // Merchants make the required with extension info.
 const makeRequired = Effect.gen(function* () {

@@ -2,7 +2,7 @@ import { KnownAssets, Facilitator, Required, Requirements, Payload } from "cross
 import { Eip155Address } from "crosshatch/Eip155"
 import { Config, Effect } from "effect"
 
-import { PayerLive } from "./_common.ts"
+import { PayerLive } from "./PayerLive.ts"
 
 Effect.gen(function* () {
   const PAY_TO_EIP155 = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")

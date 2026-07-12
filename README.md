@@ -18,7 +18,7 @@ import { Http402 } from "crosshatch"
 import { Console, Effect, Layer } from "effect"
 import { LanguageModel } from "effect/unstable/ai"
 
-import { PayerLive } from "./_common.ts"
+import { PayerLive } from "./PayerLive.ts"
 
 const BlockrunLive = OpenAiLanguageModel.layer({ model: "deepseek/deepseek-chat" }).pipe(
   Layer.provide(OpenAiClient.layer({ apiUrl: "https://blockrun.ai/api/v1" })),
@@ -32,6 +32,8 @@ LanguageModel.generateText({
   Effect.runFork,
 )
 ```
+
+> Payment capability––`PayerLive`--detailed below.
 
 ## Example Merchant
 
@@ -69,6 +71,31 @@ export default Effect.gen(function* () {
   const settlement = yield* Facilitator.settle({ payload })
   return HttpServerResponse.text("The paid resource.").pipe(Http402.addResponseHeader(settlement))
 })
+```
+
+## Payer Layer
+
+The following allows the signing payment payloads for various USD-denominated stablecoins across EVM and Solana chains.
+Payment capability derived from a single mnemonic `MNEMONIC` in the environment variables.
+
+`PayerLive.ts`
+
+```ts
+import { Accept, KnownAssets, Mnemonic, Payer } from "crosshatch"
+import { Erc3009, Eip155Signer, Permit2 } from "crosshatch/Eip155"
+import { Layer } from "effect"
+
+export const PayerLive = Payer.layer.pipe(
+  Layer.provide(
+    Accept.layer(KnownAssets).pipe(
+      Layer.provide(
+        Layer.mergeAll(Erc3009.layer, Permit2.layer).pipe(
+          Layer.provide(Eip155Signer.layerMnemonic.pipe(Layer.provide(Mnemonic.layerEnv))),
+        ),
+      ),
+    ),
+  ),
+)
 ```
 
 ## Contributing
