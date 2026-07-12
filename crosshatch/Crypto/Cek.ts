@@ -1,14 +1,13 @@
 import { Effect, Schema as S } from "effect"
 
-import { CryptoKey } from "./CryptoKey.ts"
-import * as CryptoKey_ from "./CryptoKey.ts"
+import * as CryptoKey from "./CryptoKey.ts"
 import { Symmetric } from "./Envelope.ts"
 
 const AES_GCM = "AES-GCM"
 const AES_KEY_BITS = 256
 const GCM_TAG_BITS = 128
 
-export const Cek = CryptoKey.pipe(S.brand("crosshatch/Cek"))
+export const Cek = CryptoKey.CryptoKey.pipe(S.brand("crosshatch/Cek"))
 
 export const fromBytes = (bytes: Uint8Array, config?: { readonly extractable?: boolean | undefined }) =>
   Effect.promise(() =>
@@ -18,11 +17,14 @@ export const fromBytes = (bytes: Uint8Array, config?: { readonly extractable?: b
     ]),
   ).pipe(Effect.map((v) => Cek.make(v)))
 
-export const toBytes = (cek: typeof Cek.Type) => CryptoKey_.toBytes(cek)
+export const toBytes = (cek: typeof Cek.Type) => CryptoKey.toBytes(cek)
 
 export const random = Effect.sync(() => crypto.getRandomValues(new Uint8Array(32))).pipe(Effect.flatMap(fromBytes))
 
-export const fromPrf = Effect.fnUntraced(function* (value: Uint8Array) {
+export const fromPrf = Effect.fnUntraced(function* (
+  value: Uint8Array,
+  config?: { readonly extractable?: boolean | undefined },
+) {
   const baseKey = yield* Effect.promise(() =>
     crypto.subtle.importKey("raw", value.slice(), "HKDF", false, ["deriveKey"]),
   )
@@ -30,7 +32,6 @@ export const fromPrf = Effect.fnUntraced(function* (value: Uint8Array) {
     crypto.subtle.deriveKey(
       {
         hash: "SHA-256",
-        info: new TextEncoder().encode("crosshatch/cek"), // TODO: remove?
         name: "HKDF",
         salt: new Uint8Array(),
       },
@@ -39,7 +40,7 @@ export const fromPrf = Effect.fnUntraced(function* (value: Uint8Array) {
         length: AES_KEY_BITS,
         name: AES_GCM,
       },
-      true,
+      config?.extractable ?? false,
       ["encrypt", "decrypt"],
     ),
   ).pipe(Effect.map((v) => Cek.make(v)))

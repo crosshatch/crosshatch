@@ -18,6 +18,10 @@ export const fromNative = ({ privateKey, publicKey }: CryptoKeyPair) =>
   })
 
 export const random = (config?: { readonly extractable?: boolean | undefined }) =>
-  Effect.promise(() =>
-    crypto.subtle.generateKey({ name: "X25519" }, config?.extractable ?? false, ["deriveKey", "deriveBits"]),
+  Effect.promise(
+    () =>
+      crypto.subtle.generateKey({ name: "X25519" }, config?.extractable ?? false, [
+        "deriveKey",
+        "deriveBits",
+      ]) as Promise<CryptoKeyPair>,
   ).pipe(Effect.map(fromNative))

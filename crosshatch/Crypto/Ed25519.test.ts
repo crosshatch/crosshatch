@@ -17,15 +17,13 @@ describe(import.meta.url, () => {
   it.effect(
     "does not verify signatures for a different message or public key",
     Effect.fn(function* () {
-      const pair = yield* Ed25519Pair.random()
-      const otherPair = yield* Ed25519Pair.random()
-      const data = new TextEncoder().encode("crosshatching")
-      const otherData = new TextEncoder().encode("not crosshatching")
-      const signature = yield* Ed25519PrivateKey.sign(pair.privateKey, data)
-
-      const differentMessageVerification = yield* Ed25519PublicKey.verify(pair.publicKey, signature, otherData)
-      const differentKeyVerification = yield* Ed25519PublicKey.verify(otherPair.publicKey, signature, data)
-
+      const pairA = yield* Ed25519Pair.random()
+      const pairB = yield* Ed25519Pair.random()
+      const dataA = new TextEncoder().encode("crosshatching")
+      const dataB = new TextEncoder().encode("not crosshatching")
+      const signature = yield* Ed25519PrivateKey.sign(pairA.privateKey, dataA)
+      const differentMessageVerification = yield* Ed25519PublicKey.verify(pairA.publicKey, signature, dataB)
+      const differentKeyVerification = yield* Ed25519PublicKey.verify(pairB.publicKey, signature, dataA)
       expect(differentMessageVerification).toBeFalsy()
       expect(differentKeyVerification).toBeFalsy()
     }),
