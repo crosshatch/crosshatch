@@ -19,11 +19,8 @@ export const require = Effect.fnUntraced(function* ({ required }: { readonly req
   })
 })
 
-export const addResponseHeader =
-  (settlement: typeof SettleResponse.Type) => (response: HttpServerResponse.HttpServerResponse) =>
-    S.encodeEffect(SettleResponseFromBase64JsonString)(settlement).pipe(
-      Effect.map((v) => HttpServerResponse.setHeader(PAYMENT_RESPONSE, v)(response)),
-    )
+export const addResponseHeader = (settlement: typeof SettleResponse.Type) =>
+  HttpServerResponse.setHeader(PAYMENT_RESPONSE, S.encodeSync(SettleResponseFromBase64JsonString)(settlement))
 
 export const layerMiddleware = <X extends ReadonlyArray<Extension.Any> = []>(
   config?: { readonly extensions: X } | undefined,
