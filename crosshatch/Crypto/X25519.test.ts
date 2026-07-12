@@ -1,7 +1,7 @@
 import { describe, expect, it } from "@effect/vitest"
 import { Effect, Exit } from "effect"
 
-import { Ed25519Pair, Ed25519PrivateKey, X25519Pair, X25519PrivateKey, X25519PublicKey } from "./Crypto.ts"
+import { CryptoKey, Ed25519Pair, Ed25519PrivateKey, X25519Pair, X25519PrivateKey, X25519PublicKey } from "./Crypto.ts"
 
 describe(import.meta.url, () => {
   it.effect(
@@ -76,9 +76,9 @@ describe(import.meta.url, () => {
     "public key serialization roundtrip",
     Effect.fn(function* () {
       const { publicKey } = yield* X25519Pair.random({ extractable: true })
-      const raw = yield* X25519PublicKey.toBytes(publicKey)
+      const raw = yield* CryptoKey.toBytes(publicKey)
       const hydrated = yield* X25519PublicKey.fromBytes(raw)
-      const raw2 = yield* X25519PublicKey.toBytes(hydrated)
+      const raw2 = yield* CryptoKey.toBytes(hydrated)
       expect(raw).toStrictEqual(raw2)
     }),
   )

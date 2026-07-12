@@ -1,7 +1,7 @@
 import { describe, expect, it } from "@effect/vitest"
 import { Effect, Exit } from "effect"
 
-import { Ed25519Pair, Ed25519PrivateKey, Ed25519PublicKey, X25519Pair, X25519PrivateKey } from "./Crypto.ts"
+import { CryptoKey, Ed25519Pair, Ed25519PrivateKey, Ed25519PublicKey, X25519Pair, X25519PrivateKey } from "./Crypto.ts"
 
 describe(import.meta.url, () => {
   it.effect(
@@ -32,9 +32,9 @@ describe(import.meta.url, () => {
     "public key serialization roundtrip",
     Effect.fn(function* () {
       const { publicKey } = yield* Ed25519Pair.random()
-      const raw = yield* Ed25519PublicKey.toBytes(publicKey)
+      const raw = yield* CryptoKey.toBytes(publicKey)
       const hydrated = yield* Ed25519PublicKey.fromBytes(raw)
-      const raw2 = yield* Ed25519PublicKey.toBytes(hydrated)
+      const raw2 = yield* CryptoKey.toBytes(hydrated)
       expect(raw).toStrictEqual(raw2)
     }),
   )
@@ -105,11 +105,9 @@ describe(import.meta.url, () => {
       const seed = new Uint8Array(32).map((_, i) => i)
       const pair1 = yield* Ed25519Pair.fromSeed(seed)
       const pair2 = yield* Ed25519Pair.fromSeed(seed)
-      const publicKeyBytes1 = yield* Ed25519PublicKey.toBytes(pair1.publicKey)
-      const publicKeyBytes2 = yield* Ed25519PublicKey.toBytes(pair2.publicKey)
-
+      const publicKeyBytes1 = yield* CryptoKey.toBytes(pair1.publicKey)
+      const publicKeyBytes2 = yield* CryptoKey.toBytes(pair2.publicKey)
       expect(publicKeyBytes1).toStrictEqual(publicKeyBytes2)
-
       const data = new TextEncoder().encode("crosshatching")
       const signature = yield* Ed25519PrivateKey.sign(pair1.privateKey, data)
       const verification = yield* Ed25519PublicKey.verify(pair2.publicKey, signature, data)

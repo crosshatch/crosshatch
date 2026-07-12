@@ -5,8 +5,8 @@ import * as CryptoKey from "./CryptoKey.ts"
 export const X25519PublicKey = CryptoKey.CryptoKey.pipe(S.brand("crosshatch/X25519PublicKey"))
 
 export const encrypt = Effect.fnUntraced(function* (publicKey: typeof X25519PublicKey.Type, value: Uint8Array) {
-  const eph = yield* Effect.promise(() =>
-    crypto.subtle.generateKey({ name: "X25519" }, false, ["deriveKey", "deriveBits"]),
+  const eph = yield* Effect.promise(
+    () => crypto.subtle.generateKey({ name: "X25519" }, false, ["deriveKey", "deriveBits"]) as Promise<CryptoKeyPair>,
   )
   const aeadKey = yield* Effect.promise(() =>
     crypto.subtle.deriveKey(
@@ -37,5 +37,3 @@ export const fromBytes = (raw: Uint8Array) =>
   Effect.promise(() => crypto.subtle.importKey("raw", raw.slice(), { name: "X25519" }, true, [])).pipe(
     Effect.map((v) => X25519PublicKey.make(v)),
   )
-
-export const toBytes = (publicKey: typeof X25519PublicKey.Type) => CryptoKey.toBytes(publicKey)
