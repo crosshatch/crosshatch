@@ -19,7 +19,8 @@ export const fromBytes = (bytes: Uint8Array, config?: { readonly extractable?: b
 
 export const toBytes = (cek: typeof Cek.Type) => CryptoKey.toBytes(cek)
 
-export const random = Effect.sync(() => crypto.getRandomValues(new Uint8Array(32))).pipe(Effect.flatMap(fromBytes))
+export const random = (config?: { readonly extractable?: boolean | undefined }) =>
+  Effect.sync(() => crypto.getRandomValues(new Uint8Array(32))).pipe(Effect.flatMap((v) => fromBytes(v, config)))
 
 export const fromPrf = Effect.fnUntraced(function* (
   value: Uint8Array,
