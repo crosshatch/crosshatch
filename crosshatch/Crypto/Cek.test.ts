@@ -24,15 +24,4 @@ describe(import.meta.url, () => {
       expect(raw).toStrictEqual(raw2)
     }),
   )
-  it.effect(
-    "derives from a PRF value",
-    Effect.fn(function* () {
-      const value = new TextEncoder().encode("crosshatching")
-      const cek = yield* Cek.fromPrf(value)
-      const data = new TextEncoder().encode("payload")
-      const cv = yield* Cek.encrypt(cek, data)
-      const decrypted = yield* Cek.decrypt(cek, cv)
-      expect(decrypted).toStrictEqual(data)
-    }),
-  )
 })

@@ -10,15 +10,13 @@ const GCM_TAG_BITS = 128
 
 export const Cek = CryptoKey.pipe(S.brand("crosshatch/Cek"))
 
-export const fromBytes = (bytes: Uint8Array) =>
+export const fromBytes = (bytes: Uint8Array, config?: { readonly extractable?: boolean | undefined }) =>
   Effect.promise(() =>
-<<<<<<< HEAD
-    crypto.subtle.importKey("raw", bytes.slice(), { name: AES_GCM }, false, ["encrypt", "decrypt"]),
+    crypto.subtle.importKey("raw", bytes.slice(), { name: AES_GCM }, config?.extractable ?? false, [
+      "encrypt",
+      "decrypt",
+    ]),
   ).pipe(Effect.map((v) => Cek.make(v)))
-=======
-    crypto.subtle.importKey("raw", bytes.slice(), { name: AES_GCM }, true, ["encrypt", "decrypt"]),
-  ).pipe(Effect.map(Cek.make))
->>>>>>> eb426be (add oxlint config, add misc. crypto tests)
 
 export const toBytes = (cek: typeof Cek.Type) => CryptoKey_.toBytes(cek)
 

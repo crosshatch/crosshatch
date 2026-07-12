@@ -36,8 +36,4 @@ export const fromSeed = (bytes: Uint8Array) =>
       Effect.map((v) => Ed25519PublicKey.Ed25519PublicKey.make(v)),
     ),
     privateKey: Ed25519PrivateKey.fromSeed(bytes),
-<<<<<<< HEAD
   }).pipe(Effect.map((v) => Ed25519Pair.make(v)))
-=======
-  }).pipe(Effect.map((pair) => Ed25519Pair.make(pair)))
->>>>>>> eb426be (add oxlint config, add misc. crypto tests)
