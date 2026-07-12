@@ -21,6 +21,9 @@ catalogs:
     '@distilled.cloud/coinbase':
       specifier: ^0.29.0
       version: 0.29.0
+    '@effect/ai-openai-compat':
+      specifier: 4.0.0-beta.97
+      version: 4.0.0-beta.97
     '@effect/atom-react':
       specifier: 4.0.0-beta.97
       version: 4.0.0-beta.97
@@ -431,9 +434,9 @@ importers:
 
   examples/headless:
     dependencies:
-      '@cloudflare/workers-types':
+      '@effect/ai-openai-compat':
         specifier: 'catalog:'
-        version: 4.20260626.1
+        version: 4.0.0-beta.97(effect@4.0.0-beta.97)
       crosshatch:
         specifier: workspace:*
         version: link:../../crosshatch
@@ -1170,6 +1173,11 @@ packages:
     resolution: {integrity: sha512-CDieF5POk7mfoNjjPnU93h8RtHQxlsNUWJaHtaQcNSOBZ4y1xjgJFOejiBRK06AA8GoGYCt50s78J+eYmJWUmA==}
     peerDependencies:
       effect: '>=4.0.0-beta.97 || >=4.0.0'
+
+  '@effect/ai-openai-compat@4.0.0-beta.97':
+    resolution: {integrity: sha512-UIj+K8Nh70taGznspAKkD3Wspc4XRsET7JCwSTaO4hPygaAmQX5QL67bOJoi2zj27S5O1TBpD70gTepcaf4wQA==}
+    peerDependencies:
+      effect: ^4.0.0-beta.97
 
   '@effect/atom-react@4.0.0-beta.90':
     resolution: {integrity: sha512-E1GFtNT+ZeIA3//g+IcbaAfjVAn5VZ08q4/MTEEV/862AlCfia8nRETJqpvVcTEK4X6EnebjTXdWu7tTV9wggg==}
@@ -8402,6 +8410,10 @@ snapshots:
   '@distilled.cloud/planetscale@0.29.0(effect@4.0.0-beta.97)':
     dependencies:
       '@distilled.cloud/core': 0.29.0(effect@4.0.0-beta.97)
+      effect: 4.0.0-beta.97
+
+  '@effect/ai-openai-compat@4.0.0-beta.97(effect@4.0.0-beta.97)':
+    dependencies:
       effect: 4.0.0-beta.97
 
   '@effect/atom-react@4.0.0-beta.90(effect@4.0.0-beta.90)(react@19.2.7)(scheduler@0.27.0)':

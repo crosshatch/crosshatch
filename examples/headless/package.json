@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@cloudflare/workers-types": "catalog:",
+    "@effect/ai-openai-compat": "catalog:",
     "crosshatch": "workspace:*",
     "effect": "catalog:"
   }
