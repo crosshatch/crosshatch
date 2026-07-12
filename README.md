@@ -1,10 +1,10 @@
 # Crosshatch
 
-**Crosshatch is a general purpose Effect toolkit for composing x402 payments.**
+[![npm](https://img.shields.io/npm/v/crosshatch?style=flat-square&color=6D5BD0&label=crosshatch)](https://www.npmjs.com/package/crosshatch)
+[![license](https://img.shields.io/badge/license-Apache%202.0-6D5BD0?style=flat-square)](./LICENSE)
+[![discord](https://img.shields.io/badge/discord-join-6D5BD0?style=flat-square&logo=discord&logoColor=white)](https://discord.gg/CSXCRUKjh9)
 
-[![npm](https://img.shields.io/npm/v/crosshatch?style=flat-square&color=3f5a2a&label=crosshatch)](https://www.npmjs.com/package/crosshatch)
-[![license](https://img.shields.io/badge/license-Apache%202.0-3f5a2a?style=flat-square)](./LICENSE)
-[![discord](https://img.shields.io/badge/discord-join-3f5a2a?style=flat-square&logo=discord&logoColor=white)](https://discord.gg/CSXCRUKjh9)
+**Crosshatch is a general purpose Effect toolkit for composing x402 payments.**
 
 [Docs](https://crosshatch.dev) · [Examples](./examples) · [Discord](https://discord.gg/jwKw8dBJdN)
 
