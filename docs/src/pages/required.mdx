@@ -1,7 +1,6 @@
 # Payment Required
 
-`Required` is Crosshatch's schema and builder for the x402 `PaymentRequired`
-response.
+`Required` is Crosshatch's builder for x402 payment-required responses.
 
 You can think of this as the "invoice" format of x402. It is the description a
 server returns when a client asks for a paid resource without providing payment.
@@ -9,31 +8,27 @@ The client reads the invoice, selects one of the accepted payment requirements,
 creates a [payment payload](/payload), and retries the request with that payment
 attached.
 
-## Shape
-
-Crosshatch models the x402 payment-required object as `Required`:
-
-```ts
-import { Required } from "crosshatch"
-
-type Required = typeof Required.Required.Type
-```
-
-Within a `Required` value is the `accepts` field, which describes the way(s)
-that the client can pay the invoice: the scheme, network, asset, amount,
-recipient, timeout, and any chain-specific metadata needed to validate
-settlement.
-
 ## Building a Required
 
 Start with `Required.make`, then pipe builder operations into it.
 `Required.accept` adds one or more acceptable payment requirements, and
 `Required.extend` adds x402 extension payloads.
 
+The typical order is description first, extension requests next, and acceptable
+payment options last:
+
+```ts
+Required.make`Access to the paid resource.`.pipe(
+  Required.extend(SomeExtension, info),
+  Required.accept(requirements),
+)
+```
+
 ```ts
 import { Config, Effect } from "effect"
-import { Required, Requirements, PaymentId, KnownAssets } from "crosshatch"
+import { Required, Requirements, KnownAssets } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
+import { PaymentId } from "crosshatch/Extensions"
 
 const makeRequired = Effect.gen(function* () {
   return yield* Required.make`
@@ -60,16 +55,15 @@ const makeRequired = Effect.gen(function* () {
 })
 ```
 
-The description is passed first, either as a string or tagged template.
-Crosshatch strips the leading margin, so multi-line descriptions stay legible in
-source.
+The description is passed first. It should be written for the client or wallet
+that may show the payment request to a user.
 
 ## Requirements Groups
 
-`Requirements.asset` turns a `PhysicalAsset` into one or more x402 payment
-requirements. For example, `USDC` may contain deployments for multiple EIP-155
-chains. The `recipients` object chooses which deployments this invoice accepts
-and which address should receive payment on each chain.
+`Requirements.asset` turns a `PhysicalAsset` into acceptable payment options.
+For example, `USDC` may contain deployments for multiple EIP-155 chains. The
+`recipients` object chooses which deployments this invoice accepts and where
+payment should be sent on each chain.
 
 ```ts
 Requirements.asset(USDC, {
@@ -83,6 +77,4 @@ Requirements.asset(USDC, {
 ```
 
 The USD amount is converted into the asset's atomic units using the selected
-deployment's decimals. The resulting requirement includes the CAIP-2 network id,
-token asset id, recipient address, timeout, and metadata such as asset name and
-version.
+deployment's decimals.

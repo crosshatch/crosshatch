@@ -1,0 +1,79 @@
+# Solana
+
+The `crosshatch/Solana` module contains the Solana provider-specific schemas,
+signer, latest-blockhash service, and payment adapter.
+
+```ts
+import {
+  GetLatestBlockhash,
+  SolanaAdapter,
+  SolanaAddress,
+  SolanaAsset,
+  SolanaSigner,
+} from "crosshatch/Solana"
+```
+
+## Addresses And Assets
+
+Solana deployments live under the `solana` namespace in a `PhysicalAsset`. A
+deployment identifies the SPL mint and includes the token program id used by
+that mint.
+
+See [Assets](/asset) for asset configuration.
+
+## Signer
+
+The built-in mnemonic signer derives a Solana signer from the configured
+Crosshatch mnemonic.
+
+```ts
+import { Mnemonic } from "crosshatch"
+import { SolanaSigner } from "crosshatch/Solana"
+import { Layer } from "effect"
+
+const SolanaSignerLive = SolanaSigner.layerMnemonic.pipe(
+  Layer.provide(Mnemonic.layerEnv),
+)
+```
+
+See [Mnemonic](/mnemonic) for mnemonic sources.
+
+## Latest Blockhash
+
+Solana payload creation needs a recent blockhash. Provide `GetLatestBlockhash`
+anywhere you provide `SolanaAdapter.layer`.
+
+```ts
+import { Config, Layer } from "effect"
+import { GetLatestBlockhash } from "crosshatch/Solana"
+
+const BlockhashLive = Config.string("SOLANA_RPC_URL").pipe(
+  Config.map(GetLatestBlockhash.layer),
+  Layer.unwrap,
+)
+```
+
+## Adapter
+
+`SolanaAdapter.layer` creates a signed base64-encoded Solana transaction. The
+transaction transfers the selected SPL token amount from the payer's associated
+token account to the merchant's associated token account.
+
+The accepted requirement's `extra` field must include the fee payer and may
+include a memo.
+
+```ts
+import { SolanaAdapter, SolanaSigner } from "crosshatch/Solana"
+import { Layer } from "effect"
+
+const SolanaLive = SolanaAdapter.layer.pipe(
+  Layer.provide([SolanaSigner.layerMnemonic, BlockhashLive]),
+)
+```
+
+## Payer Composition
+
+A Solana-capable payer provides the Solana adapter, signer, latest blockhash
+service, and asset metadata.
+
+See [Payer Service](/payer) for the full composition pattern.

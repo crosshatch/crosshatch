@@ -1,50 +1,16 @@
 # Payload
 
-`Payload` is Crosshatch's utilities for working with the x402 `PaymentPayload`
-object.
+`Payload` is Crosshatch's utilities for working with x402 payment payloads.
 
 If `Required` is the invoice format of x402, `Payload` is the signed check. It
 is what a payer creates after reading a payment-required invoice and deciding
 how to pay it. The server or facilitator can then verify that signed check
 against the selected requirement and settle the payment.
 
-## Shape
-
-Crosshatch models the x402 payment payload as `Payload`:
-
-```ts
-import { Payload } from "crosshatch"
-
-type Payload = typeof Payload.Payload.Type
-```
-
-Conceptually, it has this shape:
-
-```ts
-type Payload = {
-  x402Version: 2
-  accepted: {
-    scheme: "exact" | "upto"
-    network: string
-    asset: string
-    amount: string
-    payTo: string
-    maxTimeoutSeconds: number
-    extra?: Record<string, unknown>
-  }
-  payload: Record<string, unknown>
-  resource?: {
-    url?: string
-    description?: string
-    mimeType?: string
-  }
-  extensions?: Record<string, unknown>
-}
-```
-
-The stable envelope says which invoice entry was accepted. The inner `payload`
-field is chain-specific. For EIP-155 payments, for example, it may contain an
-EIP-3009 transfer authorization or a Permit2 authorization plus signature.
+Every payload has a stable x402 envelope that says which invoice entry was
+accepted, plus an inner payment body that is chain-specific. For EIP-155
+payments, for example, the inner body may contain an EIP-3009 transfer
+authorization or a Permit2 authorization plus signature.
 
 ## Making a Payload
 
@@ -100,28 +66,8 @@ and how to produce the signed payload. For the built-in EIP-155 flow, the
 `Payer` uses the configured asset metadata to select a supported requirement,
 then asks the selected adapter to create the concrete payload.
 
-```ts
-import { Accept, KnownAssets, Mnemonic, Payer } from "crosshatch"
-import { Eip155Signer, Erc3009, Permit2 } from "crosshatch/Eip155"
-import { Effect, Layer } from "effect"
-
-const payerLayer = Payer.layer.pipe(
-  Layer.provide(
-    Accept.layer(KnownAssets).pipe(
-      Layer.provide(
-        Layer.mergeAll(Erc3009.layer, Permit2.layer).pipe(
-          Layer.provide(Mnemonic.toLayerEnv(Eip155Signer)),
-        ),
-      ),
-    ),
-  ),
-)
-
-const runnable = program.pipe(Effect.provide(payerLayer))
-```
-
-This section is only concerned with `Payload.make`; the payer and bridge
-services are covered later.
+Provide a `Payer` layer when running the program. See [Payer Service](/payer)
+for local signing and bridge-backed payer setup.
 
 To delegate payload creation to an external wallet, browser extension, or other
 agent, provide `Payer.layerBridge` with a `Bridge` implementation instead of a

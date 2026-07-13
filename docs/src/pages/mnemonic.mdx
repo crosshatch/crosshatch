@@ -1,0 +1,72 @@
+# Mnemonic
+
+`Mnemonic` is the private phrase used by Crosshatch's built-in signer layers.
+Treat it as foundational key material: EIP-155 and Solana signing capability can
+both be derived from the same mnemonic.
+
+Both EIP-155 and Solana mnemonic signers consume the same `Mnemonic.Mnemonic`
+service:
+
+```ts
+import { Mnemonic } from "crosshatch"
+import { Eip155Signer } from "crosshatch/Eip155"
+import { SolanaSigner } from "crosshatch/Solana"
+import { Layer } from "effect"
+
+const SignersLive = Layer.mergeAll(
+  Eip155Signer.layerMnemonic,
+  SolanaSigner.layerMnemonic,
+).pipe(Layer.provide(Mnemonic.layerEnv))
+```
+
+## From Text
+
+Use `fromText` when you already have the phrase in memory.
+
+```ts
+import { Mnemonic } from "crosshatch"
+
+const mnemonic = Mnemonic.fromText(
+  "test test test test test test test test test test test junk",
+)
+```
+
+Use `layerText` to provide that phrase as the `Mnemonic` service.
+
+```ts
+const MnemonicLive = Mnemonic.layerText(
+  "test test test test test test test test test test test junk",
+)
+```
+
+## From Config
+
+Use `fromConfig` and `layerConfig` when the phrase comes from an Effect config
+source.
+
+```ts
+import { Config } from "effect"
+import { Mnemonic } from "crosshatch"
+
+const MnemonicLive = Mnemonic.layerConfig(Config.string("BUYER_MNEMONIC"))
+```
+
+The default environment variable helpers read `MNEMONIC`.
+
+```ts
+const mnemonic = yield * Mnemonic.env
+const MnemonicLive = Mnemonic.layerEnv
+```
+
+## Random Mnemonics
+
+`Mnemonic.random` creates a new random mnemonic. `Mnemonic.layerRandom` provides
+a fresh random mnemonic as a layer.
+
+```ts
+const mnemonic = yield * Mnemonic.random
+```
+
+Use random mnemonics for tests or disposable local flows. For real payer
+clients, persist the mnemonic securely and provide it with `layerEnv`,
+`layerConfig`, or your own layer.

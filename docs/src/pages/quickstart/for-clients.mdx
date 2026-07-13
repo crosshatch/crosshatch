@@ -7,123 +7,116 @@ description:
 
 # Client Quickstart
 
-Use this guide when your application needs to access paid x402 resources.
-
-Crosshatch helps clients read payment requirements, create payment payloads, and
-retry requests with the payment attached.
+Crosshatch lets clients call paid x402 services through normal HTTP clients.
+When a service returns `402 Payment Required`, Crosshatch creates the payment
+payload and retries the request with the payment attached.
 
 ## Stablecoin Setup
 
-> This step is only relevant if you do not already have a mnemonic and/or
-> stablecoin deposited in one of its derived chain-specific signers.
+To pay for x402 resources, your client needs a mnemonic from which funded
+signers can be derived.
 
-The following command will create a Crosshatch user profile (signing capability)
-and help you (optional) onramp some USD Coin on Base (the primary network of the
-initial x402 build-out).
+The mnemonic is the secret from which Crosshatch derives signing capability
+across supported networks. Any chain-specific signer used to authorize a payment
+ultimately comes from this phrase, so keep it private and make sure at least one
+derived signer has the stablecoin required by the resource you want to fetch.
 
-```sh
-crosshatch profile add
-```
+## Call a Paid AI Model
 
-> Your mnemonics are encrypted with a per-mnemonic X25519 private key, stored in
-> your system keychain via
-> [keyring-node](https://github.com/Brooooooklyn/keyring-node).
+Provide `Http402.layerClient` with a `Payer` layer, then use the client
+normally. For OpenAI-compatible x402 services like Blockrun, this works directly
+with Effect AI.
 
-If you already have a mnemonic with some corresponding funds, you can set it up
-like so.
+```ts
+import { OpenAiClient, OpenAiLanguageModel } from "@effect/ai-openai-compat"
+import { Http402 } from "crosshatch"
+import { Console, Effect, Layer } from "effect"
+import { LanguageModel } from "effect/unstable/ai"
 
-```sh
-crosshatch profile add --mnemonic <mnemonic>
-```
+import { PayerLive } from "./PayerLive.ts"
 
-## For Future Reference
+const BlockrunLive = OpenAiLanguageModel.layer({
+  model: "deepseek/deepseek-chat",
+}).pipe(
+  Layer.provide(OpenAiClient.layer({ apiUrl: "https://blockrun.ai/api/v1" })),
+)
 
-You can access the decrypted phrase using the `mnemonic show` subcommand.
-
-```sh
-crosshatch profile reveal-mnemonic
+LanguageModel.generateText({
+  prompt: "Hello from Crosshatch.",
+}).pipe(
+  Effect.tap(({ text }) => Console.log(text)),
+  Effect.provide(
+    BlockrunLive.pipe(
+      Layer.provide(Http402.layerClient.pipe(Layer.provide(PayerLive))),
+    ),
+  ),
+  Effect.runFork,
+)
 ```
 
 ## Fetch a Paid Resource
 
-Provide `Http402.layerClient` with a `Payer` layer. The HTTP client intercepts
-402 responses, asks the payer to create a payload, and retries with the payment
-attached.
+The same layer also works with ordinary Effect HTTP requests. If the first
+response is `402`, Crosshatch reads the payment requirement, asks `PayerLive`
+for a payload, and retries once with the payment header attached.
 
 ```ts
-import { Accept, Http402, KnownAssets, Mnemonic, Payer } from "crosshatch"
-import { Eip155Signer, Erc3009, Permit2 } from "crosshatch/Eip155"
+import { Http402 } from "crosshatch"
 import { Effect, Layer } from "effect"
 import { HttpClient, HttpClientRequest } from "effect/unstable/http"
 
+import { PayerLive } from "./PayerLive.ts"
+
 const program = Effect.gen(function* () {
   const client = yield* HttpClient.HttpClient
-  const { json } = yield* HttpClientRequest.post(
-    "https://blockrun.ai/api/v1/chat/completions",
-  ).pipe(
-    HttpClientRequest.acceptJson,
-    HttpClientRequest.bodyJsonUnsafe({
-      model: "openai/gpt-5.5",
-      messages: [{ role: "user", content: "Hello Crosshatch." }],
-    }),
-    client.execute,
-  )
-  return yield* json
-}).pipe(
-  Effect.provide([
-    Http402.layerClient,
-    Payer.layer,
-    Accept.layer(KnownAssets),
-    Layer.mergeAll(Erc3009.layer, Permit2.layer).pipe(
-      Layer.provide(Mnemonic.toLayerEnv(Eip155Signer)),
-    ),
-  ]),
-)
+  const response = yield* HttpClientRequest.get(
+    "https://example.com/paid",
+  ).pipe(client.execute)
+  return yield* response.text
+}).pipe(Effect.provide(Http402.layerClient.pipe(Layer.provide(PayerLive))))
 ```
 
-## Higher-level Clients
-
-The example above can be simplified via Effect AI.
+`PayerLive` wires the payer to supported assets and signers. The headless
+example includes EIP-155 and Solana support:
 
 ```ts
-import {
-  Accept,
-  Http402,
-  KnownAssets,
-  Mnemonic,
-  Payer,
-  LanguageModel402,
-} from "crosshatch"
+import { Accept, KnownAssets, Mnemonic, Payer } from "crosshatch"
 import { Eip155Signer, Erc3009, Permit2 } from "crosshatch/Eip155"
-import { Effect, Layer } from "effect"
-import { LanguageModel } from "effect/unstable/ai"
+import {
+  GetLatestBlockhash,
+  SolanaAdapter,
+  SolanaSigner,
+} from "crosshatch/Solana"
+import { Config, Layer } from "effect"
 
-const program = Effect.gen(function* () {
-  const model = yield* LanguageModel.LanguageModel
-  return yield* model.generateText({
-    prompt: "Hello Crosshatch.",
-  })
-}).pipe(
-  LanguageModel402.layer({
-    model: "openai/gpt-5.5",
-    url: "https://blockrun.ai/api/v1/chat/completions",
-  }).pipe(
-    Layer.provide([
-      Http402.layerClient,
-      Payer.layer,
-      Accept.layer(KnownAssets),
-      Layer.mergeAll(Erc3009.layer, Permit2.layer).pipe(
-        Layer.provide(Mnemonic.toLayerEnv(Eip155Signer)),
+export const PayerLive = Payer.layer.pipe(
+  Layer.provide(
+    Accept.layer(KnownAssets).pipe(
+      Layer.provide(
+        Layer.mergeAll(
+          Layer.mergeAll(Erc3009.layer, Permit2.layer).pipe(
+            Layer.provide(Eip155Signer.layerMnemonic),
+          ),
+          SolanaAdapter.layer.pipe(
+            Layer.provide([
+              SolanaSigner.layerMnemonic,
+              Config.string("SOLANA_RPC_URL").pipe(
+                Config.map(GetLatestBlockhash.layer),
+                Layer.unwrap,
+              ),
+            ]),
+          ),
+        ).pipe(Layer.provide(Mnemonic.layerEnv)),
       ),
-    ]),
+    ),
   ),
 )
 ```
 
-## Create a Payment Payload
+## Delegate Payment Creation
 
-When you need more control, drop down to the raw x402 spec and create a payment
-payload directly from payment requirements.
+When another agent should handle approval and signing, delegate payment creation
+through a `Bridge`.
 
 ```ts
 import { Bridge } from "crosshatch"

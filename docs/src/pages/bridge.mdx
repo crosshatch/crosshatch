@@ -23,6 +23,10 @@ const program = Effect.gen(function* () {
 `Bridge.propose` accepts a `Required` value and returns a signed `Payload`. When
 a trace is active, Crosshatch forwards the trace id to the bridge automatically.
 
+The bridge implementation owns the user approval and signing experience. It can
+open an extension popup, call a hosted wallet, route to a native app, or use any
+other mechanism that eventually returns a Crosshatch `Payload`.
+
 ## Use A Bridge As A Payer
 
 ```ts
@@ -41,3 +45,21 @@ const payerLayer = Payer.layerBridge.pipe(Layer.provide(BridgeLive))
 
 Use this when the code consuming paid resources should not directly hold signing
 keys.
+
+## Trace Context
+
+Bridges can opt into payment-approval tracing by implementing `createTrace`.
+Crosshatch calls it from `Bridge.traced` and passes the active trace id into
+`Bridge.propose`.
+
+```ts
+import { Bridge } from "crosshatch"
+
+const paidRequest = Bridge.traced("ai-completion")`
+| Ask the model to summarize the paid document.
+`(program)
+```
+
+Use `Bridge.traced` around work that may produce a payment prompt. The bridge
+can use the trace name, description, and id to show a better approval screen or
+to correlate wallet-side logs with the protected request.

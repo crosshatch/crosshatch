@@ -7,12 +7,8 @@ description:
 
 # Lifecycle
 
-x402 is not a single request pattern. It is a small set of composable atomic
-units that can be carried across any transport or service boundary.
-
-This page outlines the lifecycle of an x402 exchange in terms of those units:
-the payment requirement, the payment payload, and the facilitator service that
-verifies and/or settles payment.
+x402 exchanges move through three portable units: a payment requirement, a
+payment payload, and facilitator verification or settlement.
 
 ## Atomic Units
 
@@ -23,15 +19,8 @@ x402 composes three independent pieces:
   signed transfer authorization.
 - Facilitator service: the verification and settlement surface.
 
-These units are intentionally separable. A merchant can construct requirements
-without knowing which wallet or account a client will use. A client can create a
-payload after choosing one acceptable payment mechanism from the merchant's
-list. A facilitator can verify and/or settle the selected payload without owning
-the merchant's application flow.
-
-That separation is what makes x402 composable. The merchant describes a payable
-resource. The client decides how to pay. The facilitator checks the payment and
-interacts with the relevant low-level settlement infrastructure.
+The merchant describes a payable resource. The client decides how to pay. The
+facilitator checks the payment and connects it to settlement infrastructure.
 
 ## Payment Required
 
@@ -41,16 +30,9 @@ returns a payment required. This could describe payment for the one resource,
 multiple resources, a realtime session, a deposit... it's entirely up to the
 merchant when and how to require payment.
 
-The required acts like an invoice. It describes the resource, the accepted
-schemes, networks, assets, recipients, amounts, timeouts, and any chain-specific
-metadata needed to create a valid payment payload. A single requirement response
-can offer multiple acceptable ways to pay, allowing the client to select the
-option it can satisfy.
-
-The important property is that the requirement is data. It is not tied to HTTP,
-a browser wallet, or a particular runtime. It is the merchant's portable
-statement: "this resource can be delivered if one of these payment conditions is
-met."
+The requirement acts like an invoice. It describes the resource and the accepted
+ways to pay. A single requirement response can offer multiple options, allowing
+the client to select one it can satisfy.
 
 ## Payment Payload
 
@@ -58,10 +40,8 @@ After reading the payment required, the client chooses one acceptable payment
 mechanism and produces a payment payload.
 
 The payload is the client's response to the invoice. It references the accepted
-requirement entry and carries the concrete payment data for the selected scheme.
-In many stablecoin flows, that concrete data is a signed transfer authorization,
-such as an authorization that lets the recipient or facilitator execute a token
-transfer under the constraints described by the requirement.
+requirement entry and carries the concrete payment data for the selected scheme,
+often a signed transfer authorization.
 
 The payload may also carry extension data requested by the merchant. This lets
 the client submit the means of payment and the merchant-specific context needed
@@ -72,32 +52,16 @@ to interpret, trace, or replay the exchange as one coherent unit.
 The facilitator service verifies that a submitted payment payload satisfies the
 selected requirement and connects that verification step to settlement.
 
-Depending on the scheme, the facilitator may validate signatures, check
-expiration windows, ensure the selected asset and network match the requirement,
-prevent replay, submit a transfer, or confirm that settlement has already
-occurred. The merchant can then use the facilitator's result as the decision
-point for resource delivery.
-
-This keeps the merchant application focused on pricing, access control, and
-resource delivery while delegating payment verification and settlement mechanics
-to a service designed for that purpose.
+Depending on the scheme, the facilitator may validate signatures, check timeout
+windows, prevent replay, submit a transfer, or confirm that settlement has
+already occurred. The merchant uses that result to decide whether to deliver the
+resource.
 
 ## Transport Agnosticism
 
-x402 payloads are transport-agnostic. The protocol units do not require HTTP
-semantics even though HTTP `402 Payment Required` is the most obvious deployment
-shape.
-
-A merchant can require payment and a client can send a payment payload over
-HTTP, a socket, Bluetooth, an RPC session, a message queue, a local device
-channel, or any number of other transports. The transport only needs to carry
-the requirement from merchant to client and the payload from client back to
-merchant or facilitator.
-
-This means the lifecycle is the same whether the exchange looks like a `402`
-response followed by a retried HTTP request, a socket message followed by a
-signed reply, or a nearby-device interaction where the requirement and payload
-are exchanged without an HTTP server at all.
+x402 does not require HTTP even though HTTP `402 Payment Required` is the most
+obvious deployment shape. Any transport can carry the requirement from merchant
+to client and the payload back to the merchant or facilitator.
 
 ## Resource Delivery
 
@@ -105,8 +69,6 @@ The merchant can decide when to deliver the paid resource. It could for example
 fork a settlement fiber and eagerly deliver the resource. Or it could block on
 settlement, and only deliver the resource upon confirmation.
 
-Delivery may happen as the response to the retried request, as a socket message,
-as an out-of-band fulfillment event, or through any other channel the program
-uses. The delivery step is not what defines x402. The x402 lifecycle is the
-portable exchange of a requirement, a payload, and settlement verification that
-lets the merchant decide when delivery is authorized.
+Delivery may happen as the response to a retried HTTP request, as a socket
+message, as an out-of-band fulfillment event, or through any other channel the
+program uses.

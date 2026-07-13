@@ -21,6 +21,8 @@ const prompts = [
   },
 ] as const
 
+const MCP_URL = "https://crosshatch.dev/api/mcp"
+
 export const CodingAgentsButton = (props: {
   readonly merchantPrompt: string
   readonly effectAiClientPrompt: string
@@ -38,6 +40,12 @@ export const CodingAgentsButton = (props: {
   const onCopy = async (value: keyof typeof promptByValue) => {
     await navigator.clipboard.writeText(promptByValue[value])
     setCopied(value)
+    window.setTimeout(() => setCopied(undefined), 5000)
+  }
+
+  const onCopyMcpUrl = async () => {
+    await navigator.clipboard.writeText(MCP_URL)
+    setCopied("mcp")
     window.setTimeout(() => setCopied(undefined), 5000)
   }
 
@@ -69,8 +77,27 @@ export const CodingAgentsButton = (props: {
               <X />
             </button>
             <p className="crosshatch-code-kicker">Coding Agents</p>
-            <h2 id="crosshatch-agents-modal-title">Copy the right prompt</h2>
-            <p>Paste one of these integration-path-specific prompts into your coding agent.</p>
+            <h2 id="crosshatch-agents-modal-title">Give agents the right context</h2>
+            <p>Connect the Crosshatch docs MCP server, then paste one of these integration-specific prompts.</p>
+            <section className="crosshatch-agents-mcp" aria-labelledby="crosshatch-agents-mcp-title">
+              <div>
+                <h3 id="crosshatch-agents-mcp-title">Docs MCP server</h3>
+                <code className="px-0">{MCP_URL}</code>
+              </div>
+              <button type="button" onClick={onCopyMcpUrl}>
+                {copied === "mcp" ? (
+                  <>
+                    Copied
+                    <Check />
+                  </>
+                ) : (
+                  <>
+                    Copy URL
+                    <Copy />
+                  </>
+                )}
+              </button>
+            </section>
             <div className="crosshatch-agents-prompt-grid">
               {prompts.map((prompt) => (
                 <button

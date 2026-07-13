@@ -11,18 +11,53 @@ import { Accept, KnownAssets, Mnemonic, Payer } from "crosshatch"
 import { Eip155Signer, Erc3009, Permit2 } from "crosshatch/Eip155"
 import { Layer } from "effect"
 
-const payerLayer = Payer.layer.pipe(
+const PayerLive = Payer.layer.pipe(
   Layer.provide(
     Accept.layer(KnownAssets).pipe(
       Layer.provide(
         Layer.mergeAll(Erc3009.layer, Permit2.layer).pipe(
-          Layer.provide(Mnemonic.toLayerEnv(Eip155Signer)),
+          Layer.provide(
+            Eip155Signer.layerMnemonic.pipe(Layer.provide(Mnemonic.layerEnv)),
+          ),
         ),
       ),
     ),
   ),
 )
 ```
+
+## Requirement Selection
+
+`Accept` is the requirement-selection service used by `Payer.layer`.
+
+Given a `Required` invoice, it chooses one compatible entry from
+`required.accepts`, finds the matching physical asset deployment, and returns
+the adapter effect that can create the chain-specific payment payload.
+
+`Accept.layer(assets)` receives an asset config. `KnownAssets` is the default
+config for the assets Crosshatch ships. Provide it to `Payer.layer` together
+with the signing adapters your client supports.
+
+`Accept` compares the invoice's accepted payment options against the configured
+physical assets. A payment option is usable when its network and asset match a
+configured deployment, and one of that deployment's adapters is available in the
+current Effect context.
+
+Most applications do not call `Accept` directly. They provide `Accept.layer` to
+`Payer.layer`, then call `Payer.createPayload`.
+
+If no configured asset and adapter can satisfy the invoice, payment creation
+fails. This usually means the client does not support the merchant's requested
+asset, network, or payment scheme.
+
+## Extensions
+
+The built-in payer also answers registered client extensions. If the requirement
+contains extension requests and the client has provided matching
+`Extension.layerHandler` layers, their responses are encoded into
+`payload.extensions`.
+
+## Bridge Payer
 
 If payment creation should be delegated to another agent, provide
 `Payer.layerBridge` with a `Bridge` implementation. That keeps HTTP and

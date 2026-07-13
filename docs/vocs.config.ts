@@ -49,7 +49,6 @@ export default defineConfig({
               { text: "For Merchants", link: "/quickstart/for-merchants" },
             ],
           },
-          { text: "Background", link: "/background" },
           { text: "Lifecycle", link: "/lifecycle" },
         ],
       },
@@ -57,50 +56,30 @@ export default defineConfig({
         text: "Core Types",
         items: [
           { text: "Asset", link: "/asset" },
+          { text: "Mnemonic", link: "/mnemonic" },
           { text: "Required", link: "/required" },
           { text: "Payload", link: "/payload" },
           { text: "Extension", link: "/extension" },
         ],
       },
       {
-        text: "Clients",
+        text: "Payment Capability",
         items: [
           { text: "Bridge", link: "/bridge" },
-          { text: "Payer Service", link: "/payer" },
-          { text: "Fetch", link: "/fetch" },
-          { text: "Effect HTTP Client", link: "/effect-http-client" },
-          { text: "Effect AI", link: "/effect-ai" },
-          { text: "Effect Atom", link: "/effect-atom" },
-        ],
-      },
-      {
-        text: "Merchants",
-        items: [
-          { text: "Effect HTTP", link: "/effect-http" },
-          { text: "Effect RPC", link: "/effect-rpc" },
-          { text: "Effect Socket", link: "/effect-socket" },
-        ],
-      },
-      {
-        text: "Settlement",
-        items: [
-          { text: "Facilitation", link: "/facilitation" },
-          { text: "Immediate Settlement", link: "/immediate-settlement" },
-          { text: "Deposit | Rebate", link: "/deposit-rebate" },
-        ],
-      },
-      {
-        text: "Observability",
-        items: [
-          { text: "OpenTelemetry", link: "/otel" },
-          { text: "Payment Identifiers", link: "/payment-identifiers" },
+          { text: "Payer", link: "/payer" },
+          {
+            text: "Adapter",
+            link: "/adapter",
+            collapsed: true,
+            items: [
+              { text: "EIP-155", link: "/eip155" },
+              { text: "Solana", link: "/solana" },
+            ],
+          },
         ],
       },
     ],
-    "/articles": [
-      { link: "/articles", text: "All Articles" },
-      { link: "/articles/hello_crosshatch", text: "Hello Crosshatch" },
-    ],
+    "/articles": [{ link: "/articles", text: "All Articles" }],
   },
   socials: [
     { icon: "github", link: "https://github.com/crosshatch/crosshatch" },

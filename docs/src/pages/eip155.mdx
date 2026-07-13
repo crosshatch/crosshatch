@@ -1,0 +1,87 @@
+# EIP-155
+
+The `crosshatch/Eip155` module contains the EVM provider-specific schemas,
+signer, and payment adapters.
+
+```ts
+import {
+  Eip155Address,
+  Eip155Asset,
+  Eip155Signer,
+  Erc3009,
+  Permit2,
+} from "crosshatch/Eip155"
+```
+
+## Addresses And Assets
+
+EIP-155 deployments use EVM addresses for both recipients and ERC-20 assets.
+They live under the `eip155` namespace in a `PhysicalAsset`.
+
+```ts
+import { Config } from "effect"
+import { Eip155Address } from "crosshatch/Eip155"
+
+const payTo =
+  yield * Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
+```
+
+See [Assets](/asset) for asset configuration.
+
+## Signer
+
+The built-in mnemonic signer derives an EVM account from the configured
+Crosshatch mnemonic.
+
+```ts
+import { Mnemonic } from "crosshatch"
+import { Eip155Signer } from "crosshatch/Eip155"
+import { Layer } from "effect"
+
+const Eip155SignerLive = Eip155Signer.layerMnemonic.pipe(
+  Layer.provide(Mnemonic.layerEnv),
+)
+```
+
+See [Mnemonic](/mnemonic) for mnemonic sources.
+
+## EIP-3009
+
+`Erc3009.layer` provides the `Erc3009.Erc3009Adapter`. It creates a
+`TransferWithAuthorization` payload and signs EIP-712 typed data with the
+`Eip155Signer` service.
+
+```ts
+import { Eip155Signer, Erc3009 } from "crosshatch/Eip155"
+import { Layer } from "effect"
+
+const Erc3009Live = Erc3009.layer.pipe(
+  Layer.provide(Eip155Signer.layerMnemonic),
+)
+```
+
+Use this adapter for deployments that support EIP-3009 style transfer
+authorization.
+
+## Permit2
+
+`Permit2.layer` provides the `Permit2.Permit2Adapter`. It creates a Permit2
+witness transfer authorization and signs the corresponding EIP-712 typed data
+with the `Eip155Signer` service.
+
+```ts
+import { Eip155Signer, Permit2 } from "crosshatch/Eip155"
+import { Layer } from "effect"
+
+const Permit2Live = Permit2.layer.pipe(
+  Layer.provide(Eip155Signer.layerMnemonic),
+)
+```
+
+Use this adapter for deployments that settle through the exact Permit2 proxy.
+
+## Payer Composition
+
+Most EIP-155 clients provide both adapters and let `Accept.layer` choose the one
+matching the selected asset deployment. See [Payer Service](/payer) for the full
+composition.
