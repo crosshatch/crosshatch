@@ -165,9 +165,11 @@ const paidRoute = Effect.gen(function* () {
     return yield* Http402.require({ required })
   }
 
-  yield* Facilitator.settle({ payload })
+  const settlement = yield* Facilitator.settle({ payload })
 
-  return HttpServerResponse.text("The paid resource.")
+  return HttpServerResponse.text("The paid resource.").pipe(
+    Http402.addResponseHeader(settlement),
+  )
 })
 ```
 
