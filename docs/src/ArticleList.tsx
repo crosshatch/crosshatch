@@ -15,14 +15,12 @@ type Article = {
   readonly title: string
 }
 
-const modules = import.meta.glob<ArticleModule>("./pages/articles/*.mdx", {
-  eager: true,
-})
+const modules = import.meta.glob<ArticleModule>("./pages/articles/*.mdx", { eager: true })
 
 const articles = Object.entries(modules)
   .filter(([path]) => !path.endsWith("/index.mdx"))
   .map(([path, module]): Article => {
-    const slug = path.replace(/^\.\/pages\/articles\//, "").replace(/\.mdx$/, "")
+    const slug = path.replace(/^\.\/pages\/articles\//u, "").replace(/\.mdx$/u, "")
     const frontmatter = module.frontmatter ?? {}
 
     return {
@@ -32,7 +30,7 @@ const articles = Object.entries(modules)
       title: frontmatter.title ?? slug,
     }
   })
-  .sort((left, right) => right.date.localeCompare(left.date))
+  .toSorted((left, right) => right.date.localeCompare(left.date))
 
 export const ArticleList = () => {
   if (articles.length === 0) return <p>No articles have been published yet.</p>
