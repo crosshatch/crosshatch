@@ -7,6 +7,7 @@ export default defineConfig({
     title: "Crosshatch",
     repo: "crosshatch",
   }),
+  colorScheme: "dark",
   description: PackageJson.description,
   topNav: [
     {
