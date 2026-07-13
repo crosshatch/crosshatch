@@ -70,7 +70,7 @@ export const CodingAgentsButton = (props: {
             </button>
             <p className="crosshatch-code-kicker">Coding Agents</p>
             <h2 id="crosshatch-agents-modal-title">Copy the right prompt</h2>
-            <p>Paste one of these prompts into your agent so it starts with the right integration path.</p>
+            <p>Paste one of these integration-path-specific prompts into your coding agent.</p>
             <div className="crosshatch-agents-prompt-grid">
               {prompts.map((prompt) => (
                 <button

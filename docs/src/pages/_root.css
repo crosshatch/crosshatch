@@ -44,11 +44,11 @@ body:has(.crosshatch-landing) {
 }
 
 .crosshatch-hero-group h1 {
-  font-weight: 900;
+  font-weight: 500;
 }
 
 .crosshatch-hero-group p {
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .crosshatch-hero-buttons {
