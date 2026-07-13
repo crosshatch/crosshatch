@@ -8,6 +8,7 @@
   "dependencies": {
     "@effect/atom-react": "catalog:",
     "@types/react": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
     "alchemy": "catalog:",
     "crosshatch": "workspace:*",
     "effect": "catalog:",
@@ -20,6 +21,7 @@
     "react-medium-image-zoom": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
+    "vite": "catalog:",
     "vocs": "catalog:",
     "waku": "catalog:"
   }

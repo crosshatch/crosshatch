@@ -73,16 +73,16 @@ import {
 <div aria-hidden="true" className="crosshatch-section-separator" />
 
 <div className="crosshatch-code-sections">
-  <section className="crosshatch-code-section">
+  <section className="crosshatch-code-section crosshatch-code-section-reversed">
     <div className="crosshatch-code-copy">
-      <p className="crosshatch-code-kicker">AI Client</p>
-      <h2>Pay-per-call language models</h2>
+      <p className="crosshatch-code-kicker">HTTP Client</p>
+      <h2>Call merchant endpoints</h2>
       <p>
-        Route Effect AI requests through an x402-aware HTTP client, so model calls can be paid for directly at the
-        network boundary.
+        Use an Effect HTTP client with any x402 merchant endpoint to automatically respond to payment challenges and fetch paid
+        resources.
       </p>
-      <a className="crosshatch-code-link" href="/quickstart/for-clients">
-        <span>Read the client quickstart</span>
+      <a className="crosshatch-code-link" href="/quickstart/for-clients#fetch-a-paid-resource">
+        <span>Read the HTTP client quickstart</span>
         <span className="crosshatch-code-link-icon" aria-hidden="true">
           <ChevronRight />
         </span>
@@ -91,28 +91,21 @@ import {
     <div className="crosshatch-code-block">
 
 ```ts
-import { OpenAiClient, OpenAiLanguageModel } from "@effect/ai-openai-compat"
 import { Http402 } from "crosshatch"
 import { Console, Effect, Layer } from "effect"
-import { LanguageModel } from "effect/unstable/ai"
+import { HttpClient, HttpClientRequest } from "effect/unstable/http"
 
 import { PayerLive } from "./PayerLive.ts"
 
-const BlockrunLive = OpenAiLanguageModel.layer({
-  model: "deepseek/deepseek-chat",
+Effect.gen(function* () {
+  const client = yield* HttpClient.HttpClient
+  const response = yield* HttpClientRequest.get(
+    "https://merchant.example/paid",
+  ).pipe(client.execute)
+  const body = yield* response.text
+  yield* Console.log(body)
 }).pipe(
-  Layer.provide(OpenAiClient.layer({ apiUrl: "https://blockrun.ai/api/v1" })),
-)
-
-LanguageModel.generateText({
-  prompt: "Hello from Crosshatch.",
-}).pipe(
-  Effect.tap(({ text }) => Console.log(text)),
-  Effect.provide(
-    BlockrunLive.pipe(
-      Layer.provide(Http402.layerClient.pipe(Layer.provide(PayerLive))),
-    ),
-  ),
+  Effect.provide(Http402.layerClient.pipe(Layer.provide(PayerLive))),
   Effect.runFork,
 )
 ```
@@ -121,13 +114,13 @@ LanguageModel.generateText({
 
   </section>
 
-  <section className="crosshatch-code-section crosshatch-code-section-reversed">
+  <section className="crosshatch-code-section">
     <div className="crosshatch-code-copy">
-      <p className="crosshatch-code-kicker">Merchant Route</p>
+      <p className="crosshatch-code-kicker">Merchant HTTP Route</p>
       <h2>Require & settle payment</h2>
       <p>
-        Define accepted stablecoin requirements, return an x402 payment challenge, and settle the submitted payload before
-        serving the protected resource.
+        Accept stablecoin payments: require and settle x402 payments and
+        serve the protected resource as an Effect HTTP server response.
       </p>
       <a className="crosshatch-code-link" href="/quickstart/for-merchants#effect-http">
         <span>Read the merchant quickstart</span>
@@ -182,13 +175,60 @@ const router = HttpRouter.add(
 
   </section>
 
+  <section className="crosshatch-code-section crosshatch-code-section-reversed">
+    <div className="crosshatch-code-copy">
+      <p className="crosshatch-code-kicker">AI Client</p>
+      <h2>Pay-per-call language models</h2>
+      <p>
+        Route Effect AI requests through an x402-aware HTTP client, so model calls can be paid for directly at the
+        network boundary.
+      </p>
+      <a className="crosshatch-code-link" href="/quickstart/for-clients">
+        <span>Read the client quickstart</span>
+        <span className="crosshatch-code-link-icon" aria-hidden="true">
+          <ChevronRight />
+        </span>
+      </a>
+    </div>
+    <div className="crosshatch-code-block">
+
+```ts
+import { OpenAiClient, OpenAiLanguageModel } from "@effect/ai-openai-compat"
+import { Http402 } from "crosshatch"
+import { Console, Effect, Layer } from "effect"
+import { LanguageModel } from "effect/unstable/ai"
+
+import { PayerLive } from "./PayerLive.ts"
+
+const BlockrunLive = OpenAiLanguageModel.layer({
+  model: "deepseek/deepseek-chat",
+}).pipe(
+  Layer.provide(OpenAiClient.layer({ apiUrl: "https://blockrun.ai/api/v1" })),
+)
+
+LanguageModel.generateText({
+  prompt: "Hello from Crosshatch.",
+}).pipe(
+  Effect.tap(({ text }) => Console.log(text)),
+  Effect.provide(
+    BlockrunLive.pipe(
+      Layer.provide(Http402.layerClient.pipe(Layer.provide(PayerLive))),
+    ),
+  ),
+  Effect.runFork,
+)
+```
+
+    </div>
+
+  </section>
+
   <section className="crosshatch-code-section">
     <div className="crosshatch-code-copy">
       <p className="crosshatch-code-kicker">Payer Layer</p>
-      <h2>Chain-agnostic payment capability</h2>
+      <h2>Chain-agnostic payments</h2>
       <p>
-        Compose accepted assets, signing strategies, and mnemonic-backed keys into a reusable Effect layer for clients that
-        need to create payment payloads.
+        Compose accepted assets, signing strategies, and mnemonic-backed keys as Effect layers.
       </p>
       <a className="crosshatch-code-link" href="/payer">
         <span>Read the Payer docs</span>
