@@ -30,6 +30,7 @@ export const CodingAgentsButton = (props: {
 }) => {
   const [open, setOpen] = React.useState(false)
   const [copied, setCopied] = React.useState<string | undefined>()
+  const [modalTopOffset, setModalTopOffset] = React.useState(0)
 
   const promptByValue = {
     merchant: props.merchantPrompt,
@@ -49,6 +50,23 @@ export const CodingAgentsButton = (props: {
     window.setTimeout(() => setCopied(undefined), 5000)
   }
 
+  React.useLayoutEffect(() => {
+    if (!open) return
+
+    const updateModalTopOffset = () => {
+      const headerBottom = Array.from(document.querySelectorAll("[data-v-banner], [data-v-gutter-top]"))
+        .map((element) => element.getBoundingClientRect().bottom)
+        .reduce((max, bottom) => Math.max(max, bottom), 0)
+
+      setModalTopOffset(headerBottom)
+    }
+
+    updateModalTopOffset()
+    window.addEventListener("resize", updateModalTopOffset)
+
+    return () => window.removeEventListener("resize", updateModalTopOffset)
+  }, [open])
+
   return (
     <>
       <button
@@ -60,7 +78,12 @@ export const CodingAgentsButton = (props: {
         <Bot className="ml-2 size-4 stroke-1" />
       </button>
       {open ? (
-        <div className="crosshatch-agents-modal-backdrop" role="presentation" onClick={() => setOpen(false)}>
+        <div
+          className="crosshatch-agents-modal-backdrop"
+          role="presentation"
+          style={{ "--crosshatch-agents-modal-top-offset": `${modalTopOffset}px` } as React.CSSProperties}
+          onClick={() => setOpen(false)}
+        >
           <div
             aria-modal="true"
             className="crosshatch-agents-modal"

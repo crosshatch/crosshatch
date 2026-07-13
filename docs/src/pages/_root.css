@@ -115,6 +115,7 @@ body:has(.crosshatch-landing) {
   z-index: 100;
   display: grid;
   place-items: center;
+  overflow-y: auto;
   padding: 1rem;
   background: rgb(3 8 15 / 0.72);
   backdrop-filter: blur(10px);
@@ -123,6 +124,8 @@ body:has(.crosshatch-landing) {
 .crosshatch-agents-modal {
   position: relative;
   width: min(100%, 46rem);
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
   padding: 1.5rem;
   border: 1px solid rgb(86 215 255 / 0.22);
   border-radius: 1.25rem;
@@ -412,6 +415,27 @@ body:has(.crosshatch-landing) {
 }
 
 @media (width <= 860px) {
+  .crosshatch-hero-group h1 {
+    font-size: clamp(2.25rem, 10vw, 3.2rem);
+  }
+
+  .crosshatch-hero-group p {
+    font-size: 1rem;
+  }
+
+  .crosshatch-hero-buttons :is(a, button) {
+    font-size: 0.92rem;
+  }
+
+  .crosshatch-agents-modal-backdrop {
+    align-items: start;
+    inset: var(--crosshatch-agents-modal-top-offset, 0) 0 0;
+  }
+
+  .crosshatch-agents-modal {
+    max-height: calc(100dvh - var(--crosshatch-agents-modal-top-offset, 0) - 2rem);
+  }
+
   .crosshatch-code-section,
   .crosshatch-code-section-reversed {
     grid-template-columns: 1fr;
