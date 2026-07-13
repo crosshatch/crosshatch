@@ -20,7 +20,10 @@ export default Alchemy.Stack(
     })
     const { url } = yield* Cloudflare.Website.Vite("Docs", {
       ...base,
-      main: "src/waku.server.ts",
+      viteEnvironments: {
+        entry: "rsc",
+        children: ["ssr"],
+      },
       dev: {
         mode: "external",
         url: dev.url,
