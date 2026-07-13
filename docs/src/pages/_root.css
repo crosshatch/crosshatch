@@ -14,20 +14,185 @@ body:has(.crosshatch-landing) {
 .crosshatch-landing {
   position: relative;
   isolation: isolate;
+  min-height: 100vh;
 }
 
-.crosshatch-ascii-rain {
+.crosshatch-dot-pattern {
   position: absolute;
-  inset: 0;
-  overflow: hidden;
+  inset: 0 0 auto;
+  min-height: 100vh;
+  height: 100%;
   pointer-events: none;
   z-index: -1;
-  opacity: 0.62;
+  opacity: 0.72;
   mask-image: linear-gradient(to bottom, black 0%, black 58%, transparent 100%);
 }
 
-.crosshatch-ascii-rain canvas {
+.crosshatch-hero-group {
+  display: grid;
+  gap: 1.35rem;
+  justify-items: center;
+  padding: 2rem 0;
+}
+
+.crosshatch-hero-group [data-v-home-page-logo] {
+  margin-top: 2rem;
+}
+
+.crosshatch-hero-group [data-v-home-page-buttons] {
+  margin-bottom: 2rem;
+}
+
+.crosshatch-hero-buttons {
+  margin-top: 0.75rem;
+}
+
+.crosshatch-card-grid > * {
+  border-color: rgb(86 215 255 / 0.18) !important;
+}
+
+.crosshatch-section-separator {
+  width: 100%;
+  max-width: 80rem;
+  height: 1px;
+  margin-top: 1.25rem;
+  background: linear-gradient(90deg, transparent, rgb(86 215 255 / 0.28), transparent);
+}
+
+.crosshatch-code-sections {
+  display: grid;
+  gap: 3rem;
+  width: 100%;
+  max-width: 80rem;
+  margin-top: 1.25rem;
+  text-align: left;
+}
+
+.crosshatch-code-section {
+  display: grid;
+  grid-template-columns: minmax(0, 0.74fr) minmax(0, 1.26fr);
+  gap: 1.5rem;
+  align-items: center;
+  width: 100%;
+  padding: 1.25rem;
+  border: 1px solid rgb(86 215 255 / 0.18);
+  background: linear-gradient(135deg, rgb(255 255 255 / 0.045), rgb(255 255 255 / 0.018));
+  box-shadow: 0 24px 80px rgb(0 0 0 / 0.26);
+  backdrop-filter: blur(14px);
+}
+
+.crosshatch-code-section-reversed {
+  grid-template-columns: minmax(0, 1.26fr) minmax(0, 0.74fr);
+}
+
+.crosshatch-code-section-reversed .crosshatch-code-copy {
+  order: 2;
+}
+
+.crosshatch-code-copy {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  padding: 0.75rem;
+}
+
+.crosshatch-code-kicker {
+  margin: 0 0 1.5rem;
+  color: #7ddcff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.crosshatch-code-copy h2 {
+  margin: 0;
+  color: rgb(255 255 255 / 0.94);
+  font-size: clamp(2rem, 3.6vw, 2.9rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+}
+
+.crosshatch-code-copy p:not(.crosshatch-code-kicker) {
+  margin: 1rem 0 0;
+  color: rgb(255 255 255 / 0.62);
+  font-size: 1.12rem;
+  line-height: 1.75;
+}
+
+.crosshatch-code-link {
+  display: inline-grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 0.45rem;
+  width: fit-content;
+  margin-top: auto;
+  padding-top: 2rem;
+  color: #9ee7ff;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.crosshatch-code-link:hover {
+  color: white;
+}
+
+.crosshatch-code-link-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.08em;
+  height: 1.08em;
+}
+
+.crosshatch-code-link-icon svg {
   display: block;
+  width: 100%;
+  height: 100%;
+  stroke-width: 1.75;
+}
+
+.crosshatch-code-block {
+  margin: 0;
+  min-width: 0;
+}
+
+.crosshatch-code-block pre {
+  max-height: 30rem;
+  margin: 0 !important;
+  overflow: auto;
+  padding: 1.125rem 1.125rem 1.125rem 0.04rem;
+  border: 1px solid rgb(125 220 255 / 0.12);
+  color: rgb(226 244 255 / 0.86);
+  font-size: 0.88rem;
+  line-height: 1.62;
+}
+
+.crosshatch-code-block code {
+  font-family: var(--vocs-font-family-mono);
+}
+
+.crosshatch-footer {
+  width: 100%;
+  max-width: 80rem;
+  padding: 2rem 0 0;
+  color: rgb(255 255 255 / 0.42);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+@media (width <= 860px) {
+  .crosshatch-code-section,
+  .crosshatch-code-section-reversed {
+    grid-template-columns: 1fr;
+  }
+
+  .crosshatch-code-section-reversed .crosshatch-code-copy {
+    order: 0;
+  }
 }
 
 [data-v-logo-text]::before {

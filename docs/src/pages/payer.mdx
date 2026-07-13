@@ -1,9 +1,10 @@
 # Payer
 
-`Payer` is the service that turns a `Required` value into a signed x402 `Payload`.
+`Payer` is the service that turns a `Required` value into a signed x402
+`Payload`.
 
-Local clients usually provide it with `Payer.layer`, asset metadata for requirement selection, and the supported signing
-adapters:
+Local clients usually provide it with `Payer.layer`, asset metadata for
+requirement selection, and the supported signing adapters:
 
 ```ts
 import { Accept, KnownAssets, Mnemonic, Payer } from "crosshatch"
@@ -14,12 +15,16 @@ const payerLayer = Payer.layer.pipe(
   Layer.provide(
     Accept.layer(KnownAssets).pipe(
       Layer.provide(
-        Layer.mergeAll(Erc3009.layer, Permit2.layer).pipe(Layer.provide(Mnemonic.toLayerEnv(Eip155Signer))),
+        Layer.mergeAll(Erc3009.layer, Permit2.layer).pipe(
+          Layer.provide(Mnemonic.toLayerEnv(Eip155Signer)),
+        ),
       ),
     ),
   ),
 )
 ```
 
-If payment creation should be delegated to another agent, provide `Payer.layerBridge` with a `Bridge` implementation.
-That keeps HTTP and `Payload.make` integrations Payer-based while allowing signing and user approval to live elsewhere.
+If payment creation should be delegated to another agent, provide
+`Payer.layerBridge` with a `Bridge` implementation. That keeps HTTP and
+`Payload.make` integrations Payer-based while allowing signing and user approval
+to live elsewhere.

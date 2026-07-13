@@ -1,18 +1,20 @@
 ---
 title: OpenTelemetry
 description:
-  Trace x402 requirements, payment payload verification, settlement, and resource delivery in merchant systems.
+  Trace x402 requirements, payment payload verification, settlement, and
+  resource delivery in merchant systems.
 ---
 
 # OpenTelemetry
 
-OpenTelemetry lets merchants connect payment activity to the traces that already describe resource requests, background
-work, and settlement calls.
+OpenTelemetry lets merchants connect payment activity to the traces that already
+describe resource requests, background work, and settlement calls.
 
 ## Why Trace Payments
 
-Payments are part of the request lifecycle. When a paid resource fails, the useful debugging question is rarely just
-"did payment fail?" It is usually where the request moved through pricing, requirement creation, payload verification,
+Payments are part of the request lifecycle. When a paid resource fails, the
+useful debugging question is rarely just "did payment fail?" It is usually where
+the request moved through pricing, requirement creation, payload verification,
 facilitation, settlement, and resource delivery.
 
 Tracing those steps together makes it possible to answer questions like:
@@ -39,15 +41,18 @@ The merchant decides which x402 payment requirement applies.
 
 ### Emit A Requirement
 
-If payment is missing, the merchant returns `402 Payment Required` with the requirement.
+If payment is missing, the merchant returns `402 Payment Required` with the
+requirement.
 
 ### Verify The Payload
 
-The client retries with a payment payload. The merchant or facilitator verifies it.
+The client retries with a payment payload. The merchant or facilitator verifies
+it.
 
 ### Settle Or Record Usage
 
-The system settles immediately, records granular usage, or updates a deposit + rebate session.
+The system settles immediately, records granular usage, or updates a deposit +
+rebate session.
 
 ### Serve The Resource
 

@@ -1,13 +1,14 @@
 ---
 title: Effect HTTP
 description:
-  Protect Effect HTTP routes with Crosshatch's x402 middleware, payment-required responses, payment payload parsing, and
-  settlement.
+  Protect Effect HTTP routes with Crosshatch's x402 middleware, payment-required
+  responses, payment payload parsing, and settlement.
 ---
 
 # Effect HTTP
 
-Crosshatch includes a small Effect HTTP integration for the common merchant flow:
+Crosshatch includes a small Effect HTTP integration for the common merchant
+flow:
 
 - Parse an incoming payment payload from the request headers.
 - Make the parsed payload available as an Effect service.
@@ -18,24 +19,29 @@ Use this page when your merchant service is built with `effect/unstable/http`.
 
 ## Install The Middleware
 
-`Http402.layerMiddleware()` is an `HttpRouter` middleware. It reads `payment-signature`, decodes the base64-encoded x402
-payload, and provides it to the route as `Http402.ResolvedPayload`.
+`Http402.layerMiddleware()` is an `HttpRouter` middleware. It reads
+`payment-signature`, decodes the base64-encoded x402 payload, and provides it to
+the route as `Http402.ResolvedPayload`.
 
 ```ts
 import { Http402 } from "crosshatch"
 import { Layer } from "effect"
 import { HttpRouter } from "effect/unstable/http"
 
-const app = HttpRouter.empty.pipe(Layer.provide(Http402.layerMiddleware()), HttpRouter.toHttpEffect)
+const app = HttpRouter.empty.pipe(
+  Layer.provide(Http402.layerMiddleware()),
+  HttpRouter.toHttpEffect,
+)
 ```
 
-If the header is absent or cannot be decoded, the provided payload is `undefined`. Your route can then decide whether to
-return a payment requirement or continue with unpaid behavior.
+If the header is absent or cannot be decoded, the provided payload is
+`undefined`. Your route can then decide whether to return a payment requirement
+or continue with unpaid behavior.
 
 ## Protect A Route
 
-Inside the route, read the parsed payload service. If there is no payload, build a `Required` value and return
-`Http402.require({ required })`.
+Inside the route, read the parsed payload service. If there is no payload, build
+a `Required` value and return `Http402.require({ required })`.
 
 ```ts
 import { Config, Effect } from "effect"
@@ -53,7 +59,10 @@ const paidRoute = Effect.gen(function* () {
           amount: 0.01,
           recipients: {
             eip155: {
-              8453: yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155"),
+              8453: yield* Config.schema(
+                Eip155Address.Eip155Address,
+                "PAY_TO_EIP155",
+              ),
             },
           },
         }),
@@ -67,12 +76,14 @@ const paidRoute = Effect.gen(function* () {
 })
 ```
 
-`Http402.require` returns an empty HTTP response with the encoded requirement in the `payment-required` header. If a
-Crosshatch trace id is available, it also includes `x-crosshatch-trace-id`.
+`Http402.require` returns an empty HTTP response with the encoded requirement in
+the `payment-required` header. If a Crosshatch trace id is available, it also
+includes `x-crosshatch-trace-id`.
 
 ## Settle Before Delivery
 
-Most merchant routes should settle the payload before returning the paid resource.
+Most merchant routes should settle the payload before returning the paid
+resource.
 
 ```ts
 import { Facilitator, Http402 } from "crosshatch"
@@ -92,12 +103,14 @@ const paidRoute = Effect.gen(function* () {
 })
 ```
 
-`Facilitator.settle({ payload })` uses the configured facilitator client. It fails the route if the facilitator cannot
-settle the payment or returns an unsuccessful settlement result.
+`Facilitator.settle({ payload })` uses the configured facilitator client. It
+fails the route if the facilitator cannot settle the payment or returns an
+unsuccessful settlement result.
 
 ## Non-blocking Settlement
 
-To avoid blocking the resource delivery, you can fork a scope-bound fiber from the settlement effect.
+To avoid blocking the resource delivery, you can fork a scope-bound fiber from
+the settlement effect.
 
 ```ts
 import { Facilitator, Http402 } from "crosshatch"
@@ -119,8 +132,9 @@ const paidRoute = Effect.gen(function* () {
 
 ## Browser CORS
 
-Browser clients need access to the `payment-required` response header so they can read the invoice and retry with a
-payment payload. Crosshatch exports `Http402.EXPOSED_HEADERS` for the headers used by the HTTP integration.
+Browser clients need access to the `payment-required` response header so they
+can read the invoice and retry with a payment payload. Crosshatch exports
+`Http402.EXPOSED_HEADERS` for the headers used by the HTTP integration.
 
 ```ts
 import { Http402 } from "crosshatch"
@@ -141,4 +155,5 @@ const app = router.pipe(
 )
 ```
 
-Tighten `allowedOrigins`, `allowedMethods`, and `allowedHeaders` for production services.
+Tighten `allowedOrigins`, `allowedMethods`, and `allowedHeaders` for production
+services.

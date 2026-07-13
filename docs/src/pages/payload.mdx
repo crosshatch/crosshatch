@@ -1,10 +1,12 @@
 # Payload
 
-`Payload` is Crosshatch's utilities for working with the x402 `PaymentPayload` object.
+`Payload` is Crosshatch's utilities for working with the x402 `PaymentPayload`
+object.
 
-If `Required` is the invoice format of x402, `Payload` is the signed check. It is what a payer creates after reading a
-payment-required invoice and deciding how to pay it. The server or facilitator can then verify that signed check against
-the selected requirement and settle the payment.
+If `Required` is the invoice format of x402, `Payload` is the signed check. It
+is what a payer creates after reading a payment-required invoice and deciding
+how to pay it. The server or facilitator can then verify that signed check
+against the selected requirement and settle the payment.
 
 ## Shape
 
@@ -40,12 +42,14 @@ type Payload = {
 }
 ```
 
-The stable envelope says which invoice entry was accepted. The inner `payload` field is chain-specific. For EIP-155
-payments, for example, it may contain an EIP-3009 transfer authorization or a Permit2 authorization plus signature.
+The stable envelope says which invoice entry was accepted. The inner `payload`
+field is chain-specific. For EIP-155 payments, for example, it may contain an
+EIP-3009 transfer authorization or a Permit2 authorization plus signature.
 
 ## Making a Payload
 
-Use `Payload.make` when you have a `Required` invoice and want to construct the signed payment payload for it.
+Use `Payload.make` when you have a `Required` invoice and want to construct the
+signed payment payload for it.
 
 ```ts
 import { Config, Effect } from "effect"
@@ -59,7 +63,10 @@ const program = Effect.gen(function* () {
         amount: 0.01,
         recipients: {
           eip155: {
-            8453: yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155"),
+            8453: yield* Config.schema(
+              Eip155Address.Eip155Address,
+              "PAY_TO_EIP155",
+            ),
           },
         },
       }),
@@ -72,13 +79,15 @@ const program = Effect.gen(function* () {
 })
 ```
 
-`Payload.make({ required })` returns an Effect because creating a payment payload may need to select a supported
-requirement, read wallet configuration, sign typed data, and encode chain-specific payload fields.
+`Payload.make({ required })` returns an Effect because creating a payment
+payload may need to select a supported requirement, read wallet configuration,
+sign typed data, and encode chain-specific payload fields.
 
 ## The `Payer` Requirement
 
-`Payload.make` does not know which wallet, account, chain, or requirement-selection policy your application wants to
-use. Instead, calling it introduces a `Payer` service requirement into the Effect.
+`Payload.make` does not know which wallet, account, chain, or
+requirement-selection policy your application wants to use. Instead, calling it
+introduces a `Payer` service requirement into the Effect.
 
 ```ts
 import { Payer } from "crosshatch"
@@ -86,9 +95,10 @@ import { Payer } from "crosshatch"
 const { createPayload } = yield * Payer.Payer
 ```
 
-At runtime, the provided `Payer` decides which `required.accepts` entry to pay and how to produce the signed payload.
-For the built-in EIP-155 flow, the `Payer` uses the configured asset metadata to select a supported requirement, then
-asks the selected adapter to create the concrete payload.
+At runtime, the provided `Payer` decides which `required.accepts` entry to pay
+and how to produce the signed payload. For the built-in EIP-155 flow, the
+`Payer` uses the configured asset metadata to select a supported requirement,
+then asks the selected adapter to create the concrete payload.
 
 ```ts
 import { Accept, KnownAssets, Mnemonic, Payer } from "crosshatch"
@@ -99,7 +109,9 @@ const payerLayer = Payer.layer.pipe(
   Layer.provide(
     Accept.layer(KnownAssets).pipe(
       Layer.provide(
-        Layer.mergeAll(Erc3009.layer, Permit2.layer).pipe(Layer.provide(Mnemonic.toLayerEnv(Eip155Signer))),
+        Layer.mergeAll(Erc3009.layer, Permit2.layer).pipe(
+          Layer.provide(Mnemonic.toLayerEnv(Eip155Signer)),
+        ),
       ),
     ),
   ),
@@ -108,7 +120,9 @@ const payerLayer = Payer.layer.pipe(
 const runnable = program.pipe(Effect.provide(payerLayer))
 ```
 
-This section is only concerned with `Payload.make`; the payer and bridge services are covered later.
+This section is only concerned with `Payload.make`; the payer and bridge
+services are covered later.
 
-To delegate payload creation to an external wallet, browser extension, or other agent, provide `Payer.layerBridge` with
-a `Bridge` implementation instead of a local signing chain.
+To delegate payload creation to an external wallet, browser extension, or other
+agent, provide `Payer.layerBridge` with a `Bridge` implementation instead of a
+local signing chain.

@@ -12,14 +12,16 @@ import { Brand } from "effect"
 type Asset = string & Brand.Brand<"Asset">
 ```
 
-On an EIP-155 chain, an `Asset` is typically the token contract address, represented by a more specific branded schema
-such as `Eip155Asset`. It answers the narrow question: "which onchain asset identifier is this?"
+On an EIP-155 chain, an `Asset` is typically the token contract address,
+represented by a more specific branded schema such as `Eip155Asset`. It answers
+the narrow question: "which onchain asset identifier is this?"
 
 ## `PhysicalAsset`
 
-`PhysicalAsset` is the deployed asset metadata. It wraps one or more chain-specific `Asset` identifiers with the
-information needed to use them: symbol, peg, network namespace, chain id, decimals, name, version, and the supported
-payment adapters for that deployment.
+`PhysicalAsset` is the deployed asset metadata. It wraps one or more
+chain-specific `Asset` identifiers with the information needed to use them:
+symbol, peg, network namespace, chain id, decimals, name, version, and the
+supported payment adapters for that deployment.
 
 ```ts
 interface PhysicalAsset {
@@ -39,14 +41,16 @@ interface Deployment {
 
 ## Why "Physical?"
 
-An asset is rarely just one identifier. The same logical asset, such as USDC, can exist as different token contracts on
-different networks. Each deployment has its own chain id, address, decimals, name, symbol, version, and chain-specific
-payment implementation.
+An asset is rarely just one identifier. The same logical asset, such as USDC,
+can exist as different token contracts on different networks. Each deployment
+has its own chain id, address, decimals, name, symbol, version, and
+chain-specific payment implementation.
 
 ## Physical Asset
 
-A `PhysicalAsset` describes one logical asset across its concrete deployments. It maps from a network namespace to a
-chain id to the metadata Crosshatch needs to build and validate payments on that chain.
+A `PhysicalAsset` describes one logical asset across its concrete deployments.
+It maps from a network namespace to a chain id to the metadata Crosshatch needs
+to build and validate payments on that chain.
 
 ```ts
 import { Asset } from "crosshatch"
@@ -56,17 +60,22 @@ type Reference = string
 type PhysicalAsset = {
   symbol: string
   peg: string
-  deployments: Record<Namespace, Record<Reference, Asset.PhysicalAssetDeployment>>
+  deployments: Record<
+    Namespace,
+    Record<Reference, Asset.PhysicalAssetDeployment>
+  >
 }
 ```
 
-For EIP-155 assets, the network namespace is `eip155`, and each namespace's references map to an ERC-20 deployment. This
-lets application code talk about a single asset, while Crosshatch still preserves the exact physical deployment needed
-for Base, Polygon, Arbitrum, or any other supported network.
+For EIP-155 assets, the network namespace is `eip155`, and each namespace's
+references map to an ERC-20 deployment. This lets application code talk about a
+single asset, while Crosshatch still preserves the exact physical deployment
+needed for Base, Polygon, Arbitrum, or any other supported network.
 
 ## Known Assets
 
-Crosshatch ships known asset definitions. These are ready-to-use `PhysicalAsset` values for common tokens.
+Crosshatch ships known asset definitions. These are ready-to-use `PhysicalAsset`
+values for common tokens.
 
 ```ts
 import { KnownAssets } from "crosshatch"
@@ -74,8 +83,8 @@ import { KnownAssets } from "crosshatch"
 const { USDC, USDCE, USDT0 } = KnownAssets
 ```
 
-Each export is a `PhysicalAsset`. For example, `USDC` contains multiple EIP-155 deployments under the `eip155`
-namespace:
+Each export is a `PhysicalAsset`. For example, `USDC` contains multiple EIP-155
+deployments under the `eip155` namespace:
 
 ```ts
 import { KnownAssets } from "crosshatch"
@@ -84,16 +93,17 @@ const baseUsdc = KnownAssets.USDC.deployments.eip155[8453]
 const polygonUsdc = KnownAssets.USDC.deployments.eip155[137]
 ```
 
-Those two values refer to different physical token contracts, but they are grouped under the same logical Crosshatch
-asset definition.
+Those two values refer to different physical token contracts, but they are
+grouped under the same logical Crosshatch asset definition.
 
-Known assets are useful when your application accepts a standard token and wants Crosshatch to supply the deployment
-details. They also serve as examples for custom asset definitions.
+Known assets are useful when your application accepts a standard token and wants
+Crosshatch to supply the deployment details. They also serve as examples for
+custom asset definitions.
 
 ## Custom Assets
 
-To represent your own asset, create an object with the same namespace and chain-id structure, then check it with
-`satisfies Asset.PhysicalAsset`.
+To represent your own asset, create an object with the same namespace and
+chain-id structure, then check it with `satisfies Asset.PhysicalAsset`.
 
 For an EIP-155 ERC-20 token:
 
@@ -107,7 +117,9 @@ export const MY_TOKEN = {
   deployments: {
     eip155: {
       8453: {
-        asset: Eip155Asset.Eip155Asset.make("0x0000000000000000000000000000000000000000"),
+        asset: Eip155Asset.Eip155Asset.make(
+          "0x0000000000000000000000000000000000000000",
+        ),
         decimals: 18,
         name: "My Token",
         version: "1",
@@ -118,8 +130,8 @@ export const MY_TOKEN = {
 } as const satisfies Asset.PhysicalAsset
 ```
 
-Add one entry per supported deployment. If the same logical token is deployed on Base and Arbitrum, both deployments can
-live under the same `PhysicalAsset`:
+Add one entry per supported deployment. If the same logical token is deployed on
+Base and Arbitrum, both deployments can live under the same `PhysicalAsset`:
 
 ```ts
 export const MY_TOKEN = {
@@ -128,14 +140,18 @@ export const MY_TOKEN = {
   deployments: {
     eip155: {
       8453: {
-        asset: Eip155Asset.Eip155Asset.make("0x0000000000000000000000000000000000000000"),
+        asset: Eip155Asset.Eip155Asset.make(
+          "0x0000000000000000000000000000000000000000",
+        ),
         decimals: 18,
         name: "My Token",
         version: "1",
         adapters: [Erc3009.Erc3009Adapter, Permit2.Permit2Adapter],
       },
       42161: {
-        asset: Eip155Asset.Eip155Asset.make("0x1111111111111111111111111111111111111111"),
+        asset: Eip155Asset.Eip155Asset.make(
+          "0x1111111111111111111111111111111111111111",
+        ),
         decimals: 18,
         name: "My Token",
         version: "1",
@@ -146,6 +162,8 @@ export const MY_TOKEN = {
 } as const satisfies Asset.PhysicalAsset
 ```
 
-Use a separate `PhysicalAsset` when deployments should not be treated as the same logical asset. Native USDC and bridged
-USDC.e are a good example: they may share similar names and denominations, but they have different issuance, backing,
-and bridge-risk properties. Modeling them separately keeps those differences visible to payment code.
+Use a separate `PhysicalAsset` when deployments should not be treated as the
+same logical asset. Native USDC and bridged USDC.e are a good example: they may
+share similar names and denominations, but they have different issuance,
+backing, and bridge-risk properties. Modeling them separately keeps those
+differences visible to payment code.

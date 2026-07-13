@@ -7,54 +7,196 @@ showLogo: false
 ---
 
 import { Card, HomePage } from "vocs"
-import { Bot, UserRound } from "lucide-react"
-import { AsciiRainBackground } from "../AsciiRainBackground"
+import { Bot, ChevronRight, Github, UserRound } from "lucide-react"
+import { DotPattern } from "../DotPattern"
 import { CopyPromptButton } from "../CopyPromptButton"
 import { PROMPT } from "../PROMPT"
 
 <HomePage.Root className="crosshatch-landing">
 
-<AsciiRainBackground />
+<DotPattern
+  className="crosshatch-dot-pattern"
+  baseColor="#31445f"
+  glowColor="#56d7ff"
+  gap={28}
+  proximity={150}
+/>
+
+<div className="crosshatch-hero-group">
 
 <HomePage.Logo />
 
 <HomePage.Tagline>Effect-native x402 Clients & Merchants</HomePage.Tagline>
 
 <HomePage.Description>
-  Crosshatch is an Effect stablecoin payments toolkit: Effect x402 and CAIP schemas, payment required + payload
-  builders, Effect Integrations (HTTP/RPC/AI/Atom), and cross-network stablecoin interop.
+  Crosshatch is an Effect toolkit for requiring and accepting payment through
+  x402. The micropayment revolution is underway.
 </HomePage.Description>
 
-<HomePage.Buttons>
+<HomePage.Buttons className="crosshatch-hero-buttons">
+  <HomePage.Button href="https://github.com/crosshatch/crosshatch">
+    GitHub
+    <Github className="ml-2 size-4 stroke-1" />
+  </HomePage.Button>
   <CopyPromptButton prompt={PROMPT}>
-    For Coding Agents
+    Coding Agents
     <Bot className="ml-2 size-4 stroke-1" />
   </CopyPromptButton>
   <HomePage.Button href="/quickstart" variant="accent">
-    For Humans
+    Quickstart
     <UserRound className="ml-2 size-4 stroke-1" />
   </HomePage.Button>
 </HomePage.Buttons>
 
-<div className="vocs:grid vocs:w-full vocs:max-w-7xl vocs:grid-cols-1 vocs:gap-4 vocs:text-left vocs:md:grid-cols-2 vocs:lg:grid-cols-3">
-  <Card title="Effect Schemas" description="Schemas for x402, CAIP identifiers and cross-chain asset deployments." />
+</div>
+
+<div className="crosshatch-card-grid vocs:grid w-full vocs:max-w-7xl grid-cols-1 vocs:gap-4 vocs:text-left vocs:md:grid-cols-2 md:grid-cols-3">
   <Card
-    title="Require Payment"
-    description="Declare what a resource costs, which assets and chains are accepted and who gets paid."
-  />
-  <Card title="Payload Creation" description="Create x402 payment payloads for supported chain architectures." />
-  <Card
-    title="Realtime streaming payments through Effect RPC."
-    description="Use x402 payment requirements and payloads to exchange value during Effect RPC sessions."
-  />
-  <Card
-    title="Experiment with micropayments"
-    description="x402 micropayments may enable entirely new application categories."
+    title="Pay and be paid through x402."
+    description="Create chain-agnostic x402 payment requirements and payloads, settled instantly on public blockchains."
   />
   <Card
     title="Stablecoin Interop"
     description="Work with known stablecoins through one payment model across supported networks."
   />
+  <Card
+    title="Realtime micropayments."
+    description="Encode multi-actor systems with granular realtime micropayments."
+  />
 </div>
+
+<div aria-hidden="true" className="crosshatch-section-separator" />
+
+<div className="crosshatch-code-sections">
+  <section className="crosshatch-code-section">
+    <div className="crosshatch-code-copy">
+      <p className="crosshatch-code-kicker">AI Client</p>
+      <h2>Pay-per-call language models</h2>
+      <p>
+        Route Effect AI requests through an x402-aware HTTP client, so model calls can be paid for directly at the
+        network boundary.
+      </p>
+      <a className="crosshatch-code-link" href="/effect-ai">
+        <span>Read the Effect AI docs</span>
+        <span className="crosshatch-code-link-icon" aria-hidden="true">
+          <ChevronRight />
+        </span>
+      </a>
+    </div>
+    <div className="crosshatch-code-block">
+
+```ts
+const BlockrunLive = OpenAiLanguageModel.layer({
+  model: "deepseek/deepseek-chat",
+}).pipe(
+  Layer.provide(OpenAiClient.layer({ apiUrl: "https://blockrun.ai/api/v1" })),
+)
+
+LanguageModel.generateText({
+  prompt: "Hello from Crosshatch.",
+}).pipe(
+  Effect.tap(({ text }) => Console.log(text)),
+  Effect.provide(
+    BlockrunLive.pipe(
+      Layer.provide(Http402.layerClient.pipe(Layer.provide(PayerLive))),
+    ),
+  ),
+  Effect.runFork,
+)
+```
+
+    </div>
+
+  </section>
+
+  <section className="crosshatch-code-section crosshatch-code-section-reversed">
+    <div className="crosshatch-code-copy">
+      <p className="crosshatch-code-kicker">Merchant Route</p>
+      <h2>Require payment, then settle</h2>
+      <p>
+        Define accepted stablecoin requirements, return an x402 payment challenge, and settle the submitted payload before
+        serving the protected resource.
+      </p>
+      <a className="crosshatch-code-link" href="/effect-http">
+        <span>Read the Effect HTTP docs</span>
+        <span className="crosshatch-code-link-icon" aria-hidden="true">
+          <ChevronRight />
+        </span>
+      </a>
+    </div>
+    <div className="crosshatch-code-block">
+
+```ts
+const recipient = Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
+
+const routeEffect = Effect.gen(function* () {
+  const payload = yield* Payload.Payload
+  if (!payload) {
+    const required = yield* Required.make`Description of the charge here.`.pipe(
+      Required.accept(
+        Requirements.asset(KnownAssets.USDC, {
+          amount: 0.01,
+          recipients: { eip155: { 8453: yield* recipient } },
+        }),
+      ),
+    )
+    return yield* Http402.require({ required })
+  }
+  const settlement = yield* Facilitator.settle({ payload })
+  return HttpServerResponse.text("The paid resource.").pipe(
+    Http402.addResponseHeader(settlement),
+  )
+})
+```
+
+    </div>
+
+  </section>
+
+  <section className="crosshatch-code-section">
+    <div className="crosshatch-code-copy">
+      <p className="crosshatch-code-kicker">Payer Layer</p>
+      <h2>Chain-agnostic payment capability</h2>
+      <p>
+        Compose accepted assets, signing strategies, and mnemonic-backed keys into a reusable Effect layer for clients that
+        need to create payment payloads.
+      </p>
+      <a className="crosshatch-code-link" href="/payer">
+        <span>Read the Payer docs</span>
+        <span className="crosshatch-code-link-icon" aria-hidden="true">
+          <ChevronRight />
+        </span>
+      </a>
+    </div>
+    <div className="crosshatch-code-block">
+
+```ts
+import { Accept, KnownAssets, Mnemonic, Payer } from "crosshatch"
+import { Erc3009, Eip155Signer, Permit2 } from "crosshatch/Eip155"
+import { Layer } from "effect"
+
+export const PayerLive = Payer.layer.pipe(
+  Layer.provide(
+    Accept.layer(KnownAssets).pipe(
+      Layer.provide(
+        Layer.mergeAll(Erc3009.layer, Permit2.layer).pipe(
+          Layer.provide(
+            Eip155Signer.layerMnemonic.pipe(Layer.provide(Mnemonic.layerEnv)),
+          ),
+        ),
+      ),
+    ),
+  ),
+)
+```
+
+    </div>
+
+  </section>
+</div>
+
+<footer className="crosshatch-footer">
+  Copyright 2026 Crosshatch Labs Inc.
+</footer>
 
 </HomePage.Root>

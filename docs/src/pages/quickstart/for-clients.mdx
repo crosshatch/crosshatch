@@ -1,31 +1,36 @@
 ---
 title: Client Quickstart
-description: Use Crosshatch to consume paid x402 services from a client or buyer application.
+description:
+  Use Crosshatch to consume paid x402 services from a client or buyer
+  application.
 ---
 
 # Client Quickstart
 
 Use this guide when your application needs to access paid x402 resources.
 
-Crosshatch helps clients read payment requirements, create payment payloads, and retry requests with the payment
-attached.
+Crosshatch helps clients read payment requirements, create payment payloads, and
+retry requests with the payment attached.
 
 ## Stablecoin Setup
 
-> This step is only relevant if you do not already have a mnemonic and/or stablecoin deposited in one of its derived
-> chain-specific signers.
+> This step is only relevant if you do not already have a mnemonic and/or
+> stablecoin deposited in one of its derived chain-specific signers.
 
-The following command will create a Crosshatch user profile (signing capability) and help you (optional) onramp some USD
-Coin on Base (the primary network of the initial x402 build-out).
+The following command will create a Crosshatch user profile (signing capability)
+and help you (optional) onramp some USD Coin on Base (the primary network of the
+initial x402 build-out).
 
 ```sh
 crosshatch profile add
 ```
 
-> Your mnemonics are encrypted with a per-mnemonic X25519 private key, stored in your system keychain via
+> Your mnemonics are encrypted with a per-mnemonic X25519 private key, stored in
+> your system keychain via
 > [keyring-node](https://github.com/Brooooooklyn/keyring-node).
 
-If you already have a mnemonic with some corresponding funds, you can set it up like so.
+If you already have a mnemonic with some corresponding funds, you can set it up
+like so.
 
 ```sh
 crosshatch profile add --mnemonic <mnemonic>
@@ -41,8 +46,9 @@ crosshatch profile reveal-mnemonic
 
 ## Fetch a Paid Resource
 
-Provide `Http402.layerClient` with a `Payer` layer. The HTTP client intercepts 402 responses, asks the payer to create a
-payload, and retries with the payment attached.
+Provide `Http402.layerClient` with a `Payer` layer. The HTTP client intercepts
+402 responses, asks the payer to create a payload, and retries with the payment
+attached.
 
 ```ts
 import { Accept, Http402, KnownAssets, Mnemonic, Payer } from "crosshatch"
@@ -52,7 +58,9 @@ import { HttpClient, HttpClientRequest } from "effect/unstable/http"
 
 const program = Effect.gen(function* () {
   const client = yield* HttpClient.HttpClient
-  const { json } = yield* HttpClientRequest.post("https://blockrun.ai/api/v1/chat/completions").pipe(
+  const { json } = yield* HttpClientRequest.post(
+    "https://blockrun.ai/api/v1/chat/completions",
+  ).pipe(
     HttpClientRequest.acceptJson,
     HttpClientRequest.bodyJsonUnsafe({
       model: "openai/gpt-5.5",
@@ -66,7 +74,9 @@ const program = Effect.gen(function* () {
     Http402.layerClient,
     Payer.layer,
     Accept.layer(KnownAssets),
-    Layer.mergeAll(Erc3009.layer, Permit2.layer).pipe(Layer.provide(Mnemonic.toLayerEnv(Eip155Signer))),
+    Layer.mergeAll(Erc3009.layer, Permit2.layer).pipe(
+      Layer.provide(Mnemonic.toLayerEnv(Eip155Signer)),
+    ),
   ]),
 )
 ```
@@ -76,7 +86,14 @@ const program = Effect.gen(function* () {
 The example above can be simplified via Effect AI.
 
 ```ts
-import { Accept, Http402, KnownAssets, Mnemonic, Payer, LanguageModel402 } from "crosshatch"
+import {
+  Accept,
+  Http402,
+  KnownAssets,
+  Mnemonic,
+  Payer,
+  LanguageModel402,
+} from "crosshatch"
 import { Eip155Signer, Erc3009, Permit2 } from "crosshatch/Eip155"
 import { Effect, Layer } from "effect"
 import { LanguageModel } from "effect/unstable/ai"
@@ -95,7 +112,9 @@ const program = Effect.gen(function* () {
       Http402.layerClient,
       Payer.layer,
       Accept.layer(KnownAssets),
-      Layer.mergeAll(Erc3009.layer, Permit2.layer).pipe(Layer.provide(Mnemonic.toLayerEnv(Eip155Signer))),
+      Layer.mergeAll(Erc3009.layer, Permit2.layer).pipe(
+        Layer.provide(Mnemonic.toLayerEnv(Eip155Signer)),
+      ),
     ]),
   ),
 )
@@ -103,8 +122,8 @@ const program = Effect.gen(function* () {
 
 ## Create a Payment Payload
 
-When you need more control, drop down to the raw x402 spec and create a payment payload directly from payment
-requirements.
+When you need more control, drop down to the raw x402 spec and create a payment
+payload directly from payment requirements.
 
 ```ts
 import { Bridge } from "crosshatch"

@@ -58,7 +58,6 @@ catalog:
   "@vitest/web-worker": ^4.1.10
   alchemy: https://pkg.ing/alchemy/bec01fd
   "@effect/tsgo": 0.16.0
-  asciify-engine: ^1.0.118
   babel-plugin-react-compiler: ^1.0.0
   class-variance-authority: ^0.7.1
   clsx: ^2.1.1
