@@ -208,7 +208,7 @@ export const DotPattern = ({
     <div
       ref={containerRef}
       className={cn("crosshatch-dot-pattern-root", className)}
-      style={{ backgroundColor: "#0a0a0a", inset: 0, overflow: "hidden", position: "absolute" }}
+      style={{ backgroundColor: "var(--crosshatch-dot-bg)", inset: 0, overflow: "hidden", position: "absolute" }}
     >
       <canvas
         ref={canvasRef}
@@ -216,7 +216,7 @@ export const DotPattern = ({
       />
       <div
         style={{
-          background: "radial-gradient(ellipse at center, transparent 0%, transparent 40%, rgba(10,10,10,0.6) 100%)",
+          background: "var(--crosshatch-dot-vignette)",
           inset: 0,
           pointerEvents: "none",
           position: "absolute",
@@ -224,9 +224,9 @@ export const DotPattern = ({
       />
       <div
         style={{
-          border: "2px solid rgb(86 215 255 / 0.22)",
+          border: "2px solid var(--crosshatch-dot-border)",
           borderRadius: "28px",
-          boxShadow: "0 0 32px rgb(86 215 255 / 0.18), inset 0 0 32px rgb(86 215 255 / 0.08)",
+          boxShadow: "var(--crosshatch-dot-shadow)",
           filter: "blur(0.3px)",
           inset: 0,
           pointerEvents: "none",

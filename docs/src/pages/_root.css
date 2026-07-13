@@ -2,13 +2,67 @@
 
 body:has(.crosshatch-landing) {
   --vocs-spacing-content: 80rem;
+  --crosshatch-landing-bg:
+    radial-gradient(circle at 50% 0%, rgb(107 79 255 / 0.18), transparent 34rem),
+    radial-gradient(circle at 18% 18%, rgb(86 215 255 / 0.18), transparent 30rem),
+    radial-gradient(circle at 82% 12%, rgb(123 92 255 / 0.14), transparent 34rem),
+    linear-gradient(180deg, #fbfdff 0%, #f4f8fb 48%, #ffffff 100%);
+  --crosshatch-dot-bg: #f7fbff;
+  --crosshatch-dot-vignette: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 46%,
+    rgb(247 251 255 / 0.7) 100%
+  );
+  --crosshatch-dot-border: rgb(20 132 180 / 0.2);
+  --crosshatch-dot-shadow: 0 0 32px rgb(86 215 255 / 0.12), inset 0 0 32px rgb(86 215 255 / 0.06);
+  --crosshatch-panel-border: rgb(20 132 180 / 0.18);
+  --crosshatch-panel-bg: linear-gradient(135deg, rgb(255 255 255 / 0.86), rgb(240 248 252 / 0.72));
+  --crosshatch-panel-shadow: 0 24px 80px rgb(12 32 48 / 0.12);
+  --crosshatch-heading: rgb(9 18 29 / 0.94);
+  --crosshatch-body: rgb(24 40 56 / 0.72);
+  --crosshatch-muted: rgb(24 40 56 / 0.5);
+  --crosshatch-link: #087ea4;
+  --crosshatch-link-hover: #062f47;
+  --crosshatch-kicker: #087ea4;
+  --crosshatch-separator: linear-gradient(90deg, transparent, rgb(20 132 180 / 0.24), transparent);
+  --crosshatch-code-border: rgb(20 132 180 / 0.16);
+  --crosshatch-code-text: rgb(14 34 52 / 0.88);
+  --crosshatch-footer: rgb(24 40 56 / 0.42);
 
-  background:
+  background: var(--crosshatch-landing-bg);
+  background-attachment: fixed;
+}
+
+:root.dark body:has(.crosshatch-landing),
+:root[data-vocs-theme="dark"] body:has(.crosshatch-landing) {
+  --crosshatch-landing-bg:
     radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.13), transparent 34rem),
     radial-gradient(circle at 18% 18%, rgb(80 180 255 / 0.2), transparent 30rem),
     radial-gradient(circle at 82% 12%, rgb(120 90 255 / 0.2), transparent 34rem),
     linear-gradient(180deg, #08111f 0%, #070b14 46%, #05070c 100%);
-  background-attachment: fixed;
+  --crosshatch-dot-bg: #0a0a0a;
+  --crosshatch-dot-vignette: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 40%,
+    rgb(10 10 10 / 0.6) 100%
+  );
+  --crosshatch-dot-border: rgb(86 215 255 / 0.22);
+  --crosshatch-dot-shadow: 0 0 32px rgb(86 215 255 / 0.18), inset 0 0 32px rgb(86 215 255 / 0.08);
+  --crosshatch-panel-border: rgb(86 215 255 / 0.18);
+  --crosshatch-panel-bg: linear-gradient(135deg, rgb(255 255 255 / 0.045), rgb(255 255 255 / 0.018));
+  --crosshatch-panel-shadow: 0 24px 80px rgb(0 0 0 / 0.26);
+  --crosshatch-heading: rgb(255 255 255 / 0.94);
+  --crosshatch-body: rgb(255 255 255 / 0.62);
+  --crosshatch-muted: rgb(255 255 255 / 0.42);
+  --crosshatch-link: #9ee7ff;
+  --crosshatch-link-hover: white;
+  --crosshatch-kicker: #7ddcff;
+  --crosshatch-separator: linear-gradient(90deg, transparent, rgb(86 215 255 / 0.28), transparent);
+  --crosshatch-code-border: rgb(125 220 255 / 0.12);
+  --crosshatch-code-text: rgb(226 244 255 / 0.86);
+  --crosshatch-footer: rgb(255 255 255 / 0.42);
 }
 
 .crosshatch-landing {
@@ -221,7 +275,7 @@ body:has(.crosshatch-landing) {
 }
 
 .crosshatch-card-grid > * {
-  border-color: rgb(86 215 255 / 0.18) !important;
+  border-color: var(--crosshatch-panel-border) !important;
 }
 
 .crosshatch-section-separator {
@@ -229,7 +283,7 @@ body:has(.crosshatch-landing) {
   max-width: 80rem;
   height: 1px;
   margin-top: 1.25rem;
-  background: linear-gradient(90deg, transparent, rgb(86 215 255 / 0.28), transparent);
+  background: var(--crosshatch-separator);
 }
 
 .crosshatch-code-sections {
@@ -248,9 +302,9 @@ body:has(.crosshatch-landing) {
   align-items: center;
   width: 100%;
   padding: 1.25rem;
-  border: 1px solid rgb(86 215 255 / 0.18);
-  background: linear-gradient(135deg, rgb(255 255 255 / 0.045), rgb(255 255 255 / 0.018));
-  box-shadow: 0 24px 80px rgb(0 0 0 / 0.26);
+  border: 1px solid var(--crosshatch-panel-border);
+  background: var(--crosshatch-panel-bg);
+  box-shadow: var(--crosshatch-panel-shadow);
   backdrop-filter: blur(14px);
 }
 
@@ -271,7 +325,7 @@ body:has(.crosshatch-landing) {
 
 .crosshatch-code-kicker {
   margin: 0 0 1.5rem;
-  color: #7ddcff;
+  color: var(--crosshatch-kicker);
   font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.16em;
@@ -280,7 +334,7 @@ body:has(.crosshatch-landing) {
 
 .crosshatch-code-copy h2 {
   margin: 0;
-  color: rgb(255 255 255 / 0.94);
+  color: var(--crosshatch-heading);
   font-size: clamp(2rem, 3.6vw, 2.9rem);
   font-weight: 500;
   letter-spacing: -0.04em;
@@ -289,7 +343,7 @@ body:has(.crosshatch-landing) {
 
 .crosshatch-code-copy p:not(.crosshatch-code-kicker) {
   margin: 1rem 0 0;
-  color: rgb(255 255 255 / 0.62);
+  color: var(--crosshatch-body);
   font-size: 1.12rem;
   line-height: 1.75;
 }
@@ -302,7 +356,7 @@ body:has(.crosshatch-landing) {
   width: fit-content;
   margin-top: auto;
   padding-top: 2rem;
-  color: #9ee7ff;
+  color: var(--crosshatch-link);
   font-size: 1.05rem;
   font-weight: 600;
   line-height: 1.35;
@@ -310,7 +364,7 @@ body:has(.crosshatch-landing) {
 }
 
 .crosshatch-code-link:hover {
-  color: white;
+  color: var(--crosshatch-link-hover);
 }
 
 .crosshatch-code-link-icon {
@@ -338,8 +392,8 @@ body:has(.crosshatch-landing) {
   margin: 0 !important;
   overflow: auto;
   padding: 1.125rem 1.125rem 1.125rem 0.04rem;
-  border: 1px solid rgb(125 220 255 / 0.12);
-  color: rgb(226 244 255 / 0.86);
+  border: 1px solid var(--crosshatch-code-border);
+  color: var(--crosshatch-code-text);
   font-size: 0.88rem;
   line-height: 1.62;
 }
@@ -352,7 +406,7 @@ body:has(.crosshatch-landing) {
   width: 100%;
   max-width: 80rem;
   padding: 2rem 0 0;
-  color: rgb(255 255 255 / 0.42);
+  color: var(--crosshatch-footer);
   font-size: 0.9rem;
   text-align: center;
 }
