@@ -129,24 +129,29 @@ LanguageModel.generateText({
 ```ts
 const recipient = Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
 
-const routeEffect = Effect.gen(function* () {
-  const payload = yield* Payload.Payload
-  if (!payload) {
-    const required = yield* Required.make`Description of the charge here.`.pipe(
-      Required.accept(
-        Requirements.asset(KnownAssets.USDC, {
-          amount: 0.01,
-          recipients: { eip155: { 8453: yield* recipient } },
-        }),
-      ),
+const router = HttpRouter.add(
+  "GET",
+  "/paid",
+  Effect.gen(function* () {
+    const payload = yield* Payload.Payload
+    if (!payload) {
+      const required =
+        yield* Required.make`Description of the charge here.`.pipe(
+          Required.accept(
+            Requirements.asset(KnownAssets.USDC, {
+              amount: 0.01,
+              recipients: { eip155: { 8453: yield* recipient } },
+            }),
+          ),
+        )
+      return yield* Http402.require({ required })
+    }
+    const settlement = yield* Facilitator.settle({ payload })
+    return HttpServerResponse.text("The paid resource.").pipe(
+      Http402.addResponseHeader(settlement),
     )
-    return yield* Http402.require({ required })
-  }
-  const settlement = yield* Facilitator.settle({ payload })
-  return HttpServerResponse.text("The paid resource.").pipe(
-    Http402.addResponseHeader(settlement),
-  )
-})
+  }),
+).pipe(Layer.provide(Http402.layerMiddleware()))
 ```
 
     </div>

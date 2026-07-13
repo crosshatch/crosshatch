@@ -28,7 +28,7 @@ export default defineConfig({
     //   external: true,
     // },
   ],
-  iconUrl: "https://crosshatch.dev/favicon.ico",
+  iconUrl: "/icon.svg",
   banner: {
     content: "Crosshatch is in preview. Join the discord for updates.",
     dismissable: false,
