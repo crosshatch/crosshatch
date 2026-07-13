@@ -26,7 +26,7 @@ export default Alchemy.Stack(
       },
       assets: {
         htmlHandling: "drop-trailing-slash",
-        notFoundHandling: "404-page",
+        notFoundHandling: "single-page-application",
         runWorkerFirst: ["/api/*", "/RSC/*"],
       },
       env: {
