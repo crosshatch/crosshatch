@@ -43,12 +43,131 @@ body:has(.crosshatch-landing) {
   margin-bottom: 2rem;
 }
 
-.crosshatch-hero-group :is(h1, p) {
+.crosshatch-hero-group h1 {
+  font-weight: 900;
+}
+
+.crosshatch-hero-group p {
   font-weight: 500;
 }
 
 .crosshatch-hero-buttons {
   margin-top: 0.75rem;
+}
+
+.crosshatch-agents-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(3 8 15 / 0.72);
+  backdrop-filter: blur(10px);
+}
+
+.crosshatch-agents-modal {
+  position: relative;
+  width: min(100%, 46rem);
+  padding: 1.5rem;
+  border: 1px solid rgb(86 215 255 / 0.22);
+  border-radius: 1.25rem;
+  background: linear-gradient(135deg, rgb(12 24 42 / 0.98), rgb(5 9 17 / 0.98));
+  box-shadow: 0 30px 100px rgb(0 0 0 / 0.5);
+  text-align: left;
+}
+
+.crosshatch-agents-modal h2 {
+  margin: 0;
+  color: rgb(255 255 255 / 0.94);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+}
+
+.crosshatch-agents-modal p:not(.crosshatch-code-kicker) {
+  max-width: 36rem;
+  margin: 0.9rem 0 0;
+  color: rgb(255 255 255 / 0.64);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.crosshatch-agents-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: inline-grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: 999px;
+  color: rgb(255 255 255 / 0.72);
+  background: rgb(255 255 255 / 0.05);
+  cursor: pointer;
+}
+
+.crosshatch-agents-modal-close:hover {
+  color: white;
+  background: rgb(255 255 255 / 0.1);
+}
+
+.crosshatch-agents-modal-close svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.crosshatch-agents-prompt-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-top: 1.25rem;
+}
+
+.crosshatch-agents-prompt-button {
+  display: flex;
+  min-height: 12rem;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid rgb(125 220 255 / 0.14);
+  border-radius: 1rem;
+  color: rgb(255 255 255 / 0.9);
+  background: rgb(255 255 255 / 0.045);
+  cursor: pointer;
+  text-align: left;
+}
+
+.crosshatch-agents-prompt-button:hover {
+  border-color: rgb(125 220 255 / 0.36);
+  background: rgb(86 215 255 / 0.08);
+}
+
+.crosshatch-agents-prompt-button span {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.crosshatch-agents-prompt-button small {
+  color: rgb(255 255 255 / 0.6);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.crosshatch-agents-prompt-button strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: auto;
+  color: #9ee7ff;
+  font-size: 0.9rem;
+}
+
+.crosshatch-agents-prompt-button strong svg {
+  width: 1rem;
+  height: 1rem;
 }
 
 .crosshatch-card-grid > * {
@@ -192,6 +311,14 @@ body:has(.crosshatch-landing) {
   .crosshatch-code-section,
   .crosshatch-code-section-reversed {
     grid-template-columns: 1fr;
+  }
+
+  .crosshatch-agents-prompt-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .crosshatch-agents-prompt-button {
+    min-height: 0;
   }
 
   .crosshatch-code-section-reversed .crosshatch-code-copy {

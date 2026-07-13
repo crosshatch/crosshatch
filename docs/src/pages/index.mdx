@@ -7,10 +7,14 @@ showLogo: false
 ---
 
 import { Card, HomePage } from "vocs"
-import { Bot, ChevronRight, Github, UserRound } from "lucide-react"
+import { ChevronRight, Github, UserRound } from "lucide-react"
 import { DotPattern } from "../DotPattern"
-import { CopyPromptButton } from "../CopyPromptButton"
-import { PROMPT } from "../PROMPT"
+import { CodingAgentsButton } from "../CodingAgentsButton"
+import {
+  EFFECT_AI_CLIENT_PROMPT,
+  EFFECT_HTTP_CLIENT_PROMPT,
+  MERCHANT_PROMPT,
+} from "../PROMPT"
 
 <HomePage.Root className="crosshatch-landing">
 
@@ -38,10 +42,11 @@ import { PROMPT } from "../PROMPT"
     GitHub
     <Github className="ml-2 size-4 stroke-1" />
   </HomePage.Button>
-  <CopyPromptButton prompt={PROMPT}>
-    Coding Agents
-    <Bot className="ml-2 size-4 stroke-1" />
-  </CopyPromptButton>
+  <CodingAgentsButton
+    merchantPrompt={MERCHANT_PROMPT}
+    effectAiClientPrompt={EFFECT_AI_CLIENT_PROMPT}
+    effectHttpClientPrompt={EFFECT_HTTP_CLIENT_PROMPT}
+  />
   <HomePage.Button href="/quickstart" variant="accent">
     Quickstart
     <UserRound className="ml-2 size-4 stroke-1" />
@@ -53,7 +58,7 @@ import { PROMPT } from "../PROMPT"
 <div className="crosshatch-card-grid vocs:grid w-full vocs:max-w-7xl grid-cols-1 vocs:gap-4 vocs:text-left vocs:md:grid-cols-2 md:grid-cols-3">
   <Card
     title="Pay and get paid through x402."
-    description="Create chain-agnostic x402 payment requirements and payloads, settled instantly."
+    description="Create chain-agnostic x402 payment requirements and payloads. Settle instantly."
   />
   <Card
     title="Chain-agnostic, token-agnostic."
@@ -86,6 +91,13 @@ import { PROMPT } from "../PROMPT"
     <div className="crosshatch-code-block">
 
 ```ts
+import { OpenAiClient, OpenAiLanguageModel } from "@effect/ai-openai-compat"
+import { Http402 } from "crosshatch"
+import { Console, Effect, Layer } from "effect"
+import { LanguageModel } from "effect/unstable/ai"
+
+import { PayerLive } from "./PayerLive.ts"
+
 const BlockrunLive = OpenAiLanguageModel.layer({
   model: "deepseek/deepseek-chat",
 }).pipe(
@@ -112,7 +124,7 @@ LanguageModel.generateText({
   <section className="crosshatch-code-section crosshatch-code-section-reversed">
     <div className="crosshatch-code-copy">
       <p className="crosshatch-code-kicker">Merchant Route</p>
-      <h2>Require payment, then settle</h2>
+      <h2>Require payment & settle</h2>
       <p>
         Define accepted stablecoin requirements, return an x402 payment challenge, and settle the submitted payload before
         serving the protected resource.
@@ -127,6 +139,18 @@ LanguageModel.generateText({
     <div className="crosshatch-code-block">
 
 ```ts
+import {
+  Facilitator,
+  Http402,
+  KnownAssets,
+  Payload,
+  Required,
+  Requirements,
+} from "crosshatch"
+import { Eip155Address } from "crosshatch/Eip155"
+import { Config, Effect, Layer } from "effect"
+import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
+
 const recipient = Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
 
 const router = HttpRouter.add(
