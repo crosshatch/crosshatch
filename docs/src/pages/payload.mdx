@@ -32,7 +32,7 @@ import { Eip155Address } from "crosshatch/Eip155"
 const program = Effect.gen(function* () {
   const required = yield* Required.make`Access to the paid resource.`.pipe(
     Required.accept(
-      Requirements.asset(KnownAssets.USDC, {
+      Requirements.asset(KnownAssets.Usd.USDC, {
         amount: 0.01,
         recipients: {
           eip155: {
@@ -70,8 +70,8 @@ const { createPayload } = yield * Payer.Payer
 
 At runtime, the provided `Payer` decides which `required.accepts` entry to pay
 and how to produce the signed payload. For the built-in EIP-155 flow, the
-`Payer` uses the configured asset metadata to select a supported requirement,
-then asks the selected adapter to create the concrete payload.
+`Payer` uses the configured asset peg to select a supported requirement, then
+asks the selected scheme to create the concrete payload.
 
 Provide a `Payer` layer when running the program. See [Payer Service](/payer)
 for local signing and bridge-backed payer setup.

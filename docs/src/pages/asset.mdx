@@ -7,7 +7,8 @@ description:
 
 # Assets
 
-Crosshatch uses two closely related asset concepts: `Asset` and `PhysicalAsset`.
+Crosshatch uses three related asset concepts: `Asset`, `PhysicalAsset`, and
+`Peg`.
 
 ## `Asset`
 
@@ -20,6 +21,12 @@ onchain asset identifier is this?"
 `PhysicalAsset` describes one logical asset across one or more concrete network
 deployments. It groups the deployment metadata Crosshatch needs to build and
 validate payments on each chain.
+
+## `Peg`
+
+`Peg` groups one or more logical assets by their target denomination. The
+built-in USD peg, for example, contains native USDC, bridged USDC.e, and other
+USD-like assets, each with its own physical network deployments.
 
 ## Why "Physical?"
 
@@ -35,23 +42,23 @@ needed for Base, Polygon, Arbitrum, or any other supported network.
 
 ## Known Assets
 
-Crosshatch ships known asset definitions. These are ready-to-use `PhysicalAsset`
-values for common tokens.
+Crosshatch ships known asset definitions. These are ready-to-use peg groups for
+common denominations.
 
 ```ts
 import { KnownAssets } from "crosshatch"
 
-const { MEGAUSDC, MUSD, SBC, USDC, USDCE, USDT0 } = KnownAssets
+const { MEGAUSDC, MUSD, SBC, USDC, USDCE, USDT0 } = KnownAssets.Usd
 ```
 
-Each export is a `PhysicalAsset`. For example, `USDC` contains multiple EIP-155
-deployments under the `eip155` namespace:
+Each export is a namespace map for one logical asset. For example, `USDC`
+contains multiple EIP-155 physical assets under the `eip155` namespace:
 
 ```ts
 import { KnownAssets } from "crosshatch"
 
-const baseUsdc = KnownAssets.USDC.deployments.eip155[8453]
-const polygonUsdc = KnownAssets.USDC.deployments.eip155[137]
+const baseUsdc = KnownAssets.Usd.USDC.eip155[8453]
+const polygonUsdc = KnownAssets.Usd.USDC.eip155[137]
 ```
 
 Those two values refer to different physical token contracts, but they are
@@ -67,26 +74,23 @@ To represent your own asset, define the logical asset once, then add one entry
 per supported deployment.
 
 ```ts
-import { Eip155Asset, Erc3009, Permit2 } from "crosshatch/Eip155"
+import { Eip155Asset, Erc3009Scheme, Permit2Scheme } from "crosshatch/Eip155"
 import type { Asset } from "crosshatch"
 
 export const MY_TOKEN = {
-  peg: "USD",
-  symbol: "MYT",
-  deployments: {
-    eip155: {
-      8453: {
-        asset: Eip155Asset.Eip155Asset.make(
-          "0x0000000000000000000000000000000000000000",
-        ),
-        decimals: 18,
-        name: "My Token",
-        version: "1",
-        adapters: [Erc3009.Erc3009Adapter, Permit2.Permit2Adapter],
-      },
+  eip155: {
+    8453: {
+      asset: Eip155Asset.Eip155Asset.make(
+        "0x0000000000000000000000000000000000000000",
+      ),
+      decimals: 18,
+      name: "My Token",
+      version: "1",
+      schemes: [Erc3009Scheme.Erc3009Scheme, Permit2Scheme.Permit2Scheme],
+      metadata: { symbol: "MYT" },
     },
   },
-} as const satisfies Asset.PhysicalAsset
+} as const satisfies Asset.Namespaces
 ```
 
 Use a separate `PhysicalAsset` when deployments should not be treated as the

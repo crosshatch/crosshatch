@@ -2,21 +2,21 @@
 title: EIP-155
 description:
   Configure EVM assets, mnemonic signing, EIP-3009 transfers, and Permit2
-  payment adapters.
+  payment schemes.
 ---
 
 # EIP-155
 
 The `crosshatch/Eip155` module contains the EVM provider-specific schemas,
-signer, and payment adapters.
+signer, and payment schemes.
 
 ```ts
 import {
   Eip155Address,
   Eip155Asset,
   Eip155Signer,
-  Erc3009,
-  Permit2,
+  Erc3009Scheme,
+  Permit2Scheme,
 } from "crosshatch/Eip155"
 ```
 
@@ -54,41 +54,41 @@ See [Mnemonic](/mnemonic) for mnemonic sources.
 
 ## EIP-3009
 
-`Erc3009.layer` provides the `Erc3009.Erc3009Adapter`. It creates a
+`Erc3009Scheme.layer` provides the `Erc3009Scheme.Erc3009Scheme`. It creates a
 `TransferWithAuthorization` payload and signs EIP-712 typed data with the
 `Eip155Signer` service.
 
 ```ts
-import { Eip155Signer, Erc3009 } from "crosshatch/Eip155"
+import { Eip155Signer, Erc3009Scheme } from "crosshatch/Eip155"
 import { Layer } from "effect"
 
-const Erc3009Live = Erc3009.layer.pipe(
+const Erc3009Live = Erc3009Scheme.layer.pipe(
   Layer.provide(Eip155Signer.layerMnemonic),
 )
 ```
 
-Use this adapter for deployments that support EIP-3009 style transfer
+Use this scheme for physical assets that support EIP-3009 style transfer
 authorization.
 
 ## Permit2
 
-`Permit2.layer` provides the `Permit2.Permit2Adapter`. It creates a Permit2
-witness transfer authorization and signs the corresponding EIP-712 typed data
-with the `Eip155Signer` service.
+`Permit2Scheme.layer` provides the `Permit2Scheme.Permit2Scheme`. It creates a
+Permit2 witness transfer authorization and signs the corresponding EIP-712 typed
+data with the `Eip155Signer` service.
 
 ```ts
-import { Eip155Signer, Permit2 } from "crosshatch/Eip155"
+import { Eip155Signer, Permit2Scheme } from "crosshatch/Eip155"
 import { Layer } from "effect"
 
-const Permit2Live = Permit2.layer.pipe(
+const Permit2Live = Permit2Scheme.layer.pipe(
   Layer.provide(Eip155Signer.layerMnemonic),
 )
 ```
 
-Use this adapter for deployments that settle through the exact Permit2 proxy.
+Use this scheme for physical assets that settle through the exact Permit2 proxy.
 
 ## Payer Composition
 
-Most EIP-155 clients provide both adapters and let `Accept.layer` choose the one
+Most EIP-155 clients provide both schemes and let `Accept.layer` choose the one
 matching the selected asset deployment. See [Payer Service](/payer) for the full
 composition.

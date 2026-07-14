@@ -1,7 +1,7 @@
 ---
 title: Payer
 description:
-  Create signed x402 payment payloads from requirements with local adapters or
+  Create signed x402 payment payloads from requirements with local schemes or
   bridge-backed payment flows.
 ---
 
@@ -11,18 +11,18 @@ description:
 `Payload`.
 
 Local clients usually provide it with `Payer.layer`, asset metadata for
-requirement selection, and the supported signing adapters:
+requirement selection, and the supported signing schemes:
 
 ```ts
 import { Accept, KnownAssets, Mnemonic, Payer } from "crosshatch"
-import { Eip155Signer, Erc3009, Permit2 } from "crosshatch/Eip155"
+import { Eip155Signer, Erc3009Scheme, Permit2Scheme } from "crosshatch/Eip155"
 import { Layer } from "effect"
 
 const PayerLive = Payer.layer.pipe(
   Layer.provide(
-    Accept.layer(KnownAssets).pipe(
+    Accept.layer(KnownAssets.Usd).pipe(
       Layer.provide(
-        Layer.mergeAll(Erc3009.layer, Permit2.layer).pipe(
+        Layer.mergeAll(Erc3009Scheme.layer, Permit2Scheme.layer).pipe(
           Layer.provide(
             Eip155Signer.layerMnemonic.pipe(Layer.provide(Mnemonic.layerEnv)),
           ),
@@ -38,22 +38,22 @@ const PayerLive = Payer.layer.pipe(
 `Accept` is the requirement-selection service used by `Payer.layer`.
 
 Given a `Required` invoice, it chooses one compatible entry from
-`required.accepts`, finds the matching physical asset deployment, and returns
-the adapter effect that can create the chain-specific payment payload.
+`required.accepts`, finds the matching physical asset, and returns the scheme
+effect that can create the chain-specific payment payload.
 
-`Accept.layer(assets)` receives an asset config. `KnownAssets` is the default
-config for the assets Crosshatch ships. Provide it to `Payer.layer` together
-with the signing adapters your client supports.
+`Accept.layer(peg)` receives a peg config. `KnownAssets.Usd` is the built-in USD
+peg Crosshatch ships. Provide it to `Payer.layer` together with the signing
+schemes your client supports.
 
 `Accept` compares the invoice's accepted payment options against the configured
-physical assets. A payment option is usable when its network and asset match a
-configured deployment, and one of that deployment's adapters is available in the
-current Effect context.
+peg. A payment option is usable when its network and asset match a configured
+physical asset, and one of that asset's schemes is available in the current
+Effect context.
 
 Most applications do not call `Accept` directly. They provide `Accept.layer` to
 `Payer.layer`, then call `Payer.createPayload`.
 
-If no configured asset and adapter can satisfy the invoice, payment creation
+If no configured asset and scheme can satisfy the invoice, payment creation
 fails. This usually means the client does not support the merchant's requested
 asset, network, or payment scheme.
 

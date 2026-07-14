@@ -1,44 +1,44 @@
 ---
-title: Adapter
+title: Scheme
 description:
-  Understand how Crosshatch selects chain-specific adapters that build concrete
+  Understand how Crosshatch selects chain-specific schemes that build concrete
   x402 payment payloads.
 ---
 
-# Adapter
+# Scheme
 
-Adapters are the chain-specific payment payload builders used by `Payer.layer`.
+Schemes are the chain-specific payment payload builders used by `Payer.layer`.
 
 A `Required` value describes acceptable payment options in a chain-agnostic
-shape. An adapter turns one accepted option into the concrete JSON payload
-needed by that payment scheme, such as an EIP-3009 authorization, a Permit2
+shape. A scheme turns one accepted option into the concrete JSON payload needed
+by that payment scheme, such as an EIP-3009 authorization, a Permit2
 authorization, or a Solana transaction.
 
-## How Adapters Are Selected
+## How Schemes Are Selected
 
-`Accept.layer` selects adapters from the configured asset metadata.
+`Accept.layer` selects schemes from the configured asset peg.
 
-Each `PhysicalAssetDeployment` lists the adapter tags it supports. During
-payment creation, `Accept.layer` looks for a `required.accepts` entry whose
-network and asset match a configured deployment, then uses the first listed
-adapter that is available in the current Effect context.
+Each `PhysicalAsset` lists the scheme tags it supports. During payment creation,
+`Accept.layer` looks for a `required.accepts` entry whose network and asset
+match a configured physical asset, then uses the first listed scheme that is
+available in the current Effect context.
 
 See [Payer Service](/payer) for the usual client composition.
 
-## Custom Adapters
+## Custom Schemes
 
-Most applications use the built-in adapters. Custom adapters are only needed
-when you add a new payment scheme or chain-specific authorization format. A
-custom adapter receives the selected requirement and matching asset deployment,
-then returns the JSON-serializable body that becomes the inner payment payload.
+Most applications use the built-in schemes. Custom schemes are only needed when
+you add a new payment scheme or chain-specific authorization format. A custom
+scheme receives the selected requirement and matching physical asset, then
+returns the JSON-serializable body that becomes the inner payment payload.
 
-## Built-in Adapters
+## Built-in Schemes
 
-Crosshatch currently ships provider-specific adapters in these modules:
+Crosshatch currently ships provider-specific schemes in these modules:
 
 ```ts
-import { Erc3009, Permit2 } from "crosshatch/Eip155"
-import { SolanaAdapter } from "crosshatch/Solana"
+import { Erc3009Scheme, Permit2Scheme } from "crosshatch/Eip155"
+import { SolanaScheme } from "crosshatch/Solana"
 ```
 
 See [EIP-155](/eip155) and [Solana](/solana) for provider-specific setup.

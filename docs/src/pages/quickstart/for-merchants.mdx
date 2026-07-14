@@ -40,7 +40,7 @@ const route = Effect.gen(function* () {
   if (!payload) {
     const required = yield* Required.make`Access to the paid resource.`.pipe(
       Required.accept(
-        Requirements.asset(KnownAssets.USDC, {
+        Requirements.asset(KnownAssets.Usd.USDC, {
           amount: 0.01,
           recipients: {
             eip155: { 8453: "0x..." },
@@ -123,7 +123,7 @@ const paidRoute = Effect.gen(function* () {
   if (!payload) {
     const required = yield* Required.make`Access to the paid resource.`.pipe(
       Required.accept(
-        Requirements.asset(KnownAssets.USDC, {
+        Requirements.asset(KnownAssets.Usd.USDC, {
           amount: 0.01,
           recipients: {
             eip155: {

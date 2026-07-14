@@ -69,7 +69,7 @@ export default defineConfig({
           { text: "Bridge", link: "/bridge" },
           { text: "Payer", link: "/payer" },
           {
-            text: "Adapter",
+            text: "Scheme",
             link: "/adapter",
             collapsed: true,
             items: [

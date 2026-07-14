@@ -14,10 +14,10 @@ import {
 import { Effect, Schema as S } from "effect"
 
 import * as Scheme from "../Scheme.ts"
-import { GetLatestBlockhash } from "./GetLatestBlockhash.ts"
 import * as SolanaAddress from "./SolanaAddress.ts"
 import * as SolanaAsset from "./SolanaAsset.ts"
 import { SolanaSigner } from "./SolanaSigner.ts"
+import { SolanaState } from "./SolanaState.ts"
 
 export const Known = S.Struct({
   tokenProgramId: SolanaAddress.SolanaAddress,
@@ -45,7 +45,8 @@ export const layer = SolanaScheme.layer(
     Effect.fnUntraced(
       function* ({ physical, accepted }) {
         const signer = yield* SolanaSigner
-        const latestBlockhash = yield* GetLatestBlockhash.pipe(Effect.flatten)
+        const { getLatestBlockhash } = yield* SolanaState
+        const latestBlockhash = yield* getLatestBlockhash
 
         const mintAsset = yield* S.decodeUnknownEffect(SolanaAsset.SolanaAsset)(accepted.asset)
         const mint = address(mintAsset)
