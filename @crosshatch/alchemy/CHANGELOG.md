@@ -1,5 +1,17 @@
 # @crosshatch/alchemy
 
+## 0.0.3
+
+### Patch Changes
+
+- [#104](https://github.com/crosshatch/crosshatch/pull/104)
+  [`3e3fb12`](https://github.com/crosshatch/crosshatch/commit/3e3fb1287e23d71f3354ad850ab6f2379bfc3032)
+  Thanks @harrysolovay! - Fix fault second effect version included transiently.
+
+- Updated dependencies
+  [[`3e3fb12`](https://github.com/crosshatch/crosshatch/commit/3e3fb1287e23d71f3354ad850ab6f2379bfc3032)]:
+  - crosshatch@0.0.6
+
 ## 0.0.2
 
 ### Patch Changes
