@@ -1,4 +1,4 @@
-import { Data, flow, Types, Array, Effect, Schema as S, Record, Duration, UndefinedOr, Cause } from "effect"
+import { flow, Types, Array, Effect, Schema as S, Record, Duration, UndefinedOr } from "effect"
 
 import { Address } from "./Address.ts"
 import * as Amount from "./Amount.ts"
@@ -21,10 +21,6 @@ export type RequirementsLike =
   | Effect.Effect<typeof Requirements.Type, InvalidAmountError>
   | Array<typeof Requirements.Type>
   | Effect.Effect<Array<typeof Requirements.Type>, InvalidAmountError>
-
-export class CreateRequirementsError extends Data.TaggedError("CreateRequirementsError")<{
-  readonly reason: Cause.NoSuchElementError
-}> {}
 
 export const logical = Effect.fnUntraced(function* <A extends LogicalAsset>(
   asset: A,

@@ -62,12 +62,11 @@ export const Service =
         readonly known: T["Type"]
         readonly extra: T2["Type"]
       }) => (config: SchemeConfig) => Adapt<R>,
-    ): Layer.Layer<Self, never, Exclude<T["DecodingServices"] | R, Scope.Scope>> =>
+    ): Layer.Layer<Self, never, Exclude<T2["DecodingServices"] | R, Scope.Scope>> =>
       Layer.effect(
         tag,
         Effect.gen(function* () {
-          const context =
-            yield* Effect.context<Exclude<T["DecodingServices"] | T2["DecodingServices"] | R, Scope.Scope>>()
+          const context = yield* Effect.context<Exclude<T2["DecodingServices"] | R, Scope.Scope>>()
           const bound = flow(Effect.scoped, Effect.provideContext(context))
           return Effect.fnUntraced(function* ({
             accepted,

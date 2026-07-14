@@ -82,11 +82,7 @@ example includes EIP-155 and Solana support:
 ```ts
 import { Accept, KnownAssets, Mnemonic, Payer } from "crosshatch"
 import { Eip155Signer, Erc3009Scheme, Permit2Scheme } from "crosshatch/Eip155"
-import {
-  GetLatestBlockhash,
-  SolanaScheme,
-  SolanaSigner,
-} from "crosshatch/Solana"
+import { SolanaScheme, SolanaSigner, SolanaState } from "crosshatch/Solana"
 import { Config, Layer } from "effect"
 
 export const PayerLive = Payer.layer.pipe(
@@ -101,7 +97,7 @@ export const PayerLive = Payer.layer.pipe(
             Layer.provide([
               SolanaSigner.layerMnemonic,
               Config.string("SOLANA_RPC_URL").pipe(
-                Config.map(GetLatestBlockhash.layer),
+                Config.map(SolanaState.layer),
                 Layer.unwrap,
               ),
             ]),

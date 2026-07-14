@@ -12,11 +12,11 @@ signer, latest-blockhash service, and payment scheme.
 
 ```ts
 import {
-  GetLatestBlockhash,
   SolanaAddress,
   SolanaAsset,
   SolanaScheme,
   SolanaSigner,
+  SolanaState,
 } from "crosshatch/Solana"
 ```
 
@@ -45,17 +45,17 @@ const SolanaSignerLive = SolanaSigner.layerMnemonic.pipe(
 
 See [Mnemonic](/mnemonic) for mnemonic sources.
 
-## Latest Blockhash
+## State
 
-Solana payload creation needs a recent blockhash. Provide `GetLatestBlockhash`
-anywhere you provide `SolanaScheme.layer`.
+Solana payload creation needs current chain state, including a recent blockhash.
+Provide `SolanaState` anywhere you provide `SolanaScheme.layer`.
 
 ```ts
 import { Config, Layer } from "effect"
-import { GetLatestBlockhash } from "crosshatch/Solana"
+import { SolanaState } from "crosshatch/Solana"
 
-const BlockhashLive = Config.string("SOLANA_RPC_URL").pipe(
-  Config.map(GetLatestBlockhash.layer),
+const SolanaStateLive = Config.string("SOLANA_RPC_URL").pipe(
+  Config.map(SolanaState.layer),
   Layer.unwrap,
 )
 ```
@@ -74,13 +74,13 @@ import { SolanaScheme, SolanaSigner } from "crosshatch/Solana"
 import { Layer } from "effect"
 
 const SolanaLive = SolanaScheme.layer.pipe(
-  Layer.provide([SolanaSigner.layerMnemonic, BlockhashLive]),
+  Layer.provide([SolanaSigner.layerMnemonic, SolanaStateLive]),
 )
 ```
 
 ## Payer Composition
 
-A Solana-capable payer provides the Solana scheme, signer, latest blockhash
-service, and denomination.
+A Solana-capable payer provides the Solana scheme, signer, chain state service,
+and denomination.
 
 See [Payer Service](/payer) for the full composition pattern.

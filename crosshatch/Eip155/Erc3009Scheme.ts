@@ -37,8 +37,8 @@ export const ERC3009_ABI_TYPES = {
   ],
 } as const
 
-export const layer = Erc3009Scheme.layer({ known: S.Void, extra: Extra }, ({ extra: { name, version } }) =>
-  Effect.fnUntraced(function* ({ accepted }) {
+export const layer = Erc3009Scheme.layer({ known: S.Void, extra: Extra }, () =>
+  Effect.fnUntraced(function* ({ accepted, physical: { name, version } }) {
     const now = Math.floor(Date.now() / 1000)
     const chainId = parseInt(accepted.network.split(":")[1]!)
     const signer = yield* Eip155Signer

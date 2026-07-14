@@ -1,5 +1,6 @@
-import { String, Schema as S, Context, Option, Data, Effect, flow } from "effect"
+import { Schema as S, Context, Option, Data, Effect, flow } from "effect"
 
+import { stringRaw } from "./_util.ts"
 import type { Payload } from "./Payload.ts"
 import type { Required } from "./Required.ts"
 
@@ -66,9 +67,7 @@ export const traced =
       const trace = {
         traceId,
         name,
-        description: String.stripMargin(
-          globalThis.String.raw(template, ...substitutions).replace(/(?<margin>^[ \t]*\|) /gmu, "$<margin>"),
-        ).trim(),
+        description: stringRaw(template, substitutions),
       }
       yield* createTrace?.(trace) ?? Effect.void
       return yield* Effect.provideService(effect, Trace, trace)
