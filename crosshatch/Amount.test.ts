@@ -99,7 +99,7 @@ describe(import.meta.url, () => {
   )
 
   it(
-    "scales grouped requirements by deployment decimals",
+    "scales grouped requirements by physical asset decimals",
     Effect.fn(function* () {
       const payTo = Address.Address.make("0x0000000000000000000000000000000000000001")
       const [sixDecimals] = yield* Requirements.peg(KnownAssets.Usd, {

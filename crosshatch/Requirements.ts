@@ -42,12 +42,12 @@ export const asset = Effect.fnUntraced(function* <A extends Namespaces>(
     references
       ? Record.toEntries(references).reduce(
           (acc, [reference, payTo]) => {
-            const deployment = asset[namespace]![reference]!
-            const { name, version } = deployment
+            const physical = asset[namespace]![reference]!
+            const { name, version } = physical
             return payTo
               ? acc.concat({
-                  amount: Amount.toAtomic(nominal, deployment),
-                  asset: Asset.make(deployment.asset),
+                  amount: Amount.toAtomic(nominal, physical),
+                  asset: Asset.make(physical.asset),
                   maxTimeoutSeconds,
                   network: ChainId.make(`${namespace}:${reference}`),
                   payTo,

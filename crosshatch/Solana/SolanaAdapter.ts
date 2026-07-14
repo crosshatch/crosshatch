@@ -23,7 +23,7 @@ import { SolanaSigner } from "./SolanaSigner.ts"
 export class SolanaAdapter extends Adapter.Service<SolanaAdapter>()("@crosshatch/SolanaAdapter") {}
 
 export const layer = SolanaAdapter.layer(
-  Effect.fnUntraced(function* ({ physical: deployment, accepted }) {
+  Effect.fnUntraced(function* ({ physical, accepted }) {
     const { feePayer, memo } = yield* S.decodeUnknownEffect(
       S.Struct({
         feePayer: SolanaAddress.SolanaAddress,
@@ -42,7 +42,7 @@ export const layer = SolanaAdapter.layer(
       S.Struct({
         tokenProgramId: SolanaAddress.SolanaAddress,
       }),
-    )(deployment.metadata)
+    )(physical.metadata)
 
     return Effect.gen(function* () {
       const signer = yield* SolanaSigner
@@ -77,7 +77,7 @@ export const layer = SolanaAdapter.layer(
                   destination: destAta,
                   authority: signer,
                   amount: BigInt(accepted.amount),
-                  decimals: deployment.decimals,
+                  decimals: physical.decimals,
                 },
                 { programAddress: tokenProgram },
               ),
