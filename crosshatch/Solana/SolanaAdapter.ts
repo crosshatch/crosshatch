@@ -23,7 +23,7 @@ import { SolanaSigner } from "./SolanaSigner.ts"
 export class SolanaAdapter extends Adapter.Service<SolanaAdapter>()("@crosshatch/SolanaAdapter") {}
 
 export const layer = SolanaAdapter.layer(
-  Effect.fnUntraced(function* ({ deployment, accepted }) {
+  Effect.fnUntraced(function* ({ physical: deployment, accepted }) {
     const { feePayer, memo } = yield* S.decodeUnknownEffect(
       S.Struct({
         feePayer: SolanaAddress.SolanaAddress,

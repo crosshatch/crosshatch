@@ -21,7 +21,7 @@ const Live = HttpRouter.serve(
       CredentialsFromEnv,
       Payer.layer.pipe(
         Layer.provide(
-          Accept.layer(KnownAssets).pipe(
+          Accept.layer(KnownAssets.Usd).pipe(
             Layer.provide(
               Erc3009.layer.pipe(Layer.provide(Eip155Signer.layerMnemonic.pipe(Layer.provide(Mnemonic.layerEnv)))),
             ),
@@ -38,7 +38,7 @@ describe.skipIf(!env.TEST_LIVE)(import.meta.url, () => {
     Effect.fn(function* () {
       const required = yield* Required.make().pipe(
         Required.accept(
-          Requirements.asset(KnownAssets.USDC, {
+          Requirements.peg(KnownAssets.Usd, {
             amount: 0.01,
             recipients: {
               eip155: {

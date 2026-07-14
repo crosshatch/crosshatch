@@ -5,7 +5,7 @@ import { Config, Layer } from "effect"
 
 export const PayerLive = Payer.layer.pipe(
   Layer.provide(
-    Accept.layer(KnownAssets).pipe(
+    Accept.layer(KnownAssets.Usd).pipe(
       Layer.provide(
         Layer.mergeAll(
           // EIP155 doesn't need the latest blockhash, so no RPC necessary.

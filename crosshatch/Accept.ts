@@ -1,7 +1,7 @@
 import { Effect, Context, Schema as S, Option, Layer } from "effect"
 
 import type { Adapt } from "./Adapter.ts"
-import type { AssetConfig, PhysicalAssetDeployment } from "./Asset.ts"
+import type { Peg, PhysicalAsset } from "./Asset.ts"
 import { ChainId } from "./ChainId.ts"
 import { Required } from "./Required.ts"
 import type { Requirements } from "./Requirements.ts"
@@ -15,33 +15,33 @@ export class Accept extends Context.Service<
       readonly accepted: typeof Requirements.Type
       readonly acceptedI: number
       readonly chainId: typeof ChainId.Type
-      readonly deployment: PhysicalAssetDeployment
+      readonly physical: PhysicalAsset
       readonly adapt: Adapt
     },
     AcceptError
   >
 >()("crosshatch/Accept") {}
 
-export const layer = (assets: AssetConfig) =>
+export const layer = (peg: Peg) =>
   Layer.effect(
     Accept,
     Effect.gen(function* () {
       const context = yield* Effect.context<never>()
       return Effect.fnUntraced(function* ({ required }) {
         const { accepts } = required
-        for (const asset of Object.values(assets)) {
-          for (const [namespace, references] of Object.entries(asset.deployments)) {
-            for (const [reference, deployment] of Object.entries(references)) {
+        for (const asset of Object.values(peg)) {
+          for (const [namespace, references] of Object.entries(asset)) {
+            for (const [reference, physical] of Object.entries(references)) {
               const chainId = ChainId.make(`${namespace}:${reference}`)
-              for (let i = 0; i < accepts.length; i++) {
-                const accepted = accepts[i]!
-                if (chainId === accepted.network && deployment.asset === accepted.asset) {
-                  for (const tag of deployment.adapters) {
+              for (let acceptedI = 0; acceptedI < accepts.length; acceptedI++) {
+                const accepted = accepts[acceptedI]!
+                if (chainId === accepted.network && physical.asset === accepted.asset) {
+                  for (const tag of physical.adapters) {
                     const adapter = context.pipe(Context.getOption(tag), Option.getOrUndefined)
                     if (!adapter) {
                       continue
                     }
-                    const adapt = yield* adapter({ accepted, deployment }).pipe(
+                    const adapt = yield* adapter({ accepted, physical }).pipe(
                       Effect.catchTags({
                         SchemaError: () => Effect.undefined,
                       }),
@@ -49,13 +49,7 @@ export const layer = (assets: AssetConfig) =>
                     if (!adapt) {
                       continue
                     }
-                    return {
-                      acceptedI: i,
-                      accepted,
-                      chainId,
-                      deployment,
-                      adapt,
-                    }
+                    return { acceptedI, accepted, chainId, physical, adapt }
                   }
                 }
               }

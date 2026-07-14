@@ -1,6 +1,6 @@
 import { Context, Data, Effect, flow, Layer, Schema as S, Scope } from "effect"
 
-import type { PhysicalAssetDeployment } from "./Asset.ts"
+import type { PhysicalAsset } from "./Asset.ts"
 import type { Requirements } from "./Requirements.ts"
 
 export class CreatePayloadError extends Data.TaggedError("CreatePayloadError")<{ readonly cause?: unknown }> {}
@@ -9,10 +9,10 @@ export type Adapt<R = never> = Effect.Effect<Record<string, S.Json>, CreatePaylo
 
 export type Service<R = never, R2 = never> = ({
   accepted,
-  deployment,
+  physical,
 }: {
   readonly accepted: typeof Requirements.Type
-  readonly deployment: PhysicalAssetDeployment
+  readonly physical: PhysicalAsset
 }) => Effect.Effect<Adapt<R> | undefined, S.SchemaError, R2>
 
 const TypeId = "~crosshatch/Adapter" as const
