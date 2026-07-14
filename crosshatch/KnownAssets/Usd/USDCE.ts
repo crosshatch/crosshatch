@@ -1,5 +1,5 @@
 import type { References } from "../../Asset.ts"
-import { Eip155Asset, Erc3009, Permit2 } from "../../Eip155/Eip155.ts"
+import { Eip155Asset, Erc3009Scheme, Permit2Scheme } from "../../Eip155/Eip155.ts"
 
 export const eip155 = {
   36900: {
@@ -7,13 +7,13 @@ export const eip155 = {
     decimals: 6,
     name: "USDC.e",
     version: "2",
-    adapters: [Erc3009.Erc3009Adapter, Permit2.Permit2Adapter],
+    schemes: [Erc3009Scheme.Erc3009Scheme, Permit2Scheme.Permit2Scheme],
   },
   190415: {
     asset: Eip155Asset.Eip155Asset.make("0x401eCb1D350407f13ba348573E5630B83638E30D"),
     decimals: 6,
     name: "Bridged USDC",
     version: "2",
-    adapters: [Erc3009.Erc3009Adapter, Permit2.Permit2Adapter],
+    schemes: [Erc3009Scheme.Erc3009Scheme, Permit2Scheme.Permit2Scheme],
   },
 } as const satisfies References

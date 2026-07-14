@@ -1,6 +1,6 @@
 import { Schema as S } from "effect"
 
-import type { Adapter } from "./Adapter.ts"
+import type { Scheme } from "./Scheme.ts"
 
 export const brand = S.brand("crosshatch/Asset")
 
@@ -11,7 +11,7 @@ export interface PhysicalAsset {
   readonly decimals: number
   readonly name: string
   readonly version: string
-  readonly adapters: ReadonlyArray<Adapter<any, any>>
+  readonly schemes: ReadonlyArray<Scheme.Any>
   readonly metadata?: unknown
 }
 

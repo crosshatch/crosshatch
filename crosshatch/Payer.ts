@@ -1,11 +1,11 @@
 import { Array, Schema as S, Context, Effect, Layer, Record, Predicate, flow } from "effect"
 
 import { Accept, type AcceptError } from "./Accept.ts"
-import { CreatePayloadError } from "./Adapter.ts"
 import { Bridge } from "./Bridge.ts"
 import { ExtensionRegistry } from "./Extension.ts"
 import type { Payload } from "./Payload.ts"
 import type { Required } from "./Required.ts"
+import { CreatePayloadError } from "./Scheme.ts"
 
 export class Payer extends Context.Service<
   Payer,

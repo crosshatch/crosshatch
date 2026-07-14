@@ -1,4 +1,4 @@
-import { Types, Array, Effect, Schema as S, Record, Duration } from "effect"
+import { Data, flow, Types, Array, Effect, Schema as S, Record, Duration, UndefinedOr, Cause } from "effect"
 
 import { Address } from "./Address.ts"
 import * as Amount from "./Amount.ts"
@@ -22,6 +22,10 @@ export type RequirementsLike =
   | Array<typeof Requirements.Type>
   | Effect.Effect<Array<typeof Requirements.Type>, InvalidAmountError>
 
+export class CreateRequirementsError extends Data.TaggedError("CreateRequirementsError")<{
+  readonly reason: Cause.NoSuchElementError
+}> {}
+
 export const asset = Effect.fnUntraced(function* <A extends Namespaces>(
   asset: A,
   {
@@ -36,13 +40,17 @@ export const asset = Effect.fnUntraced(function* <A extends Namespaces>(
     readonly ttl?: Duration.Input | undefined
   },
 ) {
-  const maxTimeoutSeconds = ttl ? Math.ceil(Duration.fromInputUnsafe(ttl).pipe(Duration.toSeconds)) : 300
+  const maxTimeoutSeconds = UndefinedOr.match(ttl, {
+    onDefined: flow(Duration.fromInputUnsafe, Duration.toSeconds, Math.ceil),
+    onUndefined: () => 300,
+  })
   const nominal = yield* Amount.from(amount)
   return Record.toEntries(recipients).flatMap(([namespace, references]) =>
     references
       ? Record.toEntries(references).reduce(
           (acc, [reference, payTo]) => {
-            const physical = asset[namespace]![reference]!
+            const physical = asset[namespace]?.[reference]
+            if (!physical) return acc
             const { name, version } = physical
             return payTo
               ? acc.concat({

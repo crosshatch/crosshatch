@@ -1,5 +1,5 @@
 import type { References } from "../../Asset.ts"
-import { Eip155Asset, Erc3009, Permit2 } from "../../Eip155/Eip155.ts"
+import { Eip155Asset, Erc3009Scheme, Permit2Scheme } from "../../Eip155/Eip155.ts"
 
 export const eip155 = {
   723487: {
@@ -7,6 +7,6 @@ export const eip155 = {
     decimals: 6,
     name: "Stable Coin",
     version: "1",
-    adapters: [Erc3009.Erc3009Adapter, Permit2.Permit2Adapter],
+    schemes: [Erc3009Scheme.Erc3009Scheme, Permit2Scheme.Permit2Scheme],
   },
 } as const satisfies References

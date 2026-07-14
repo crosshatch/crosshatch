@@ -1,10 +1,10 @@
 import { Effect, Context, Schema as S, Option, Layer } from "effect"
 
-import type { Adapt } from "./Adapter.ts"
 import type { Peg, PhysicalAsset } from "./Asset.ts"
 import { ChainId } from "./ChainId.ts"
 import { Required } from "./Required.ts"
 import type { Requirements } from "./Requirements.ts"
+import type { Adapt } from "./Scheme.ts"
 
 export class AcceptError extends S.TaggedErrorClass<AcceptError>()("AcceptError", { required: Required }) {}
 
@@ -16,7 +16,7 @@ export class Accept extends Context.Service<
       readonly acceptedI: number
       readonly chainId: typeof ChainId.Type
       readonly physical: PhysicalAsset
-      readonly adapt: Adapt
+      readonly adapt: Adapt<never>
     },
     AcceptError
   >
@@ -36,7 +36,7 @@ export const layer = (peg: Peg) =>
               for (let acceptedI = 0; acceptedI < accepts.length; acceptedI++) {
                 const accepted = accepts[acceptedI]!
                 if (chainId === accepted.network && physical.asset === accepted.asset) {
-                  for (const tag of physical.adapters) {
+                  for (const tag of physical.schemes) {
                     const adapter = context.pipe(Context.getOption(tag), Option.getOrUndefined)
                     if (!adapter) {
                       continue
