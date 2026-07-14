@@ -55,7 +55,7 @@ export class NoSurroundingTraceError extends Data.TaggedError("NoSurroundingTrac
 
 export const traced =
   (name: string) =>
-  (template: TemplateStringsArray, ...substitutions: ReadonlyArray<unknown>) =>
+  (template: TemplateStringsArray | string, ...substitutions: ReadonlyArray<unknown>) =>
     Effect.fnUntraced(function* <A, E, R>(effect: Effect.Effect<A, E, R>) {
       const { createTrace } = yield* Bridge
       const traceId = yield* Effect.currentSpan.pipe(

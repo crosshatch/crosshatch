@@ -75,10 +75,13 @@ export const Service =
             readonly accepted: typeof Requirements.Type
             readonly physical: PhysicalAsset
           }) {
-            const match = yield* Effect.all({
-              known: S.decodeUnknownEffect(S.toType(known))(physical.metadata),
-              extra: S.decodeUnknownEffect(extra)(accepted.extra),
-            })
+            const match = yield* Effect.all(
+              {
+                known: S.decodeUnknownEffect(S.toType(known))(physical.metadata),
+                extra: S.decodeUnknownEffect(extra)(accepted.extra),
+              },
+              { concurrency: "unbounded" },
+            )
             return f(match)({ accepted, physical }).pipe(bound)
           }, bound)
         }),

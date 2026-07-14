@@ -1,6 +1,6 @@
 import { assert, describe, it } from "@effect/vitest"
 
-import { normalizeStringRaw, stringRaw } from "./_util.ts"
+import { stringRaw } from "./_util.ts"
 
 const template = (template: TemplateStringsArray, ...substitutions: Array<unknown>) =>
   [template, substitutions] as const
@@ -33,12 +33,8 @@ describe(import.meta.url, () => {
     assert.strictEqual(description, "Charge type: subscription\nAmount: $20")
   })
 
-  it("preserves plain strings", () => {
-    const description = normalizeStringRaw("  Description of the charge.  ", [])
-    assert.strictEqual(description, "  Description of the charge.  ")
-  })
-
-  it("preserves undefined", () => {
-    assert.strictEqual(normalizeStringRaw(undefined, []), undefined)
+  it("trims plain strings", () => {
+    const description = stringRaw("  Description of the charge.  ", [])
+    assert.strictEqual(description, "Description of the charge.")
   })
 })

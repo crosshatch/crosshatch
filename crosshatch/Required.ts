@@ -1,6 +1,6 @@
 import { Schema as S, Effect, Context } from "effect"
 
-import { normalizeStringRaw } from "./_util.ts"
+import { stringRaw } from "./_util.ts"
 import { InvalidAmountError } from "./Amount.ts"
 import { type Extension, ExtensionsInfo } from "./Extension.ts"
 import { Requirements, type RequirementsLike } from "./Requirements.ts"
@@ -34,7 +34,7 @@ export const make = Effect.fnUntraced(function* (
     resource: {
       url,
       ...(template && {
-        description: normalizeStringRaw(template, substitutions),
+        description: stringRaw(template, substitutions),
       }),
     },
   } satisfies typeof Required.Type
