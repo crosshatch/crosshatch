@@ -1,5 +1,13 @@
 # @crosshatch/alchemy
 
+## 0.0.2
+
+### Patch Changes
+
+- Updated dependencies
+  [[`c8afbc3`](https://github.com/crosshatch/crosshatch/commit/c8afbc3ceb7c83c647cf0e02dec47e7e3c3e6b97)]:
+  - crosshatch@0.0.5
+
 ## 0.0.1
 
 ### Patch Changes

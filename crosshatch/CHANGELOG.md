@@ -1,5 +1,15 @@
 # crosshatch
 
+## 0.0.5
+
+### Patch Changes
+
+- [#102](https://github.com/crosshatch/crosshatch/pull/102)
+  [`c8afbc3`](https://github.com/crosshatch/crosshatch/commit/c8afbc3ceb7c83c647cf0e02dec47e7e3c3e6b97)
+  Thanks @harrysolovay! - Refactor physical asset shape, various names of
+  `Asset`, and update `KnownAssets` accordingly. Rename `Adapter` to `Scheme`.
+  Introduce initial `State` abstraction.
+
 ## 0.0.4
 
 ### Patch Changes
