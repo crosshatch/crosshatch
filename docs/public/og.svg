@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <style>
+    @font-face { font-family: "Manrope"; src: url("../../liminal/liminal-util/fonts/Manrope/Manrope-Regular.ttf") format("truetype"); font-weight: 400; }
+    @font-face { font-family: "Manrope"; src: url("../../liminal/liminal-util/fonts/Manrope/Manrope-SemiBold.ttf") format("truetype"); font-weight: 600; }
+    @font-face { font-family: "Manrope"; src: url("../../liminal/liminal-util/fonts/Manrope/Manrope-Bold.ttf") format("truetype"); font-weight: 700; }
+  </style>
+  <defs>
+    <radialGradient id="cyan" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(230 105) rotate(54) scale(430 310)"><stop stop-color="#50b4ff" stop-opacity="0.42"/><stop offset="0.58" stop-color="#50b4ff" stop-opacity="0.12"/><stop offset="1" stop-color="#50b4ff" stop-opacity="0"/></radialGradient>
+    <radialGradient id="violet" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(965 80) rotate(134) scale(470 315)"><stop stop-color="#785aff" stop-opacity="0.38"/><stop offset="0.64" stop-color="#785aff" stop-opacity="0.1"/><stop offset="1" stop-color="#785aff" stop-opacity="0"/></radialGradient>
+    <radialGradient id="white" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(600 0) scale(420 260)"><stop stop-color="#ffffff" stop-opacity="0.16"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
+    <linearGradient id="panel" x1="150" y1="52" x2="1050" y2="578" gradientUnits="userSpaceOnUse"><stop stop-color="#ffffff" stop-opacity="0.075"/><stop offset="1" stop-color="#ffffff" stop-opacity="0.028"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="28" stdDeviation="34" flood-color="#000000" flood-opacity="0.34"/></filter>
+  </defs>
+  <rect width="1200" height="630" fill="#05070c"/>
+  <rect width="1200" height="630" fill="url(#white)"/>
+  <rect width="1200" height="630" fill="url(#cyan)"/>
+  <rect width="1200" height="630" fill="url(#violet)"/>
+  <path d="M0 630H1200V315C1048 401 875 442 681 438 442 433 243 484 0 585Z" fill="#08111f" fill-opacity="0.54"/>
+  <g filter="url(#shadow)"><rect x="42" y="38" width="1116" height="554" fill="url(#panel)" stroke="#56d7ff" stroke-opacity="0.2"/></g>
+  <text x="142" y="168" fill="#9ee7ff" font-family="Manrope, ui-sans-serif, system-ui, sans-serif" font-size="26" font-weight="700" letter-spacing="3.2">EFFECT-NATIVE X402</text>
+  <text x="140" y="337" fill="#ffffff" fill-opacity="0.96" font-family="Manrope, ui-sans-serif, system-ui, sans-serif" font-size="100" font-weight="600" letter-spacing="-3.6">CROSSHATCH</text>
+  <text x="144" y="419" fill="#ffffff" fill-opacity="0.66" font-family="Manrope, ui-sans-serif, system-ui, sans-serif" font-size="34" font-weight="400" letter-spacing="-0.7">Build x402 clients and merchants with Effect!</text>
+  <path d="M142 505H510" stroke="#56d7ff" stroke-opacity="0.3" stroke-width="1.5"/>
+  <path d="M142 506H292" stroke="#9ee7ff" stroke-opacity="0.72" stroke-width="1.5"/>
+</svg>
