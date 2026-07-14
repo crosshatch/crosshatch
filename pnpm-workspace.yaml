@@ -21,9 +21,9 @@ catalog:
   "@effect/atom-react": 4.0.0-beta.97
   "@effect/language-service": ^0.86.6
   "@effect/openapi-generator": 4.0.0-beta.97
-  "@effect/platform-browser": 4.0.0-beta.97
-  "@effect/platform-node": 4.0.0-beta.97
-  "@effect/sql-d1": 4.0.0-beta.97
+  "@effect/platform-browser": ^4.0.0-beta.97
+  "@effect/platform-node": ^4.0.0-beta.97
+  "@effect/sql-d1": ^4.0.0-beta.97
   "@effect/sql-pg": 4.0.0-beta.97
   "@effect/vitest": 4.0.0-beta.97
   "@electric-sql/pglite": ^0.3.15
@@ -65,7 +65,7 @@ catalog:
   date-fns: ^4.1.0
   drizzle-kit: 1.0.0-rc.4
   drizzle-orm: 1.0.0-rc.4
-  effect: 4.0.0-beta.97
+  effect: ^4.0.0-beta.97
   fake-indexeddb: ^6.2.5
   happy-dom: ^20.10.6
   http-message-sig: ^0.1.0
@@ -99,7 +99,7 @@ catalog:
   vite: ^8.1.2
   vite-bundle-analyzer: ^1.3.6
   vitest: 4.1.4
-  vocs: 2.0.15
+  vocs: ^2.0.15
   waku: 1.0.0-beta.3
   yaml: ^2.9.0
 
@@ -113,6 +113,7 @@ overrides:
 patchedDependencies:
   "@changesets/apply-release-plan@7.1.1": konfik/patches/@changesets__apply-release-plan@7.1.1.patch
   "@changesets/assemble-release-plan@6.0.10": konfik/patches/@changesets__assemble-release-plan@6.0.10.patch
+  "@changesets/config@3.1.4": konfik/patches/@changesets__config@3.1.4.patch
   "@changesets/get-github-info@0.8.0": konfik/patches/@changesets__get-github-info@0.8.0.patch
 
 minimumReleaseAgeExclude:

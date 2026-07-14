@@ -3,6 +3,7 @@
   "changelog": ["@changesets/changelog-github", { "repo": "crosshatch/crosshatch" }],
   "commit": false,
   "linked": [],
+  "ignore": ["liminal", "liminal-util", "effect-workerd"],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch"
