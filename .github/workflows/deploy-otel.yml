@@ -2,10 +2,6 @@ name: Deploy Otel
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-  pull_request:
-    types: [opened, reopened, synchronize, closed]
 
 permissions:
   contents: read
