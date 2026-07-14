@@ -36,7 +36,7 @@ export const Extra = S.Struct({
 })
 
 export class SolanaScheme extends Scheme.Service<SolanaScheme, typeof Known.Type, typeof Extra.Type>()(
-  "@crosshatch/SolanaScheme",
+  "@crosshatch/Solana/SolanaScheme",
 ) {}
 
 export const layer = SolanaScheme.layer(

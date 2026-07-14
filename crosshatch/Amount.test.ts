@@ -102,12 +102,12 @@ describe(import.meta.url, () => {
     "scales grouped requirements by physical asset decimals",
     Effect.fn(function* () {
       const payTo = Address.Address.make("0x0000000000000000000000000000000000000001")
-      const [sixDecimals] = yield* Requirements.peg(KnownAssets.Usd, {
+      const [sixDecimals] = yield* Requirements.denomination(KnownAssets.Usd, {
         amount: 0.01,
         recipients: { eip155: { 8453: payTo } },
       })
       assert.strictEqual(sixDecimals!.amount, "10000")
-      const [eighteenDecimals] = yield* Requirements.peg(KnownAssets.Usd, {
+      const [eighteenDecimals] = yield* Requirements.denomination(KnownAssets.Usd, {
         amount: 0.01,
         recipients: { eip155: { 31612: payTo } },
       })

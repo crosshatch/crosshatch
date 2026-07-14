@@ -66,17 +66,16 @@ export default defineConfig({
       {
         text: "Payment Capability",
         items: [
-          { text: "Bridge", link: "/bridge" },
           { text: "Payer", link: "/payer" },
-          {
-            text: "Scheme",
-            link: "/adapter",
-            collapsed: true,
-            items: [
-              { text: "EIP-155", link: "/eip155" },
-              { text: "Solana", link: "/solana" },
-            ],
-          },
+          { text: "Bridge", link: "/bridge" },
+          { text: "Scheme", link: "/scheme" },
+        ],
+      },
+      {
+        text: "Schemes",
+        items: [
+          { text: "EIP-155", link: "/eip155" },
+          { text: "Solana", link: "/solana" },
         ],
       },
     ],

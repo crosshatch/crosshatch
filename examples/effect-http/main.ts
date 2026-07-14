@@ -26,7 +26,7 @@ export default Worker.make({
             required: true,
           }),
           Required.accept(
-            Requirements.peg(KnownAssets.Usd, {
+            Requirements.denomination(KnownAssets.Usd, {
               amount: 0.01,
               recipients: { eip155: { 8453: PAY_TO_EIP155 } },
             }),

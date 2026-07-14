@@ -3,7 +3,7 @@ import { Data, flow, Types, Array, Effect, Schema as S, Record, Duration, Undefi
 import { Address } from "./Address.ts"
 import * as Amount from "./Amount.ts"
 import type { InvalidAmountError } from "./Amount.ts"
-import { Asset, type Namespaces, type Peg } from "./Asset.ts"
+import { Asset, type Denomination, type LogicalAsset } from "./Asset.ts"
 import { ChainId } from "./ChainId.ts"
 
 export const Requirements = S.Struct({
@@ -26,7 +26,7 @@ export class CreateRequirementsError extends Data.TaggedError("CreateRequirement
   readonly reason: Cause.NoSuchElementError
 }> {}
 
-export const asset = Effect.fnUntraced(function* <A extends Namespaces>(
+export const asset = Effect.fnUntraced(function* <A extends LogicalAsset>(
   asset: A,
   {
     amount,
@@ -70,8 +70,8 @@ export const asset = Effect.fnUntraced(function* <A extends Namespaces>(
   )
 })
 
-export const peg = <A extends Peg>(
-  peg: A,
+export const denomination = <A extends Denomination>(
+  denomination: A,
   config: {
     readonly amount: Amount.Input
     readonly recipients: Types.UnionToIntersection<
@@ -86,6 +86,6 @@ export const peg = <A extends Peg>(
     readonly ttl?: Duration.Input | undefined
   },
 ) =>
-  Effect.all(Record.toEntries(peg).map(([_k, namespaces]) => asset(namespaces, config as never))).pipe(
+  Effect.all(Record.toEntries(denomination).map(([_k, logicalAsset]) => asset(logicalAsset, config as never))).pipe(
     Effect.map(Array.flatten),
   )

@@ -1,6 +1,6 @@
 import { Effect, Context, Schema as S, Option, Layer } from "effect"
 
-import type { Peg, PhysicalAsset } from "./Asset.ts"
+import type { Denomination, PhysicalAsset } from "./Asset.ts"
 import { ChainId } from "./ChainId.ts"
 import { Required } from "./Required.ts"
 import type { Requirements } from "./Requirements.ts"
@@ -22,14 +22,14 @@ export class Accept extends Context.Service<
   >
 >()("crosshatch/Accept") {}
 
-export const layer = (peg: Peg) =>
+export const layer = (denomination: Denomination) =>
   Layer.effect(
     Accept,
     Effect.gen(function* () {
       const context = yield* Effect.context<never>()
       return Effect.fnUntraced(function* ({ required }) {
         const { accepts } = required
-        for (const asset of Object.values(peg)) {
+        for (const asset of Object.values(denomination)) {
           for (const [namespace, references] of Object.entries(asset)) {
             for (const [reference, physical] of Object.entries(references)) {
               const chainId = ChainId.make(`${namespace}:${reference}`)

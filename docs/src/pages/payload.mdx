@@ -70,7 +70,7 @@ const { createPayload } = yield * Payer.Payer
 
 At runtime, the provided `Payer` decides which `required.accepts` entry to pay
 and how to produce the signed payload. For the built-in EIP-155 flow, the
-`Payer` uses the configured asset peg to select a supported requirement, then
+`Payer` uses the configured denomination to select a supported requirement, then
 asks the selected scheme to create the concrete payload.
 
 Provide a `Payer` layer when running the program. See [Payer Service](/payer)

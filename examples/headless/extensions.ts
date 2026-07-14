@@ -18,7 +18,7 @@ const makeRequired = Effect.gen(function* () {
       required: true,
     }),
     Required.accept(
-      Requirements.peg(KnownAssets.Usd, {
+      Requirements.denomination(KnownAssets.Usd, {
         amount: 0.01,
         recipients: { eip155: { 8453: PAY_TO_EIP155 } },
         ttl: "1 minutes",

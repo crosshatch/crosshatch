@@ -40,7 +40,7 @@ describe.skipIf(!env.TEST_LIVE)(import.meta.url, () => {
     Effect.fn(function* () {
       const required = yield* Required.make().pipe(
         Required.accept(
-          Requirements.peg(KnownAssets.Usd, {
+          Requirements.denomination(KnownAssets.Usd, {
             amount: 0.01,
             recipients: {
               eip155: {

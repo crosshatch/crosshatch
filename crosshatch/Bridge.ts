@@ -66,7 +66,9 @@ export const traced =
       const trace = {
         traceId,
         name,
-        description: String.stripMargin(globalThis.String.raw(template, ...substitutions)),
+        description: String.stripMargin(
+          globalThis.String.raw(template, ...substitutions).replace(/(?<margin>^[ \t]*\|) /gmu, "$<margin>"),
+        ).trim(),
       }
       yield* createTrace?.(trace) ?? Effect.void
       return yield* Effect.provideService(effect, Trace, trace)

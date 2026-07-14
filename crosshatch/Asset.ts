@@ -20,5 +20,5 @@ type NamespaceId = string
 type AssetId = string
 
 export type References = Readonly<Record<ReferenceId, PhysicalAsset>>
-export type Namespaces = Readonly<Record<NamespaceId, References>>
-export type Peg = Readonly<Record<AssetId, Namespaces>>
+export type LogicalAsset = Readonly<Record<NamespaceId, References>>
+export type Denomination = Readonly<Record<AssetId, LogicalAsset>>

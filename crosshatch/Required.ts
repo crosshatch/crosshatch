@@ -36,7 +36,12 @@ export const make = Effect.fnUntraced(function* (
         description:
           typeof template === "string"
             ? template
-            : String.stripMargin(globalThis.String.raw(template, ...(substitutions ?? []))),
+            : String.stripMargin(
+                globalThis.String.raw(template, ...(substitutions ?? [])).replace(
+                  /(?<margin>^[ \t]*\|) /gmu,
+                  "$<margin>",
+                ),
+              ).trim(),
       }),
     },
   } satisfies typeof Required.Type

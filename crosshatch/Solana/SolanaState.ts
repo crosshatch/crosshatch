@@ -3,7 +3,7 @@ import { Effect, Layer } from "effect"
 
 import * as State from "../State.ts"
 
-export class SolanaState extends State.Service<SolanaState, Blockhash>()("crosshatch/SolanaState") {}
+export class SolanaState extends State.Service<SolanaState, Blockhash>()("crosshatch/Solana/SolanaState") {}
 
 export const layer = (url: string) =>
   Layer.effect(

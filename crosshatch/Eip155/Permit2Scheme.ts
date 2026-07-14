@@ -8,7 +8,9 @@ export const Extra = S.Struct({
   assetTransferMethod: S.Never.pipe(S.optional),
 })
 
-export class Permit2Scheme extends Scheme.Service<Permit2Scheme, void, typeof Extra.Type>()("crosshatch/Permit2") {}
+export class Permit2Scheme extends Scheme.Service<Permit2Scheme, void, typeof Extra.Type>()(
+  "crosshatch/Eip155/Permit2Scheme",
+) {}
 
 export interface Permit2 {
   readonly signature: string

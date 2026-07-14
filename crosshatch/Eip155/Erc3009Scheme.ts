@@ -11,7 +11,7 @@ export const Extra = S.Struct({
 })
 
 export class Erc3009Scheme extends Scheme.Service<Erc3009Scheme, void, typeof Extra.Type>()(
-  "crosshatch/Erc3009Scheme",
+  "crosshatch/Eip155/Erc3009Scheme",
 ) {}
 
 export interface Erc3009 {

@@ -41,14 +41,14 @@ Given a `Required` invoice, it chooses one compatible entry from
 `required.accepts`, finds the matching physical asset, and returns the scheme
 effect that can create the chain-specific payment payload.
 
-`Accept.layer(peg)` receives a peg config. `KnownAssets.Usd` is the built-in USD
-peg Crosshatch ships. Provide it to `Payer.layer` together with the signing
-schemes your client supports.
+`Accept.layer(denomination)` receives a denomination config. `KnownAssets.Usd`
+is the built-in USD denomination Crosshatch ships. Provide it to `Payer.layer`
+together with the signing schemes your client supports.
 
 `Accept` compares the invoice's accepted payment options against the configured
-peg. A payment option is usable when its network and asset match a configured
-physical asset, and one of that asset's schemes is available in the current
-Effect context.
+denomination. A payment option is usable when its network and asset match a
+configured physical asset, and one of that asset's schemes is available in the
+current Effect context.
 
 Most applications do not call `Accept` directly. They provide `Accept.layer` to
 `Payer.layer`, then call `Payer.createPayload`.
