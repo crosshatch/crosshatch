@@ -7,6 +7,9 @@ export default defineConfig({
     title: "Crosshatch",
     repo: "crosshatch",
   }),
+  mcp: {
+    enabled: false,
+  },
   description: PackageJson.description,
   topNav: [
     {
@@ -36,6 +39,7 @@ export default defineConfig({
     variant: "tip",
   },
   baseUrl: "https://crosshatch.dev",
+  ogImageUrl: "https://crosshatch.dev/og.png",
   sidebar: {
     "/": [
       {
