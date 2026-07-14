@@ -2,5 +2,6 @@
 "crosshatch": patch
 ---
 
-Reactor physical asset shape and `KnownAssets`. Rename `Adapter` to `Scheme`.
-Introduce initial `State` abstraction.
+Refactor physical asset shape, various names of `Asset`, and update
+`KnownAssets` accordingly. Rename `Adapter` to `Scheme`. Introduce initial
+`State` abstraction.

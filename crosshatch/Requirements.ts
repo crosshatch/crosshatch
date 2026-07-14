@@ -26,7 +26,7 @@ export class CreateRequirementsError extends Data.TaggedError("CreateRequirement
   readonly reason: Cause.NoSuchElementError
 }> {}
 
-export const asset = Effect.fnUntraced(function* <A extends LogicalAsset>(
+export const logical = Effect.fnUntraced(function* <A extends LogicalAsset>(
   asset: A,
   {
     amount,
@@ -86,6 +86,6 @@ export const denomination = <A extends Denomination>(
     readonly ttl?: Duration.Input | undefined
   },
 ) =>
-  Effect.all(Record.toEntries(denomination).map(([_k, logicalAsset]) => asset(logicalAsset, config as never))).pipe(
+  Effect.all(Record.toEntries(denomination).map(([_k, logicalAsset]) => logical(logicalAsset, config as never))).pipe(
     Effect.map(Array.flatten),
   )

@@ -12,6 +12,7 @@ type Page =
   | { path: '/changelog'; render: 'static' }
   | { path: '/eip155'; render: 'static' }
   | { path: '/extension'; render: 'static' }
+  | { path: '/facilitation'; render: 'static' }
   | { path: '/'; render: 'static' }
   | { path: '/lifecycle'; render: 'static' }
   | { path: '/mnemonic'; render: 'static' }

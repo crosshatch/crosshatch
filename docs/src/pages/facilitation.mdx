@@ -1,0 +1,79 @@
+---
+title: Facilitation
+description:
+  Configure the facilitator client used to verify and settle x402 payment
+  payloads.
+---
+
+# Facilitation
+
+Settlement and verification are performed through a facilitator service.
+Crosshatch uses `FacilitatorClient` to call that service from
+`Facilitator.verify` and `Facilitator.settle`.
+
+By default, Crosshatch points at the public Crosshatch facilitator:
+`https://facilitator.crosshatch.dev`.
+
+## Providing a Facilitator
+
+Provide `FacilitatorClient.layer` when your program should use a different
+facilitator URL.
+
+```ts
+import { Facilitator } from "crosshatch"
+import { Effect } from "effect"
+
+const Program = Effect.gen(function* () {
+  // Your merchant routes or settlement effects live here.
+})
+
+Program.pipe(
+  Effect.provide(
+    Facilitator.FacilitatorClient.layer({
+      baseUrl: "https://facilitator.example.com",
+    }),
+  ),
+)
+```
+
+Any `Facilitator.verify({ payload })` or `Facilitator.settle({ payload })` call
+inside the provided scope will use this facilitator.
+
+## Merchant Settlement
+
+Most merchant servers provide the facilitator client at the application layer so
+every paid route settles against the same service.
+
+```ts
+import { Facilitator, Payload } from "crosshatch"
+import { Effect } from "effect"
+
+const route = Effect.gen(function* () {
+  const payload = yield* Payload.pipe(Effect.flatMap(Effect.fromNullishOr))
+  const settlement = yield* Facilitator.settle({ payload })
+  // ...
+}).pipe(
+  // [!code focus:start]
+  Effect.provide(
+    Facilitator.FacilitatorClient.layer({
+      baseUrl: "https://facilitator.example.com",
+    }),
+  ),
+  // [!code focus:end]
+)
+```
+
+## When to Override
+
+Use a custom facilitator when you operate your own settlement service, route
+traffic through an environment-specific deployment, or need to test settlement
+against a local facilitator.
+
+```ts
+Facilitator.FacilitatorClient.layer({
+  baseUrl: "http://localhost:8787",
+})
+```
+
+The facilitator must implement the Crosshatch facilitator API expected by
+`@crosshatch/Facilitator/FacilitatorClient.ts`.

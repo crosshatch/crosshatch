@@ -51,6 +51,7 @@ export default defineConfig({
             ],
           },
           { text: "Lifecycle", link: "/lifecycle" },
+          { text: "Facilitation", link: "/facilitation" },
         ],
       },
       {

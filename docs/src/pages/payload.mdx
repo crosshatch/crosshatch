@@ -32,7 +32,7 @@ import { Eip155Address } from "crosshatch/Eip155"
 const program = Effect.gen(function* () {
   const required = yield* Required.make`Access to the paid resource.`.pipe(
     Required.accept(
-      Requirements.asset(KnownAssets.Usd.USDC, {
+      Requirements.logical(KnownAssets.Usd.USDC, {
         amount: 0.01,
         recipients: {
           eip155: {

@@ -46,7 +46,7 @@ const makeRequired = Effect.gen(function* () {
       required: true,
     }),
     Required.accept(
-      Requirements.asset(KnownAssets.Usd.USDC, {
+      Requirements.logical(KnownAssets.Usd.USDC, {
         amount: 0.01,
         recipients: {
           eip155: {
@@ -67,13 +67,13 @@ that may show the payment request to a user.
 
 ## Requirements Groups
 
-`Requirements.asset` turns one logical asset's namespace map into acceptable
+`Requirements.logical` turns one logical asset's namespace map into acceptable
 payment options. For example, `USDC` may contain physical assets for multiple
 EIP-155 chains. The `recipients` object chooses which deployments this invoice
 accepts and where payment should be sent on each chain.
 
 ```ts
-Requirements.asset(USDC, {
+Requirements.logical(USDC, {
   amount: 0.01,
   recipients: {
     eip155: {
