@@ -7,9 +7,6 @@ export default defineConfig({
     title: "Crosshatch",
     repo: "crosshatch",
   }),
-  mcp: {
-    enabled: false,
-  },
   description: PackageJson.description,
   topNav: [
     {
