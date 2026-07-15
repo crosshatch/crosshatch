@@ -27,17 +27,11 @@ export const layerMemory = Layer.effect(
         invoices[id] = deferred
       }),
       await: Effect.fnUntraced(function* (paymentId) {
-        const invoice = invoices[paymentId]
-        if (!invoice) {
-          return yield* new Cause.NoSuchElementError()
-        }
+        const invoice = yield* Effect.fromNullishOr(invoices[paymentId])
         return yield* Deferred.await(invoice)
       }),
       resolve: Effect.fnUntraced(function* (id, payload) {
-        const deferred = invoices[id]
-        if (!deferred) {
-          return yield* new Cause.NoSuchElementError()
-        }
+        const deferred = yield* Effect.fromNullishOr(invoices[id])
         delete invoices[id]
         return yield* Deferred.succeed(deferred, payload)
       }),
