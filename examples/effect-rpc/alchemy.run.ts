@@ -2,7 +2,7 @@ import * as Alchemy from "alchemy"
 import * as Cloudflare from "alchemy/Cloudflare"
 import { Effect } from "effect"
 
-import ExampleEffectRpc from "./main.ts"
+import ExampleEffectRpc from "./ExampleEffectRpc.ts"
 
 export default Alchemy.Stack(
   "crosshatch-example-effect-rpc",

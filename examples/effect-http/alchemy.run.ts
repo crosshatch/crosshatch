@@ -2,7 +2,7 @@ import * as Alchemy from "alchemy"
 import * as Cloudflare from "alchemy/Cloudflare"
 import { Effect } from "effect"
 
-import ExampleEffectHttp from "./main.ts"
+import ExampleEffectHttp from "./ExampleEffectHttp.ts"
 
 export default Alchemy.Stack(
   "crosshatch-example-effect-http",

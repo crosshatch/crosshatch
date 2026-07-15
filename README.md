@@ -66,9 +66,9 @@ const recipient = Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
 
 export default class Merchant extends Cloudflare.Worker<Merchant>()(
   "Merchant",
-  { main: import.meta.filename },
-  Effect.succeed({
-    fetch: HttpRouter.add(
+  { main: import.meta.url },
+  Effect.gen(function* () {
+    const fetch = HttpRouter.add(
       "GET",
       "/paid",
       Effect.gen(function* () {
@@ -108,8 +108,10 @@ export default class Merchant extends Cloudflare.Worker<Merchant>()(
         ChxHttp.layerMiddleware(),
       ]),
       HttpRouter.toHttpEffect,
+      Effect.scoped,
       Effect.flatten,
-    ),
+    )
+    return { fetch }
   }),
 ) {}
 ```

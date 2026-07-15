@@ -1,6 +1,7 @@
 import { Schema as S, Cause, Context, Deferred, Effect, Layer } from "effect"
 
-import { Extension, Payload } from "../index.ts"
+import * as Extension from "../Extension.ts"
+import * as Payload from "../Payload.ts"
 
 export const PaymentId = S.String.check(S.isLengthBetween(16, 128), S.isPattern(/^[a-zA-Z0-9_-]+$/u)).pipe(
   S.brand("crosshatch/PaymentId"),

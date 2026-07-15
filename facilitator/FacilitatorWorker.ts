@@ -22,7 +22,7 @@ export default class FacilitatorWorker extends Cloudflare.Worker<FacilitatorWork
     },
   },
   Effect.gen(function* () {
-    const env = yield* FacilitatorEnv
+    yield* FacilitatorEnv
     const fetch = Layer.mergeAll(
       HttpApiBuilder.layer(Facilitator.FacilitatorApi, { openapiPath: "/openapi.json" }).pipe(
         Layer.provide(FacilitatorLive),
@@ -31,19 +31,20 @@ export default class FacilitatorWorker extends Cloudflare.Worker<FacilitatorWork
       FacilitatorLive,
     ).pipe(
       Layer.provide([
+        Etag.layer,
+        Path.layer,
+        HttpPlatform.layer.pipe(Layer.provideMerge(FileSystem.layerNoop({}))),
         HttpRouter.cors({
           allowedHeaders: ["*"],
           allowedMethods: ["*"],
           allowedOrigins: ["*"],
         }),
-        Etag.layer,
-        HttpPlatform.layer.pipe(Layer.provideMerge(FileSystem.layerNoop({}))),
-        Path.layer,
       ]),
       HttpRouter.toHttpEffect,
       Effect.scoped,
       Effect.flatten,
-      Effect.provide(Prelude.layer.pipe(Layer.provideMerge(Layer.succeed(FacilitatorEnv, env)))),
+      Effect.provide(Prelude.layer.pipe(Layer.provideMerge(FacilitatorEnv.layer))),
+      Effect.catchTag("ConfigError", Effect.die),
     )
     return { fetch }
   }).pipe(Effect.provide(FacilitatorEnv.layer)),

@@ -2,7 +2,7 @@ import { Schema as S, Context, Option, Data, Effect, flow } from "effect"
 
 import { stringRaw } from "./_util.ts"
 import type { Payload } from "./Payload.ts"
-import type { Required } from "./Required.ts"
+import { Required } from "./Required.ts"
 
 export class CreateTraceError extends S.TaggedErrorClass<CreateTraceError>()("CreateTraceError", {
   cause: S.Unknown.pipe(S.optional),
@@ -12,25 +12,24 @@ export class ProposeError extends S.TaggedErrorClass<ProposeError>()("ProposeErr
   cause: S.Unknown.pipe(S.optional),
 }) {}
 
+export class Proposal extends S.Class<Proposal>("Proposal")({
+  traceId: S.String.pipe(S.optional),
+  required: Required,
+}) {}
+
 export class Bridge extends Context.Service<
   Bridge,
   {
     readonly createTrace?: undefined | ((config: typeof TraceConfig.Type) => Effect.Effect<void, CreateTraceError>)
 
-    readonly propose: (config: {
-      readonly traceId?: string | undefined
-      readonly required: typeof Required.Type
-    }) => Effect.Effect<{ readonly payload: Payload }, ProposeError>
+    readonly propose: (proposal: Proposal) => Effect.Effect<{ readonly payload: Payload }, ProposeError>
   }
 >()("crosshatch/Bridge") {}
 
-export const propose = Effect.fnUntraced(function* (config: {
-  readonly traceId?: string | undefined
-  readonly required: typeof Required.Type
-}) {
+export const propose = Effect.fnUntraced(function* (proposal: Proposal) {
   const { createTrace, propose } = yield* Bridge
-  const traceId = config.traceId ?? (yield* createTrace ? TraceId : Effect.undefined)
-  const { required } = config
+  const traceId = proposal.traceId ?? (yield* createTrace ? TraceId : Effect.undefined)
+  const { required } = proposal
   return yield* propose({ traceId, required })
 })
 

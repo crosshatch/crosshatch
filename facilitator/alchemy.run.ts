@@ -4,7 +4,7 @@ import * as Github from "alchemy/GitHub"
 import { Effect, Layer } from "effect"
 import { PrPreviewComment } from "liminal-util/alchemicals/PrComment"
 
-import FacilitatorWorker from "./main.ts"
+import FacilitatorWorker from "./FacilitatorWorker.ts"
 
 export default Alchemy.Stack(
   "crosshatch-facilitator",
