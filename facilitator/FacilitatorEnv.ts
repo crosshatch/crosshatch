@@ -1,4 +1,3 @@
-import * as Alchemy from "alchemy"
 import { Config, Layer, Context } from "effect"
 
 export class FacilitatorEnv extends Context.Service<FacilitatorEnv>()("FacilitatorEnv", {
