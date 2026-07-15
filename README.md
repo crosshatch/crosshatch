@@ -15,7 +15,7 @@ completion.
 
 ```ts
 import { OpenAiClient, OpenAiLanguageModel } from "@effect/ai-openai-compat"
-import { Http402 } from "crosshatch"
+import { ChxHttp } from "crosshatch"
 import { Console, Effect, Layer } from "effect"
 import { LanguageModel } from "effect/unstable/ai"
 
@@ -24,18 +24,18 @@ import { PayerLive } from "./PayerLive.ts"
 const BlockrunLive = OpenAiLanguageModel.layer({
   model: "deepseek/deepseek-chat",
 }).pipe(
-  Layer.provide(OpenAiClient.layer({ apiUrl: "https://blockrun.ai/api/v1" })),
+  Layer.provide(
+    OpenAiClient.layer({ apiUrl: "https://blockrun.ai/api/v1" }).pipe(
+      Layer.provide(ChxHttp.layerClient.pipe(Layer.provide(PayerLive))),
+    ),
+  ),
 )
 
 LanguageModel.generateText({
   prompt: "Hello from Crosshatch.",
 }).pipe(
   Effect.tap(({ text }) => Console.log(text)),
-  Effect.provide(
-    BlockrunLive.pipe(
-      Layer.provide(Http402.layerClient.pipe(Layer.provide(PayerLive))),
-    ),
-  ),
+  Effect.provide(BlockrunLive),
   Effect.runFork,
 )
 ```
@@ -44,7 +44,9 @@ LanguageModel.generateText({
 
 ## Example Merchant
 
-The following Effect HTTP API route charges and settles USDC on Base.
+The following Effect HTTP API route charges and settles USDC on Base. It uses
+`alchemy/Cloudflare`'s single-file `Cloudflare.Worker` DX, where platform
+configuration and the Worker runtime live together.
 
 ```ts
 import {
@@ -52,41 +54,64 @@ import {
   Required,
   Payload,
   Requirements,
-  Http402,
+  ChxHttp,
   KnownAssets,
 } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
-import { Effect, Config } from "effect"
-import { HttpServerResponse } from "effect/unstable/http"
+import * as Cloudflare from "alchemy/Cloudflare"
+import { Effect, Config, Layer } from "effect"
+import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
 
 const recipient = Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
 
-export default Effect.gen(function* () {
-  const payload = yield* Payload.Payload
-  if (!payload) {
-    const required = yield* Required.make`
-    |
-    | Description of the charge here.
-    |
-    | What is this charge for?
-    |
-    | How does it fit into the current flow?
-    |
-    `.pipe(
-      Required.accept(
-        Requirements.asset(KnownAssets.USDC, {
-          amount: 0.01,
-          recipients: { eip155: { 8453: yield* recipient } },
+export default class Merchant extends Cloudflare.Worker<Merchant>()(
+  "Merchant",
+  { main: import.meta.filename },
+  Effect.succeed({
+    fetch: HttpRouter.add(
+      "GET",
+      "/paid",
+      Effect.gen(function* () {
+        const payload = yield* Payload.Payload
+        if (!payload) {
+          const required = yield* Required.make`
+          |
+          | Description of the charge here.
+          |
+          | What is this charge for?
+          |
+          | How does it fit into the current flow?
+          |
+          `.pipe(
+            Required.accept(
+              Requirements.denomination(KnownAssets.Usd, {
+                amount: 0.01,
+                recipients: { eip155: { 8453: yield* recipient } },
+              }),
+            ),
+          )
+          return yield* ChxHttp.require({ required })
+        }
+        const settlement = yield* Facilitator.settle({ payload })
+        return HttpServerResponse.text("The paid resource.").pipe(
+          ChxHttp.addResponseHeader(settlement),
+        )
+      }),
+    ).pipe(
+      Layer.provide([
+        HttpRouter.cors({
+          allowedHeaders: ["*"],
+          allowedMethods: ["*"],
+          allowedOrigins: ["*"],
+          exposedHeaders: ChxHttp.HEADERS,
         }),
-      ),
-    )
-    return yield* Http402.require({ required })
-  }
-  const settlement = yield* Facilitator.settle({ payload })
-  return HttpServerResponse.text("The paid resource.").pipe(
-    Http402.addResponseHeader(settlement),
-  )
-})
+        ChxHttp.layerMiddleware(),
+      ]),
+      HttpRouter.toHttpEffect,
+      Effect.flatten,
+    ),
+  }),
+) {}
 ```
 
 ## Payer Layer
@@ -99,18 +124,27 @@ single mnemonic `MNEMONIC` in the environment variables.
 
 ```ts
 import { Accept, KnownAssets, Mnemonic, Payer } from "crosshatch"
-import { Erc3009, Eip155Signer, Permit2 } from "crosshatch/Eip155"
-import { Layer } from "effect"
+import { Erc3009Scheme, Eip155Signer, Permit2Scheme } from "crosshatch/Eip155"
+import { SolanaState, SolanaScheme, SolanaSigner } from "crosshatch/Solana"
+import { Config, Layer } from "effect"
+
+const SolanaStateLive = Config.string("SOLANA_RPC_URL").pipe(
+  Config.map(SolanaState.layer),
+  Layer.unwrap,
+)
 
 export const PayerLive = Payer.layer.pipe(
   Layer.provide(
-    Accept.layer(KnownAssets).pipe(
+    Accept.layer(KnownAssets.Usd).pipe(
       Layer.provide(
-        Layer.mergeAll(Erc3009.layer, Permit2.layer).pipe(
-          Layer.provide(
-            Eip155Signer.layerMnemonic.pipe(Layer.provide(Mnemonic.layerEnv)),
+        Layer.mergeAll(
+          Layer.mergeAll(Erc3009Scheme.layer, Permit2Scheme.layer).pipe(
+            Layer.provide(Eip155Signer.layerMnemonic),
           ),
-        ),
+          SolanaScheme.layer.pipe(
+            Layer.provide([SolanaSigner.layerMnemonic, SolanaStateLive]),
+          ),
+        ).pipe(Layer.provide(Mnemonic.layerEnv)),
       ),
     ),
   ),
@@ -124,7 +158,6 @@ git clone --recurse-submodules=konfik git@github.com:crosshatch/crosshatch.git
 cd crosshatch
 git submodule update --init liminal
 git -C liminal submodule update --init konfik
-
 pnpm i
 pnpm build
 pnpm test

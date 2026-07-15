@@ -1,7 +1,8 @@
 import * as Alchemy from "alchemy"
 import * as Cloudflare from "alchemy/Cloudflare"
 import { Effect } from "effect"
-import { WorkerConfig } from "liminal-util/alchemicals/WorkerConfig"
+
+import ExampleEffectRpc from "./main.ts"
 
 export default Alchemy.Stack(
   "crosshatch-example-effect-rpc",
@@ -10,21 +11,7 @@ export default Alchemy.Stack(
     providers: Cloudflare.providers(),
   },
   Effect.gen(function* () {
-    const base = yield* WorkerConfig({
-      domain: "example-effect-rpc.crosshatch.dev",
-    })
-    const CROSSHATCH_STAGE = yield* Alchemy.Stage
-    yield* Cloudflare.Website.Vite("Entry", {
-      ...base,
-      dev: {
-        host: "127.0.0.1",
-        port: 4386,
-        strictPort: true,
-      },
-      env: {
-        CROSSHATCH_STAGE,
-        VITE_PUBLIC_CROSSHATCH_STAGE: CROSSHATCH_STAGE,
-      },
-    })
+    const worker = yield* ExampleEffectRpc
+    return { url: worker.url.as<string>() }
   }),
 )

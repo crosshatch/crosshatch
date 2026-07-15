@@ -23,13 +23,13 @@ derived signer has the stablecoin required by the resource you want to fetch.
 
 ## Call a Paid AI Model
 
-Provide `Http402.layerClient` with a `Payer` layer, then use the client
+Provide `ChxHttp.layerClient` with a `Payer` layer, then use the client
 normally. For OpenAI-compatible x402 services like Blockrun, this works directly
 with Effect AI.
 
 ```ts
 import { OpenAiClient, OpenAiLanguageModel } from "@effect/ai-openai-compat"
-import { Http402 } from "crosshatch"
+import { ChxHttp } from "crosshatch"
 import { Console, Effect, Layer } from "effect"
 import { LanguageModel } from "effect/unstable/ai"
 
@@ -47,7 +47,7 @@ LanguageModel.generateText({
   Effect.tap(({ text }) => Console.log(text)),
   Effect.provide(
     BlockrunLive.pipe(
-      Layer.provide(Http402.layerClient.pipe(Layer.provide(PayerLive))),
+      Layer.provide(ChxHttp.layerClient.pipe(Layer.provide(PayerLive))),
     ),
   ),
   Effect.runFork,
@@ -61,7 +61,7 @@ response is `402`, Crosshatch reads the payment requirement, asks `PayerLive`
 for a payload, and retries once with the payment header attached.
 
 ```ts
-import { Http402 } from "crosshatch"
+import { ChxHttp } from "crosshatch"
 import { Effect, Layer } from "effect"
 import { HttpClient, HttpClientRequest } from "effect/unstable/http"
 
@@ -73,7 +73,7 @@ const program = Effect.gen(function* () {
     "https://example.com/paid",
   ).pipe(client.execute)
   return yield* response.text
-}).pipe(Effect.provide(Http402.layerClient.pipe(Layer.provide(PayerLive))))
+}).pipe(Effect.provide(ChxHttp.layerClient.pipe(Layer.provide(PayerLive))))
 ```
 
 `PayerLive` wires the payer to supported assets and signers. The headless

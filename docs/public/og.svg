@@ -16,10 +16,10 @@
   <rect width="1200" height="630" fill="url(#cyan)"/>
   <rect width="1200" height="630" fill="url(#violet)"/>
   <path d="M0 630H1200V315C1048 401 875 442 681 438 442 433 243 484 0 585Z" fill="#08111f" fill-opacity="0.54"/>
-  <g filter="url(#shadow)"><rect x="42" y="38" width="1116" height="554" fill="url(#panel)" stroke="#56d7ff" stroke-opacity="0.2"/></g>
-  <text x="142" y="168" fill="#9ee7ff" font-family="Manrope, ui-sans-serif, system-ui, sans-serif" font-size="26" font-weight="700" letter-spacing="3.2">EFFECT-NATIVE X402</text>
-  <text x="140" y="337" fill="#ffffff" fill-opacity="0.96" font-family="Manrope, ui-sans-serif, system-ui, sans-serif" font-size="100" font-weight="600" letter-spacing="-3.6">CROSSHATCH</text>
-  <text x="144" y="419" fill="#ffffff" fill-opacity="0.66" font-family="Manrope, ui-sans-serif, system-ui, sans-serif" font-size="34" font-weight="400" letter-spacing="-0.7">Build x402 clients and merchants with Effect!</text>
+  <g filter="url(#shadow)"><rect x="42" y="38" width="1116" height="554" rx="18" fill="url(#panel)" stroke="#56d7ff" stroke-opacity="0.2"/></g>
+  <text x="142" y="170" fill="#9ee7ff" font-family="Manrope, ui-sans-serif, system-ui, sans-serif" font-size="29" font-weight="700" letter-spacing="3.3">EFFECT-NATIVE X402</text>
+  <text x="140" y="345" fill="#ffffff" fill-opacity="0.96" font-family="Manrope, ui-sans-serif, system-ui, sans-serif" font-size="112" font-weight="600" letter-spacing="-4">CROSSHATCH</text>
+  <text x="144" y="432" fill="#ffffff" fill-opacity="0.66" font-family="Manrope, ui-sans-serif, system-ui, sans-serif" font-size="38" font-weight="400" letter-spacing="-0.8">Build x402 clients and merchants with Effect!</text>
   <path d="M142 505H510" stroke="#56d7ff" stroke-opacity="0.3" stroke-width="1.5"/>
   <path d="M142 506H292" stroke="#9ee7ff" stroke-opacity="0.72" stroke-width="1.5"/>
 </svg>

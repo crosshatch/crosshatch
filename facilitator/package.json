@@ -14,7 +14,6 @@
     "alchemy": "catalog:",
     "crosshatch": "workspace:*",
     "effect": "catalog:",
-    "effect-workerd": "workspace:*",
     "liminal-util": "workspace:*",
     "viem": "catalog:",
     "vite": "catalog:"

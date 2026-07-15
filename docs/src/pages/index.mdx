@@ -91,7 +91,7 @@ import {
     <div className="crosshatch-code-block">
 
 ```ts
-import { Http402 } from "crosshatch"
+import { ChxHttp } from "crosshatch"
 import { Console, Effect, Layer } from "effect"
 import { HttpClient, HttpClientRequest } from "effect/unstable/http"
 
@@ -105,7 +105,7 @@ Effect.gen(function* () {
   const body = yield* response.text
   yield* Console.log(body)
 }).pipe(
-  Effect.provide(Http402.layerClient.pipe(Layer.provide(PayerLive))),
+  Effect.provide(ChxHttp.layerClient.pipe(Layer.provide(PayerLive))),
   Effect.runFork,
 )
 ```
@@ -134,7 +134,7 @@ Effect.gen(function* () {
 ```ts
 import {
   Facilitator,
-  Http402,
+  ChxHttp,
   KnownAssets,
   Payload,
   Required,
@@ -161,14 +161,14 @@ const router = HttpRouter.add(
             }),
           ),
         )
-      return yield* Http402.require({ required })
+      return yield* ChxHttp.require({ required })
     }
     const settlement = yield* Facilitator.settle({ payload })
     return HttpServerResponse.text("The paid resource.").pipe(
-      Http402.addResponseHeader(settlement),
+      ChxHttp.addResponseHeader(settlement),
     )
   }),
-).pipe(Layer.provide(Http402.layerMiddleware()))
+).pipe(Layer.provide(ChxHttp.layerMiddleware()))
 ```
 
     </div>
@@ -194,7 +194,7 @@ const router = HttpRouter.add(
 
 ```ts
 import { OpenAiClient, OpenAiLanguageModel } from "@effect/ai-openai-compat"
-import { Http402 } from "crosshatch"
+import { ChxHttp } from "crosshatch"
 import { Console, Effect, Layer } from "effect"
 import { LanguageModel } from "effect/unstable/ai"
 
@@ -212,7 +212,7 @@ LanguageModel.generateText({
   Effect.tap(({ text }) => Console.log(text)),
   Effect.provide(
     BlockrunLive.pipe(
-      Layer.provide(Http402.layerClient.pipe(Layer.provide(PayerLive))),
+      Layer.provide(ChxHttp.layerClient.pipe(Layer.provide(PayerLive))),
     ),
   ),
   Effect.runFork,
@@ -265,7 +265,12 @@ export const PayerLive = Payer.layer.pipe(
 </div>
 
 <footer className="crosshatch-footer">
-  Copyright 2026 Crosshatch Labs Inc.
+  Made by{" "}
+  <img
+    src="/icon.svg"
+    alt="Crosshatch"
+    className="inline-block h-4 w-4 align-middle"
+  />
 </footer>
 
 </HomePage.Root>

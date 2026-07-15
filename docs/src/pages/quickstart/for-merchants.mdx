@@ -26,7 +26,7 @@ limited to HTTP; route protection is just one integration path.
 
 ```ts
 import {
-  Http402,
+  ChxHttp,
   Payload,
   Required,
   Requirements,
@@ -49,7 +49,7 @@ const route = Effect.gen(function* () {
       ),
     )
 
-    return yield* Http402.require({ required })
+    return yield* ChxHttp.require({ required })
   }
 
   return payload
@@ -81,17 +81,17 @@ Use this integration when your merchant service is built with
 
 ### Install The Middleware
 
-`Http402.layerMiddleware()` is an `HttpRouter` middleware. It reads
+`ChxHttp.layerMiddleware()` is an `HttpRouter` middleware. It reads
 `payment-signature`, decodes the base64-encoded x402 payload, and provides it to
 the route as `Payload.Payload`.
 
 ```ts
-import { Http402 } from "crosshatch"
+import { ChxHttp } from "crosshatch"
 import { Layer } from "effect"
 import { HttpRouter } from "effect/unstable/http"
 
 const app = HttpRouter.empty.pipe(
-  Layer.provide(Http402.layerMiddleware()),
+  Layer.provide(ChxHttp.layerMiddleware()),
   HttpRouter.toHttpEffect,
 )
 ```
@@ -103,11 +103,11 @@ or continue with unpaid behavior.
 ### Protect An Effect HTTP Route
 
 Inside the route, read the parsed payload service. If there is no payload, build
-a `Required` value and return `Http402.require({ required })`.
+a `Required` value and return `ChxHttp.require({ required })`.
 
 ```ts
 import {
-  Http402,
+  ChxHttp,
   KnownAssets,
   Payload,
   Required,
@@ -137,14 +137,14 @@ const paidRoute = Effect.gen(function* () {
       ),
     )
 
-    return yield* Http402.require({ required })
+    return yield* ChxHttp.require({ required })
   }
 
   return HttpServerResponse.text("The paid resource.")
 })
 ```
 
-`Http402.require` returns an empty HTTP response with the encoded requirement in
+`ChxHttp.require` returns an empty HTTP response with the encoded requirement in
 the `payment-required` header. If a Crosshatch trace id is available, it also
 includes `x-crosshatch-trace-id`.
 
@@ -154,7 +154,7 @@ Most merchant routes should settle the payload before returning the paid
 resource.
 
 ```ts
-import { Facilitator, Http402, Payload } from "crosshatch"
+import { Facilitator, ChxHttp, Payload } from "crosshatch"
 import { Effect } from "effect"
 import { HttpServerResponse } from "effect/unstable/http"
 
@@ -162,13 +162,13 @@ const paidRoute = Effect.gen(function* () {
   const payload = yield* Payload.Payload
 
   if (!payload) {
-    return yield* Http402.require({ required })
+    return yield* ChxHttp.require({ required })
   }
 
   const settlement = yield* Facilitator.settle({ payload })
 
   return HttpServerResponse.text("The paid resource.").pipe(
-    Http402.addResponseHeader(settlement),
+    ChxHttp.addResponseHeader(settlement),
   )
 })
 ```
@@ -183,7 +183,7 @@ To avoid blocking the resource delivery, you can fork a scope-bound fiber from
 the settlement effect.
 
 ```ts
-import { Facilitator, Http402, Payload } from "crosshatch"
+import { Facilitator, ChxHttp, Payload } from "crosshatch"
 import { Effect } from "effect"
 import { HttpServerResponse } from "effect/unstable/http"
 
@@ -191,7 +191,7 @@ const paidRoute = Effect.gen(function* () {
   const payload = yield* Payload.Payload
 
   if (!payload) {
-    return yield* Http402.require({ required })
+    return yield* ChxHttp.require({ required })
   }
 
   yield* Facilitator.settle({ payload }).pipe(Effect.forkScoped) // [!code focus]
@@ -204,10 +204,10 @@ const paidRoute = Effect.gen(function* () {
 
 Browser clients need access to the `payment-required` response header so they
 can read the invoice and retry with a payment payload. Crosshatch exports
-`Http402.EXPOSED_HEADERS` for the headers used by the HTTP integration.
+`ChxHttp.HEADERS` for the headers used by the HTTP integration.
 
 ```ts
-import { Http402 } from "crosshatch"
+import { ChxHttp } from "crosshatch"
 import { Layer } from "effect"
 import { HttpRouter } from "effect/unstable/http"
 
@@ -217,9 +217,9 @@ const app = router.pipe(
       allowedHeaders: ["*"],
       allowedMethods: ["*"],
       allowedOrigins: ["*"],
-      exposedHeaders: Http402.EXPOSED_HEADERS,
+      exposedHeaders: ChxHttp.HEADERS,
     }),
-    Http402.layerMiddleware(),
+    ChxHttp.layerMiddleware(),
   ]),
   HttpRouter.toHttpEffect,
 )

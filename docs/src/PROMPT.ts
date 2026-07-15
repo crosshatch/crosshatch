@@ -8,7 +8,7 @@ export const EFFECT_AI_CLIENT_PROMPT = `You are helping build a Crosshatch Effec
 
 Route Effect AI model calls through Crosshatch's x402-aware HTTP client so paid model providers can return payment requirements and the client can retry with a signed payment payload.
 
-Prefer the client quickstart documented at https://crosshatch.dev/quickstart/for-clients and compose Http402.layerClient with the application's Payer layer.`
+Prefer the client quickstart documented at https://crosshatch.dev/quickstart/for-clients and compose ChxHttp.layerClient with the application's Payer layer.`
 
 export const EFFECT_HTTP_CLIENT_PROMPT = `You are helping build a Crosshatch Effect HTTP client integration.
 

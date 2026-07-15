@@ -1,9 +1,10 @@
 import * as Alchemy from "alchemy"
 import * as Cloudflare from "alchemy/Cloudflare"
 import * as Github from "alchemy/GitHub"
-import { Config, Effect, Layer } from "effect"
+import { Effect, Layer } from "effect"
 import { PrPreviewComment } from "liminal-util/alchemicals/PrComment"
-import { WorkerConfig } from "liminal-util/alchemicals/WorkerConfig"
+
+import FacilitatorWorker from "./main.ts"
 
 export default Alchemy.Stack(
   "crosshatch-facilitator",
@@ -12,29 +13,9 @@ export default Alchemy.Stack(
     providers: Layer.mergeAll(Cloudflare.providers(), Github.providers()),
   },
   Effect.gen(function* () {
-    const base = yield* WorkerConfig({
-      domain: "facilitator.crosshatch.dev",
-    })
-    const CROSSHATCH_STAGE = yield* Alchemy.Stage
-    const { url } = yield* Cloudflare.Worker("Entry", {
-      ...base,
-      dev: {
-        host: "127.0.0.1",
-        port: 1337,
-        strictPort: true,
-      },
-      main: "main.ts",
-      env: {
-        CROSSHATCH_STAGE,
-        CDP_API_KEY_ID: Config.string("CDP_API_KEY_ID"),
-        CDP_API_KEY_SECRET: Config.redacted("CDP_API_KEY_SECRET"),
-        OTEL_EXPORTER_OTLP_ENDPOINT: Config.string("OTEL_EXPORTER_OTLP_ENDPOINT"),
-        OTEL_EXPORTER_OTLP_HEADERS: Config.redacted("OTEL_EXPORTER_OTLP_HEADERS"),
-        OTEL_LOGS_EXPORTER: "otlp",
-        OTEL_METRICS_EXPORTER: CROSSHATCH_STAGE.startsWith("dev_") ? "none" : "otlp",
-        OTEL_TRACES_EXPORTER: "otlp",
-      },
-    })
+    const worker = yield* FacilitatorWorker
+    const url = worker.url.as<string>()
     yield* PrPreviewComment({ name: "Facilitator", url })
+    return { url }
   }),
 )

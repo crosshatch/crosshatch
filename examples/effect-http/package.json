@@ -10,7 +10,6 @@
     "alchemy": "catalog:",
     "crosshatch": "workspace:*",
     "effect": "catalog:",
-    "effect-workerd": "workspace:*",
     "vitest": "catalog:"
   }
 }

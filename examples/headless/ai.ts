@@ -1,5 +1,5 @@
 import { OpenAiClient, OpenAiLanguageModel } from "@effect/ai-openai-compat"
-import { Http402 } from "crosshatch"
+import { ChxHttp } from "crosshatch"
 import { Console, Effect, Layer } from "effect"
 import { LanguageModel } from "effect/unstable/ai"
 
@@ -10,7 +10,7 @@ const BlockrunLive = OpenAiLanguageModel.layer({
 }).pipe(
   Layer.provide(
     OpenAiClient.layer({ apiUrl: "https://blockrun.ai/api/v1" }).pipe(
-      Layer.provide(Http402.layerClient.pipe(Layer.provide(PayerLive))),
+      Layer.provide(ChxHttp.layerClient.pipe(Layer.provide(PayerLive))),
     ),
   ),
 )
