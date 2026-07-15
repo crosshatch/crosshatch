@@ -9,7 +9,7 @@ import { Api } from "./Api.ts"
 export default class ExampleEffectRpc extends Cloudflare.RpcWorker<ExampleEffectRpc>()(
   "ExampleEffectRpc",
   {
-    main: new URL(import.meta.url).pathname,
+    main: import.meta.url,
     schema: Api,
     domain: "example-effect-rpc.crosshatch.dev",
     dev: {
@@ -23,6 +23,9 @@ export default class ExampleEffectRpc extends Cloudflare.RpcWorker<ExampleEffect
       buyThing: () => Effect.succeed("The paid resource."),
     })
 
-    return RpcServer.toHttpEffect(Api).pipe(Effect.provide(Layer.mergeAll(handlers, RpcSerialization.layerJson)))
+    return RpcServer.toHttpEffect(Api).pipe(
+      Effect.scoped,
+      Effect.provide(Layer.mergeAll(handlers, RpcSerialization.layerJson)),
+    )
   }),
 ) {}

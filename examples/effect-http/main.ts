@@ -8,7 +8,7 @@ import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
 export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHttp>()(
   "ExampleEffectHttp",
   {
-    main: new URL(import.meta.url).pathname,
+    main: import.meta.url,
     domain: "example-effect-http.crosshatch.dev",
     dev: {
       host: "127.0.0.1",
@@ -61,6 +61,7 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
         }),
       ]),
       HttpRouter.toHttpEffect,
+      Effect.scoped,
       Effect.flatten,
     )
 

@@ -4,6 +4,7 @@
 .dev.vars
 .direnv/
 .env*
+!.envrc
 .tanstack
 .turbo/
 dist/
