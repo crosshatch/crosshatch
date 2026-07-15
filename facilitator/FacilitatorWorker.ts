@@ -13,15 +13,18 @@ import * as Prelude from "./Prelude.ts"
 
 export default class FacilitatorWorker extends Cloudflare.Worker<FacilitatorWorker>()(
   "Facilitator",
-  {
-    main: import.meta.url,
-    domain: domain("facilitator.crosshatch.dev"),
-    dev: {
-      host: "127.0.0.1",
-      port: 1337,
-      strictPort: true,
-    },
-  },
+  // @ts-ignore
+  Effect.gen(function* () {
+    return {
+      main: import.meta.url,
+      domain: yield* domain("facilitator.crosshatch.dev"),
+      dev: {
+        host: "127.0.0.1",
+        port: 1337,
+        strictPort: true,
+      },
+    }
+  }),
   Effect.gen(function* () {
     yield* FacilitatorEnv
     const fetch = Layer.mergeAll(
