@@ -7,7 +7,8 @@ showLogo: false
 ---
 
 import { Card, HomePage } from "vocs"
-import { ChevronRight, Github, UserRound } from "lucide-react"
+import { SiGithub } from "@icons-pack/react-simple-icons"
+import { ChevronRight, UserRound } from "lucide-react"
 import { DotPattern } from "../DotPattern"
 import { CodingAgentsButton } from "../CodingAgentsButton"
 import {
@@ -40,7 +41,7 @@ import {
 <HomePage.Buttons className="crosshatch-hero-buttons">
   <HomePage.Button href="https://github.com/crosshatch/crosshatch">
     GitHub
-    <Github className="ml-2 size-4 stroke-1" />
+    <SiGithub className="ml-2 size-4" />
   </HomePage.Button>
   <CodingAgentsButton
     merchantPrompt={MERCHANT_PROMPT}

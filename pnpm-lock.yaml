@@ -45,6 +45,9 @@ catalogs:
     '@effect/vitest':
       specifier: 4.0.0-beta.97
       version: 4.0.0-beta.97
+    '@icons-pack/react-simple-icons':
+      specifier: ^13.13.0
+      version: 13.13.0
     '@kitlangton/motel':
       specifier: 0.2.6
       version: 0.2.6
@@ -332,6 +335,9 @@ importers:
       '@effect/atom-react':
         specifier: 'catalog:'
         version: 4.0.0-beta.97(effect@4.0.0-beta.97)(react@19.2.7)(scheduler@0.27.0)
+      '@icons-pack/react-simple-icons':
+        specifier: 'catalog:'
+        version: 13.13.0(react@19.2.7)
       '@types/react':
         specifier: ^19.2.14
         version: 19.2.17
@@ -1513,6 +1519,12 @@ packages:
 
   '@iconify/utils@3.1.4':
     resolution: {integrity: sha512-b1S7B1k9ohZ+iNTi2ATxbRYG9fTrJmUT0rc46bvVnNxqNRGW7dyo/vRREwyniI5IRN2RSJHDcm+s3BjWrSAjHw==}
+
+  '@icons-pack/react-simple-icons@13.13.0':
+    resolution: {integrity: sha512-B5HhQMIpcSH4z8IZ8HFhD59CboHceKYMpPC9kAwGyKntvPdyJJv26DLu4Z1wAjcCLyrJhf11tMhiQGom9Rxb9g==}
+    engines: {node: '>=24', pnpm: '>=10'}
+    peerDependencies:
+      react: ^19.2.4
 
   '@img/colour@1.1.0':
     resolution: {integrity: sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ==}
@@ -9066,6 +9078,10 @@ snapshots:
       '@antfu/install-pkg': 1.1.0
       '@iconify/types': 2.0.0
       import-meta-resolve: 4.2.0
+
+  '@icons-pack/react-simple-icons@13.13.0(react@19.2.7)':
+    dependencies:
+      react: 19.2.7
 
   '@img/colour@1.1.0': {}
 

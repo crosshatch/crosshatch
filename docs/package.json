@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "@effect/atom-react": "catalog:",
+    "@icons-pack/react-simple-icons": "catalog:",
     "@types/react": "catalog:",
     "alchemy": "catalog:",
     "crosshatch": "workspace:*",
