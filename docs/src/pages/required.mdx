@@ -37,6 +37,8 @@ import { Required, Requirements, KnownAssets } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
 import { PaymentId } from "crosshatch/Extensions"
 
+const recipient = Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
+
 const makeRequired = Effect.gen(function* () {
   return yield* Required.make`
   | Access to the paid resource.
@@ -48,14 +50,7 @@ const makeRequired = Effect.gen(function* () {
     Required.accept(
       Requirements.logical(KnownAssets.Usd.USDC, {
         amount: 0.01,
-        recipients: {
-          eip155: {
-            8453: yield* Config.schema(
-              Eip155Address.Eip155Address,
-              "PAY_TO_EIP155",
-            ),
-          },
-        },
+        recipients: { eip155: { 8453: recipient } },
       }),
     ),
   )

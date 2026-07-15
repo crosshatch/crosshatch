@@ -33,8 +33,9 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
           | How does it fit into the current flow?
           |
           `.pipe(
-            Required.extend(PaymentId.PaymentIdExtension, {
+            Required.extend(PaymentId.FromMerchant, {
               required: true,
+              id: PaymentId.PaymentId.make(crypto.randomUUID()),
             }),
             Required.accept(
               Requirements.denomination(KnownAssets.Usd, {
@@ -57,7 +58,7 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
           exposedHeaders: ChxHttp.HEADERS,
         }),
         ChxHttp.layerMiddleware({
-          extensions: [PaymentId.PaymentIdExtension],
+          extensions: [PaymentId.FromMerchant],
         }),
       ]),
       HttpRouter.toHttpEffect,

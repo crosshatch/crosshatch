@@ -29,8 +29,10 @@ They live under the `eip155` namespace in a `PhysicalAsset`.
 import { Config } from "effect"
 import { Eip155Address } from "crosshatch/Eip155"
 
-const payTo =
-  yield * Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
+const recipientConfig = Config.schema(
+  Eip155Address.Eip155Address,
+  "PAY_TO_EIP155",
+)
 ```
 
 See [Assets](/asset) for asset configuration.

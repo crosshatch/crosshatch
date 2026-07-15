@@ -5,7 +5,7 @@ import { Config, Effect } from "effect"
 import { PayerLive } from "./PayerLive.ts"
 
 Effect.gen(function* () {
-  const PAY_TO_EIP155 = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
+  const recipient = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
   const required = yield* Required.make`
   |
   | Description of the charge.
@@ -14,7 +14,7 @@ Effect.gen(function* () {
     Required.accept(
       Requirements.denomination(KnownAssets.Usd, {
         amount: 0.01,
-        recipients: { eip155: { 8453: PAY_TO_EIP155 } },
+        recipients: { eip155: { 8453: recipient } },
         ttl: "1 minutes",
       }),
     ),

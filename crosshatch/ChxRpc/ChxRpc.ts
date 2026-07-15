@@ -1,24 +1,20 @@
-import { flow, Schema as S, Stream, Context, PubSub, Layer, Effect, Deferred } from "effect"
+import { Schema as S, Stream, PubSub, Layer, Effect } from "effect"
 import { Rpc, RpcGroup } from "effect/unstable/rpc"
 
-import { Bridge, Proposal, TraceConfig } from "../Bridge.ts"
-import type { PaymentId } from "../Extensions/Extensions.ts"
-import { PaymentIdExtension } from "../Extensions/PaymentId.ts"
-import { settle } from "../Facilitator/settle.ts"
+import { Bridge } from "../Bridge.ts"
+import * as Invoices from "../Extensions/Invoices.ts"
+import { FromMerchant } from "../Extensions/PaymentId.ts"
 import { Payload } from "../Payload.ts"
-
-export const ChxRpcEvent = S.TaggedUnion({
-  CreateTrace: { config: TraceConfig },
-  Propose: { proposal: Proposal },
-})
+import { ChxEvent, ChxEvents } from "./ChxEvent.ts"
 
 export class ChxRpcGroup extends RpcGroup.make(
   Rpc.make("crosshatch_StreamEvents", {
-    success: ChxRpcEvent,
+    success: ChxEvent,
     stream: true,
   }),
   Rpc.make("crosshatch_SendPayment", {
     payload: S.Struct({
+      traceId: S.String.pipe(S.optional),
       payload: Payload,
     }),
     success: S.Void,
@@ -26,41 +22,30 @@ export class ChxRpcGroup extends RpcGroup.make(
   }),
 ) {}
 
-export class Events extends Context.Service<Events, PubSub.PubSub<typeof ChxRpcEvent.Type>>()(
-  "crosshatch/ChxRpc/Events",
-) {}
-
-export class Invoices extends Context.Service<
-  Invoices,
-  Record<typeof PaymentId.PaymentId.Type, Deferred.Deferred<Payload>>
->()("crosshatch/ChxRpc/Invoices") {}
-
 export const layer = Layer.mergeAll(
   Layer.effect(
     Bridge,
     Effect.gen(function* () {
-      const deferreds = yield* Invoices
-      const events = yield* Events
+      const invoices = yield* Invoices.Invoices
+      const events = yield* ChxEvents
       return {
         createTrace: (config) => PubSub.publish(events, { _tag: "CreateTrace", config }),
-        propose: Effect.fnUntraced(
-          function* (proposal) {
-            const { id } = yield* PaymentIdExtension.decodeRequired(proposal.required)
-            const deferred = yield* Deferred.make<Payload>()
-            deferreds[id!] = deferred
-            yield* PubSub.publish(events, { _tag: "Propose", proposal })
-            const payload = yield* Deferred.await(deferred)
-            return { payload }
-          },
-          Effect.catchTags({
-            SchemaError: Effect.die,
-          }),
-        ),
+        propose: Effect.fnUntraced(function* (proposal) {
+          const { id } = yield* FromMerchant.decodeRequired(proposal.required)
+          yield* invoices.add(id)
+          yield* PubSub.publish(events, { _tag: "Propose", proposal })
+          const payload = yield* invoices.await(id)
+          return { payload }
+        }, Effect.orDie),
       }
     }),
   ),
   ChxRpcGroup.toLayer({
-    crosshatch_StreamEvents: () => Events.pipe(Effect.map(Stream.fromPubSub), Stream.unwrap),
-    crosshatch_SendPayment: flow(settle, Effect.asVoid, Effect.orDie),
+    crosshatch_StreamEvents: () => ChxEvents.pipe(Effect.map(Stream.fromPubSub), Stream.unwrap),
+    crosshatch_SendPayment: Effect.fnUntraced(function* ({ payload }) {
+      const invoices = yield* Invoices.Invoices
+      const id = yield* FromMerchant.decodePayload(payload).pipe(Effect.flatMap(({ id }) => Effect.fromNullishOr(id)))
+      yield* invoices.resolve(id, payload)
+    }, Effect.orDie),
   }),
-).pipe(Layer.provideMerge([Layer.effect(Events, PubSub.unbounded()), Layer.succeed(Invoices, {})]))
+).pipe(Layer.provideMerge([Layer.effect(ChxEvents, PubSub.unbounded()), Invoices.layerMemory]))

@@ -38,15 +38,12 @@ describe.skipIf(!env.TEST_LIVE)(import.meta.url, () => {
   it.effect(
     "verifies and settles a freshly signed EIP155 x402 payment",
     Effect.fn(function* () {
+      const recipient = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
       const required = yield* Required.make().pipe(
         Required.accept(
           Requirements.denomination(KnownAssets.Usd, {
             amount: 0.01,
-            recipients: {
-              eip155: {
-                8453: yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155"),
-              },
-            },
+            recipients: { eip155: { 8453: recipient } },
           }),
         ),
       )

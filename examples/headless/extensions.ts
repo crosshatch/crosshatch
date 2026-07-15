@@ -8,19 +8,17 @@ import { PayerLive } from "./PayerLive.ts"
 
 // Merchants make the required with extension info.
 const makeRequired = Effect.gen(function* () {
-  const PAY_TO_EIP155 = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
+  const recipient = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
   return yield* Required.make`
   |
   | Description of the charge.
   |
   `.pipe(
-    Required.extend(PaymentId.PaymentIdExtension, {
-      required: true,
-    }),
+    Required.extend(PaymentId.FromClient, { required: true }),
     Required.accept(
       Requirements.denomination(KnownAssets.Usd, {
         amount: 0.01,
-        recipients: { eip155: { 8453: PAY_TO_EIP155 } },
+        recipients: { eip155: { 8453: recipient } },
         ttl: "1 minutes",
       }),
     ),
@@ -38,7 +36,7 @@ Effect.gen(function* () {
     PayerLive.pipe(
       Layer.provide(
         Extension.layerHandler(
-          PaymentId.PaymentIdExtension,
+          PaymentId.FromMerchant,
           Effect.fn(function* ({ required }) {
             return {
               required,

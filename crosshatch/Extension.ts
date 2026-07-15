@@ -44,7 +44,7 @@ export interface Extension<
 export declare namespace Extension {
   export type Info = S.Top & { readonly DecodingServices: never }
 
-  export type Echo<T extends S.Top> = T & {
+  export type Echo<T extends S.Top> = S.Top & {
     readonly Type: T["Type"]
     readonly EncodingServices: never
   }
