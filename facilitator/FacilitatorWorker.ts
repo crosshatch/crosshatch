@@ -5,6 +5,7 @@ import * as Path from "effect/Path"
 import { HttpRouter, HttpServerResponse, HttpPlatform } from "effect/unstable/http"
 import * as Etag from "effect/unstable/http/Etag"
 import { HttpApiBuilder } from "effect/unstable/httpapi"
+import { domain } from "liminal-util/alchemicals/WorkerConfig"
 
 import { FacilitatorEnv } from "./FacilitatorEnv.ts"
 import { FacilitatorLive } from "./FacilitatorLive/FacilitatorLive.ts"
@@ -14,7 +15,7 @@ export default class FacilitatorWorker extends Cloudflare.Worker<FacilitatorWork
   "Facilitator",
   {
     main: import.meta.url,
-    domain: "facilitator.crosshatch.dev",
+    domain: domain("facilitator.crosshatch.dev"),
     dev: {
       host: "127.0.0.1",
       port: 1337,
