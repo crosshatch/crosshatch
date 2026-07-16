@@ -1,5 +1,5 @@
 {
-  "name": "@crosshatch/docs",
+  "name": "crosshatch.dev",
   "private": true,
   "type": "module",
   "scripts": {
@@ -14,7 +14,7 @@
     "effect": "catalog:",
     "effect-workerd": "workspace:*",
     "liminal-util": "workspace:*",
-    "lucide-react": "catalog:",
+    "lucide-static": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "tailwindcss": "catalog:",

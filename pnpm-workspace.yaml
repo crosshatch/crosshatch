@@ -71,6 +71,7 @@ catalog:
   happy-dom: ^20.10.6
   http-message-sig: ^0.1.0
   lucide-react: ^1.24.0
+  lucide-static: ^1.24.0
   markdown-to-jsx: ^9.7.3
   mermaid: 11.16.0
   micro-key-producer: ^0.8.2

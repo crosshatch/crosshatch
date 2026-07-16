@@ -1,7 +1,9 @@
 "use client"
 
-import { Bot, Check, Copy, X } from "lucide-react"
+import { Bot, Check, Copy, X } from "lucide-static"
 import * as React from "react"
+
+import { LucideIcon } from "./LucideIcon"
 
 const prompts = [
   {
@@ -75,7 +77,7 @@ export const CodingAgentsButton = (props: {
         onClick={() => setOpen(true)}
       >
         Coding Agents
-        <Bot className="ml-2 size-4 stroke-1" />
+        <LucideIcon className="ml-2 size-4 stroke-1" svg={Bot} />
       </button>
       {open ? (
         <div
@@ -97,7 +99,7 @@ export const CodingAgentsButton = (props: {
               type="button"
               onClick={() => setOpen(false)}
             >
-              <X />
+              <LucideIcon svg={X} />
             </button>
             <p className="crosshatch-code-kicker">Coding Agents</p>
             <h2 id="crosshatch-agents-modal-title">Give agents the right context</h2>
@@ -111,12 +113,12 @@ export const CodingAgentsButton = (props: {
                 {copied === "mcp" ? (
                   <>
                     Copied
-                    <Check />
+                    <LucideIcon svg={Check} />
                   </>
                 ) : (
                   <>
                     Copy URL
-                    <Copy />
+                    <LucideIcon svg={Copy} />
                   </>
                 )}
               </button>
@@ -135,12 +137,12 @@ export const CodingAgentsButton = (props: {
                     {copied === prompt.value ? (
                       <>
                         Copied
-                        <Check />
+                        <LucideIcon svg={Check} />
                       </>
                     ) : (
                       <>
                         Copy prompt
-                        <Copy />
+                        <LucideIcon svg={Copy} />
                       </>
                     )}
                   </strong>

@@ -5,6 +5,8 @@ import { Config, Effect, Layer } from "effect"
 import { PrPreviewComment } from "liminal-util/alchemicals/PrComment"
 import { WorkerConfig } from "liminal-util/alchemicals/WorkerConfig"
 
+import PackageJson from "./package.json" with { type: "json" }
+
 export default Alchemy.Stack(
   "crosshatch-otel",
   {
@@ -13,7 +15,7 @@ export default Alchemy.Stack(
   },
   Effect.gen(function* () {
     const base = yield* WorkerConfig({
-      domain: "otel.crosshatch.dev",
+      domain: PackageJson.name,
     })
     const ALCHEMY_STAGE = yield* Alchemy.Stage
     const { url } = yield* Cloudflare.Worker("Entry", {

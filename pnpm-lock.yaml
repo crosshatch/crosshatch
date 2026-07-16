@@ -120,7 +120,7 @@ catalogs:
     happy-dom:
       specifier: ^20.10.6
       version: 20.10.6
-    lucide-react:
+    lucide-static:
       specifier: ^1.24.0
       version: 1.24.0
     ox:
@@ -356,9 +356,9 @@ importers:
       liminal-util:
         specifier: workspace:*
         version: link:../liminal/liminal-util
-      lucide-react:
+      lucide-static:
         specifier: 'catalog:'
-        version: 1.24.0(react@19.2.7)
+        version: 1.24.0
       react:
         specifier: ^19.2.4
         version: 19.2.7
@@ -6144,10 +6144,8 @@ packages:
     resolution: {integrity: sha512-DqC6n3QQ77zdFpCMASA1a3Jlb64Hv2N2DciFGkO/4L9+q/IpIAuRlKOvCXabtRW6cQf8usbmM6BE/TOPysCdIA==}
     engines: {bun: '>=1.0.0', deno: '>=1.30.0', node: '>=8.0.0'}
 
-  lucide-react@1.24.0:
-    resolution: {integrity: sha512-YT6mBD8lGKkg4nM39enlm94/sfJIiW0YKUT60fBy4YK8tai31ylg1VhGNWxkpSKHo9UagfnZqwIff3HTDQwXeA==}
-    peerDependencies:
-      react: ^19.2.4
+  lucide-static@1.24.0:
+    resolution: {integrity: sha512-NDSgPb/RWllI9QooPbGXfQCXQi/45oquDmtljeN3qVxqfEUf91uM2C4zijy8bs+pEWxKckA0/WZLZT43YD4Xnw==}
 
   lz-string@1.5.0:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
@@ -13932,9 +13930,7 @@ snapshots:
 
   lru.min@1.1.4: {}
 
-  lucide-react@1.24.0(react@19.2.7):
-    dependencies:
-      react: 19.2.7
+  lucide-static@1.24.0: {}
 
   lz-string@1.5.0: {}
 

@@ -4,8 +4,8 @@
     "noEmit": false,
     "outDir": "dist"
   },
-  "include": ["."],
-  "exclude": ["dist", "vitest.config.ts"],
+  "include": [".", "package.json"],
+  "exclude": ["dist"],
   "references": [
     { "path": "../liminal/effect-workerd" },
     { "path": "../liminal/liminal" },

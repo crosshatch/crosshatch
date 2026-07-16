@@ -4,6 +4,8 @@ import * as GitHub from "alchemy/GitHub"
 import { Effect, Layer } from "effect"
 import { docs } from "liminal-util/alchemicals/docs"
 
+import PackageJson from "./package.json" with { type: "json" }
+
 export default Alchemy.Stack(
   "crosshatch-docs",
   {
@@ -11,7 +13,7 @@ export default Alchemy.Stack(
     providers: Layer.mergeAll(Cloudflare.providers(), GitHub.providers()),
   },
   docs({
-    domain: "crosshatch.dev",
+    domain: PackageJson.name,
     devPort: 4382,
   }).pipe(Effect.asVoid),
 )
