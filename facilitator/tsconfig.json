@@ -4,7 +4,7 @@
     "noEmit": false,
     "outDir": "dist"
   },
-  "include": ["."],
+  "include": [".", "package.json"],
   "exclude": ["dist", "vitest.config.ts"],
   "references": [{ "path": "../crosshatch" }]
 }

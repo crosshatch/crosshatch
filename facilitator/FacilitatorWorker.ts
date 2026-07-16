@@ -7,9 +7,9 @@ import * as Etag from "effect/unstable/http/Etag"
 import { HttpApiBuilder } from "effect/unstable/httpapi"
 import { domain } from "liminal-util/alchemicals/WorkerConfig"
 
-import PackageJson from "../package.json" with { type: "json" }
 import { FacilitatorEnv } from "./FacilitatorEnv.ts"
 import { FacilitatorLive } from "./FacilitatorLive/FacilitatorLive.ts"
+import PackageJson from "./package.json" with { type: "json" }
 import * as Prelude from "./Prelude.ts"
 
 export default class FacilitatorWorker extends Cloudflare.Worker<FacilitatorWorker>()(
