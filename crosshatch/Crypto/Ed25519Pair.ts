@@ -21,10 +21,13 @@ export const Ed25519Pair = Object.assign(
 )
 
 export const fromNative = ({ privateKey, publicKey }: CryptoKeyPair) =>
-  Ed25519Pair.make({
-    privateKey: Ed25519PrivateKey.Ed25519PrivateKey.make(privateKey),
-    publicKey: Ed25519PublicKey.Ed25519PublicKey.make(publicKey),
-  })
+  Ed25519Pair.make(
+    {
+      privateKey: Ed25519PrivateKey.Ed25519PrivateKey.make(privateKey, { disableChecks: true }),
+      publicKey: Ed25519PublicKey.Ed25519PublicKey.make(publicKey, { disableChecks: true }),
+    },
+    { disableChecks: true },
+  )
 
 export const random = (config?: { readonly extractable?: boolean | undefined }) =>
   Effect.promise(() =>
@@ -42,7 +45,7 @@ export const fromSeed = (bytes: Uint8Array) =>
           ]),
         ),
       ),
-      Effect.map((v) => Ed25519PublicKey.Ed25519PublicKey.make(v)),
+      Effect.map((v) => Ed25519PublicKey.Ed25519PublicKey.make(v, { disableChecks: true })),
     ),
     privateKey: Ed25519PrivateKey.fromSeed(bytes),
-  }).pipe(Effect.map((v) => Ed25519Pair.make(v)))
+  }).pipe(Effect.map((v) => Ed25519Pair.make(v, { disableChecks: true })))

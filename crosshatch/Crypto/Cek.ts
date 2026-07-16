@@ -15,7 +15,7 @@ export const fromBytes = (bytes: Uint8Array, config?: { readonly extractable?: b
       "encrypt",
       "decrypt",
     ]),
-  ).pipe(Effect.map((v) => Cek.make(v)))
+  ).pipe(Effect.map((v) => Cek.make(v, { disableChecks: true })))
 
 export const toBytes = (cek: typeof Cek.Type) => CryptoKey.toBytes(cek)
 
@@ -44,7 +44,7 @@ export const fromPrf = Effect.fnUntraced(function* (
       config?.extractable ?? false,
       ["encrypt", "decrypt"],
     ),
-  ).pipe(Effect.map((v) => Cek.make(v)))
+  ).pipe(Effect.map((v) => Cek.make(v, { disableChecks: true })))
 })
 
 export const encrypt = Effect.fnUntraced(function* (cek: typeof Cek.Type, value: Uint8Array) {

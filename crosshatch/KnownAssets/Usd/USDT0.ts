@@ -3,7 +3,7 @@ import { Eip155Asset, Erc3009Scheme, Permit2Scheme } from "../../Eip155/Eip155.t
 
 export const eip155 = {
   988: {
-    asset: Eip155Asset.Eip155Asset.make("0x779Ded0c9e1022225f8E0630b35a9b54bE713736"),
+    asset: Eip155Asset.Eip155Asset.make("0x779Ded0c9e1022225f8E0630b35a9b54bE713736", { disableChecks: true }),
     decimals: 6,
     name: "USDT0",
     version: "1",

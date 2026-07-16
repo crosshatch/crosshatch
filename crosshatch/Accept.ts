@@ -32,7 +32,7 @@ export const layer = (denomination: Denomination) =>
         for (const asset of Object.values(denomination)) {
           for (const [namespace, references] of Object.entries(asset)) {
             for (const [reference, physical] of Object.entries(references)) {
-              const chainId = ChainId.make(`${namespace}:${reference}`)
+              const chainId = ChainId.make(`${namespace}:${reference}`, { disableChecks: true })
               for (let acceptedI = 0; acceptedI < accepts.length; acceptedI++) {
                 const accepted = accepts[acceptedI]!
                 if (chainId === accepted.network && physical.asset === accepted.asset) {

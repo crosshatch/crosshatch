@@ -15,5 +15,5 @@ export const fromMnemonic = (mnemonic: Mnemonic.Mnemonic): typeof Eip155Address.
   const root = HdKey.fromSeed(seed)
   const { privateKey } = root.derive("m/44'/60'/0'/0/0")
   const publicKey = Secp256k1.getPublicKey({ privateKey })
-  return Eip155Address.make(OxAddress.fromPublicKey(publicKey))
+  return Eip155Address.make(OxAddress.fromPublicKey(publicKey), { disableChecks: true })
 }

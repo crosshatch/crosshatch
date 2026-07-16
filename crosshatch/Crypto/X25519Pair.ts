@@ -21,10 +21,13 @@ export const X25519Pair = Object.assign(
 )
 
 export const fromNative = ({ privateKey, publicKey }: CryptoKeyPair) =>
-  X25519Pair.make({
-    privateKey: X25519PrivateKey.make(privateKey),
-    publicKey: X25519PublicKey.make(publicKey),
-  })
+  X25519Pair.make(
+    {
+      privateKey: X25519PrivateKey.make(privateKey, { disableChecks: true }),
+      publicKey: X25519PublicKey.make(publicKey, { disableChecks: true }),
+    },
+    { disableChecks: true },
+  )
 
 export const random = (config?: { readonly extractable?: boolean | undefined }) =>
   Effect.promise(

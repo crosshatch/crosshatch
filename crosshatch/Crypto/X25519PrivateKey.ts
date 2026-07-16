@@ -32,4 +32,4 @@ export const toPkcs8 = (privateKey: typeof X25519PrivateKey.Type) =>
 export const fromPkcs8 = (value: Uint8Array) =>
   Effect.promise(() =>
     crypto.subtle.importKey("pkcs8", value.slice(), { name: "X25519" }, false, ["deriveKey", "deriveBits"]),
-  ).pipe(Effect.map((v) => X25519PrivateKey.make(v)))
+  ).pipe(Effect.map((v) => X25519PrivateKey.make(v, { disableChecks: true })))

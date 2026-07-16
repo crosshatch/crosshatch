@@ -6,7 +6,7 @@ export const PaymentId = S.String.check(S.isLengthBetween(16, 128), S.isPattern(
   S.brand("crosshatch/PaymentId"),
 )
 
-export const random = () => PaymentId.make(crypto.randomUUID())
+export const random = () => PaymentId.make(crypto.randomUUID(), { disableChecks: true })
 
 const identifier = "payment-identifier" as const
 

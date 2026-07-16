@@ -14,5 +14,5 @@ export const fromMnemonic = (
   Slip10.derive(OxMnemonic.toSeed(Redacted.value(mnemonic)), [44, 501, 0, 0]).pipe(
     Effect.flatMap(({ privateKeySeed }) => Ed25519Pair.fromSeed(privateKeySeed)),
     Effect.flatMap(({ publicKey }) => CryptoKey.toBytes(publicKey)),
-    Effect.map(flow(Base58.fromBytes, (v) => SolanaAddress.make(v))),
+    Effect.map(flow(Base58.fromBytes, (v) => SolanaAddress.make(v, { disableChecks: true }))),
   )

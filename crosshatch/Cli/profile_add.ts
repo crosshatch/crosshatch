@@ -68,7 +68,7 @@ export const profileAdd = Command.make("add", {
           payload: {
             amount,
             provider: "Coinbase",
-            recipient: CaAccountId.make(`eip155:8453:${address}`),
+            recipient: CaAccountId.make(`eip155:8453:${address}`, { disableChecks: true }),
           },
         })
         yield* Console.log(onrampUrl)

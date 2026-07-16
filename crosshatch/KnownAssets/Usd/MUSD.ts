@@ -3,7 +3,7 @@ import { Eip155Asset, Erc3009Scheme, Permit2Scheme } from "../../Eip155/Eip155.t
 
 export const eip155 = {
   31612: {
-    asset: Eip155Asset.Eip155Asset.make("0xdD468A1DDc392dcdbEf6db6e34E89AA338F9F186"),
+    asset: Eip155Asset.Eip155Asset.make("0xdD468A1DDc392dcdbEf6db6e34E89AA338F9F186", { disableChecks: true }),
     decimals: 18,
     name: "Mezo USD",
     version: "1",

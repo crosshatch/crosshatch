@@ -51,9 +51,9 @@ export const logical = Effect.fnUntraced(function* <A extends LogicalAsset>(
             return payTo
               ? acc.concat({
                   amount: Amount.toAtomic(nominal, physical),
-                  asset: Asset.make(physical.asset),
+                  asset: Asset.make(physical.asset, { disableChecks: true }),
                   maxTimeoutSeconds,
-                  network: ChainId.make(`${namespace}:${reference}`),
+                  network: ChainId.make(`${namespace}:${reference}`, { disableChecks: true }),
                   payTo,
                   scheme: "exact",
                   extra: { name, version },

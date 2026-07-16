@@ -28,7 +28,7 @@ export const from = Effect.fnUntraced(function* (input: Input) {
   if (v === undefined || BigDecimal.isNegative(v)) {
     return yield* new InvalidAmountError({ input })
   }
-  return Amount.make(v)
+  return Amount.make(v, { disableChecks: true })
 })
 
 export const parse = (input: string): Effect.Effect<typeof Amount.Type, InvalidAmountError> => {
@@ -39,7 +39,9 @@ export const parse = (input: string): Effect.Effect<typeof Amount.Type, InvalidA
         Option.match({
           onNone: () => new InvalidAmountError({ input }),
           onSome: (decimal) =>
-            BigDecimal.isNegative(decimal) ? new InvalidAmountError({ input }) : Effect.succeed(Amount.make(decimal)),
+            BigDecimal.isNegative(decimal)
+              ? new InvalidAmountError({ input })
+              : Effect.succeed(Amount.make(decimal, { disableChecks: true })),
         }),
       )
 }
@@ -56,17 +58,17 @@ export const toAtomic = (amount: typeof Amount.Type, unit: AtomicUnit): typeof A
       mode: unit.rounding ?? "ceil",
     }),
   )
-  return Atomic.make((rounded.value * 10n ** BigInt(unit.decimals - rounded.scale)).toString())
+  return Atomic.make((rounded.value * 10n ** BigInt(unit.decimals - rounded.scale)).toString(), { disableChecks: true })
 }
 
 export const fromAtomic = (atomic: typeof Atomic.Type, unit: AtomicUnit): typeof Amount.Type =>
-  Amount.make(BigDecimal.make(BigInt(atomic), unit.decimals))
+  Amount.make(BigDecimal.make(BigInt(atomic), unit.decimals), { disableChecks: true })
 
 export const atomic = (unit: AtomicUnit) =>
   Atomic.pipe(
     S.decodeTo(Amount, {
       decode: SchemaGetter.transform((value) => fromAtomic(value, unit)),
-      encode: SchemaGetter.transform((value) => toAtomic(Amount.make(value), unit)),
+      encode: SchemaGetter.transform((value) => toAtomic(Amount.make(value, { disableChecks: true }), unit)),
     }),
   )
 

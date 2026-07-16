@@ -24,6 +24,8 @@ export const env = fromConfig(Config.string("MNEMONIC"))
 
 export const layerEnv = Layer.effect(Mnemonic, env)
 
-export const random = Effect.sync(() => fromText(OxMnemonic.random(OxMnemonic.english)))
+export const random = Effect.sync(() =>
+  Redacted.make(MnemonicText.make(OxMnemonic.random(OxMnemonic.english), { disableChecks: true })),
+)
 
 export const layerRandom = Layer.effect(Mnemonic, random)
