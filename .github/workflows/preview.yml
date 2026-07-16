@@ -1,0 +1,34 @@
+name: Preview
+on:
+  pull_request:
+  push:
+    branches:
+      - "**"
+    tags:
+      - "!**"
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+jobs:
+  check:
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-latest
+    outputs:
+      has-permissions: ${{ steps.checkPermissions.outputs.require-result }}
+    steps:
+      - name: Check permissions
+        id: checkPermissions
+        uses: actions-cool/check-user-permission@v2
+        with:
+          require: "write"
+  publish:
+    needs: check
+    if: needs.check.outputs.has-permissions == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - run: |
+          git -c url.https://github.com/.insteadOf=git@github.com: submodule update --init --depth 1 konfik liminal
+          git -c url.https://github.com/.insteadOf=git@github.com: -C liminal submodule update --init --depth 1 konfik
+      - uses: crosshatch/konfik/.github/actions/configure_environment@main
+      - run: pnpm build
+      - run: pnpm exec pkg-pr-new publish --comment=update './@crosshatch/*' './crosshatch'
