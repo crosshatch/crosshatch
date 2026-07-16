@@ -35,11 +35,10 @@ export default class FacilitatorWorker extends Cloudflare.Worker<FacilitatorWork
   Effect.gen(function* () {
     yield* FacilitatorEnv
     const fetch = Layer.mergeAll(
+      HttpRouter.add("GET", "/health", () => Effect.succeed(HttpServerResponse.text("ok"))),
       HttpApiBuilder.layer(Facilitator.FacilitatorApi, { openapiPath: "/openapi.json" }).pipe(
         Layer.provide(FacilitatorLive),
       ),
-      HttpRouter.add("GET", "/health", () => Effect.succeed(HttpServerResponse.text("ok"))),
-      FacilitatorLive,
     ).pipe(
       Layer.provide([
         Etag.layer,
