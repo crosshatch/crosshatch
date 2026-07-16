@@ -6,8 +6,12 @@ export const PaymentId = S.String.check(S.isLengthBetween(16, 128), S.isPattern(
   S.brand("crosshatch/PaymentId"),
 )
 
+export const random = () => PaymentId.make(crypto.randomUUID())
+
+const identifier = "payment-identifier" as const
+
 export class FromMerchant extends Extension.Service<FromMerchant>()("crosshatch/FromMerchant", {
-  identifier: "payment-identifier",
+  identifier,
   info: S.Struct({
     required: S.tag(true),
     id: PaymentId,
@@ -19,7 +23,7 @@ export class FromMerchant extends Extension.Service<FromMerchant>()("crosshatch/
 }) {}
 
 export class FromClient extends Extension.Service<FromClient>()("crosshatch/FromClient", {
-  identifier: "payment-identifier",
+  identifier,
   info: S.Struct({
     required: S.tag(true),
   }),
@@ -30,7 +34,7 @@ export class FromClient extends Extension.Service<FromClient>()("crosshatch/From
 }) {}
 
 export class FromEither extends Extension.Service<FromEither>()("crosshatch/FromEither", {
-  identifier: "payment-identifier",
+  identifier,
   info: S.Struct({
     required: S.tag(true),
     id: PaymentId.pipe(S.optional),

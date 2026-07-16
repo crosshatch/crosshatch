@@ -1,18 +1,11 @@
 import * as Alchemy from "alchemy"
 import * as Cloudflare from "alchemy/Cloudflare"
 import * as Github from "alchemy/GitHub"
-import { ConfigProvider, Effect, Layer } from "effect"
+import { Effect, Layer } from "effect"
 import { PrPreviewComment } from "liminal-util/alchemicals/PrComment"
+import * as Prelude from "liminal-util/alchemicals/Prelude"
 
 import FacilitatorWorker from "./FacilitatorWorker.ts"
-
-const AlchemyStageConfig = ConfigProvider.layerAdd(
-  Effect.gen(function* () {
-    const stage = yield* Alchemy.Stage
-    return ConfigProvider.fromUnknown({ ALCHEMY_STAGE: stage })
-  }),
-  { asPrimary: true },
-)
 
 export default Alchemy.Stack(
   "crosshatch-facilitator",
@@ -25,5 +18,5 @@ export default Alchemy.Stack(
     const url = worker.url.as<string>()
     yield* PrPreviewComment({ name: "Facilitator", url })
     return { url }
-  }).pipe(Effect.provide(AlchemyStageConfig)),
+  }).pipe(Effect.provide(Prelude.layer)),
 )

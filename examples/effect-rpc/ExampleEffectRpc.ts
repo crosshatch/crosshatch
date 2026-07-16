@@ -38,7 +38,7 @@ export default class ExampleEffectRpc extends Cloudflare.RpcWorker<ExampleEffect
               const required = yield* Required.make`iteration ${i}`.pipe(
                 Required.extend(PaymentId.FromMerchant, {
                   required: true,
-                  id: PaymentId.PaymentId.make(crypto.randomUUID()),
+                  id: PaymentId.random(),
                 }),
                 Required.accept(
                   Requirements.denomination(KnownAssets.Usd, {

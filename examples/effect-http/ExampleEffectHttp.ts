@@ -35,7 +35,7 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
           `.pipe(
             Required.extend(PaymentId.FromMerchant, {
               required: true,
-              id: PaymentId.PaymentId.make(crypto.randomUUID()),
+              id: PaymentId.random(),
             }),
             Required.accept(
               Requirements.denomination(KnownAssets.Usd, {

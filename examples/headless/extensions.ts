@@ -40,7 +40,7 @@ Effect.gen(function* () {
           Effect.fn(function* ({ required }) {
             return {
               required,
-              id: PaymentId.PaymentId.make(crypto.randomUUID()),
+              id: PaymentId.random(),
             }
           }),
         ),
