@@ -18,6 +18,12 @@ export default class FacilitatorWorker extends Cloudflare.Worker<FacilitatorWork
     return {
       main: import.meta.url,
       domain: yield* domain("facilitator.crosshatch.dev"),
+      observability: { enabled: true },
+      placement: { mode: "smart" },
+      compatibility: {
+        date: "2026-02-05",
+        flags: ["nodejs_compat", "global_fetch_strictly_public"],
+      },
       dev: {
         host: "127.0.0.1",
         port: 1337,
