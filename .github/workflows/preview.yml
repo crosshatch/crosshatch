@@ -9,7 +9,7 @@ on:
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
   check:
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && !github.event.pull_request.draft
     runs-on: ubuntu-latest
     outputs:
       has-permissions: ${{ steps.checkPermissions.outputs.require-result }}
@@ -22,7 +22,7 @@ jobs:
           require: "write"
   publish:
     needs: check
-    if: needs.check.outputs.has-permissions == 'true'
+    if: needs.check.outputs.has-permissions == 'true' && !github.event.pull_request.draft
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
