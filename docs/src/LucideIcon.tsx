@@ -1,4 +1,4 @@
-export const LucideIcon = (props: { readonly className?: string; readonly svg: string }) => (
+export const LucideIcon = (props: { readonly className?: string | undefined; readonly svg: string }) => (
   <span
     aria-hidden="true"
     dangerouslySetInnerHTML={{
