@@ -26,7 +26,7 @@ export default class FacilitatorWorker extends Cloudflare.Worker<FacilitatorWork
       },
       dev: {
         host: "127.0.0.1",
-        port: 1337,
+        port: 4384,
         strictPort: true,
       },
     }

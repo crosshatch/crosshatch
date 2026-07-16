@@ -44,8 +44,9 @@ const makeRequired = Effect.gen(function* () {
   | Access to the paid resource.
   | This invoice is for a single request to /paid.
   `.pipe(
-    Required.extend(PaymentId.PaymentIdExtension, {
+    Required.extend(PaymentId.FromMerchant, {
       required: true,
+      id: PaymentId.random(),
     }),
     Required.accept(
       Requirements.logical(KnownAssets.Usd.USDC, {

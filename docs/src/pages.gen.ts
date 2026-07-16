@@ -10,6 +10,7 @@ type Page =
   | { path: '/asset'; render: 'static' }
   | { path: '/bridge'; render: 'static' }
   | { path: '/changelog'; render: 'static' }
+  | { path: '/chx-rpc'; render: 'static' }
   | { path: '/eip155'; render: 'static' }
   | { path: '/extension'; render: 'static' }
   | { path: '/facilitation'; render: 'static' }

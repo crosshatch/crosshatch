@@ -23,25 +23,24 @@ in the payment payload, together with the signed payment authorization.
 
 ## Defining An Extension
 
-Extensions are typed Effect services. The merchant publishes a request payload
-in the `Required` value, and the client returns a success payload in the
+Extensions are typed Effect services. The merchant publishes an `info` payload
+in the `Required` value, and the client returns an `echo` payload in the
 `Payload` value.
 
 ```ts
 import { Extension } from "crosshatch"
 import { Schema as S } from "effect"
 
-export class PaymentIdExtension extends Extension.Service<PaymentIdExtension>()(
-  "crosshatch/PaymentIdExtension",
+export class ClientReference extends Extension.Service<ClientReference>()(
+  "example/ClientReference",
   {
-    identifier: "payment-identifier",
+    identifier: "client-reference",
     info: S.Struct({
-      required: S.Boolean,
-      id: S.String.pipe(S.optional),
+      required: S.tag(true),
     }),
     echo: S.Struct({
-      required: S.Boolean,
-      id: S.String.pipe(S.optional),
+      required: S.tag(true),
+      id: S.String,
     }),
   },
 ) {}
@@ -59,22 +58,23 @@ import { PaymentId } from "crosshatch/Extensions"
 const required =
   yield *
   Required.make`Access to the paid resource.`.pipe(
-    Required.extend(PaymentId.PaymentIdExtension, {
+    Required.extend(PaymentId.FromMerchant, {
       required: true,
+      id: PaymentId.random(),
     }),
   )
 
 const middleware = ChxHttp.layerMiddleware({
-  extensions: [PaymentId.PaymentIdExtension],
+  extensions: [PaymentId.FromMerchant],
 })
 ```
 
-Inside a protected route, `yield* PaymentId.PaymentIdExtension` returns the
-decoded extension data from the submitted payload, or `undefined` when the
-payload did not include it.
+Inside a protected route, `yield* PaymentId.FromMerchant` returns the decoded
+extension data from the submitted payload, or `undefined` when the payload did
+not include it.
 
-Use `PaymentId.PaymentIdExtension.ensure` when the route requires the client to
-submit the extension value and should fail if it is missing.
+Use `PaymentId.FromMerchant.ensure` when the route requires the client to submit
+the extension value and should fail if it is missing.
 
 ## Client API
 
@@ -88,9 +88,9 @@ import { PaymentId } from "crosshatch/Extensions"
 import { Effect } from "effect"
 
 const paymentIdHandler = Extension.layerHandler(
-  PaymentId.PaymentIdExtension,
-  Effect.fn(function* ({ required, id }) {
-    return { required, id: id ?? crypto.randomUUID() }
+  PaymentId.FromClient,
+  Effect.fn(function* ({ required }) {
+    return { required, id: PaymentId.random() }
   }),
 )
 ```
@@ -104,10 +104,9 @@ Provide the handler as part of your payer layer, alongside asset selection and
 the signing schemes your client supports.
 
 Extensions also expose explicit decoders for lower-level integrations:
-`PaymentId.PaymentIdExtension.decodeRequired(required)` reads the merchant's
-request from a `Required`, and
-`PaymentId.PaymentIdExtension.decodePayload(payload)` reads the client's echoed
-response from a `Payload`.
+`PaymentId.FromMerchant.decodeRequired(required)` reads the merchant's request
+from a `Required`, and `PaymentId.FromMerchant.decodePayload(payload)` reads the
+client's echoed response from a `Payload`.
 
 ## Example: Payment Identifiers
 
@@ -127,3 +126,12 @@ resource delivery across its own systems. They are also useful for retrieving
 previously paid resources: the client can return with the same identifier and
 the merchant can look up the earlier paid exchange instead of requiring a new
 payment.
+
+Crosshatch ships three variants of the built-in `payment-identifier` extension:
+
+- `PaymentId.FromMerchant`: the merchant supplies the id in the requirement and
+  the client must echo it in the payload.
+- `PaymentId.FromClient`: the merchant requests an id and the client supplies it
+  in the payload.
+- `PaymentId.FromEither`: the merchant may supply an id, but the final payload
+  must contain one.

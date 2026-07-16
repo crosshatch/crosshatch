@@ -45,8 +45,9 @@ LanguageModel.generateText({
 ## Example Merchant
 
 The following Effect HTTP API route charges and settles USDC on Base. It uses
-`alchemy/Cloudflare`'s single-file `Cloudflare.Worker` DX, where platform
-configuration and the Worker runtime live together.
+[Alchemy](https://github.com/alchemy-run/alchemy)'s single-file
+`Cloudflare.Worker` DX, where platform configuration and the Worker runtime live
+together.
 
 ```ts
 import {

@@ -68,6 +68,7 @@ export default defineConfig({
         items: [
           { text: "Payer", link: "/payer" },
           { text: "Bridge", link: "/bridge" },
+          { text: "ChxRpc", link: "/chx-rpc" },
           { text: "Scheme", link: "/scheme" },
         ],
       },

@@ -15,7 +15,7 @@ export default Alchemy.Stack(
     const base = yield* WorkerConfig({
       domain: "otel.crosshatch.dev",
     })
-    const CROSSHATCH_STAGE = yield* Alchemy.Stage
+    const ALCHEMY_STAGE = yield* Alchemy.Stage
     const { url } = yield* Cloudflare.Worker("Entry", {
       ...base,
       dev: {
@@ -25,11 +25,11 @@ export default Alchemy.Stack(
       },
       main: "main.ts",
       env: {
-        CROSSHATCH_STAGE,
+        ALCHEMY_STAGE,
         OTEL_EXPORTER_OTLP_ENDPOINT: Config.string("OTEL_EXPORTER_OTLP_ENDPOINT"),
         OTEL_EXPORTER_OTLP_HEADERS: Config.redacted("OTEL_EXPORTER_OTLP_HEADERS"),
         OTEL_LOGS_EXPORTER: "otlp",
-        OTEL_METRICS_EXPORTER: CROSSHATCH_STAGE.startsWith("dev_") ? "none" : "otlp",
+        OTEL_METRICS_EXPORTER: ALCHEMY_STAGE.startsWith("dev_") ? "none" : "otlp",
         OTEL_TRACES_EXPORTER: "otlp",
       },
     })

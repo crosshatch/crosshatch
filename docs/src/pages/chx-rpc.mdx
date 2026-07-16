@@ -1,0 +1,78 @@
+---
+title: ChxRpc
+description:
+  Stream Crosshatch payment proposals over Effect RPC so another process can
+  approve and submit payloads.
+---
+
+# ChxRpc
+
+`ChxRpc` adapts `Bridge` to Effect RPC. Use it when payment approval and signing
+live outside the process that is trying to access a paid resource, such as a
+browser extension, hosted wallet, or separate agent runtime.
+
+## Add Crosshatch RPCs
+
+Merge `ChxRpc.ChxRpcGroup` into your RPC API and provide `ChxRpc.layer`.
+
+```ts
+import { ChxRpc } from "crosshatch"
+import { Rpc, RpcGroup, RpcSerialization, RpcServer } from "effect/unstable/rpc"
+import { Effect, Layer, Schema as S } from "effect"
+
+class Api extends ChxRpc.ChxRpcGroup.merge(
+  RpcGroup.make(
+    Rpc.make("Foo", {
+      success: S.String,
+    }),
+  ),
+) {}
+
+const app = RpcServer.toHttpEffect(Api).pipe(
+  Effect.provide([ChxRpc.layer, RpcSerialization.layerJson]),
+)
+```
+
+`ChxRpc.ChxRpcGroup` exposes two RPC methods:
+
+- `crosshatch_StreamEvents`: streams bridge events to the approval agent.
+- `crosshatch_SendPayment`: submits a signed `Payload` back to the waiting
+  process.
+
+## Use It As A Payer
+
+Provide `Payer.layerBridge` with `ChxRpc.layer` wherever code should create
+payment payloads through the RPC bridge.
+
+```ts
+import { ChxRpc, Payer, Payload } from "crosshatch"
+import { Effect, Layer } from "effect"
+
+const payerLayer = Payer.layerBridge.pipe(Layer.provideMerge(ChxRpc.layer))
+
+const program = Payload.make({ required }).pipe(Effect.provide(payerLayer))
+```
+
+When `Payload.make` calls the bridge, `ChxRpc.layer` publishes a `Propose` event
+and waits until `crosshatch_SendPayment` supplies the corresponding payload.
+Payment correlation uses the built-in `PaymentId.FromMerchant` extension, so
+requirements sent through this bridge must include a merchant-generated payment
+id.
+
+## Stream Events
+
+Approval agents consume `crosshatch_StreamEvents` and handle these event shapes:
+
+```ts
+type ChxEvent =
+  | {
+      readonly _tag: "CreateTrace"
+      readonly config: typeof Bridge.TraceConfig.Type
+    }
+  | { readonly _tag: "Propose"; readonly proposal: Bridge.Proposal }
+```
+
+`CreateTrace` is emitted when `Bridge.traced` starts a trace and the bridge
+supports trace creation. `Propose` is emitted for each payment proposal. After
+approving and signing the proposal, call `crosshatch_SendPayment` with the
+resulting `Payload`.
