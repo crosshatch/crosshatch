@@ -84,14 +84,15 @@ export const CodingAgentsButton = (props: {
           className="crosshatch-agents-modal-backdrop"
           role="presentation"
           style={{ "--crosshatch-agents-modal-top-offset": `${modalTopOffset}px` } as React.CSSProperties}
-          onClick={() => setOpen(false)}
+          onClick={(event) => {
+            if (event.target === event.currentTarget) setOpen(false)
+          }}
         >
           <div
             aria-modal="true"
             className="crosshatch-agents-modal"
             role="dialog"
             aria-labelledby="crosshatch-agents-modal-title"
-            onClick={(event) => event.stopPropagation()}
           >
             <button
               aria-label="Close coding agents modal"
