@@ -1,5 +1,18 @@
 # crosshatch
 
+## 0.0.7
+
+### Patch Changes
+
+- [#107](https://github.com/crosshatch/crosshatch/pull/107)
+  [`e82aa8c`](https://github.com/crosshatch/crosshatch/commit/e82aa8c17e7dd00fd231650fde6ba0d37aa45824)
+  Thanks @harrysolovay! - Introduce `ChxRpc` module for blocking on multiple
+  x402 payments over the course of a single handler's execution.
+
+- [#107](https://github.com/crosshatch/crosshatch/pull/107)
+  [`e82aa8c`](https://github.com/crosshatch/crosshatch/commit/e82aa8c17e7dd00fd231650fde6ba0d37aa45824)
+  Thanks @harrysolovay! - Rename `Http402` module to `ChxHttp`.
+
 ## 0.0.6
 
 ### Patch Changes
