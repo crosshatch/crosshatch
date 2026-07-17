@@ -1,4 +1,4 @@
-import { Schema as S, Context, Layer, Effect, Scope, flow, Cause } from "effect"
+import { Schema as S, Context, Layer, Effect, Scope, flow } from "effect"
 
 import type { Payload } from "./Payload.ts"
 import type { Required } from "./Required.ts"
@@ -25,8 +25,6 @@ export interface Extension<
   readonly info: Info
 
   readonly enrichment: Enrichment
-
-  readonly ensure: Effect.Effect<Enrichment["Type"], Cause.NoSuchElementError, Self>
 
   readonly decodeRequired: (
     required: typeof Required.Type,
@@ -66,8 +64,6 @@ export const Service =
     const tag = Context.Service<Self, Service<Enrichment>>()(id)
     const { identifier, info, enrichment } = definition
 
-    const ensure = Effect.flatMap(tag, Effect.fromNullishOr)
-
     const decodeRequired = (required: typeof Required.Type) =>
       S.decodeUnknownEffect(S.toCodecJson(info))(required.extensions?.[identifier])
 
@@ -77,7 +73,6 @@ export const Service =
     return Object.assign(tag, {
       [TypeId]: TypeId,
       ...definition,
-      ensure,
       decodeRequired,
       decodePayload,
     })
