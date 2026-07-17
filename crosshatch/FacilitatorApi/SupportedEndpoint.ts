@@ -8,7 +8,7 @@ import { Version } from "../Version.ts"
 export const SupportedKind = S.Struct({
   x402Version: Version,
   scheme: S.String,
-  network: ChainId,
+  network: S.Union([S.String.pipe(S.brand("crosshatch/LegacyChainId")), ChainId]),
   extra: JsonRecord.pipe(S.optional),
 })
 
