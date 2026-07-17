@@ -44,6 +44,9 @@
       "./package.json": "./package.json"
     }
   },
+  "scripts": {
+    "dev": "node --watch ./Cli/main.ts dev"
+  },
   "peerDependencies": {
     "@crosshatch/widget": "workspace:*",
     "@effect/platform-browser": "catalog:",

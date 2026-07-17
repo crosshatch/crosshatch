@@ -9,7 +9,7 @@ import { Version } from "./Version.ts"
 
 export interface Payload {
   readonly x402Version: typeof Version.Type
-  readonly accepted: typeof Requirements.Type
+  readonly accepted: Requirements
   readonly extensions?: typeof ExtensionsInfo.Type | undefined
   readonly payload: Record<string, unknown>
   readonly resource?: typeof ResourceInfo.Type | undefined

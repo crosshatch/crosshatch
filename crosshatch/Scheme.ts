@@ -3,12 +3,14 @@ import { Context, Data, Effect, flow, Layer, Schema as S, Scope } from "effect"
 import type { PhysicalAsset } from "./Asset.ts"
 import type { Requirements } from "./Requirements.ts"
 
+export type SchemePayload = Record<string, S.Json>
+
 export class CreatePayloadError extends Data.TaggedError("CreatePayloadError")<{ readonly cause?: unknown }> {}
 
-export type Adapt<R> = Effect.Effect<Record<string, S.Json>, CreatePayloadError, R>
+export type Adapt<R> = Effect.Effect<SchemePayload, CreatePayloadError, R>
 
 export interface SchemeConfig {
-  readonly accepted: typeof Requirements.Type
+  readonly accepted: Requirements
   readonly physical: PhysicalAsset
 }
 
@@ -72,7 +74,7 @@ export const Service =
             accepted,
             physical,
           }: {
-            readonly accepted: typeof Requirements.Type
+            readonly accepted: Requirements
             readonly physical: PhysicalAsset
           }) {
             const match = yield* Effect.all(

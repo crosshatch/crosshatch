@@ -63,9 +63,9 @@ export const extend =
     K extends string,
     Name extends string,
     ExtensionPayload extends Extension.Info,
-    Success extends Extension.Echo<ExtensionPayload>,
+    Enrichment extends Extension.Enrichment<ExtensionPayload>,
   >(
-    extension: Extension<Self, K, Name, ExtensionPayload, Success>,
+    extension: Extension<Self, K, Name, ExtensionPayload, Enrichment>,
     payload: ExtensionPayload["Type"],
   ) =>
   <E, R>(

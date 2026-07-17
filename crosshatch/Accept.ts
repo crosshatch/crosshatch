@@ -12,7 +12,7 @@ export class Accept extends Context.Service<
   Accept,
   ({ required }: { readonly required: typeof Required.Type }) => Effect.Effect<
     {
-      readonly accepted: typeof Requirements.Type
+      readonly accepted: Requirements
       readonly acceptedI: number
       readonly chainId: typeof ChainId.Type
       readonly physical: PhysicalAsset

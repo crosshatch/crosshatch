@@ -1,17 +1,17 @@
 import { createServer } from "node:http"
 
 import { NodeHttpServer } from "@effect/platform-node"
-import { Facilitator } from "crosshatch"
-import { Console, Effect, Layer } from "effect"
+import { Effect, Layer } from "effect"
 import { Command, Flag } from "effect/unstable/cli"
 import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
 import { HttpApiBuilder } from "effect/unstable/httpapi"
 
+import { FacilitatorApi } from "../../Facilitator/FacilitatorApi.ts"
 import { handleSettle } from "./handleSettle.ts"
 import { handleSupported } from "./handleSupported.ts"
 import { handleVerify } from "./handleVerify.ts"
 
-export const DevFacilitatorLive = HttpApiBuilder.group(Facilitator.FacilitatorApi, "facilitator", (_) =>
+export const DevFacilitatorLive = HttpApiBuilder.group(FacilitatorApi, "facilitator", (_) =>
   Effect.succeed(_.handle("settle", handleSettle).handle("verify", handleVerify).handle("supported", handleSupported)),
 )
 
@@ -22,22 +22,14 @@ export const dev = Command.make("dev", {
   Command.withHandler(({ host, port }) =>
     HttpRouter.serve(
       Layer.mergeAll(
-        HttpApiBuilder.layer(Facilitator.FacilitatorApi, { openapiPath: "/openapi.json" }).pipe(
-          Layer.provide(DevFacilitatorLive),
-        ),
+        HttpApiBuilder.layer(FacilitatorApi, { openapiPath: "/openapi.json" }).pipe(Layer.provide(DevFacilitatorLive)),
         HttpRouter.add("GET", "/health", () => Effect.succeed(HttpServerResponse.text("ok"))),
-      ),
-    ).pipe(
-      Layer.provide(
         HttpRouter.cors({
           allowedHeaders: ["*"],
           allowedMethods: ["*"],
           allowedOrigins: ["*"],
         }),
       ),
-      Layer.provide(NodeHttpServer.layer(createServer, { host, port })),
-      Layer.tap(() => Console.log(`Facilitator listening at http://${host}:${port}`)),
-      Layer.launch,
-    ),
+    ).pipe(Layer.provide(NodeHttpServer.layer(createServer, { host, port })), Layer.launch),
   ),
 )

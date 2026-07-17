@@ -16,7 +16,7 @@ export class FromMerchant extends Extension.Service<FromMerchant>()("crosshatch/
     required: S.tag(true),
     id: PaymentId,
   }),
-  echo: S.Struct({
+  enrichment: S.Struct({
     required: S.tag(true),
     id: PaymentId,
   }),
@@ -27,7 +27,7 @@ export class FromClient extends Extension.Service<FromClient>()("crosshatch/From
   info: S.Struct({
     required: S.tag(true),
   }),
-  echo: S.Struct({
+  enrichment: S.Struct({
     required: S.tag(true),
     id: PaymentId.pipe(S.optional),
   }),
@@ -39,7 +39,7 @@ export class FromEither extends Extension.Service<FromEither>()("crosshatch/From
     required: S.tag(true),
     id: PaymentId.pipe(S.optional),
   }),
-  echo: S.Struct({
+  enrichment: S.Struct({
     required: S.tag(true),
     id: PaymentId,
   }),

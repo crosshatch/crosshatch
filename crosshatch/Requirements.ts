@@ -6,6 +6,7 @@ import type { InvalidAmountError } from "./Amount.ts"
 import { Asset, type Denomination, type LogicalAsset } from "./Asset.ts"
 import { ChainId } from "./ChainId.ts"
 
+export type Requirements = typeof Requirements.Type
 export const Requirements = S.Struct({
   amount: Amount.Atomic,
   asset: Asset,
@@ -17,10 +18,10 @@ export const Requirements = S.Struct({
 })
 
 export type RequirementsLike =
-  | typeof Requirements.Type
-  | Effect.Effect<typeof Requirements.Type, InvalidAmountError>
-  | Array<typeof Requirements.Type>
-  | Effect.Effect<Array<typeof Requirements.Type>, InvalidAmountError>
+  | Requirements
+  | Effect.Effect<Requirements, InvalidAmountError>
+  | Array<Requirements>
+  | Effect.Effect<Array<Requirements>, InvalidAmountError>
 
 export const logical = Effect.fnUntraced(function* <A extends LogicalAsset>(
   asset: A,
@@ -43,25 +44,22 @@ export const logical = Effect.fnUntraced(function* <A extends LogicalAsset>(
   const nominal = yield* Amount.from(amount)
   return Record.toEntries(recipients).flatMap(([namespace, references]) =>
     references
-      ? Record.toEntries(references).reduce(
-          (acc, [reference, payTo]) => {
-            const physical = asset[namespace]?.[reference]
-            if (!physical) return acc
-            const { name, version } = physical
-            return payTo
-              ? acc.concat({
-                  amount: Amount.toAtomic(nominal, physical),
-                  asset: Asset.make(physical.asset, { disableChecks: true }),
-                  maxTimeoutSeconds,
-                  network: ChainId.make(`${namespace}:${reference}`, { disableChecks: true }),
-                  payTo,
-                  scheme: "exact",
-                  extra: { name, version },
-                })
-              : acc
-          },
-          [] as ReadonlyArray<typeof Requirements.Type>,
-        )
+      ? Record.toEntries(references).reduce((acc, [reference, payTo]) => {
+          const physical = asset[namespace]?.[reference]
+          if (!physical) return acc
+          const { name, version } = physical
+          return payTo
+            ? acc.concat({
+                amount: Amount.toAtomic(nominal, physical),
+                asset: Asset.make(physical.asset, { disableChecks: true }),
+                maxTimeoutSeconds,
+                network: ChainId.make(`${namespace}:${reference}`, { disableChecks: true }),
+                payTo,
+                scheme: "exact",
+                extra: { name, version },
+              })
+            : acc
+        }, [] as ReadonlyArray<Requirements>)
       : [],
   )
 })

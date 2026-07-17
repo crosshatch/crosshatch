@@ -37,7 +37,7 @@ Effect.gen(function* () {
       Layer.provide(
         Extension.layerHandler(
           PaymentId.FromMerchant,
-          Effect.fn(function* ({ required }) {
+          Effect.fn(function* ({ info: { required } }) {
             return {
               required,
               id: PaymentId.random(),

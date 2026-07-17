@@ -30,15 +30,17 @@ export const layer = Layer.effect(
         const extensions = yield* Effect.forEach(
           Record.toEntries(infos),
           Effect.fnUntraced(
-            function* ([identifier, info]) {
+            function* ([identifier, infoJson]) {
               const extension = registry.entries().find(([extension]) => extension.identifier === identifier)
               if (!extension) {
                 return
               }
-              const [{ info: Info, echo: Echo }, f] = extension
-              const parsed = yield* S.decodeUnknownEffect(S.toCodecJson(Info))(info)
-              const echo = yield* f(parsed).pipe(Effect.flatMap(S.encodeEffect(S.toCodecJson(Echo))))
-              return [identifier, echo] as const
+              const [{ info: Info, enrichment: Enrichment }, f] = extension
+              const info = yield* S.decodeUnknownEffect(S.toCodecJson(Info))(infoJson)
+              const enrichment = yield* f({ accepted, info, payload, required }).pipe(
+                Effect.flatMap(S.encodeEffect(S.toCodecJson(Enrichment))),
+              )
+              return [identifier, enrichment] as const
             },
             Effect.catchTags({
               SchemaError: () => Effect.undefined,
