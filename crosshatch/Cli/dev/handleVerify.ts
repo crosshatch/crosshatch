@@ -9,6 +9,8 @@ export const handleVerify = handler(
   "verify",
   Effect.fn(function* ({ payload: { paymentPayload, paymentRequirements } }) {
     console.log({ paymentPayload, paymentRequirements })
-    return null!
+    return {
+      isValid: true as const,
+    }
   }),
 )

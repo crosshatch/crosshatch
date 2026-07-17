@@ -9,6 +9,10 @@ export const handleSettle = handler(
   "settle",
   Effect.fn(function* ({ payload: { paymentPayload, paymentRequirements } }) {
     console.log({ paymentPayload, paymentRequirements })
-    return null!
+    return {
+      success: true as const,
+      transaction: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      network: paymentRequirements.network,
+    }
   }),
 )
