@@ -18,7 +18,7 @@ export const layer = ({ baseUrl }: { readonly baseUrl: string }) =>
   )
 
 export const layerChx = Stage.pipe(
-  Effect.map(({ domain }) => layer({ baseUrl: domain("facilitator") })),
+  Effect.map(({ url }) => layer({ baseUrl: url("facilitator") })),
   Layer.unwrap,
 )
 

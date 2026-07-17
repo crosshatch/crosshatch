@@ -61,10 +61,13 @@ const route = Effect.gen(function* () {
 After receiving a payment payload, settle it before returning the paid resource.
 
 ```ts
-import { Facilitator } from "crosshatch"
+import { FacilitatorClient } from "crosshatch"
 
-yield * Facilitator.settle({ payload })
+yield * FacilitatorClient.settle({ payload })
 ```
+
+Provide `FacilitatorClient.layerChx` to use the hosted Crosshatch facilitator,
+or `FacilitatorClient.layer({ baseUrl })` for another deployment.
 
 ## Effect HTTP
 
@@ -154,7 +157,7 @@ Most merchant routes should settle the payload before returning the paid
 resource.
 
 ```ts
-import { Facilitator, ChxHttp, Payload } from "crosshatch"
+import { FacilitatorClient, ChxHttp, Payload } from "crosshatch"
 import { Effect } from "effect"
 import { HttpServerResponse } from "effect/unstable/http"
 
@@ -165,7 +168,7 @@ const paidRoute = Effect.gen(function* () {
     return yield* ChxHttp.require({ required })
   }
 
-  const settlement = yield* Facilitator.settle({ payload })
+  const settlement = yield* FacilitatorClient.settle({ payload })
 
   return HttpServerResponse.text("The paid resource.").pipe(
     ChxHttp.addResponseHeader(settlement),
@@ -173,9 +176,10 @@ const paidRoute = Effect.gen(function* () {
 })
 ```
 
-`Facilitator.settle({ payload })` uses the configured facilitator client. It
-fails the route if the facilitator cannot settle the payment or returns an
-unsuccessful settlement result.
+`FacilitatorClient.settle({ payload })` uses the provided facilitator client. It
+fails with `SettlementError` when the facilitator returns an unsuccessful
+result. Provide `FacilitatorClient.layerChx` or an explicit
+`FacilitatorClient.layer({ baseUrl })` around the application.
 
 ### Non-blocking Settlement
 
@@ -183,7 +187,7 @@ To avoid blocking the resource delivery, you can fork a scope-bound fiber from
 the settlement effect.
 
 ```ts
-import { Facilitator, ChxHttp, Payload } from "crosshatch"
+import { FacilitatorClient, ChxHttp, Payload } from "crosshatch"
 import { Effect } from "effect"
 import { HttpServerResponse } from "effect/unstable/http"
 
@@ -194,7 +198,7 @@ const paidRoute = Effect.gen(function* () {
     return yield* ChxHttp.require({ required })
   }
 
-  yield* Facilitator.settle({ payload }).pipe(Effect.forkScoped) // [!code focus]
+  yield* FacilitatorClient.settle({ payload }).pipe(Effect.forkScoped) // [!code focus]
 
   return HttpServerResponse.text("The paid resource.")
 })

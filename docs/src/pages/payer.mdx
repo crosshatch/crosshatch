@@ -59,10 +59,13 @@ asset, network, or payment scheme.
 
 ## Extensions
 
-The built-in payer also answers registered client extensions. If the requirement
-contains extension requests and the client has provided matching
-`Extension.layerHandler` layers, their responses are encoded into
-`payload.extensions`.
+The built-in payer also answers registered client extensions. For every
+recognized entry in `required.extensions`, it decodes the extension's `info`
+schema and invokes the registered `Extension.layerHandler` with
+`{ info, accepted, payload, required }`. The returned enrichment is encoded with
+the extension's `enrichment` schema and stored in `payload.extensions`.
+
+Unknown extensions and extension values that fail schema decoding are skipped.
 
 ## Bridge Payer
 
