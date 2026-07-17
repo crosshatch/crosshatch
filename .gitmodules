@@ -1,9 +1,9 @@
 [submodule "liminal"]
 	path = liminal
 	url = git@github.com:harrysolovay/liminal.git
-[submodule "repos/Effect-TS/effect-smol"]
-	path = repos/Effect-TS/effect-smol
-	url = git@github.com:Effect-TS/effect-smol.git
+[submodule "repos/Effect-TS/effect"]
+	path = repos/Effect-TS/effect
+	url = git@github.com:Effect-TS/effect.git
 [submodule "repos/TanStack/router"]
 	path = repos/TanStack/router
 	url = git@github.com:TanStack/router.git
@@ -58,9 +58,9 @@
 [submodule "repos/vitest-dev/vitest"]
 	path = repos/vitest-dev/vitest
 	url = git@github.com:vitest-dev/vitest.git
-[submodule "repos/alchemy-run/alchemy-effect"]
-	path = repos/alchemy-run/alchemy-effect
-	url = git@github.com:alchemy-run/alchemy-effect.git
+[submodule "repos/alchemy-run/alchemy"]
+	path = repos/alchemy-run/alchemy
+	url = git@github.com:alchemy-run/alchemy.git
 [submodule "repos/wevm/vocs"]
 	path = repos/wevm/vocs
 	url = git@github.com:wevm/vocs.git

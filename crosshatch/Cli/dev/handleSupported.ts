@@ -13,30 +13,25 @@ const dummySigners = {
   "solana:*": ["11111111111111111111111111111111"],
 } as const
 
-export const handleSupported = handler(
-  FacilitatorApi,
-  "facilitator",
-  "supported",
-  Effect.fn(function* () {
-    return {
-      kinds: knownAssetDenominations.flatMap((denomination) =>
-        Object.values(denomination).flatMap((logicalAsset) =>
-          Object.entries(logicalAsset).flatMap(([namespace, references]) =>
-            Object.entries(references).map(([reference, physical]) => ({
-              x402Version: 2 as const,
-              scheme: "exact",
-              network: ChainId.make(`${namespace}:${reference}`, { disableChecks: true }),
-              extra: {
-                asset: physical.asset,
-                name: physical.name,
-                version: physical.version,
-              },
-            })),
-          ),
+export const handleSupported = handler(FacilitatorApi, "facilitator", "supported", () =>
+  Effect.succeed({
+    kinds: knownAssetDenominations.flatMap((denomination) =>
+      Object.values(denomination).flatMap((logicalAsset) =>
+        Object.entries(logicalAsset).flatMap(([namespace, references]) =>
+          Object.entries(references).map(([reference, physical]) => ({
+            x402Version: 2,
+            scheme: "exact",
+            network: ChainId.make(`${namespace}:${reference}`, { disableChecks: true }),
+            extra: {
+              asset: physical.asset,
+              name: physical.name,
+              version: physical.version,
+            },
+          })),
         ),
       ),
-      extensions: [],
-      signers: dummySigners,
-    }
+    ),
+    extensions: [],
+    signers: dummySigners,
   }),
 )

@@ -24,6 +24,9 @@ export const dev = Command.make("dev", {
       Layer.mergeAll(
         HttpApiBuilder.layer(FacilitatorApi, { openapiPath: "/openapi.json" }).pipe(Layer.provide(DevFacilitatorLive)),
         HttpRouter.add("GET", "/health", () => Effect.succeed(HttpServerResponse.text("ok"))),
+        HttpRouter.add("GET", "/favicon.ico", () => Effect.succeed(HttpServerResponse.empty({ status: 204 }))).pipe(
+          Layer.provide(HttpRouter.disableLogger),
+        ),
         HttpRouter.cors({
           allowedHeaders: ["*"],
           allowedMethods: ["*"],
