@@ -32,7 +32,7 @@ Effect.gen(function* () {
   yield* Facilitator.settle({ payload })
 }).pipe(
   Effect.provide([
-    Facilitator.layerChx.pipe(Layer.provideMerge(FetchHttpClient.layer)),
+    Facilitator.layer().pipe(Layer.provideMerge(FetchHttpClient.layer)),
     PayerLive.pipe(
       Layer.provide(
         Extension.layerHandler(

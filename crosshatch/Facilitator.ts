@@ -1,4 +1,4 @@
-import { Context, Effect, Layer, Schema as S } from "effect"
+import { Context, Effect, Layer, Schema as S, UndefinedOr } from "effect"
 import { HttpApiClient } from "effect/unstable/httpapi"
 
 import { FacilitatorApiGroup, FacilitatorApi } from "./FacilitatorApi/FacilitatorApi.ts"
@@ -11,16 +11,13 @@ export class Facilitator extends Context.Service<
   HttpApiClient.Client<typeof FacilitatorApiGroup>["facilitator"]
 >()("crosshatch/Facilitator") {}
 
-export const layer = ({ baseUrl }: { readonly baseUrl: string }) =>
-  Layer.effect(
-    Facilitator,
-    HttpApiClient.make(FacilitatorApi, { baseUrl }).pipe(Effect.map(({ facilitator }) => facilitator)),
-  )
-
-export const layerChx = Stage.pipe(
-  Effect.map(({ url }) => layer({ baseUrl: url("facilitator") })),
-  Layer.unwrap,
-)
+export const layer = Effect.fnUntraced(function* (config?: { readonly baseUrl?: string | undefined }) {
+  const baseUrl = yield* UndefinedOr.match(config?.baseUrl, {
+    onDefined: Effect.succeed,
+    onUndefined: () => Stage.pipe(Effect.map(({ url }) => url("facilitator"))),
+  })
+  return yield* HttpApiClient.make(FacilitatorApi, { baseUrl }).pipe(Effect.map(({ facilitator }) => facilitator))
+}, Layer.effect(Facilitator))
 
 export class VerificationError extends S.TaggedErrorClass<VerificationError>()("VerificationError", {
   invalidReason: S.String.pipe(S.optional),

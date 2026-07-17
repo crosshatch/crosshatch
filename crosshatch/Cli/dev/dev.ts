@@ -1,7 +1,7 @@
 import { createServer } from "node:http"
 
 import { NodeHttpServer } from "@effect/platform-node"
-import { Effect, Layer } from "effect"
+import { Config, Effect, Layer } from "effect"
 import { Command, Flag } from "effect/unstable/cli"
 import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
 import { HttpApiBuilder } from "effect/unstable/httpapi"
@@ -16,7 +16,7 @@ export const DevFacilitatorLive = HttpApiBuilder.group(FacilitatorApi, "facilita
 )
 
 export const dev = Command.make("dev", {
-  port: Flag.integer("port").pipe(Flag.withDefault(4647)),
+  port: Flag.integer("port").pipe(Flag.withSchema(Config.Port), Flag.withDefault(4647)),
   host: Flag.string("host").pipe(Flag.withDefault("127.0.0.1")),
 }).pipe(
   Command.withHandler(({ host, port }) =>

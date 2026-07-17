@@ -22,6 +22,6 @@ Effect.gen(function* () {
   const { payload } = yield* Payload.make({ required })
   yield* Facilitator.settle({ payload })
 }).pipe(
-  Effect.provide([BrowserPayer.layer, Facilitator.layerChx.pipe(Layer.provide(FetchHttpClient.layer))]),
+  Effect.provide([BrowserPayer.layer, Facilitator.layer().pipe(Layer.provide(FetchHttpClient.layer))]),
   Effect.runFork,
 )

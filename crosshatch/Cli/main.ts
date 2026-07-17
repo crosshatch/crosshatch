@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-import { Cause, Effect } from "effect"
+import { NodeRuntime } from "@effect/platform-node"
+import { Effect } from "effect"
 import { Command } from "effect/unstable/cli"
 
 import PackageJson from "../package.json" with { type: "json" }
@@ -14,6 +15,6 @@ Command.make("crosshatch").pipe(
     version: PackageJson.version,
   }),
   Effect.provide(PreludeLive),
-  Effect.onError((cause) => Effect.logError(Cause.pretty(cause))),
-  Effect.runFork,
+  Effect.onError(Effect.logError),
+  NodeRuntime.runMain,
 )

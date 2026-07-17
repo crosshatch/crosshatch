@@ -135,7 +135,7 @@ Effect.gen(function* () {
 
 ```ts
 import {
-  FacilitatorClient,
+  Facilitator,
   ChxHttp,
   KnownAssets,
   Payload,
@@ -165,12 +165,12 @@ const router = HttpRouter.add(
         )
       return yield* ChxHttp.require({ required })
     }
-    const settlement = yield* FacilitatorClient.settle({ payload })
+    const settlement = yield* Facilitator.settle({ payload })
     return HttpServerResponse.text("The paid resource.").pipe(
       ChxHttp.addResponseHeader(settlement),
     )
   }),
-).pipe(Layer.provide([ChxHttp.layerMiddleware(), FacilitatorClient.layerChx]))
+).pipe(Layer.provide([ChxHttp.layerMiddleware(), Facilitator.layer()]))
 ```
 
     </div>

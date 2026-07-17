@@ -57,7 +57,7 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
       }),
     ).pipe(
       Layer.provide([
-        Facilitator.layerChx,
+        Facilitator.layer(),
         HttpRouter.cors({
           allowedHeaders: ["*"],
           allowedMethods: ["*"],

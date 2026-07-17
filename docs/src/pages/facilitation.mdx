@@ -8,24 +8,23 @@ description:
 # Facilitation
 
 Settlement and verification are performed through a facilitator service. The
-`FacilitatorClient` module exposes `verify({ payload })` and
-`settle({ payload })`. Both operations require a `FacilitatorClient` service in
-the Effect context.
+`Facilitator` module exposes `verify({ payload })` and `settle({ payload })`.
+Both operations require a `Facilitator` service in the Effect context.
 
-Use `FacilitatorClient.layerChx` for the public Crosshatch facilitator, or
-`FacilitatorClient.layer({ baseUrl })` for another deployment.
+Use `Facilitator.layer()` for the public Crosshatch facilitator, or
+`Facilitator.layer({ baseUrl })` for another deployment.
 
 ## Crosshatch Facilitator
 
-`layerChx` derives the facilitator URL from the current Crosshatch `Stage`. The
+`layer()` derives the facilitator URL from the current Crosshatch `Stage`. The
 default production stage uses `https://facilitator.crosshatch.dev`.
 
 ```ts
-import { FacilitatorClient } from "crosshatch"
+import { Facilitator } from "crosshatch"
 import { Layer } from "effect"
 import { FetchHttpClient } from "effect/unstable/http"
 
-const FacilitatorLive = FacilitatorClient.layerChx.pipe(
+const FacilitatorLive = Facilitator.layer().pipe(
   Layer.provide(FetchHttpClient.layer),
 )
 ```
@@ -35,11 +34,11 @@ does not already supply one.
 
 ## Providing a Facilitator
 
-Provide `FacilitatorClient.layer` when your program should use a different
-facilitator URL.
+Provide `Facilitator.layer` when your program should use a different facilitator
+URL.
 
 ```ts
-import { FacilitatorClient } from "crosshatch"
+import { Facilitator } from "crosshatch"
 import { Effect } from "effect"
 
 const Program = Effect.gen(function* () {
@@ -48,16 +47,15 @@ const Program = Effect.gen(function* () {
 
 Program.pipe(
   Effect.provide(
-    FacilitatorClient.layer({
+    Facilitator.layer({
       baseUrl: "https://facilitator.example.com",
     }),
   ),
 )
 ```
 
-Any `FacilitatorClient.verify({ payload })` or
-`FacilitatorClient.settle({ payload })` call inside the provided scope uses this
-facilitator.
+Any `Facilitator.verify({ payload })` or `Facilitator.settle({ payload })` call
+inside the provided scope uses this facilitator.
 
 ## Merchant Settlement
 
@@ -65,17 +63,17 @@ Most merchant servers provide the facilitator client at the application layer so
 every paid route settles against the same service.
 
 ```ts
-import { FacilitatorClient, Payload } from "crosshatch"
+import { Facilitator, Payload } from "crosshatch"
 import { Effect } from "effect"
 
 const route = Effect.gen(function* () {
   const payload = yield* Payload.pipe(Effect.flatMap(Effect.fromNullishOr))
-  const settlement = yield* FacilitatorClient.settle({ payload })
+  const settlement = yield* Facilitator.settle({ payload })
   // ...
 }).pipe(
   // [!code focus:start]
   Effect.provide(
-    FacilitatorClient.layer({
+    Facilitator.layer({
       baseUrl: "https://facilitator.example.com",
     }),
   ),
@@ -90,22 +88,22 @@ traffic through an environment-specific deployment, or need to test settlement
 against a local facilitator.
 
 ```ts
-FacilitatorClient.layer({
+Facilitator.layer({
   baseUrl: "http://127.0.0.1:4647",
 })
 ```
 
-The service must implement the `FacilitatorApi` exported from `crosshatch`,
-including `POST /verify`, `POST /settle`, and `GET /supported`. Networks
-returned by `/supported` are CAIP-2 `ChainId` values; legacy network aliases are
-not accepted by the schema.
+The service must implement the `FacilitatorApi` exported from
+`crosshatch/FacilitatorApi`. Its endpoints are `POST /verify`, `POST /settle`,
+and `GET /supported`. Networks returned by `/supported` are CAIP-2 `ChainId`
+values, and legacy network aliases are not accepted by the schema.
 
 ## Implementing a Facilitator
 
-The Effect HTTP API definition is exported directly from the package root:
+The Effect HTTP API definition is exported from its own package subpath:
 
 ```ts
-import { FacilitatorApi, FacilitatorApiGroup } from "crosshatch"
+import { FacilitatorApi, FacilitatorApiGroup } from "crosshatch/FacilitatorApi"
 ```
 
 Use `FacilitatorApi` when implementing or mounting a compatible facilitator
@@ -129,7 +127,7 @@ The server exposes `/verify`, `/settle`, `/supported`, `/health`, and
 `/openapi.json`. Connect with an explicit client layer:
 
 ```ts
-FacilitatorClient.layer({
+Facilitator.layer({
   baseUrl: "http://127.0.0.1:4647",
 })
 ```

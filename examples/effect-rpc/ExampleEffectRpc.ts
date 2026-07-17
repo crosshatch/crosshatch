@@ -59,7 +59,7 @@ export default class ExampleEffectRpc extends Cloudflare.RpcWorker<ExampleEffect
           }, Effect.orDie),
         ).pipe(Layer.provideMerge(Payer.layerBridge.pipe(Layer.provideMerge(ChxRpc.layer)))),
         RpcSerialization.layerJson,
-        Facilitator.layerChx,
+        Facilitator.layer(),
       ]),
     )
   }),
