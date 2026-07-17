@@ -26,6 +26,7 @@
     "./Eip155": "./Eip155/Eip155.ts",
     "./Extensions": "./Extensions/Extensions.ts",
     "./Facade": "./Browser/Facade/Facade.ts",
+    "./FacilitatorApi": "./FacilitatorApi/FacilitatorApi.ts",
     "./Ramp": "./Ramp/Ramp.ts",
     "./Solana": "./Solana/Solana.ts",
     "./package.json": "./package.json"
@@ -39,6 +40,7 @@
       "./Eip155": "./dist/Eip155/Eip155.js",
       "./Extensions": "./dist/Extensions/Extensions.js",
       "./Facade": "./dist/Browser/Facade/Facade.js",
+      "./FacilitatorApi": "./dist/FacilitatorApi/FacilitatorApi.js",
       "./Ramp": "./dist/Ramp/Ramp.js",
       "./Solana": "./dist/Solana/Solana.js",
       "./package.json": "./package.json"

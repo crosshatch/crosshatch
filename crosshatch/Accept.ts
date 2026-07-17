@@ -10,7 +10,7 @@ export class AcceptError extends S.TaggedErrorClass<AcceptError>()("AcceptError"
 
 export class Accept extends Context.Service<
   Accept,
-  ({ required }: { readonly required: typeof Required.Type }) => Effect.Effect<
+  ({ required }: { readonly required: Required }) => Effect.Effect<
     {
       readonly accepted: Requirements
       readonly acceptedI: number

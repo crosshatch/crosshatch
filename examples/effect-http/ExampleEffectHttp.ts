@@ -1,5 +1,5 @@
 import * as Cloudflare from "alchemy/Cloudflare"
-import { Required, Requirements, ChxHttp, KnownAssets, Payload, FacilitatorClient } from "crosshatch"
+import { Required, Requirements, ChxHttp, KnownAssets, Payload, Facilitator } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
 import { PaymentId } from "crosshatch/Extensions"
 import { Layer, Effect, Config } from "effect"
@@ -52,12 +52,12 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
           )
           return yield* ChxHttp.require({ required })
         }
-        const settlement = yield* FacilitatorClient.settle({ payload })
+        const settlement = yield* Facilitator.settle({ payload })
         return HttpServerResponse.text("The paid resource.").pipe(ChxHttp.addResponseHeader(settlement))
       }),
     ).pipe(
       Layer.provide([
-        FacilitatorClient.layerChx,
+        Facilitator.layerChx,
         HttpRouter.cors({
           allowedHeaders: ["*"],
           allowedMethods: ["*"],

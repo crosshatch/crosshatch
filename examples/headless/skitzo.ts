@@ -1,4 +1,4 @@
-import { KnownAssets, FacilitatorClient, Required, Requirements, Payload } from "crosshatch"
+import { KnownAssets, Facilitator, Required, Requirements, Payload } from "crosshatch"
 import { BrowserPayer } from "crosshatch/Browser"
 import { Eip155Address } from "crosshatch/Eip155"
 import { Config, Effect, Layer } from "effect"
@@ -20,8 +20,8 @@ Effect.gen(function* () {
     ),
   )
   const { payload } = yield* Payload.make({ required })
-  yield* FacilitatorClient.settle({ payload })
+  yield* Facilitator.settle({ payload })
 }).pipe(
-  Effect.provide([BrowserPayer.layer, FacilitatorClient.layerChx.pipe(Layer.provide(FetchHttpClient.layer))]),
+  Effect.provide([BrowserPayer.layer, Facilitator.layerChx.pipe(Layer.provide(FetchHttpClient.layer))]),
   Effect.runFork,
 )

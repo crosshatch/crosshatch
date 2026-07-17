@@ -7,6 +7,7 @@ import { Requirements, type RequirementsLike } from "./Requirements.ts"
 import { ResourceInfo } from "./ResourceInfo.ts"
 import { Version } from "./Version.ts"
 
+export type Required = typeof Required.Type
 export const Required = S.Struct({
   x402Version: Version,
   resource: ResourceInfo,
@@ -37,14 +38,12 @@ export const make = Effect.fnUntraced(function* (
         description: stringRaw(template, substitutions),
       }),
     },
-  } satisfies typeof Required.Type
+  } satisfies Required
 })
 
 export const accept =
   (...acceptsInputs: ReadonlyArray<RequirementsLike>) =>
-  <E, R>(
-    effect: Effect.Effect<typeof Required.Type, E, R>,
-  ): Effect.Effect<typeof Required.Type, E | InvalidAmountError, R> =>
+  <E, R>(effect: Effect.Effect<Required, E, R>): Effect.Effect<Required, E | InvalidAmountError, R> =>
     Effect.flatMap(
       effect,
       Effect.fnUntraced(function* ({ accepts, ...rest }) {
@@ -69,8 +68,8 @@ export const extend =
     payload: ExtensionPayload["Type"],
   ) =>
   <E, R>(
-    effect: Effect.Effect<typeof Required.Type, E, R>,
-  ): Effect.Effect<typeof Required.Type, E | S.SchemaError, R | ExtensionPayload["EncodingServices"]> =>
+    effect: Effect.Effect<Required, E, R>,
+  ): Effect.Effect<Required, E | S.SchemaError, R | ExtensionPayload["EncodingServices"]> =>
     Effect.flatMap(
       effect,
       Effect.fnUntraced(function* ({ extensions, ...rest }) {

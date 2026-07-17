@@ -8,7 +8,7 @@ import { Payload, PayloadFromBase64JsonString } from "../Payload.ts"
 import { Required, RequiredFromBase64JsonString } from "../Required.ts"
 import { PAYMENT_REQUIRED, CROSSHATCH_TRACE_ID, PAYMENT_SIGNATURE, PAYMENT_RESPONSE } from "./constants.ts"
 
-export const require = Effect.fnUntraced(function* ({ required }: { readonly required: typeof Required.Type }) {
+export const require = Effect.fnUntraced(function* ({ required }: { readonly required: Required }) {
   const traceId = yield* TraceId
   const paymentRequired = yield* S.encodeEffect(RequiredFromBase64JsonString)(required)
   return HttpServerResponse.empty({

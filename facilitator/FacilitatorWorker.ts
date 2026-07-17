@@ -1,5 +1,5 @@
 import * as Cloudflare from "alchemy/Cloudflare"
-import { FacilitatorApi } from "crosshatch"
+import { FacilitatorApi } from "crosshatch/FacilitatorApi"
 import { Layer, Effect, FileSystem } from "effect"
 import * as Path from "effect/Path"
 import { HttpRouter, HttpServerResponse, HttpPlatform } from "effect/unstable/http"

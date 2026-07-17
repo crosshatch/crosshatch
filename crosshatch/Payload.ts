@@ -28,7 +28,7 @@ export const Payload = Object.assign(
 
 export const PayloadFromBase64JsonString = S.StringFromBase64.pipe(S.decodeTo(S.fromJsonString(S.toCodecJson(Payload))))
 
-export const make = Effect.fnUntraced(function* ({ required }: { readonly required: typeof Required.Type }) {
+export const make = Effect.fnUntraced(function* ({ required }: { readonly required: Required }) {
   const { createPayload } = yield* Payer
   return yield* createPayload({ required })
 })

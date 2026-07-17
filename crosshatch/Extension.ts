@@ -26,9 +26,7 @@ export interface Extension<
 
   readonly enrichment: Enrichment
 
-  readonly decodeRequired: (
-    required: typeof Required.Type,
-  ) => Effect.Effect<Info["Type"], S.SchemaError, Info["DecodingServices"]>
+  readonly decodeRequired: (required: Required) => Effect.Effect<Info["Type"], S.SchemaError, Info["DecodingServices"]>
 
   readonly decodePayload: (
     payload: Payload,
@@ -64,7 +62,7 @@ export const Service =
     const tag = Context.Service<Self, Service<Enrichment>>()(id)
     const { identifier, info, enrichment } = definition
 
-    const decodeRequired = (required: typeof Required.Type) =>
+    const decodeRequired = (required: Required) =>
       S.decodeUnknownEffect(S.toCodecJson(info))(required.extensions?.[identifier])
 
     const decodePayload = (required: Payload) =>
@@ -103,7 +101,7 @@ export interface ExtensionHandlerConfig<Info extends S.Top> {
   readonly info: Info["Type"]
   readonly payload: SchemePayload
   readonly accepted: Requirements
-  readonly required: typeof Required.Type
+  readonly required: Required
 }
 
 export class ExtensionRegistry extends Context.Reference<

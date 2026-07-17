@@ -6,14 +6,14 @@ import { Payload } from "./Payload.ts"
 import { Stage } from "./Stage.ts"
 
 /** @effect-expect-leaking [Mode] extends ["response-only"] ? never : never */
-export class FacilitatorClient extends Context.Service<
-  FacilitatorClient,
+export class Facilitator extends Context.Service<
+  Facilitator,
   HttpApiClient.Client<typeof FacilitatorApiGroup>["facilitator"]
->()("crosshatch/FacilitatorClient") {}
+>()("crosshatch/Facilitator") {}
 
 export const layer = ({ baseUrl }: { readonly baseUrl: string }) =>
   Layer.effect(
-    FacilitatorClient,
+    Facilitator,
     HttpApiClient.make(FacilitatorApi, { baseUrl }).pipe(Effect.map(({ facilitator }) => facilitator)),
   )
 
@@ -28,7 +28,7 @@ export class VerificationError extends S.TaggedErrorClass<VerificationError>()("
 }) {}
 
 export const verify = Effect.fnUntraced(function* ({ payload }: { readonly payload: Payload }) {
-  const facilitator = yield* FacilitatorClient
+  const facilitator = yield* Facilitator
   const { accepted: paymentRequirements } = payload
   const response = yield* facilitator.verify({
     payload: {
@@ -47,7 +47,7 @@ export class SettlementError extends S.TaggedErrorClass<SettlementError>()("Sett
 }) {}
 
 export const settle = Effect.fnUntraced(function* ({ payload }: { readonly payload: Payload }) {
-  const facilitator = yield* FacilitatorClient
+  const facilitator = yield* Facilitator
   const { accepted: paymentRequirements } = payload
   const response = yield* facilitator.settle({
     payload: {

@@ -1,5 +1,6 @@
 import { supportedX402PaymentKinds } from "@distilled.cloud/coinbase"
-import { ChainId, FacilitatorApi } from "crosshatch"
+import { ChainId } from "crosshatch"
+import { FacilitatorApi } from "crosshatch/FacilitatorApi"
 import { Effect, Schema as S } from "effect"
 
 import { handler } from "./_common.ts"

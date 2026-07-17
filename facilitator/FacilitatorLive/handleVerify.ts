@@ -1,5 +1,5 @@
 import { verifyX402Payment } from "@distilled.cloud/coinbase"
-import { FacilitatorApi } from "crosshatch"
+import { FacilitatorApi } from "crosshatch/FacilitatorApi"
 import { Effect } from "effect"
 
 import { handler } from "./_common.ts"

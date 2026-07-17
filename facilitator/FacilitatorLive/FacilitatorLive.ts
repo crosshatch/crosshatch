@@ -1,4 +1,4 @@
-import { FacilitatorApi } from "crosshatch"
+import { FacilitatorApi } from "crosshatch/FacilitatorApi"
 import { Effect } from "effect"
 import { HttpApiBuilder } from "effect/unstable/httpapi"
 
