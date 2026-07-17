@@ -1,5 +1,5 @@
 import * as Cloudflare from "alchemy/Cloudflare"
-import { Facilitator } from "crosshatch"
+import { FacilitatorApi } from "crosshatch"
 import { Layer, Effect, FileSystem } from "effect"
 import * as Path from "effect/Path"
 import { HttpRouter, HttpServerResponse, HttpPlatform } from "effect/unstable/http"
@@ -36,9 +36,7 @@ export default class FacilitatorWorker extends Cloudflare.Worker<FacilitatorWork
     yield* FacilitatorEnv
     const fetch = Layer.mergeAll(
       HttpRouter.add("GET", "/health", () => Effect.succeed(HttpServerResponse.text("ok"))),
-      HttpApiBuilder.layer(Facilitator.FacilitatorApi, { openapiPath: "/openapi.json" }).pipe(
-        Layer.provide(FacilitatorLive),
-      ),
+      HttpApiBuilder.layer(FacilitatorApi, { openapiPath: "/openapi.json" }).pipe(Layer.provide(FacilitatorLive)),
     ).pipe(
       Layer.provide([
         Etag.layer,

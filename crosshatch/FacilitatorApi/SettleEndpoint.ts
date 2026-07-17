@@ -1,10 +1,10 @@
 import { Schema as S, String, Tuple } from "effect"
 import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 
-import { JsonRecord } from "../../_util.ts"
-import { ChainId } from "../../ChainId.ts"
-import { Payload } from "../../Payload.ts"
-import { Requirements } from "../../Requirements.ts"
+import { JsonRecord } from "../_util.ts"
+import { ChainId } from "../ChainId.ts"
+import { Payload } from "../Payload.ts"
+import { Requirements } from "../Requirements.ts"
 
 export const SettlePayload = S.Struct({
   paymentPayload: Payload,

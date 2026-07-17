@@ -1,10 +1,10 @@
 import { supportedX402PaymentKinds } from "@distilled.cloud/coinbase"
-import { ChainId, Facilitator } from "crosshatch"
+import { ChainId, FacilitatorApi } from "crosshatch"
 import { Effect, Schema as S } from "effect"
 
 import { handler } from "./_common.ts"
 
-export const handleSupported = handler(Facilitator.FacilitatorApi, "facilitator", "supported", () =>
+export const handleSupported = handler(FacilitatorApi, "facilitator", "supported", () =>
   supportedX402PaymentKinds({}).pipe(
     Effect.flatMap(({ kinds, ...rest }) =>
       Effect.forEach(

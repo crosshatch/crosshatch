@@ -1,9 +1,9 @@
 import { Schema as S, String, Tuple } from "effect"
 import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 
-import { JsonRecord } from "../../_util.ts"
-import { Payload } from "../../Payload.ts"
-import { Requirements } from "../../Requirements.ts"
+import { JsonRecord } from "../_util.ts"
+import { Payload } from "../Payload.ts"
+import { Requirements } from "../Requirements.ts"
 
 export const VerifyPayload = S.Struct({
   paymentPayload: Payload,

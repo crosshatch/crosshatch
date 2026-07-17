@@ -6,7 +6,7 @@ import { Command, Flag } from "effect/unstable/cli"
 import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
 import { HttpApiBuilder } from "effect/unstable/httpapi"
 
-import { FacilitatorApi } from "../../Facilitator/FacilitatorApi.ts"
+import { FacilitatorApi } from "../../FacilitatorApi/FacilitatorApi.ts"
 import { handleSettle } from "./handleSettle.ts"
 import { handleSupported } from "./handleSupported.ts"
 import { handleVerify } from "./handleVerify.ts"

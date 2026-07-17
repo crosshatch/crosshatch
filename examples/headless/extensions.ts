@@ -1,4 +1,4 @@
-import { KnownAssets, Facilitator, Required, Requirements, Payload, Extension } from "crosshatch"
+import { KnownAssets, Required, Requirements, Payload, Extension, FacilitatorClient } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
 import { PaymentId } from "crosshatch/Extensions"
 import { Config, Effect, Layer } from "effect"
@@ -29,10 +29,10 @@ const makeRequired = Effect.gen(function* () {
 Effect.gen(function* () {
   const required = yield* makeRequired
   const { payload } = yield* Payload.make({ required })
-  yield* Facilitator.settle({ payload })
+  yield* FacilitatorClient.settle({ payload })
 }).pipe(
   Effect.provide([
-    FetchHttpClient.layer,
+    FacilitatorClient.layerChx.pipe(Layer.provideMerge(FetchHttpClient.layer)),
     PayerLive.pipe(
       Layer.provide(
         Extension.layerHandler(

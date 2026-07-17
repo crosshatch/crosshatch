@@ -1,11 +1,11 @@
 import { settleX402Payment } from "@distilled.cloud/coinbase"
-import { ChainId, Facilitator } from "crosshatch"
+import { ChainId, FacilitatorApi } from "crosshatch"
 import { Effect, Schema as S } from "effect"
 
 import { handler } from "./_common.ts"
 
 export const handleSettle = handler(
-  Facilitator.FacilitatorApi,
+  FacilitatorApi,
   "facilitator",
   "settle",
   ({ payload: { paymentPayload, paymentRequirements } }) =>

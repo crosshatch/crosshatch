@@ -3,7 +3,7 @@ import { env } from "node:process"
 import { CredentialsFromEnv } from "@distilled.cloud/coinbase"
 import { NodeHttpClient, NodeHttpServer } from "@effect/platform-node"
 import { describe, it, assert } from "@effect/vitest"
-import { Requirements, Facilitator, KnownAssets, Payload, Required, Payer, Mnemonic, Accept } from "crosshatch"
+import { Requirements, KnownAssets, Payload, Required, Payer, Mnemonic, Accept, FacilitatorApi } from "crosshatch"
 import { Eip155Address, Eip155Signer, Erc3009Scheme } from "crosshatch/Eip155"
 import { Effect, Layer, Config } from "effect"
 import { HttpRouter } from "effect/unstable/http"
@@ -11,9 +11,7 @@ import { HttpApiBuilder, HttpApiClient } from "effect/unstable/httpapi"
 
 import { FacilitatorLive } from "./FacilitatorLive/FacilitatorLive.ts"
 
-const Live = HttpRouter.serve(
-  HttpApiBuilder.layer(Facilitator.FacilitatorApi).pipe(Layer.provide(FacilitatorLive)),
-).pipe(
+const Live = HttpRouter.serve(HttpApiBuilder.layer(FacilitatorApi).pipe(Layer.provide(FacilitatorLive))).pipe(
   Layer.provide(NodeHttpClient.layerFetch),
   Layer.provideMerge(
     Layer.mergeAll(
@@ -49,7 +47,7 @@ describe.skipIf(!env.TEST_LIVE)(import.meta.url, () => {
       )
       const { payload: paymentPayload } = yield* Payload.make({ required })
       const { accepted: paymentRequirements } = paymentPayload
-      const client = yield* HttpApiClient.make(Facilitator.FacilitatorApi)
+      const client = yield* HttpApiClient.make(FacilitatorApi)
       const verified = yield* client.facilitator.verify({
         payload: { paymentRequirements, paymentPayload },
       })

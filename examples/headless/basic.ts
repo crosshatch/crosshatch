@@ -1,6 +1,7 @@
-import { KnownAssets, Facilitator, Required, Requirements, Payload } from "crosshatch"
+import { KnownAssets, Required, Requirements, Payload, FacilitatorClient } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
-import { Config, Effect } from "effect"
+import { Config, Effect, Layer } from "effect"
+import { FetchHttpClient } from "effect/unstable/http"
 
 import { PayerLive } from "./PayerLive.ts"
 
@@ -20,5 +21,8 @@ Effect.gen(function* () {
     ),
   )
   const { payload } = yield* Payload.make({ required })
-  yield* Facilitator.settle({ payload })
-}).pipe(Effect.provide(PayerLive), Effect.runFork)
+  yield* FacilitatorClient.settle({ payload })
+}).pipe(
+  Effect.provide([FacilitatorClient.layerChx.pipe(Layer.provide(FetchHttpClient.layer)), PayerLive]),
+  Effect.runFork,
+)

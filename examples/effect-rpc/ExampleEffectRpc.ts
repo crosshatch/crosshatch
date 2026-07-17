@@ -1,5 +1,5 @@
 import * as Cloudflare from "alchemy/Cloudflare"
-import { ChxRpc, Facilitator, KnownAssets, Payer, Payload, Required, Requirements } from "crosshatch"
+import { ChxRpc, FacilitatorClient, KnownAssets, Payer, Payload, Required, Requirements } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
 import { PaymentId } from "crosshatch/Extensions"
 import { Config, Effect, Layer, Schema as S } from "effect"
@@ -53,12 +53,13 @@ export default class ExampleEffectRpc extends Cloudflare.RpcWorker<ExampleEffect
                 ),
               )
               const { payload } = yield* Payload.make({ required })
-              yield* Facilitator.settle({ payload })
+              yield* FacilitatorClient.settle({ payload })
             }
             return "bar"
           }, Effect.orDie),
         ).pipe(Layer.provideMerge(Payer.layerBridge.pipe(Layer.provideMerge(ChxRpc.layer)))),
         RpcSerialization.layerJson,
+        FacilitatorClient.layerChx,
       ]),
     )
   }),
