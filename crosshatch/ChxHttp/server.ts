@@ -2,7 +2,7 @@ import { Schema as S, Effect, Option, Layer } from "effect"
 import { Headers, HttpRouter, HttpServerRequest, HttpServerResponse } from "effect/unstable/http"
 
 import { TraceId } from "../Bridge.ts"
-import type { Extension } from "../Extension.ts"
+import * as Extension from "../Extension.ts"
 import { SettleResponse, SettleResponseFromBase64JsonString } from "../Facilitator/endpoints/SettleEndpoint.ts"
 import { Payload, PayloadFromBase64JsonString } from "../Payload.ts"
 import { Required, RequiredFromBase64JsonString } from "../Required.ts"
@@ -22,7 +22,7 @@ export const require = Effect.fnUntraced(function* ({ required }: { readonly req
 export const addResponseHeader = (settlement: typeof SettleResponse.Type) =>
   HttpServerResponse.setHeader(PAYMENT_RESPONSE, S.encodeSync(SettleResponseFromBase64JsonString)(settlement))
 
-export const layerMiddleware = <X extends ReadonlyArray<Extension.Any> = []>(
+export const layerMiddleware = <X extends ReadonlyArray<Extension.Extension.Any> = []>(
   config?: { readonly extensions: X } | undefined,
 ) =>
   HttpRouter.middleware<{ readonly provides: Payload | InstanceType<X[number]> }>()(
@@ -35,7 +35,7 @@ export const layerMiddleware = <X extends ReadonlyArray<Extension.Any> = []>(
         )
         const Live = Layer.mergeAll(
           Layer.succeed(Payload, payload),
-          ...(config?.extensions?.map((v) => v.layer({ payload })) ?? []),
+          ...(config?.extensions?.map((v) => Extension.layerPayload(v, payload)) ?? []),
         ) as Layer.Layer<X[number] | Payload, S.SchemaError>
         return yield* Effect.provide(effect, Live)
       }),

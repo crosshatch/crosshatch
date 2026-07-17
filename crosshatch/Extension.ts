@@ -7,7 +7,7 @@ import type { SchemePayload } from "./Scheme.ts"
 
 const TypeId = "~crosshatch/Extension" as const
 
-export type Service<Success extends S.Top> = Success["Type"] | undefined
+export type Service<Enrichment extends S.Top> = Enrichment["Type"] | undefined
 
 export interface Extension<
   Self,
@@ -25,12 +25,6 @@ export interface Extension<
   readonly info: Info
 
   readonly enrichment: Enrichment
-
-  readonly layer: ({
-    payload,
-  }: {
-    readonly payload: Payload | undefined
-  }) => Layer.Layer<Self, S.SchemaError, Exclude<Enrichment["DecodingServices"], Scope.Scope>>
 
   readonly ensure: Effect.Effect<Enrichment["Type"], Cause.NoSuchElementError, Self>
 
@@ -72,18 +66,6 @@ export const Service =
     const tag = Context.Service<Self, Service<Enrichment>>()(id)
     const { identifier, info, enrichment } = definition
 
-    const layer = ({ payload }: { readonly payload: Payload | undefined }) =>
-      Layer.effect(
-        tag,
-        Effect.gen(function* () {
-          const entry = payload?.extensions?.[identifier]
-          if (entry) {
-            return yield* S.decodeUnknownEffect(S.toCodecJson(enrichment))(entry)
-          }
-          return
-        }),
-      )
-
     const ensure = Effect.flatMap(tag, Effect.fromNullishOr)
 
     const decodeRequired = (required: typeof Required.Type) =>
@@ -95,12 +77,32 @@ export const Service =
     return Object.assign(tag, {
       [TypeId]: TypeId,
       ...definition,
-      layer,
       ensure,
       decodeRequired,
       decodePayload,
     })
   }
+
+export const layerPayload = <
+  Self,
+  Id extends string,
+  Identifier extends string,
+  Info extends Extension.Info,
+  Enrichment extends Extension.Enrichment<Info>,
+>(
+  extension: Extension<Self, Id, Identifier, Info, Enrichment>,
+  payload: Payload | undefined,
+): Layer.Layer<Self, S.SchemaError, Exclude<Enrichment["DecodingServices"], Scope.Scope>> =>
+  Layer.effect(
+    extension,
+    Effect.gen(function* () {
+      const entry = payload?.extensions?.[extension.identifier]
+      if (entry) {
+        return yield* S.decodeUnknownEffect(S.toCodecJson(extension.enrichment))(entry)
+      }
+      return
+    }),
+  )
 
 export interface ExtensionHandlerConfig<Info extends S.Top> {
   readonly info: Info["Type"]
@@ -120,11 +122,11 @@ export const layerHandler = Effect.fnUntraced(function* <
   Id extends string,
   Identifier extends string,
   Info extends Extension.Info,
-  Success extends Extension.Enrichment<Info>,
+  Enrichment extends Extension.Enrichment<Info>,
   R,
 >(
-  extension: Extension<Self, Id, Identifier, Info, Success>,
-  f: (payload: ExtensionHandlerConfig<Info>) => Effect.Effect<Success["Type"], never, R>,
+  extension: Extension<Self, Id, Identifier, Info, Enrichment>,
+  f: (payload: ExtensionHandlerConfig<Info>) => Effect.Effect<Enrichment["Type"], never, R>,
 ) {
   const registry = yield* ExtensionRegistry
   const context = yield* Effect.context<R>()

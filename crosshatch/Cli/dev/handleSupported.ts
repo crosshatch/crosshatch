@@ -1,4 +1,4 @@
-import { Effect, Record } from "effect"
+import { Effect, Record, Struct } from "effect"
 
 import type { Denomination } from "../../Asset.ts"
 import { ChainId } from "../../ChainId.ts"
@@ -7,11 +7,6 @@ import * as KnownAssets from "../../KnownAssets/KnownAssets.ts"
 import { handler } from "./_common.ts"
 
 const knownAssetDenominations: ReadonlyArray<Denomination> = [KnownAssets.Usd]
-
-const dummySigners = {
-  "eip155:*": ["0x0000000000000000000000000000000000000001"],
-  "solana:*": ["11111111111111111111111111111111"],
-} as const
 
 export const handleSupported = handler(FacilitatorApi, "facilitator", "supported", () =>
   Effect.succeed({
@@ -22,16 +17,15 @@ export const handleSupported = handler(FacilitatorApi, "facilitator", "supported
             x402Version: 2,
             scheme: "exact",
             network: ChainId.make(`${namespace}:${reference}`, { disableChecks: true }),
-            extra: {
-              asset: physical.asset,
-              name: physical.name,
-              version: physical.version,
-            },
+            extra: Struct.pick(physical, ["asset", "name", "version"]),
           })),
         ),
       ),
     ),
     extensions: [],
-    signers: dummySigners,
+    signers: {
+      "eip155:*": ["0x0000000000000000000000000000000000000001"],
+      "solana:*": ["11111111111111111111111111111111"],
+    },
   }),
 )
