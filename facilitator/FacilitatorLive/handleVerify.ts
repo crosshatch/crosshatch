@@ -13,5 +13,8 @@ export const handleVerify = handler(
       x402Version: 2,
       paymentPayload: paymentPayload as never,
       paymentRequirements: paymentRequirements as never,
-    }).pipe(Effect.orDie),
+    }).pipe(
+      Effect.map((v) => v as never),
+      Effect.orDie,
+    ),
 )

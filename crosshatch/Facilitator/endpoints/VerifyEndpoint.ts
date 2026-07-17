@@ -1,8 +1,7 @@
-import { Schema as S, String } from "effect"
+import { Schema as S, String, Tuple } from "effect"
 import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 
-import { ExtensionsInfo } from "../../Extension.ts"
-import * as Extra from "../../Extra.ts"
+import { JsonRecord } from "../../_util.ts"
 import { Payload } from "../../Payload.ts"
 import { Requirements } from "../../Requirements.ts"
 
@@ -15,14 +14,20 @@ export const VerifyResponse = S.Union([
   S.Struct({
     isValid: S.tag(true),
     payer: S.String.pipe(S.optional),
-    extensions: ExtensionsInfo.pipe(S.optional),
+    extensions: JsonRecord.pipe(S.optional),
   }),
   S.Struct({
     isValid: S.tag(false),
     invalidReason: S.String.pipe(S.optional),
     invalidMessage: S.String.pipe(S.optional),
   }),
-]).mapMembers(Extra.assign)
+]).mapMembers(
+  Tuple.map(
+    S.fieldsAssign({
+      extra: JsonRecord.pipe(S.optional),
+    }),
+  ),
+)
 
 export const VerifyEndpoint = HttpApiEndpoint.post("verify", "/verify", {
   payload: VerifyPayload,

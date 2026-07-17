@@ -1,8 +1,8 @@
 import { Schema as S, Effect, Context } from "effect"
 
-import { stringRaw } from "./_util.ts"
+import { JsonRecord, stringRaw } from "./_util.ts"
 import { InvalidAmountError } from "./Amount.ts"
-import { type Extension, ExtensionsInfo } from "./Extension.ts"
+import type { Extension } from "./Extension.ts"
 import { Requirements, type RequirementsLike } from "./Requirements.ts"
 import { ResourceInfo } from "./ResourceInfo.ts"
 import { Version } from "./Version.ts"
@@ -12,7 +12,7 @@ export const Required = S.Struct({
   resource: ResourceInfo,
   accepts: S.Array(Requirements),
   error: S.String.pipe(S.optional),
-  extensions: ExtensionsInfo.pipe(S.optional),
+  extensions: JsonRecord.pipe(S.optional),
 })
 
 export const RequiredFromBase64JsonString = S.StringFromBase64.pipe(

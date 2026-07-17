@@ -1,9 +1,8 @@
-import { Schema as S, String } from "effect"
+import { Schema as S, String, Tuple } from "effect"
 import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 
+import { JsonRecord } from "../../_util.ts"
 import { ChainId } from "../../ChainId.ts"
-import { ExtensionsInfo } from "../../Extension.ts"
-import * as Extra from "../../Extra.ts"
 import { Payload } from "../../Payload.ts"
 import { Requirements } from "../../Requirements.ts"
 
@@ -18,14 +17,20 @@ export const SettleResponse = S.Union([
     payer: S.String.pipe(S.optional),
     transaction: S.String,
     network: ChainId,
-    extensions: ExtensionsInfo.pipe(S.optional),
+    extensions: JsonRecord.pipe(S.optional),
   }),
   S.Struct({
     success: S.tag(false),
     errorReason: S.String.pipe(S.optional),
     errorMessage: S.String.pipe(S.optional),
   }),
-]).mapMembers(Extra.assign)
+]).mapMembers(
+  Tuple.map(
+    S.fieldsAssign({
+      extra: JsonRecord.pipe(S.optional),
+    }),
+  ),
+)
 
 export const SettleResponseFromBase64JsonString = S.StringFromBase64.pipe(
   S.decodeTo(S.fromJsonString(S.toCodecJson(SettleResponse))),

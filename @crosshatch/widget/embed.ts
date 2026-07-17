@@ -1,11 +1,11 @@
 import { BrowserStream } from "@effect/platform-browser"
-import { Cause, Effect, Queue, Schema as S, Stream } from "effect"
+import { Cause, Effect, Queue, Record, Schema as S, Stream } from "effect"
 
 import type { WidgetConfig } from "./self.ts"
 
 const DEFAULT_SANDBOX = "allow-scripts allow-same-origin allow-popups allow-forms"
 let currentZ = 100
-const cssText = Object.entries({
+const cssText = Record.toEntries({
   position: "fixed",
   top: 0,
   right: 0,

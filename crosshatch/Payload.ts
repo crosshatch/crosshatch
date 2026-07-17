@@ -1,6 +1,6 @@
 import { Context, Effect, Schema as S } from "effect"
 
-import { ExtensionsInfo } from "./Extension.ts"
+import { JsonRecord } from "./_util.ts"
 import { Payer } from "./Payer.ts"
 import type { Required } from "./Required.ts"
 import { Requirements } from "./Requirements.ts"
@@ -10,9 +10,9 @@ import { Version } from "./Version.ts"
 export interface Payload {
   readonly x402Version: typeof Version.Type
   readonly accepted: Requirements
-  readonly extensions?: typeof ExtensionsInfo.Type | undefined
+  readonly extensions?: JsonRecord | undefined
   readonly payload: Record<string, unknown>
-  readonly resource?: typeof ResourceInfo.Type | undefined
+  readonly resource?: ResourceInfo | undefined
 }
 
 export const Payload = Object.assign(
@@ -20,7 +20,7 @@ export const Payload = Object.assign(
   S.Struct({
     x402Version: Version,
     accepted: Requirements,
-    extensions: ExtensionsInfo.pipe(S.optional),
+    extensions: JsonRecord.pipe(S.optional),
     payload: S.Record(S.String, S.Unknown),
     resource: ResourceInfo.pipe(S.optional),
   }),

@@ -1,6 +1,6 @@
 import * as Host from "@crosshatch/widget/Host"
 import { BrowserWorker, BrowserStream } from "@effect/platform-browser"
-import { Effect, Fiber, Layer, Stream, Schema as S, Schedule, Data } from "effect"
+import { Effect, Fiber, Layer, Stream, Schema as S, Schedule, Data, Record } from "effect"
 import * as Boundary from "liminal-util/Boundary"
 
 import { Stage } from "../../Stage.ts"
@@ -43,7 +43,7 @@ export const layer = Effect.gen(function* () {
   Layer.unwrap,
 )
 
-const cssText = Object.entries({
+const cssText = Record.toEntries({
   border: 0,
   bottom: "-1px",
   clipPath: "inset(50%)",

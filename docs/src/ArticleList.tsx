@@ -1,3 +1,4 @@
+import { Record } from "effect"
 import { Card, Cards } from "vocs"
 
 type ArticleModule = {
@@ -17,7 +18,7 @@ type Article = {
 
 const modules = import.meta.glob<ArticleModule>("./pages/articles/*.mdx", { eager: true })
 
-const articles = Object.entries(modules)
+const articles = Record.toEntries(modules)
   .filter(([path]) => !path.endsWith("/index.mdx"))
   .map(([path, module]): Article => {
     const slug = path.replace(/^\.\/pages\/articles\//u, "").replace(/\.mdx$/u, "")

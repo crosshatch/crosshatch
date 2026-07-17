@@ -15,7 +15,7 @@ export const handleSettle = handler(
       paymentRequirements: paymentRequirements as never,
     }).pipe(
       Effect.flatMap(({ network, ...rest }) =>
-        S.decodeUnknownEffect(ChainId.ChainId)(network).pipe(Effect.map((network) => ({ network, ...rest }))),
+        S.decodeUnknownEffect(ChainId.ChainId)(network).pipe(Effect.map((network) => ({ network, ...rest }) as never)),
       ),
       Effect.orDie,
     ),

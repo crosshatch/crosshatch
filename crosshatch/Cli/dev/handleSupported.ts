@@ -1,4 +1,4 @@
-import { Effect } from "effect"
+import { Effect, Record } from "effect"
 
 import type { Denomination } from "../../Asset.ts"
 import { ChainId } from "../../ChainId.ts"
@@ -16,9 +16,9 @@ const dummySigners = {
 export const handleSupported = handler(FacilitatorApi, "facilitator", "supported", () =>
   Effect.succeed({
     kinds: knownAssetDenominations.flatMap((denomination) =>
-      Object.values(denomination).flatMap((logicalAsset) =>
-        Object.entries(logicalAsset).flatMap(([namespace, references]) =>
-          Object.entries(references).map(([reference, physical]) => ({
+      Record.values(denomination).flatMap((logicalAsset) =>
+        Record.toEntries(logicalAsset).flatMap(([namespace, references]) =>
+          Record.toEntries(references).map(([reference, physical]) => ({
             x402Version: 2,
             scheme: "exact",
             network: ChainId.make(`${namespace}:${reference}`, { disableChecks: true }),

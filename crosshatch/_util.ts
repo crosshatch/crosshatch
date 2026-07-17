@@ -1,4 +1,7 @@
-import { String } from "effect"
+import { String, Schema as S } from "effect"
+
+export type JsonRecord = typeof JsonRecord.Type
+export const JsonRecord = S.Record(S.String, S.Json)
 
 export const stringRaw = (template: TemplateStringsArray | string, substitutions: ReadonlyArray<unknown>) =>
   typeof template === "string"

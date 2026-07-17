@@ -1,8 +1,8 @@
 import { Schema as S, String } from "effect"
 import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 
+import { JsonRecord } from "../../_util.ts"
 import { ChainId } from "../../ChainId.ts"
-import { Extra } from "../../Extra.ts"
 import { Version } from "../../Version.ts"
 
 export const LegacyNetwork = S.Literals(["base-sepolia", "base", "solana-devnet", "solana"])
@@ -11,7 +11,7 @@ export const SupportedKind = S.Struct({
   x402Version: Version,
   scheme: S.String,
   network: S.Union([ChainId, LegacyNetwork]),
-  extra: Extra.pipe(S.optional),
+  extra: JsonRecord.pipe(S.optional),
 })
 
 export const SupportedResponse = S.Struct({
