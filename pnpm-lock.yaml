@@ -18,9 +18,6 @@ catalogs:
     '@cloudflare/workers-types':
       specifier: ^5.20260713.1
       version: 5.20260713.1
-    '@distilled.cloud/coinbase':
-      specifier: ^0.29.0
-      version: 0.29.0
     '@effect/ai-openai-compat':
       specifier: 4.0.0-beta.97
       version: 4.0.0-beta.97
@@ -437,30 +434,6 @@ importers:
       effect:
         specifier: 'catalog:'
         version: 4.0.0-beta.97
-
-  facilitator:
-    dependencies:
-      '@distilled.cloud/coinbase':
-        specifier: 'catalog:'
-        version: 0.29.0(effect@4.0.0-beta.97)
-      alchemy:
-        specifier: 'catalog:'
-        version: 2.0.0-beta.62(@effect/platform-node@4.0.0-beta.97(bufferutil@4.1.0)(effect@4.0.0-beta.97)(ioredis@5.11.1)(utf-8-validate@6.0.6))(@types/node@26.1.1)(@types/react@19.2.17)(bufferutil@4.1.0)(effect@4.0.0-beta.97)(react-devtools-core@7.0.1(bufferutil@4.1.0)(utf-8-validate@6.0.6))(utf-8-validate@6.0.6)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.23.1)(yaml@2.9.0))(vitest@4.1.10)(workerd@1.20260708.1)(ws@8.21.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))
-      crosshatch:
-        specifier: workspace:*
-        version: link:../crosshatch
-      effect:
-        specifier: 'catalog:'
-        version: 4.0.0-beta.97
-      liminal-util:
-        specifier: workspace:*
-        version: link:../liminal/liminal-util
-      viem:
-        specifier: 'catalog:'
-        version: 2.55.1(bufferutil@4.1.0)(typescript@7.0.2)(utf-8-validate@6.0.6)(zod@3.25.76)
-      vite:
-        specifier: 'catalog:'
-        version: 8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.23.1)(yaml@2.9.0)
 
   liminal/docs:
     dependencies:
@@ -1135,11 +1108,6 @@ packages:
 
   '@distilled.cloud/cloudflare@0.29.0':
     resolution: {integrity: sha512-41vIR3UbYNCNv0PCbLKDqaVOVlhP9gADd2fT5BW2TQY8MaRHUzBMDqV/MZ5bLRipnleI5zNNJqbVsc8diIdk6g==}
-    peerDependencies:
-      effect: '>=4.0.0-beta.97 || >=4.0.0'
-
-  '@distilled.cloud/coinbase@0.29.0':
-    resolution: {integrity: sha512-R428bvtlnzVqA4ggxTb5cKn205qtZvL37rXTXs4T6VMjg7yBh2BmrkGhgCAkhhJup+lr7O5nsUbMqPprBfLznA==}
     peerDependencies:
       effect: '>=4.0.0-beta.97 || >=4.0.0'
 
@@ -8770,11 +8738,6 @@ snapshots:
       - workerd
 
   '@distilled.cloud/cloudflare@0.29.0(effect@4.0.0-beta.97)':
-    dependencies:
-      '@distilled.cloud/core': 0.29.0(effect@4.0.0-beta.97)
-      effect: 4.0.0-beta.97
-
-  '@distilled.cloud/coinbase@0.29.0(effect@4.0.0-beta.97)':
     dependencies:
       '@distilled.cloud/core': 0.29.0(effect@4.0.0-beta.97)
       effect: 4.0.0-beta.97

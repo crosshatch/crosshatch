@@ -3,7 +3,6 @@ packages:
   - crosshatch
   - docs
   - examples/*
-  - facilitator
   - liminal/*
   - liminal/examples/*
   - liminal/examples/*/*

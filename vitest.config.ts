@@ -6,7 +6,6 @@ export default defineConfig({
     projects: [
       "./@crosshatch/*/vitest.config.ts",
       "./crosshatch/vitest.config.ts",
-      "./facilitator/vitest.config.ts",
       "./liminal/*/vitest.config.ts",
     ],
   },
