@@ -1,9 +1,9 @@
 import { Effect, Record, Struct } from "effect"
 
-import type { Denomination } from "../../Asset.ts"
-import { ChainId } from "../../ChainId.ts"
-import { FacilitatorApi } from "../../FacilitatorApi/FacilitatorApi.ts"
-import * as KnownAssets from "../../KnownAssets/KnownAssets.ts"
+import type { Denomination } from "../Asset.ts"
+import { ChainId } from "../ChainId.ts"
+import { FacilitatorApi } from "../FacilitatorApi/FacilitatorApi.ts"
+import * as KnownAssets from "../KnownAssets/KnownAssets.ts"
 import { handler } from "./_common.ts"
 
 const knownAssetDenominations: ReadonlyArray<Denomination> = [KnownAssets.Usd]
