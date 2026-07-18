@@ -1,5 +1,33 @@
 # crosshatch
 
+## 0.0.8
+
+### Patch Changes
+
+- [#109](https://github.com/crosshatch/crosshatch/pull/109)
+  [`29d2b27`](https://github.com/crosshatch/crosshatch/commit/29d2b27ef1a6fc4f38bd2e10bc1ac778042fb10e)
+  Thanks @harrysolovay! - Disable `<schema>.make` checks at trusted boundaries.
+
+- [#114](https://github.com/crosshatch/crosshatch/pull/114)
+  [`aca927b`](https://github.com/crosshatch/crosshatch/commit/aca927b0c9f4f1c3b8db83faf8ec7ec1231fb8bd)
+  Thanks @harrysolovay! - Implement initial development facilitator command in
+  CLI. Swap out Object global usage with Effect Record module.
+
+- [#87](https://github.com/crosshatch/crosshatch/pull/87)
+  [`2691ff5`](https://github.com/crosshatch/crosshatch/commit/2691ff59fc18e16f52b14b7e0589ef39f7fa9947)
+  Thanks @saiashirwad! - Align Solana integration with spec and update crypto
+  dependencies.
+
+- [#114](https://github.com/crosshatch/crosshatch/pull/114)
+  [`aca927b`](https://github.com/crosshatch/crosshatch/commit/aca927b0c9f4f1c3b8db83faf8ec7ec1231fb8bd)
+  Thanks @harrysolovay! - Rename "echo" to "enrichment" in the context of the
+  extension API.
+
+- Updated dependencies
+  [[`aca927b`](https://github.com/crosshatch/crosshatch/commit/aca927b0c9f4f1c3b8db83faf8ec7ec1231fb8bd),
+  [`aca927b`](https://github.com/crosshatch/crosshatch/commit/aca927b0c9f4f1c3b8db83faf8ec7ec1231fb8bd)]:
+  - @crosshatch/widget@0.0.4
+
 ## 0.0.7
 
 ### Patch Changes

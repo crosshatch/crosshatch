@@ -1,5 +1,19 @@
 # @crosshatch/widget
 
+## 0.0.4
+
+### Patch Changes
+
+- [#114](https://github.com/crosshatch/crosshatch/pull/114)
+  [`aca927b`](https://github.com/crosshatch/crosshatch/commit/aca927b0c9f4f1c3b8db83faf8ec7ec1231fb8bd)
+  Thanks @harrysolovay! - Implement initial development facilitator command in
+  CLI. Swap out Object global usage with Effect Record module.
+
+- [#114](https://github.com/crosshatch/crosshatch/pull/114)
+  [`aca927b`](https://github.com/crosshatch/crosshatch/commit/aca927b0c9f4f1c3b8db83faf8ec7ec1231fb8bd)
+  Thanks @harrysolovay! - Rename "echo" to "enrichment" in the context of the
+  extension API.
+
 ## 0.0.3
 
 ### Patch Changes
