@@ -3,8 +3,8 @@ import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "effect/unstable/httpapi"
 
 import { CaAccountId } from "./CaAccountId.ts"
 
-export class RampApi extends HttpApi.make("crosshatch_ramp").add(
-  HttpApiGroup.make("ramp").add(
+export class RampApiGroup extends HttpApiGroup.make("ramp")
+  .add(
     HttpApiEndpoint.post("onramp", "/onramp", {
       payload: S.Struct({
         provider: S.Literals(["ApplePay", "Stripe", "Coinbase"]),
@@ -16,5 +16,7 @@ export class RampApi extends HttpApi.make("crosshatch_ramp").add(
       }),
       error: S.Never,
     }),
-  ),
-) {}
+  )
+  .prefix("/ramp") {}
+
+export class RampApi extends HttpApi.make("crosshatch_ramp").add(RampApiGroup) {}
