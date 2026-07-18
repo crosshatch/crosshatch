@@ -1,9 +1,8 @@
-import { Context, Effect, Layer, Schema as S, UndefinedOr } from "effect"
+import { Context, Effect, Layer, Schema as S } from "effect"
 import { HttpApiClient } from "effect/unstable/httpapi"
 
 import { FacilitatorApiGroup, FacilitatorApi } from "./FacilitatorApi/FacilitatorApi.ts"
 import { Payload } from "./Payload.ts"
-import { Stage } from "./Stage.ts"
 
 /** @effect-expect-leaking [Mode] extends ["response-only"] ? never : never */
 export class Facilitator extends Context.Service<
@@ -11,13 +10,13 @@ export class Facilitator extends Context.Service<
   HttpApiClient.Client<typeof FacilitatorApiGroup>["facilitator"]
 >()("crosshatch/Facilitator") {}
 
-export const layer = Effect.fnUntraced(function* (config?: { readonly baseUrl?: string | undefined }) {
-  const baseUrl = yield* UndefinedOr.match(config?.baseUrl, {
-    onDefined: Effect.succeed,
-    onUndefined: () => Stage.pipe(Effect.map(({ url }) => url("facilitator"))),
-  })
-  return yield* HttpApiClient.make(FacilitatorApi, { baseUrl }).pipe(Effect.map(({ facilitator }) => facilitator))
-}, Layer.effect(Facilitator))
+export const layer = (config?: { readonly baseUrl?: string | undefined }) =>
+  Layer.effect(
+    Facilitator,
+    HttpApiClient.make(FacilitatorApi, {
+      baseUrl: config?.baseUrl ?? "https://cirque.sh",
+    }).pipe(Effect.map(({ facilitator }) => facilitator)),
+  )
 
 export class VerificationError extends S.TaggedErrorClass<VerificationError>()("VerificationError", {
   invalidReason: S.String.pipe(S.optional),
