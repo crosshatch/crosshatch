@@ -6,7 +6,6 @@
     { "path": "./crosshatch" },
     { "path": "./docs" },
     { "path": "./examples" },
-    { "path": "./konfik" },
-    { "path": "./otel" }
+    { "path": "./konfik" }
   ]
 }
