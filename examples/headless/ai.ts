@@ -20,5 +20,6 @@ LanguageModel.generateText({
 }).pipe(
   Effect.tap(({ text }) => Console.log(text)),
   Effect.provide(BlockrunLive),
+  Effect.onError(Effect.logError),
   Effect.runFork,
 )
