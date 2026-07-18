@@ -8,8 +8,6 @@ on:
     tags:
       - "!**"
 concurrency: ${{ github.workflow }}-${{ github.ref }}
-permissions:
-  contents: read
 jobs:
   check:
     if: github.event_name == 'pull_request' && !github.event.pull_request.draft
