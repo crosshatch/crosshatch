@@ -1,5 +1,5 @@
 export interface DevConfig {
-  readonly hostname: string
-  readonly port: number
+  readonly host: string | undefined
+  readonly port: number | undefined
   readonly otelEndpoint: string | undefined
 }

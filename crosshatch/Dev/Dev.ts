@@ -37,6 +37,6 @@ export const serve = Effect.fnUntraced(function* ({ otelEndpoint, ...config }: D
   if (address._tag !== "TcpAddress") {
     return yield* Effect.interrupt
   }
-  const { _tag, ...rest } = address
-  return rest
+  const { hostname: host, port } = address
+  return { host, port }
 })
