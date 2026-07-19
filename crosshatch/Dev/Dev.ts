@@ -6,37 +6,54 @@ import { HttpRouter, HttpServer, HttpServerResponse } from "effect/unstable/http
 import { HttpApiBuilder, HttpApiScalar } from "effect/unstable/httpapi"
 
 import { FacilitatorApi } from "../FacilitatorApi/FacilitatorApi.ts"
-import type { DevConfig } from "./DevConfig.ts"
-import { handleSettle } from "./handleSettle.ts"
-import { handleSupported } from "./handleSupported.ts"
-import { handleVerify } from "./handleVerify.ts"
 import * as Otel from "./Otel.ts"
+import { settle } from "./settle.ts"
+import { supported } from "./supported.ts"
+import { verify } from "./verify.ts"
 
-export const DevFacilitatorLive = HttpApiBuilder.group(FacilitatorApi, "facilitator", (_) =>
-  Effect.succeed(_.handle("settle", handleSettle).handle("verify", handleVerify).handle("supported", handleSupported)),
-)
+export interface DevConfig {
+  readonly hostname?: string | undefined
+  readonly port?: number | undefined
+  readonly otelEndpoint?: string | undefined
+}
 
-export const serve = Effect.fnUntraced(function* ({ otelEndpoint, ...config }: DevConfig) {
+export const serve = Effect.fnUntraced(function* (config?: DevConfig) {
   const context = yield* HttpRouter.serve(
     Layer.mergeAll(
       HttpApiScalar.layer(FacilitatorApi, { path: "/" }),
       Layer.mergeAll(
-        HttpApiBuilder.layer(FacilitatorApi, { openapiPath: "/openapi.json" }).pipe(Layer.provide(DevFacilitatorLive)),
+        HttpApiBuilder.layer(FacilitatorApi, { openapiPath: "/openapi.json" }).pipe(
+          Layer.provide(
+            HttpApiBuilder.group(FacilitatorApi, "facilitator", (_) => _.handleAll({ supported, settle, verify })),
+          ),
+        ),
         HttpRouter.add("GET", "/favicon.ico", () => Effect.succeed(HttpServerResponse.empty({ status: 204 }))).pipe(
           Layer.provide(HttpRouter.disableLogger),
         ),
-      ).pipe(Layer.provide(Otel.layer(otelEndpoint))),
+      ).pipe(Layer.provide(Otel.layer(config?.otelEndpoint))),
       HttpRouter.cors({
         allowedHeaders: ["*"],
         allowedMethods: ["*"],
         allowedOrigins: ["*"],
       }),
     ),
-  ).pipe(Layer.provideMerge(NodeHttpServer.layer(createServer, config)), Layer.build)
+  ).pipe(
+    Layer.provideMerge(
+      NodeHttpServer.layer(createServer, {
+        host: config?.hostname ?? "127.0.0.1",
+        port: config?.port ?? 0,
+      }),
+    ),
+    Layer.build,
+  )
   const { address } = Context.get(context, HttpServer.HttpServer)
   if (address._tag !== "TcpAddress") {
     return yield* Effect.interrupt
   }
-  const { hostname: host, port } = address
-  return { host, port }
+  const { hostname, port } = address
+  return {
+    hostname,
+    port,
+    url: `http://${hostname.includes(":") ? `[${hostname}]` : hostname}:${port}`,
+  }
 })

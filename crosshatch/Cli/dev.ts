@@ -12,4 +12,4 @@ export const dev = Command.make("dev", {
     Flag.withDescription("Export dev server logs and traces to an OTLP/HTTP endpoint"),
     Flag.map(flow(Option.map(Struct.get("href")), Option.getOrUndefined)),
   ),
-}).pipe(Command.withHandler(flow(Dev.serve, Effect.andThen(Effect.never))))
+}).pipe(Command.withHandler((config) => Dev.serve(config).pipe(Effect.andThen(Effect.never))))

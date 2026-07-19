@@ -76,3 +76,6 @@
 [submodule "repos/tempoxyz/wallet-cli"]
 	path = repos/tempoxyz/wallet-cli
 	url = git@github.com:tempoxyz/wallet-cli.git
+[submodule "repos/Effect-TS/tsgo"]
+	path = repos/Effect-TS/tsgo
+	url = git@github.com:Effect-TS/tsgo.git

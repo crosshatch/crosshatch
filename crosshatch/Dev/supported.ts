@@ -8,7 +8,7 @@ import { handler } from "./_common.ts"
 
 const knownAssetDenominations: ReadonlyArray<Denomination> = [KnownAssets.Usd]
 
-export const handleSupported = handler(FacilitatorApi, "facilitator", "supported", () =>
+export const supported = handler(FacilitatorApi, "facilitator", "supported", () =>
   Effect.succeed({
     kinds: knownAssetDenominations.flatMap((denomination) =>
       Record.values(denomination).flatMap((logicalAsset) =>
