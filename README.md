@@ -86,8 +86,8 @@ export default class Merchant extends Cloudflare.Worker<Merchant>()(
           | What is this charge for?
           |
           | How does it fit into the current flow?
-            |
-            `.pipe(Required.accept(accepted))
+          |
+          `.pipe(Required.accept(accepted))
           return yield* ChxHttp.require({ required })
         }
         const settlement = yield* Facilitator.settle({ payload })
