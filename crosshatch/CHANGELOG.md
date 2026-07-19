@@ -1,5 +1,13 @@
 # crosshatch
 
+## 0.0.11
+
+### Patch Changes
+
+- [#122](https://github.com/crosshatch/crosshatch/pull/122)
+  [`c923042`](https://github.com/crosshatch/crosshatch/commit/c92304281ec7e82cfe8c96673c780be0d3bb59dc)
+  Thanks @harrysolovay! - Remove viem dependency. Optimize packaging.
+
 ## 0.0.10
 
 ### Patch Changes
