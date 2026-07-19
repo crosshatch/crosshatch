@@ -18,26 +18,25 @@ export class Eip155Signer extends Context.Service<
 
 export const layerMnemonic = Layer.effect(
   Eip155Signer,
-  Mnemonic.Mnemonic.pipe(
-    Effect.map((value) => {
-      const privateKey = OxMnemonic.toPrivateKey(Redacted.value(value), { as: "Hex" })
-      const publicKey = Secp256k1.getPublicKey({ privateKey })
-      return {
-        address: Address.fromPublicKey(publicKey, { checksum: true }),
-        signTypedData: <
-          const typedData extends TypedData.TypedData | Record<string, unknown>,
-          primaryType extends keyof typedData | "EIP712Domain",
-        >(
-          typedData: TypedData.Definition<typedData, primaryType>,
-        ) =>
-          Signature.toHex(
-            Secp256k1.sign({
-              extraEntropy: false,
-              payload: Hash.keccak256(TypedData.encode(typedData)),
-              privateKey,
-            }),
-          ),
-      }
-    }),
-  ),
+  Effect.gen(function* () {
+    const mnemonic = yield* Mnemonic.Mnemonic
+    const privateKey = OxMnemonic.toPrivateKey(Redacted.value(mnemonic), { as: "Hex" })
+    const publicKey = Secp256k1.getPublicKey({ privateKey })
+    return {
+      address: Address.fromPublicKey(publicKey, { checksum: true }),
+      signTypedData: <
+        const typedData extends TypedData.TypedData | Record<string, unknown>,
+        primaryType extends keyof typedData | "EIP712Domain",
+      >(
+        typedData: TypedData.Definition<typedData, primaryType>,
+      ) =>
+        Signature.toHex(
+          Secp256k1.sign({
+            extraEntropy: false,
+            payload: Hash.keccak256(TypedData.encode(typedData)),
+            privateKey,
+          }),
+        ),
+    }
+  }),
 )
