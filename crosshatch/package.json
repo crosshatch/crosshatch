@@ -49,15 +49,12 @@
   "scripts": {
     "dev": "node --watch ./Cli/main.ts dev --port 4647 --otel-endpoint http://127.0.0.1:27686"
   },
-  "dependencies": {
-    "@napi-rs/keyring": "catalog:",
-    "@scure/bip39": "catalog:",
-    "ox": "catalog:"
-  },
   "peerDependencies": {
     "@crosshatch/widget": "workspace:*",
     "@effect/platform-browser": "catalog:",
     "@effect/platform-node": "catalog:",
+    "@napi-rs/keyring": "catalog:",
+    "@scure/bip39": "catalog:",
     "@solana-program/compute-budget": "catalog:",
     "@solana-program/memo": "catalog:",
     "@solana-program/token": "catalog:",
@@ -67,41 +64,7 @@
     "@standard-schema/spec": "catalog:",
     "effect": "catalog:",
     "liminal": "workspace:*",
-    "liminal-util": "workspace:*"
-  },
-  "peerDependenciesMeta": {
-    "@crosshatch/widget": {
-      "optional": true
-    },
-    "@effect/platform-browser": {
-      "optional": true
-    },
-    "@solana-program/compute-budget": {
-      "optional": true
-    },
-    "@solana-program/memo": {
-      "optional": true
-    },
-    "@solana-program/token": {
-      "optional": true
-    },
-    "@solana/addresses": {
-      "optional": true
-    },
-    "@solana/kit": {
-      "optional": true
-    },
-    "@solana/transactions": {
-      "optional": true
-    },
-    "@standard-schema/spec": {
-      "optional": true
-    },
-    "liminal": {
-      "optional": true
-    },
-    "liminal-util": {
-      "optional": true
-    }
+    "liminal-util": "workspace:*",
+    "ox": "catalog:"
   }
 }
