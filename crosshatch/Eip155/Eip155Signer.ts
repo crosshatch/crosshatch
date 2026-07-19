@@ -1,14 +1,43 @@
 import { Redacted, Context, Layer, Effect } from "effect"
-import { Mnemonic as OxMnemonic } from "ox"
-import { privateKeyToAccount, type CustomSource } from "viem/accounts"
+import { Address, Hash, Hex, Mnemonic as OxMnemonic, Secp256k1, Signature, TypedData } from "ox"
 
 import * as Mnemonic from "../Mnemonic.ts"
 
-export class Eip155Signer extends Context.Service<Eip155Signer, CustomSource>()("crosshatch/Eip155/Eip155Signer") {}
+export class Eip155Signer extends Context.Service<
+  Eip155Signer,
+  {
+    readonly address: Address.Address
+    readonly signTypedData: <
+      const typedData extends TypedData.TypedData | Record<string, unknown>,
+      primaryType extends keyof typedData | "EIP712Domain",
+    >(
+      value: TypedData.Definition<typedData, primaryType>,
+    ) => Hex.Hex
+  }
+>()("crosshatch/Eip155/Eip155Signer") {}
 
 export const layerMnemonic = Layer.effect(
   Eip155Signer,
   Mnemonic.Mnemonic.pipe(
-    Effect.map((v) => privateKeyToAccount(OxMnemonic.toPrivateKey(Redacted.value(v), { as: "Hex" }))),
+    Effect.map((value) => {
+      const privateKey = OxMnemonic.toPrivateKey(Redacted.value(value), { as: "Hex" })
+      const publicKey = Secp256k1.getPublicKey({ privateKey })
+      return {
+        address: Address.fromPublicKey(publicKey, { checksum: true }),
+        signTypedData: <
+          const typedData extends TypedData.TypedData | Record<string, unknown>,
+          primaryType extends keyof typedData | "EIP712Domain",
+        >(
+          typedData: TypedData.Definition<typedData, primaryType>,
+        ) =>
+          Signature.toHex(
+            Secp256k1.sign({
+              extraEntropy: false,
+              payload: Hash.keccak256(TypedData.encode(typedData)),
+              privateKey,
+            }),
+          ),
+      }
+    }),
   ),
 )

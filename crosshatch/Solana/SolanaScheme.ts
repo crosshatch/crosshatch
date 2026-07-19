@@ -11,7 +11,7 @@ import {
   setTransactionMessageLifetimeUsingBlockhash,
   pipe as solanaPipe,
 } from "@solana/kit"
-import { Effect, Schema as S } from "effect"
+import { Effect, Encoding, Schema as S } from "effect"
 
 import { Random } from "../Crypto/Crypto.ts"
 import * as Scheme from "../Scheme.ts"
@@ -83,7 +83,7 @@ export const layer = SolanaScheme.layer(
                   },
                   { programAddress: tokenProgram },
                 ),
-                getAddMemoInstruction({ memo: memo ?? Random.hex(16) }),
+                getAddMemoInstruction({ memo: memo ?? Encoding.encodeHex(Random.bytes(16)) }),
               ],
               v,
             ),

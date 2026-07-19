@@ -1,5 +1,5 @@
-import { Effect, Schema as S } from "effect"
-import { getAddress, toHex, type Hex } from "viem"
+import { Effect, Schema as S, Encoding } from "effect"
+import { Address } from "ox"
 
 import * as Random from "../Crypto/Random.ts"
 import * as Scheme from "../Scheme.ts"
@@ -59,12 +59,12 @@ export const layer = Permit2Scheme.layer({ known: S.Void, extra: Extra }, () =>
     const signer = yield* Eip155Signer
     const now = Math.floor(Date.now() / 1000)
     const chainId = parseInt(accepted.network.split(":")[1]!)
-    const nonce = BigInt(toHex(Random.bytes(32))).toString()
-    const token = getAddress(accepted.asset) as Hex
+    const nonce = BigInt(`0x${Encoding.encodeHex(Random.bytes(32))}`).toString()
+    const token = Address.from(accepted.asset, { checksum: true })
     const { amount } = accepted
-    const spender = EXACT_PERMIT2_PROXY as Hex
+    const spender = Address.from(EXACT_PERMIT2_PROXY)
     const deadline = (now + accepted.maxTimeoutSeconds).toString()
-    const to = getAddress(accepted.payTo) as Hex
+    const to = Address.from(accepted.payTo, { checksum: true })
     const validAfter = (now - 600).toString()
     const extra = "0x"
     const permit2Authorization: Permit2["permit2Authorization"] = {
@@ -75,31 +75,29 @@ export const layer = Permit2Scheme.layer({ known: S.Void, extra: Extra }, () =>
       deadline,
       witness: { to, validAfter, extra },
     }
-    const signature = yield* Effect.promise(() =>
-      signer.signTypedData({
-        domain: {
-          name: "Permit2",
-          chainId,
-          verifyingContract: PERMIT2_ADDRESS,
+    const signature = signer.signTypedData({
+      domain: {
+        name: "Permit2",
+        chainId,
+        verifyingContract: PERMIT2_ADDRESS,
+      },
+      types: PERMIT2_ABI_TYPES,
+      primaryType: "PermitWitnessTransferFrom",
+      message: {
+        permitted: {
+          token,
+          amount: BigInt(amount),
         },
-        types: PERMIT2_ABI_TYPES,
-        primaryType: "PermitWitnessTransferFrom",
-        message: {
-          permitted: {
-            token,
-            amount: BigInt(amount),
-          },
-          spender: getAddress(spender),
-          nonce: BigInt(nonce),
-          deadline: BigInt(deadline),
-          witness: {
-            to,
-            validAfter: BigInt(validAfter),
-            extra,
-          },
+        spender: Address.from(spender, { checksum: true }),
+        nonce: BigInt(nonce),
+        deadline: BigInt(deadline),
+        witness: {
+          to,
+          validAfter: BigInt(validAfter),
+          extra,
         },
-      }),
-    )
+      },
+    })
     return { signature, permit2Authorization } satisfies Permit2
   }),
 )

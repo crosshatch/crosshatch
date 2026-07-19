@@ -1,5 +1,5 @@
-import { Effect, Schema as S } from "effect"
-import { getAddress, toHex, type Hex } from "viem"
+import { Effect, Schema as S, Encoding } from "effect"
+import { Address, Hex } from "ox"
 
 import * as Random from "../Crypto/Random.ts"
 import * as Scheme from "../Scheme.ts"
@@ -18,12 +18,12 @@ export class Erc3009Scheme extends Scheme.Service<Erc3009Scheme, void, typeof Ex
 export interface Erc3009 {
   readonly signature: string
   readonly authorization: {
-    readonly from: Hex
-    readonly to: Hex
+    readonly from: Hex.Hex
+    readonly to: Hex.Hex
     readonly value: string
     readonly validAfter: string
     readonly validBefore: string
-    readonly nonce: Hex
+    readonly nonce: Hex.Hex
   }
 }
 
@@ -45,32 +45,30 @@ export const layer = Erc3009Scheme.layer({ known: S.Void, extra: Extra }, () =>
     const signer = yield* Eip155Signer
     const authorization: Erc3009["authorization"] = {
       from: signer.address,
-      to: getAddress(accepted.payTo) as Hex,
+      to: Address.from(accepted.payTo, { checksum: true }),
       value: accepted.amount,
       validAfter: (now - 600).toString(),
       validBefore: (now + accepted.maxTimeoutSeconds).toString(),
-      nonce: toHex(Random.bytes(32)),
+      nonce: `0x${Encoding.encodeHex(Random.bytes(32))}`,
     }
-    const signature = yield* Effect.promise(() =>
-      signer.signTypedData({
-        domain: {
-          name,
-          version,
-          chainId,
-          verifyingContract: getAddress(accepted.asset),
-        },
-        types: ERC3009_ABI_TYPES,
-        primaryType: "TransferWithAuthorization",
-        message: {
-          from: getAddress(authorization.from),
-          to: getAddress(authorization.to),
-          value: BigInt(authorization.value),
-          validAfter: BigInt(authorization.validAfter),
-          validBefore: BigInt(authorization.validBefore),
-          nonce: authorization.nonce,
-        },
-      }),
-    )
+    const signature = signer.signTypedData({
+      domain: {
+        name,
+        version,
+        chainId,
+        verifyingContract: Address.from(accepted.asset, { checksum: true }),
+      },
+      types: ERC3009_ABI_TYPES,
+      primaryType: "TransferWithAuthorization",
+      message: {
+        from: Address.from(authorization.from, { checksum: true }),
+        to: Address.from(authorization.to, { checksum: true }),
+        value: BigInt(authorization.value),
+        validAfter: BigInt(authorization.validAfter),
+        validBefore: BigInt(authorization.validBefore),
+        nonce: authorization.nonce,
+      },
+    })
     return { authorization, signature } satisfies Erc3009
   }),
 )
