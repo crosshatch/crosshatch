@@ -1,5 +1,13 @@
 # crosshatch
 
+## 0.0.12
+
+### Patch Changes
+
+- [#125](https://github.com/crosshatch/crosshatch/pull/125)
+  [`2408f21`](https://github.com/crosshatch/crosshatch/commit/2408f21778a53383194edd86b90bd6f1ef9e2415)
+  Thanks @harrysolovay! - Return to mandatory peer deps strategy for now.
+
 ## 0.0.11
 
 ### Patch Changes
