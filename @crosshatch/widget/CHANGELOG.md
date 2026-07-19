@@ -1,5 +1,14 @@
 # @crosshatch/widget
 
+## 0.0.5
+
+### Patch Changes
+
+- [#120](https://github.com/crosshatch/crosshatch/pull/120)
+  [`13b9e6b`](https://github.com/crosshatch/crosshatch/commit/13b9e6b3e4f5a4d90d04c9dc4dc250228d8cbd47)
+  Thanks @harrysolovay! - Fix misaligned effect versions causing installation
+  failure.
+
 ## 0.0.4
 
 ### Patch Changes

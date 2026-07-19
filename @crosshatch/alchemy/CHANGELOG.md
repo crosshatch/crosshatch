@@ -1,5 +1,18 @@
 # @crosshatch/alchemy
 
+## 0.0.7
+
+### Patch Changes
+
+- [#120](https://github.com/crosshatch/crosshatch/pull/120)
+  [`13b9e6b`](https://github.com/crosshatch/crosshatch/commit/13b9e6b3e4f5a4d90d04c9dc4dc250228d8cbd47)
+  Thanks @harrysolovay! - Fix misaligned effect versions causing installation
+  failure.
+
+- Updated dependencies
+  [[`13b9e6b`](https://github.com/crosshatch/crosshatch/commit/13b9e6b3e4f5a4d90d04c9dc4dc250228d8cbd47)]:
+  - crosshatch@0.0.10
+
 ## 0.0.6
 
 ### Patch Changes
