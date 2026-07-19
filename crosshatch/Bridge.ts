@@ -1,4 +1,4 @@
-import { Schema as S, Context, Option, Data, Effect, flow } from "effect"
+import { Schema as S, Context, Option, Data, Effect, flow, Struct } from "effect"
 
 import { stringRaw } from "./_util.ts"
 import type { Payload } from "./Payload.ts"
@@ -42,12 +42,7 @@ export const TraceConfig = S.Struct({
 export class Trace extends Context.Service<Trace, typeof TraceConfig.Type>()("crosshatch/Trace") {}
 
 export const TraceId = Effect.serviceOption(Trace).pipe(
-  Effect.map(
-    flow(
-      Option.map(({ traceId }) => traceId),
-      Option.getOrUndefined,
-    ),
-  ),
+  Effect.map(flow(Option.map(Struct.get("traceId")), Option.getOrUndefined)),
 )
 
 export class NoSurroundingTraceError extends Data.TaggedError("NoSurroundingTraceError")<{}> {}
@@ -58,7 +53,7 @@ export const traced =
     Effect.fnUntraced(function* <A, E, R>(effect: Effect.Effect<A, E, R>) {
       const { createTrace } = yield* Bridge
       const traceId = yield* Effect.currentSpan.pipe(
-        Effect.map(({ traceId }) => traceId),
+        Effect.map(Struct.get("traceId")),
         Effect.catchTags({
           NoSuchElementError: () => new NoSurroundingTraceError(),
         }),

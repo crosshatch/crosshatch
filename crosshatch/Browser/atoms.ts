@@ -1,4 +1,4 @@
-import { Effect, Match, Cause } from "effect"
+import { Effect, Match, Cause, Struct } from "effect"
 import { Atom } from "effect/unstable/reactivity"
 import * as Boundary from "liminal-util/Boundary"
 
@@ -10,10 +10,7 @@ import { ActivityWidget, IdWidget, LinkWidget } from "./Widgets.ts"
 
 const runtime = Atom.runtime(BrowserPayer.layer)
 
-export const stateAtom = runtime.atom(FacadeClient.state).pipe(
-  Atom.keepAlive,
-  Atom.mapResult(({ status }) => status),
-)
+export const stateAtom = runtime.atom(FacadeClient.state).pipe(Atom.keepAlive, Atom.mapResult(Struct.get("status")))
 
 export const isLinkedAtom = stateAtom.pipe(Atom.mapResult((v) => v._tag === "Linked"))
 
