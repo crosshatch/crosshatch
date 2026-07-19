@@ -64,8 +64,12 @@ introduces a `Payer` service requirement into the Effect.
 
 ```ts
 import { Payer } from "crosshatch"
+import { Effect } from "effect"
 
-const { createPayload } = yield * Payer.Payer
+const program = Effect.gen(function* () {
+  const { createPayload } = yield* Payer.Payer
+  return createPayload
+})
 ```
 
 At runtime, the provided `Payer` decides which `required.accepts` entry to pay

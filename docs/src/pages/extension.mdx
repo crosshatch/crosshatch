@@ -54,18 +54,21 @@ extension data by installing the extension in the HTTP middleware.
 ```ts
 import { ChxHttp, Required } from "crosshatch"
 import { PaymentId } from "crosshatch/Extensions"
+import { Effect } from "effect"
 
-const required =
-  yield *
-  Required.make`Access to the paid resource.`.pipe(
+const program = Effect.gen(function* () {
+  const required = yield* Required.make`Access to the paid resource.`.pipe(
     Required.extend(PaymentId.FromMerchant, {
       required: true,
       id: PaymentId.random(),
     }),
   )
 
-const middleware = ChxHttp.layerMiddleware({
-  extensions: [PaymentId.FromMerchant],
+  const middleware = ChxHttp.layerMiddleware({
+    extensions: [PaymentId.FromMerchant],
+  })
+
+  return { required, middleware }
 })
 ```
 
@@ -74,8 +77,14 @@ enrichment from the submitted payload, or `undefined` when the payload did not
 include it. Handle a required value explicitly:
 
 ```ts
-const paymentId =
-  yield * PaymentId.FromMerchant.pipe(Effect.flatMap(Effect.fromNullishOr))
+import { PaymentId } from "crosshatch/Extensions"
+import { Effect } from "effect"
+
+const program = Effect.gen(function* () {
+  return yield* PaymentId.FromMerchant.pipe(
+    Effect.flatMap(Effect.fromNullishOr),
+  )
+})
 ```
 
 ## Client API
@@ -114,6 +123,11 @@ For non-HTTP integrations, provide a decoded extension service directly from a
 payload:
 
 ```ts
+import { Extension, Payload } from "crosshatch"
+import { PaymentId } from "crosshatch/Extensions"
+
+declare const payload: Payload.Payload
+
 const ExtensionLive = Extension.layerPayload(PaymentId.FromMerchant, payload)
 ```
 
@@ -144,7 +158,7 @@ Crosshatch ships three variants of the built-in `payment-identifier` extension:
 
 - `PaymentId.FromMerchant`: the merchant supplies the id in the requirement and
   the payer includes the same id in its enrichment.
-- `PaymentId.FromClient`: the merchant requests an id and the client supplies it
-  in the payload.
+- `PaymentId.FromClient`: the merchant requests a client-generated id. The
+  payload enrichment may omit it.
 - `PaymentId.FromEither`: the merchant may supply an id, but the final payload
   must contain one.

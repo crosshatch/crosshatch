@@ -93,11 +93,11 @@ import {
     <div className="crosshatch-code-block">
 
 ```ts
-import { ChxHttp } from "crosshatch"
+import { ChxHttp, Payer } from "crosshatch"
 import { Console, Effect, Layer } from "effect"
 import { HttpClient, HttpClientRequest } from "effect/unstable/http"
 
-import { PayerLive } from "./PayerLive.ts"
+declare const PayerLive: Layer.Layer<Payer.Payer>
 
 Effect.gen(function* () {
   const client = yield* HttpClient.HttpClient
@@ -144,7 +144,11 @@ import {
 } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
 import { Config, Effect, Layer } from "effect"
-import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
+import {
+  FetchHttpClient,
+  HttpRouter,
+  HttpServerResponse,
+} from "effect/unstable/http"
 
 const recipient = Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
 
@@ -163,14 +167,21 @@ const router = HttpRouter.add(
             }),
           ),
         )
-      return yield* ChxHttp.require({ required })
+      return yield* ChxHttp.require({ required }).pipe(
+        Effect.map(HttpServerResponse.setStatus(402)),
+      )
     }
     const settlement = yield* Facilitator.settle({ payload })
     return HttpServerResponse.text("The paid resource.").pipe(
       ChxHttp.addResponseHeader(settlement),
     )
   }),
-).pipe(Layer.provide([ChxHttp.layerMiddleware(), Facilitator.layer()]))
+).pipe(
+  Layer.provide([
+    ChxHttp.layerMiddleware(),
+    Facilitator.layer().pipe(Layer.provide(FetchHttpClient.layer)),
+  ]),
+)
 ```
 
     </div>
@@ -196,11 +207,11 @@ const router = HttpRouter.add(
 
 ```ts
 import { OpenAiClient, OpenAiLanguageModel } from "@effect/ai-openai-compat"
-import { ChxHttp } from "crosshatch"
+import { ChxHttp, Payer } from "crosshatch"
 import { Console, Effect, Layer } from "effect"
 import { LanguageModel } from "effect/unstable/ai"
 
-import { PayerLive } from "./PayerLive.ts"
+declare const PayerLive: Layer.Layer<Payer.Payer>
 
 const BlockrunLive = OpenAiLanguageModel.layer({
   model: "deepseek/deepseek-chat",

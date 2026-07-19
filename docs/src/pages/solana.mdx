@@ -70,8 +70,13 @@ The accepted requirement's `extra` field must include the fee payer and may
 include a memo.
 
 ```ts
-import { SolanaScheme, SolanaSigner } from "crosshatch/Solana"
-import { Layer } from "effect"
+import { SolanaScheme, SolanaSigner, SolanaState } from "crosshatch/Solana"
+import { Config, Layer } from "effect"
+
+const SolanaStateLive = Config.string("SOLANA_RPC_URL").pipe(
+  Config.map(SolanaState.layer),
+  Layer.unwrap,
+)
 
 const SolanaLive = SolanaScheme.layer.pipe(
   Layer.provide([SolanaSigner.layerMnemonic, SolanaStateLive]),

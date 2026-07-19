@@ -8,6 +8,9 @@ export default defineConfig({
     repo: "crosshatch",
   }),
   description: PackageJson.description,
+  twoslash: {
+    explicitTrigger: false,
+  },
   topNav: [
     {
       link: "/",

@@ -41,6 +41,8 @@ const mnemonic = Mnemonic.fromText(
 Use `layerText` to provide that phrase as the `Mnemonic` service.
 
 ```ts
+import { Mnemonic } from "crosshatch"
+
 const MnemonicLive = Mnemonic.layerText(
   "test test test test test test test test test test test junk",
 )
@@ -61,7 +63,13 @@ const MnemonicLive = Mnemonic.layerConfig(Config.string("BUYER_MNEMONIC"))
 The default environment variable helpers read `MNEMONIC`.
 
 ```ts
-const mnemonic = yield * Mnemonic.env
+import { Mnemonic } from "crosshatch"
+import { Effect } from "effect"
+
+const program = Effect.gen(function* () {
+  return yield* Mnemonic.env
+})
+
 const MnemonicLive = Mnemonic.layerEnv
 ```
 
@@ -71,7 +79,12 @@ const MnemonicLive = Mnemonic.layerEnv
 a fresh random mnemonic as a layer.
 
 ```ts
-const mnemonic = yield * Mnemonic.random
+import { Mnemonic } from "crosshatch"
+import { Effect } from "effect"
+
+const program = Effect.gen(function* () {
+  return yield* Mnemonic.random
+})
 ```
 
 Use random mnemonics for tests or disposable local flows. For real payer

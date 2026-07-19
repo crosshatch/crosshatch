@@ -45,8 +45,10 @@ Provide `Payer.layerBridge` with `ChxRpc.layer` wherever code should create
 payment payloads through the RPC bridge.
 
 ```ts
-import { ChxRpc, Payer, Payload } from "crosshatch"
+import { ChxRpc, Payer, Payload, Required } from "crosshatch"
 import { Effect, Layer } from "effect"
+
+declare const required: Required.Required
 
 const payerLayer = Payer.layerBridge.pipe(Layer.provideMerge(ChxRpc.layer))
 
@@ -64,6 +66,8 @@ id.
 Approval agents consume `crosshatch_StreamEvents` and handle these event shapes:
 
 ```ts
+import { Bridge } from "crosshatch"
+
 type ChxEvent =
   | {
       readonly _tag: "CreateTrace"
@@ -74,5 +78,5 @@ type ChxEvent =
 
 `CreateTrace` is emitted when `Bridge.traced` starts a trace and the bridge
 supports trace creation. `Propose` is emitted for each payment proposal. After
-approving and signing the proposal, call `crosshatch_SendPayment` with the
-resulting `Payload`.
+approving and signing the proposal, call `crosshatch_SendPayment` with
+`{ payload, traceId }`; `traceId` is optional.

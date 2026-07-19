@@ -19,16 +19,20 @@ locally with a chain implementation, or be backed by a `Bridge` via
 ## Propose A Payment
 
 ```ts
-import { Bridge } from "crosshatch"
+import { Bridge, Required } from "crosshatch"
 import { Effect } from "effect"
+
+declare const required: Required.Required
 
 const program = Effect.gen(function* () {
   const { payload } = yield* Bridge.propose({ required })
 })
 ```
 
-`Bridge.propose` accepts a `Required` value and returns a signed `Payload`. When
-a trace is active, Crosshatch forwards the trace id to the bridge automatically.
+`Bridge.propose` accepts a `Bridge.Proposal`, containing `required` and an
+optional `traceId`, and returns `{ payload }`. When `traceId` is omitted and the
+installed bridge implements `createTrace`, Crosshatch forwards the id from the
+surrounding `Bridge.traced` scope.
 
 The bridge implementation owns the user approval and signing experience. It can
 open an extension popup, call a hosted wallet, route to a native app, or use any
@@ -37,8 +41,12 @@ other mechanism that eventually returns a Crosshatch `Payload`.
 ## Use A Bridge As A Payer
 
 ```ts
-import { Bridge, Payer } from "crosshatch"
+import { Bridge, Payer, Payload } from "crosshatch"
 import { Effect, Layer } from "effect"
+
+declare const askWalletToPay: (
+  proposal: Bridge.Proposal,
+) => Effect.Effect<{ readonly payload: Payload.Payload }, Bridge.ProposeError>
 
 const BridgeLive = Layer.succeed(Bridge.Bridge, {
   propose: ({ required, traceId }) =>
@@ -61,6 +69,9 @@ Crosshatch calls it from `Bridge.traced` and passes the active trace id into
 
 ```ts
 import { Bridge } from "crosshatch"
+import { Effect } from "effect"
+
+declare const program: Effect.Effect<void>
 
 const paidRequest = Bridge.traced("ai-completion")`
 | Ask the model to summarize the paid document.

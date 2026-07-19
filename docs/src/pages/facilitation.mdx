@@ -38,7 +38,8 @@ URL.
 
 ```ts
 import { Facilitator } from "crosshatch"
-import { Effect } from "effect"
+import { Effect, Layer } from "effect"
+import { FetchHttpClient } from "effect/unstable/http"
 
 const Program = Effect.gen(function* () {
   // Your merchant routes or settlement effects live here.
@@ -48,7 +49,7 @@ Program.pipe(
   Effect.provide(
     Facilitator.layer({
       baseUrl: "https://facilitator.example.com",
-    }),
+    }).pipe(Layer.provide(FetchHttpClient.layer)),
   ),
 )
 ```
@@ -63,10 +64,13 @@ every paid route settles against the same service.
 
 ```ts
 import { Facilitator, Payload } from "crosshatch"
-import { Effect } from "effect"
+import { Effect, Layer } from "effect"
+import { FetchHttpClient } from "effect/unstable/http"
 
 const route = Effect.gen(function* () {
-  const payload = yield* Payload.pipe(Effect.flatMap(Effect.fromNullishOr))
+  const payload = yield* Payload.Payload.pipe(
+    Effect.flatMap(Effect.fromNullishOr),
+  )
   const settlement = yield* Facilitator.settle({ payload })
   // ...
 }).pipe(
@@ -74,7 +78,7 @@ const route = Effect.gen(function* () {
   Effect.provide(
     Facilitator.layer({
       baseUrl: "https://facilitator.example.com",
-    }),
+    }).pipe(Layer.provide(FetchHttpClient.layer)),
   ),
   // [!code focus:end]
 )
@@ -87,15 +91,18 @@ traffic through an environment-specific deployment, or need to test settlement
 against a local facilitator.
 
 ```ts
+import { Facilitator } from "crosshatch"
+
 Facilitator.layer({
   baseUrl: "http://127.0.0.1:4647",
 })
 ```
 
 The service must implement the `FacilitatorApi` exported from
-`crosshatch/FacilitatorApi`. Its endpoints are `POST /verify`, `POST /settle`,
-and `GET /supported`. Networks returned by `/supported` are CAIP-2 `ChainId`
-values, and legacy network aliases are not accepted by the schema.
+`crosshatch/FacilitatorApi`. Its mounted endpoints are
+`POST /facilitator/verify`, `POST /facilitator/settle`, and
+`GET /facilitator/supported`. The supported-network schema accepts both CAIP-2
+`ChainId` values and legacy network strings.
 
 ## Implementing a Facilitator
 

@@ -29,11 +29,11 @@ with Effect AI.
 
 ```ts
 import { OpenAiClient, OpenAiLanguageModel } from "@effect/ai-openai-compat"
-import { ChxHttp } from "crosshatch"
+import { ChxHttp, Payer } from "crosshatch"
 import { Console, Effect, Layer } from "effect"
 import { LanguageModel } from "effect/unstable/ai"
 
-import { PayerLive } from "./PayerLive.ts"
+declare const PayerLive: Layer.Layer<Payer.Payer>
 
 const BlockrunLive = OpenAiLanguageModel.layer({
   model: "deepseek/deepseek-chat",
@@ -61,11 +61,11 @@ response is `402`, Crosshatch reads the payment requirement, asks `PayerLive`
 for a payload, and retries once with the payment header attached.
 
 ```ts
-import { ChxHttp } from "crosshatch"
+import { ChxHttp, Payer } from "crosshatch"
 import { Effect, Layer } from "effect"
 import { HttpClient, HttpClientRequest } from "effect/unstable/http"
 
-import { PayerLive } from "./PayerLive.ts"
+declare const PayerLive: Layer.Layer<Payer.Payer>
 
 const program = Effect.gen(function* () {
   const client = yield* HttpClient.HttpClient
@@ -115,8 +115,10 @@ When another agent should handle approval and signing, delegate payment creation
 through a `Bridge`.
 
 ```ts
-import { Bridge } from "crosshatch"
+import { Bridge, Required } from "crosshatch"
 import { Effect } from "effect"
+
+declare const required: Required.Required
 
 const program = Effect.gen(function* () {
   const { payload } = yield* Bridge.propose({ required }) // [!code focus]

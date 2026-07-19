@@ -32,9 +32,15 @@ import {
   Requirements,
   KnownAssets,
 } from "crosshatch"
-import { Effect } from "effect"
+import { Eip155Address } from "crosshatch/Eip155"
+import { Config, Effect } from "effect"
+import { HttpServerResponse } from "effect/unstable/http"
 
 const route = Effect.gen(function* () {
+  const recipient = yield* Config.schema(
+    Eip155Address.Eip155Address,
+    "PAY_TO_EIP155",
+  )
   const payload = yield* Payload.Payload
 
   if (!payload) {
@@ -43,13 +49,15 @@ const route = Effect.gen(function* () {
         Requirements.logical(KnownAssets.Usd.USDC, {
           amount: 0.01,
           recipients: {
-            eip155: { 8453: "0x..." },
+            eip155: { 8453: recipient },
           },
         }),
       ),
     )
 
-    return yield* ChxHttp.require({ required })
+    return yield* ChxHttp.require({ required }).pipe(
+      Effect.map(HttpServerResponse.setStatus(402)),
+    )
   }
 
   return payload
@@ -61,9 +69,11 @@ const route = Effect.gen(function* () {
 After receiving a payment payload, settle it before returning the paid resource.
 
 ```ts
-import { Facilitator } from "crosshatch"
+import { Facilitator, Payload } from "crosshatch"
 
-yield * Facilitator.settle({ payload })
+declare const payload: Payload.Payload
+
+const settlement = Facilitator.settle({ payload })
 ```
 
 Provide `Facilitator.layer()` to use the hosted Crosshatch facilitator, or
@@ -90,13 +100,9 @@ the route as `Payload.Payload`.
 
 ```ts
 import { ChxHttp } from "crosshatch"
-import { Layer } from "effect"
 import { HttpRouter } from "effect/unstable/http"
 
-const app = HttpRouter.empty.pipe(
-  Layer.provide(ChxHttp.layerMiddleware()),
-  HttpRouter.toHttpEffect,
-)
+const app = ChxHttp.layerMiddleware().pipe(HttpRouter.toHttpEffect)
 ```
 
 If the header is absent or cannot be decoded, the provided payload is
@@ -106,7 +112,8 @@ or continue with unpaid behavior.
 ### Protect An Effect HTTP Route
 
 Inside the route, read the parsed payload service. If there is no payload, build
-a `Required` value and return `ChxHttp.require({ required })`.
+a `Required` value and return `ChxHttp.require({ required })` with its status
+set to `402`.
 
 ```ts
 import {
@@ -140,7 +147,9 @@ const paidRoute = Effect.gen(function* () {
       ),
     )
 
-    return yield* ChxHttp.require({ required })
+    return yield* ChxHttp.require({ required }).pipe(
+      Effect.map(HttpServerResponse.setStatus(402)),
+    )
   }
 
   return HttpServerResponse.text("The paid resource.")
@@ -148,8 +157,9 @@ const paidRoute = Effect.gen(function* () {
 ```
 
 `ChxHttp.require` returns an empty HTTP response with the encoded requirement in
-the `payment-required` header. If a Crosshatch trace id is available, it also
-includes `x-crosshatch-trace-id`.
+the `payment-required` header. It does not set the response status, so the empty
+response defaults to `204`; set it to `402` as shown above. If a Crosshatch
+trace id is available, the response also includes `x-crosshatch-trace-id`.
 
 ### Settle Before Delivery
 
@@ -157,15 +167,19 @@ Most merchant routes should settle the payload before returning the paid
 resource.
 
 ```ts
-import { Facilitator, ChxHttp, Payload } from "crosshatch"
+import { Facilitator, ChxHttp, Payload, Required } from "crosshatch"
 import { Effect } from "effect"
 import { HttpServerResponse } from "effect/unstable/http"
+
+declare const required: Required.Required
 
 const paidRoute = Effect.gen(function* () {
   const payload = yield* Payload.Payload
 
   if (!payload) {
-    return yield* ChxHttp.require({ required })
+    return yield* ChxHttp.require({ required }).pipe(
+      Effect.map(HttpServerResponse.setStatus(402)),
+    )
   }
 
   const settlement = yield* Facilitator.settle({ payload })
@@ -179,7 +193,8 @@ const paidRoute = Effect.gen(function* () {
 `Facilitator.settle({ payload })` uses the provided facilitator client. It fails
 with `SettlementError` when the facilitator returns an unsuccessful result.
 Provide `Facilitator.layer()` or an explicit `Facilitator.layer({ baseUrl })`
-around the application.
+around the application, along with an Effect HTTP-client layer such as
+`FetchHttpClient.layer` when the runtime does not already provide one.
 
 ### Non-blocking Settlement
 
@@ -187,15 +202,19 @@ To avoid blocking the resource delivery, you can fork a scope-bound fiber from
 the settlement effect.
 
 ```ts
-import { Facilitator, ChxHttp, Payload } from "crosshatch"
+import { Facilitator, ChxHttp, Payload, Required } from "crosshatch"
 import { Effect } from "effect"
 import { HttpServerResponse } from "effect/unstable/http"
+
+declare const required: Required.Required
 
 const paidRoute = Effect.gen(function* () {
   const payload = yield* Payload.Payload
 
   if (!payload) {
-    return yield* ChxHttp.require({ required })
+    return yield* ChxHttp.require({ required }).pipe(
+      Effect.map(HttpServerResponse.setStatus(402)),
+    )
   }
 
   yield* Facilitator.settle({ payload }).pipe(Effect.forkScoped) // [!code focus]
@@ -213,7 +232,9 @@ can read the invoice and retry with a payment payload. Crosshatch exports
 ```ts
 import { ChxHttp } from "crosshatch"
 import { Layer } from "effect"
-import { HttpRouter } from "effect/unstable/http"
+import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
+
+const router = HttpRouter.add("GET", "/", HttpServerResponse.empty())
 
 const app = router.pipe(
   Layer.provide([

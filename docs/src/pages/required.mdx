@@ -18,18 +18,8 @@ attached.
 ## Building a Required
 
 Start with `Required.make`, then pipe builder operations into it.
-`Required.accept` adds one or more acceptable payment requirements, and
-`Required.extend` adds x402 extension payloads.
-
-The typical order is description first, extension requests next, and acceptable
-payment options last:
-
-```ts
-Required.make`Access to the paid resource.`.pipe(
-  Required.extend(SomeExtension, info),
-  Required.accept(requirements),
-)
-```
+`Required.accept` sets the acceptable payment requirements, replacing any
+previous entries. `Required.extend` adds x402 extension payloads.
 
 ```ts
 import { Config, Effect } from "effect"
@@ -37,9 +27,12 @@ import { Required, Requirements, KnownAssets } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
 import { PaymentId } from "crosshatch/Extensions"
 
-const recipient = Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
-
 const makeRequired = Effect.gen(function* () {
+  const recipient = yield* Config.schema(
+    Eip155Address.Eip155Address,
+    "PAY_TO_EIP155",
+  )
+
   return yield* Required.make`
   | Access to the paid resource.
   | This invoice is for a single request to /paid.
@@ -69,7 +62,12 @@ EIP-155 chains. The `recipients` object chooses which deployments this invoice
 accepts and where payment should be sent on each chain.
 
 ```ts
-Requirements.logical(USDC, {
+import { KnownAssets, Requirements } from "crosshatch"
+import { Eip155Address } from "crosshatch/Eip155"
+
+declare const payToOnBase: typeof Eip155Address.Eip155Address.Type
+
+Requirements.logical(KnownAssets.Usd.USDC, {
   amount: 0.01,
   recipients: {
     eip155: {

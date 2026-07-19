@@ -5,9 +5,5 @@
     "declaration": false
   },
   "include": ["."],
-  "references": [
-    { "path": "../crosshatch" },
-    { "path": "../liminal/effect-workerd" },
-    { "path": "../liminal/liminal-util" }
-  ]
+  "references": [{ "path": "../crosshatch" }, { "path": "../liminal/liminal-util" }]
 }
