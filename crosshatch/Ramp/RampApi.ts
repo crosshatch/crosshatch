@@ -19,4 +19,4 @@ export class RampApiGroup extends HttpApiGroup.make("ramp")
   )
   .prefix("/ramp") {}
 
-export class RampApi extends HttpApi.make("crosshatch_ramp").add(RampApiGroup) {}
+export class RampApi extends HttpApi.make("ramp").add(RampApiGroup) {}

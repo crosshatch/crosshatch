@@ -14,6 +14,5 @@ Command.make("crosshatch").pipe(
   Command.run({ version: PackageJson.version }),
   Effect.scoped,
   Effect.provide([RampClient.layer.pipe(Layer.provideMerge(NodeHttpClient.layerFetch)), NodeServices.layer]),
-  Effect.onError(Effect.logError),
   NodeRuntime.runMain,
 )

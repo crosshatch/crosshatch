@@ -7,7 +7,6 @@ import { VerifyEndpoint } from "./VerifyEndpoint.ts"
 export class FacilitatorApiGroup extends HttpApiGroup.make("facilitator")
   .add(VerifyEndpoint)
   .add(SettleEndpoint)
-  .add(SupportedEndpoint)
-  .prefix("/facilitator") {}
+  .add(SupportedEndpoint) {}
 
 export class FacilitatorApi extends HttpApi.make("facilitator").add(FacilitatorApiGroup) {}

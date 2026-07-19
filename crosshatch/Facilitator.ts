@@ -22,7 +22,7 @@ export const layer = (config?: { readonly baseUrl?: string | undefined }) =>
         Effect.map(
           Option.match({
             onSome: ({ host, port }) => `http://${host.includes(":") ? `[${host}]` : host}:${port}`,
-            onNone: () => config?.baseUrl ?? "https://cirque.sh",
+            onNone: () => config?.baseUrl ?? "https://cirque.sh/facilitator",
           }),
         ),
       )
