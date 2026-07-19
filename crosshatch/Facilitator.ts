@@ -15,14 +15,13 @@ export const layer = (config?: { readonly baseUrl?: string | undefined }) =>
     Facilitator,
     Effect.gen(function* () {
       const baseUrl = yield* Config.all({
-        host: Config.port("CROSSHATCH_DEV_HOST"),
+        host: Config.string("CROSSHATCH_DEV_HOST").pipe(Config.withDefault("localhost")),
         port: Config.port("CROSSHATCH_DEV_PORT"),
-        https: Config.boolean("CROSSHATCH_DEV_HTTPS"),
       }).pipe(
         Effect.option,
         Effect.map(
           Option.match({
-            onSome: ({ https, host, port }) => `http${https ? "s" : ""}://${host}:${port}`,
+            onSome: ({ host, port }) => `http://${host.includes(":") ? `[${host}]` : host}:${port}`,
             onNone: () => config?.baseUrl ?? "https://cirque.sh",
           }),
         ),

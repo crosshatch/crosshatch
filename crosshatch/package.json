@@ -47,7 +47,7 @@
     }
   },
   "scripts": {
-    "dev": "node --watch ./Cli/main.ts dev --otel-endpoint http://localhost:4318"
+    "dev": "node --watch ./Cli/main.ts dev --port 4647 --otel-endpoint http://127.0.0.1:27686"
   },
   "peerDependencies": {
     "@crosshatch/widget": "workspace:*",
