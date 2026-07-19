@@ -1,5 +1,13 @@
 # crosshatch
 
+## 0.0.13
+
+### Patch Changes
+
+- [#128](https://github.com/crosshatch/crosshatch/pull/128)
+  [`1977208`](https://github.com/crosshatch/crosshatch/commit/1977208d9a6b58b2c28fa780ef6c444ce73b56c6)
+  Thanks @harrysolovay! - Fix incorrect facilitator endpoint path resolution.
+
 ## 0.0.12
 
 ### Patch Changes
