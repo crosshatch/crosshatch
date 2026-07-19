@@ -32,7 +32,7 @@ export const layer = Layer.mergeAll(
         createTrace: (config) => PubSub.publish(events, { _tag: "CreateTrace", config }),
         propose: Effect.fnUntraced(function* (proposal) {
           const { id } = yield* FromMerchant.decodeRequired(proposal.required)
-          yield* invoices.add(id)
+          yield* invoices.add(proposal.required.accepts, id)
           yield* PubSub.publish(events, { _tag: "Propose", proposal })
           const payload = yield* invoices.await(id)
           return { payload }

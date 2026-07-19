@@ -37,7 +37,7 @@ export const make = Effect.fnUntraced(function* ({ required }: { readonly requir
 })
 
 export const isAcceptable = (
-  requirements: ReadonlyArray<Requirements>,
+  accepts: ReadonlyArray<Requirements>,
   payload: Payload | undefined,
 ): payload is Acceptable =>
-  payload !== undefined && requirements.some((requirement) => Equal.equals(requirement, payload.accepted))
+  payload !== undefined && accepts.some((requirement) => Equal.equals(requirement, payload.accepted))
