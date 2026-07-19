@@ -1,5 +1,13 @@
 # crosshatch
 
+## 0.0.9
+
+### Patch Changes
+
+- [#118](https://github.com/crosshatch/crosshatch/pull/118)
+  [`1cc6c34`](https://github.com/crosshatch/crosshatch/commit/1cc6c341228fac8774612eec6505486a86928cd5)
+  Thanks @harrysolovay! - Refactor development mock facilitator.
+
 ## 0.0.8
 
 ### Patch Changes
