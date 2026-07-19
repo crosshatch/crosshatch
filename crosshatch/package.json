@@ -49,10 +49,8 @@
   "scripts": {
     "dev": "node --watch ./Cli/main.ts dev --port 4647 --otel-endpoint http://127.0.0.1:27686"
   },
-  "peerDependencies": {
+  "dependencies": {
     "@crosshatch/widget": "workspace:*",
-    "@effect/platform-browser": "catalog:",
-    "@effect/platform-node": "catalog:",
     "@napi-rs/keyring": "catalog:",
     "@scure/bip39": "catalog:",
     "@solana-program/compute-budget": "catalog:",
@@ -62,10 +60,14 @@
     "@solana/kit": "catalog:",
     "@solana/transactions": "catalog:",
     "@standard-schema/spec": "catalog:",
-    "effect": "catalog:",
     "liminal": "workspace:*",
     "liminal-util": "workspace:*",
     "ox": "catalog:",
     "viem": "catalog:"
+  },
+  "peerDependencies": {
+    "@effect/platform-browser": "catalog:",
+    "@effect/platform-node": "catalog:",
+    "effect": "catalog:"
   }
 }
