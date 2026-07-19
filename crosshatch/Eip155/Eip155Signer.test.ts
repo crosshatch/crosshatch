@@ -34,7 +34,7 @@ const expectedSignature =
 
 describe(import.meta.url, () => {
   it.effect(
-    "matches the previous Viem EIP-712 vector",
+    "signs typed data with a recoverable deterministic signature",
     Effect.fn(function* () {
       const signer = yield* Eip155Signer.pipe(
         Effect.provide(layerMnemonic.pipe(Layer.provide(Mnemonic.layerText(mnemonicText)))),
