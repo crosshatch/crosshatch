@@ -56,6 +56,26 @@ const program = Effect.gen(function* () {
 payload may need to select a supported requirement, read wallet configuration,
 sign typed data, and encode chain-specific payload fields.
 
+## Checking A Payload
+
+Decoding a payload only confirms its shape. Before verification or settlement,
+use `Payload.isAcceptable` to confirm that it selected one of the requirements
+offered for the resource.
+
+```ts
+import { Payload, Required } from "crosshatch"
+
+declare const required: Required.Required
+declare const payload: Payload.Payload | undefined
+
+if (Payload.isAcceptable(required.accepts, payload)) {
+  // payload is present and its accepted requirement matches the invoice
+}
+```
+
+The check also narrows the value to `Payload.Acceptable`, so downstream code can
+require evidence that the comparison was performed.
+
 ## The `Payer` Requirement
 
 `Payload.make` does not know which wallet, account, chain, or

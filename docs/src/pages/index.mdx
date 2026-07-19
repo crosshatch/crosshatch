@@ -153,15 +153,14 @@ const router = HttpRouter.add(
   "/paid",
   Effect.gen(function* () {
     const payload = yield* Payload.Payload
-    if (!payload) {
+    const accepted = yield* Requirements.logical(KnownAssets.Usd.USDC, {
+      amount: 0.01,
+      recipients: { eip155: { 8453: yield* recipient } },
+    })
+    if (!Payload.isAcceptable(accepted, payload)) {
       const required =
         yield* Required.make`Description of the charge here.`.pipe(
-          Required.accept(
-            Requirements.logical(KnownAssets.Usd.USDC, {
-              amount: 0.01,
-              recipients: { eip155: { 8453: yield* recipient } },
-            }),
-          ),
+          Required.accept(accepted),
         )
       return yield* ChxHttp.require({ required }).pipe(
         Effect.map(HttpServerResponse.setStatus(402)),

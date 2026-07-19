@@ -29,7 +29,11 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
       "/paid",
       Effect.gen(function* () {
         const payload = yield* Payload.Payload
-        if (!payload) {
+        const accepted = yield* Requirements.denomination(KnownAssets.Usd, {
+          amount: 0.01,
+          recipients: { eip155: { 8453: recipient } },
+        })
+        if (!Payload.isAcceptable(accepted, payload)) {
           const required = yield* Required.make`
           |
           | Description of the charge here.
@@ -43,12 +47,7 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
               required: true,
               id: PaymentId.random(),
             }),
-            Required.accept(
-              Requirements.denomination(KnownAssets.Usd, {
-                amount: 0.01,
-                recipients: { eip155: { 8453: recipient } },
-              }),
-            ),
+            Required.accept(accepted),
           )
           return yield* ChxHttp.require({ required })
         }

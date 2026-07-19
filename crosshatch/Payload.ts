@@ -1,4 +1,4 @@
-import { Context, Effect, Schema as S } from "effect"
+import { Context, Effect, Equal, Schema as S } from "effect"
 
 import { JsonRecord } from "./_util.ts"
 import { Payer } from "./Payer.ts"
@@ -26,9 +26,18 @@ export const Payload = Object.assign(
   }),
 )
 
+export type Acceptable = typeof Acceptable.Type
+export const Acceptable = Payload.pipe(S.brand("crosshatch/Acceptable"))
+
 export const PayloadFromBase64JsonString = S.StringFromBase64.pipe(S.decodeTo(S.fromJsonString(S.toCodecJson(Payload))))
 
 export const make = Effect.fnUntraced(function* ({ required }: { readonly required: Required }) {
   const { createPayload } = yield* Payer
   return yield* createPayload({ required })
 })
+
+export const isAcceptable = (
+  requirements: ReadonlyArray<Requirements>,
+  payload: Payload | undefined,
+): payload is Acceptable =>
+  payload !== undefined && requirements.some((requirement) => Equal.equals(requirement, payload.accepted))

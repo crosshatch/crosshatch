@@ -63,14 +63,17 @@ Most merchant servers provide the facilitator client at the application layer so
 every paid route settles against the same service.
 
 ```ts
-import { Facilitator, Payload } from "crosshatch"
+import { Facilitator, Payload, Required } from "crosshatch"
 import { Effect, Layer } from "effect"
 import { FetchHttpClient } from "effect/unstable/http"
 
+declare const required: Required.Required
+
 const route = Effect.gen(function* () {
-  const payload = yield* Payload.Payload.pipe(
-    Effect.flatMap(Effect.fromNullishOr),
-  )
+  const payload = yield* Payload.Payload
+  if (!Payload.isAcceptable(required.accepts, payload)) {
+    return required
+  }
   const settlement = yield* Facilitator.settle({ payload })
   // ...
 }).pipe(

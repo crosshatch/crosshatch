@@ -74,7 +74,11 @@ export default class Merchant extends Cloudflare.Worker<Merchant>()(
       "/paid",
       Effect.gen(function* () {
         const payload = yield* Payload.Payload
-        if (!payload) {
+        const accepted = yield* Requirements.denomination(KnownAssets.Usd, {
+          amount: 0.01,
+          recipients: { eip155: { 8453: yield* recipient } },
+        })
+        if (!Payload.isAcceptable(accepted, payload)) {
           const required = yield* Required.make`
           |
           | Description of the charge here.
@@ -82,15 +86,8 @@ export default class Merchant extends Cloudflare.Worker<Merchant>()(
           | What is this charge for?
           |
           | How does it fit into the current flow?
-          |
-          `.pipe(
-            Required.accept(
-              Requirements.denomination(KnownAssets.Usd, {
-                amount: 0.01,
-                recipients: { eip155: { 8453: yield* recipient } },
-              }),
-            ),
-          )
+            |
+            `.pipe(Required.accept(accepted))
           return yield* ChxHttp.require({ required })
         }
         const settlement = yield* Facilitator.settle({ payload })

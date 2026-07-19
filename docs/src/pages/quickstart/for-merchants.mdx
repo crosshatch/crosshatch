@@ -21,8 +21,9 @@ or shared pot of funds that receives revenue.
 ## Protect a Route
 
 Declare what the resource costs and return a 402 response when the request does
-not include a payment payload. This example uses HTTP, but Crosshatch is not
-limited to HTTP; route protection is just one integration path.
+not include a payment payload that selects one of those requirements. This
+example uses HTTP, but Crosshatch is not limited to HTTP; route protection is
+just one integration path.
 
 ```ts
 import {
@@ -42,17 +43,16 @@ const route = Effect.gen(function* () {
     "PAY_TO_EIP155",
   )
   const payload = yield* Payload.Payload
+  const accepted = yield* Requirements.logical(KnownAssets.Usd.USDC, {
+    amount: 0.01,
+    recipients: {
+      eip155: { 8453: recipient },
+    },
+  })
 
-  if (!payload) {
+  if (!Payload.isAcceptable(accepted, payload)) {
     const required = yield* Required.make`Access to the paid resource.`.pipe(
-      Required.accept(
-        Requirements.logical(KnownAssets.Usd.USDC, {
-          amount: 0.01,
-          recipients: {
-            eip155: { 8453: recipient },
-          },
-        }),
-      ),
+      Required.accept(accepted),
     )
 
     return yield* ChxHttp.require({ required }).pipe(
@@ -87,7 +87,8 @@ flow:
 - Parse an incoming payment payload from the request headers.
 - Make the parsed payload available as an Effect service.
 - Return an x402 payment-required response when no payload was supplied.
-- Settle the supplied payload before returning the paid resource.
+- Confirm the payload selects an accepted requirement, then settle it before
+  returning the paid resource.
 
 Use this integration when your merchant service is built with
 `effect/unstable/http`.
@@ -107,13 +108,15 @@ const app = ChxHttp.layerMiddleware().pipe(HttpRouter.toHttpEffect)
 
 If the header is absent or cannot be decoded, the provided payload is
 `undefined`. Your route can then decide whether to return a payment requirement
-or continue with unpaid behavior.
+or continue with unpaid behavior. A successfully decoded payload is not
+necessarily acceptable for that route; compare it with the offered requirements
+using `Payload.isAcceptable` before verification or settlement.
 
 ### Protect An Effect HTTP Route
 
-Inside the route, read the parsed payload service. If there is no payload, build
-a `Required` value and return `ChxHttp.require({ required })` with its status
-set to `402`.
+Inside the route, read the parsed payload service. If it is absent or does not
+match one of the route's accepted requirements, build a `Required` value and
+return `ChxHttp.require({ required })` with its status set to `402`.
 
 ```ts
 import {
@@ -129,22 +132,21 @@ import { HttpServerResponse } from "effect/unstable/http"
 
 const paidRoute = Effect.gen(function* () {
   const payload = yield* Payload.Payload
+  const accepted = yield* Requirements.logical(KnownAssets.Usd.USDC, {
+    amount: 0.01,
+    recipients: {
+      eip155: {
+        8453: yield* Config.schema(
+          Eip155Address.Eip155Address,
+          "PAY_TO_EIP155",
+        ),
+      },
+    },
+  })
 
-  if (!payload) {
+  if (!Payload.isAcceptable(accepted, payload)) {
     const required = yield* Required.make`Access to the paid resource.`.pipe(
-      Required.accept(
-        Requirements.logical(KnownAssets.Usd.USDC, {
-          amount: 0.01,
-          recipients: {
-            eip155: {
-              8453: yield* Config.schema(
-                Eip155Address.Eip155Address,
-                "PAY_TO_EIP155",
-              ),
-            },
-          },
-        }),
-      ),
+      Required.accept(accepted),
     )
 
     return yield* ChxHttp.require({ required }).pipe(
@@ -176,7 +178,7 @@ declare const required: Required.Required
 const paidRoute = Effect.gen(function* () {
   const payload = yield* Payload.Payload
 
-  if (!payload) {
+  if (!Payload.isAcceptable(required.accepts, payload)) {
     return yield* ChxHttp.require({ required }).pipe(
       Effect.map(HttpServerResponse.setStatus(402)),
     )
@@ -211,7 +213,7 @@ declare const required: Required.Required
 const paidRoute = Effect.gen(function* () {
   const payload = yield* Payload.Payload
 
-  if (!payload) {
+  if (!Payload.isAcceptable(required.accepts, payload)) {
     return yield* ChxHttp.require({ required }).pipe(
       Effect.map(HttpServerResponse.setStatus(402)),
     )
