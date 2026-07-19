@@ -10,10 +10,8 @@ import { dev } from "./dev.ts"
 import { profile } from "./profile.ts"
 
 Command.make("crosshatch").pipe(
-  Command.withSubcommands([profile, dev]),
-  Command.run({
-    version: PackageJson.version,
-  }),
+  Command.withSubcommands([dev, profile]),
+  Command.run({ version: PackageJson.version }),
   Effect.scoped,
   Effect.provide([RampClient.layer.pipe(Layer.provideMerge(NodeHttpClient.layerFetch)), NodeServices.layer]),
   Effect.onError(Effect.logError),

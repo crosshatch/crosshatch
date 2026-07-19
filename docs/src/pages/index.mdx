@@ -144,11 +144,7 @@ import {
 } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
 import { Config, Effect, Layer } from "effect"
-import {
-  FetchHttpClient,
-  HttpRouter,
-  HttpServerResponse,
-} from "effect/unstable/http"
+import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
 
 const recipient = Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
 
@@ -176,12 +172,7 @@ const router = HttpRouter.add(
       ChxHttp.addResponseHeader(settlement),
     )
   }),
-).pipe(
-  Layer.provide([
-    ChxHttp.layerMiddleware(),
-    Facilitator.layer().pipe(Layer.provide(FetchHttpClient.layer)),
-  ]),
-)
+).pipe(Layer.provide([ChxHttp.layerMiddleware(), Facilitator.layer()]))
 ```
 
     </div>

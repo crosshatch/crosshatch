@@ -439,6 +439,9 @@ importers:
 
   liminal/docs:
     dependencies:
+      '@effect/platform-browser':
+        specifier: 'catalog:'
+        version: 4.0.0-beta.99(effect@4.0.0-beta.99)
       '@types/react':
         specifier: ^19.2.14
         version: 19.2.17
@@ -451,6 +454,9 @@ importers:
       effect:
         specifier: 'catalog:'
         version: 4.0.0-beta.99
+      effect-workerd:
+        specifier: workspace:*
+        version: link:../effect-workerd
       liminal:
         specifier: workspace:*
         version: link:../liminal

@@ -1,16 +1,14 @@
 import { Effect, Record, Struct } from "effect"
 
+import { handler } from "../_util.ts"
 import type { Denomination } from "../Asset.ts"
 import { ChainId } from "../ChainId.ts"
 import { FacilitatorApi } from "../FacilitatorApi/FacilitatorApi.ts"
 import * as KnownAssets from "../KnownAssets/KnownAssets.ts"
-import { handler } from "./_common.ts"
-
-const knownAssetDenominations: ReadonlyArray<Denomination> = [KnownAssets.Usd]
 
 export const supported = handler(FacilitatorApi, "facilitator", "supported", () =>
   Effect.succeed({
-    kinds: knownAssetDenominations.flatMap((denomination) =>
+    kinds: Record.values(KnownAssets).flatMap((denomination: Denomination) =>
       Record.values(denomination).flatMap((logicalAsset) =>
         Record.toEntries(logicalAsset).flatMap(([namespace, references]) =>
           Record.toEntries(references).map(([reference, physical]) => ({
