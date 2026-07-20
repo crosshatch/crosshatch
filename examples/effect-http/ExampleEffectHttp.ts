@@ -1,6 +1,5 @@
 import * as Cloudflare from "alchemy/Cloudflare"
 import { ChxHttp, Facilitator, KnownAssets, Payload, Required, Requirements } from "crosshatch"
-import * as CaAccountId from "crosshatch/CaAccountId"
 import { Eip155Address } from "crosshatch/Eip155"
 import { PaymentId } from "crosshatch/Extensions"
 import * as Siwx from "crosshatch/Siwx"
@@ -81,7 +80,6 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
         ChxHttp.layerMiddleware({ extensions: [PaymentId.FromMerchant] }),
         siwxServer,
         KeyValueStore.layerMemory,
-        Layer.succeed(Siwx.Entitlements.Builders, [CaAccountId.eip155.builder]),
       ]),
       HttpRouter.toHttpEffect,
       Effect.scoped,
