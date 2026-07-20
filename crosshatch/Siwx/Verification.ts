@@ -40,7 +40,7 @@ export const verifyProof = <const Verifiers extends ReadonlyArray<Verifier.Any>>
         return yield* new SiwxError({})
       }
 
-      if (!challenge.supportedChains.some((entry) => entry.chainId === proof.chainId && entry.type === proof.type)) {
+      if (!challenge.supportedChains.some(({ chainId, type }) => chainId === proof.chainId && type === proof.type)) {
         return yield* new SiwxError({})
       }
 
