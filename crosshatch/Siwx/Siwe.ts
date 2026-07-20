@@ -74,7 +74,7 @@ export const { prover, verifier } = makeScheme({
   supportsChainId: (value) => eip155Account.supports(value),
   sign: Effect.fnUntraced(function* (info, chainId) {
     const signer = yield* Eip155Signer
-    const unsigned = { ...info, address: signer.address, chainId, type: "eip191" as const }
+    const unsigned = { ...info, address: signer.address, chainId, type: "eip191" }
     const message = yield* createSigningMessage(unsigned)
     const signature = yield* Effect.tryPromise({
       try: async () => await signer.signMessage({ message }),
