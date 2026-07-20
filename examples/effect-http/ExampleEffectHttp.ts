@@ -6,6 +6,7 @@ import { PaymentId } from "crosshatch/Extensions"
 import * as Siwx from "crosshatch/Siwx"
 import { Config, Effect, Layer, Schema as S } from "effect"
 import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
+import { KeyValueStore } from "effect/unstable/persistence"
 
 const verifiers = [Siwx.Siwe.verifier] as const
 const paidResource = Siwx.Entitlement.Id.make("paid-resource")
@@ -31,9 +32,7 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
     const recipient = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
     const publicOrigin = yield* Config.schema(S.URLFromString, "PUBLIC_ORIGIN")
 
-    const siwxServer = Siwx.Server.layerMiddleware({ verifiers, origin: publicOrigin.origin }).pipe(
-      Layer.provide(Siwx.ChallengeStore.layerChallengeMemory),
-    )
+    const siwxServer = Siwx.Server.layerMiddleware({ verifiers, origin: publicOrigin.origin })
 
     const handler = HttpRouter.add(
       "GET",
@@ -81,7 +80,7 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
         }),
         ChxHttp.layerMiddleware({ extensions: [PaymentId.FromMerchant] }),
         siwxServer,
-        Siwx.Entitlements.layerProvideMemory,
+        KeyValueStore.layerMemory,
         Layer.succeed(Siwx.Entitlements.Builders, [CaAccountId.eip155.builder]),
       ]),
       HttpRouter.toHttpEffect,

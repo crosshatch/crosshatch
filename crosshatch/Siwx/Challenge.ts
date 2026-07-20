@@ -1,7 +1,7 @@
 import { Array as A, Clock, Effect, Encoding, pipe, Schema as S } from "effect"
 
 import type { Required } from "../Required.ts"
-import { ChallengeStore } from "./ChallengeStore.ts"
+import * as ChallengeStore from "./ChallengeStore.ts"
 import { SiwxError } from "./Error.ts"
 import {
   Challenge as ChallengeSchema,
@@ -33,11 +33,11 @@ export const make = Effect.fnUntraced(
     }
     const url = yield* S.decodeUnknownEffect(S.URLFromString)(uri)
 
-    const supportedChains = networks.flatMap((network) =>
-      verifiers.flatMap((verifier) =>
-        verifier.supportsChainId(network)
-          ? [{ chainId: network, type: verifier.type, signatureScheme: verifier.scheme }]
-          : [],
+    const supportedChains = verifiers.flatMap((verifier) =>
+      pipe(
+        networks,
+        A.filter(verifier.supportsChainId),
+        A.map((network) => ({ chainId: network, type: verifier.type, signatureScheme: verifier.scheme })),
       ),
     )
     if (!A.isReadonlyArrayNonEmpty(supportedChains)) {
@@ -64,9 +64,7 @@ export const make = Effect.fnUntraced(
       schema: proofSchema,
     } satisfies typeof ChallengeSchema.Type
 
-    const inserted = yield* ChallengeStore.pipe(
-      Effect.flatMap(({ insert }) => insert({ challenge, expiresAt: expirationTime ?? maxExpiresAt })),
-    )
+    const inserted = yield* ChallengeStore.insert({ challenge, expiresAt: expirationTime ?? maxExpiresAt })
     if (!inserted) {
       return yield* new SiwxError({})
     }

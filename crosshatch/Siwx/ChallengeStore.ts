@@ -1,7 +1,6 @@
-import { Clock, Context, Effect, Layer, Schema as S } from "effect"
+import { Clock, Effect, Option, Schema as S } from "effect"
 import { KeyValueStore } from "effect/unstable/persistence"
 
-import { SiwxError } from "./Error.ts"
 import { Challenge } from "./Schema.ts"
 
 export interface StoredChallenge {
@@ -14,65 +13,44 @@ const StoredChallengeJson = S.Struct({
   expiresAt: S.Finite,
 })
 
-export const StoredChallengeFromJson = S.fromJsonString(S.toCodecJson(StoredChallengeJson))
+const store = Effect.map(KeyValueStore.KeyValueStore, (kv) =>
+  KeyValueStore.toSchemaStore(KeyValueStore.prefix(kv, "siwx:challenge:"), StoredChallengeJson),
+)
 
-export class ChallengeStore extends Context.Service<
-  ChallengeStore,
-  {
-    readonly insert: (entry: StoredChallenge) => Effect.Effect<boolean, SiwxError>
-    readonly get: (nonce: string) => Effect.Effect<typeof Challenge.Type | undefined, SiwxError>
-    readonly consume: (nonce: string) => Effect.Effect<boolean, SiwxError>
-  }
->()("crosshatch/Siwx/ChallengeStore") {}
+export const insert = (entry: StoredChallenge) =>
+  Effect.gen(function* () {
+    const challenges = yield* store
+    const nonce = entry.challenge.info.nonce
+    if (yield* challenges.has(nonce)) {
+      return false
+    }
+    yield* challenges.set(nonce, entry)
+    return true
+  })
 
-export const layerChallengeKeyValueStore = (options?: { readonly prefix?: string | undefined }) =>
-  Layer.effect(
-    ChallengeStore,
-    Effect.gen(function* () {
-      const store = yield* KeyValueStore.KeyValueStore
-      const prefix = options?.prefix ?? "siwx:challenge:"
-      const key = (nonce: string) => `${prefix}${nonce}`
+export const get = (nonce: string) =>
+  Effect.gen(function* () {
+    const challenges = yield* store
+    const entry = yield* challenges.get(nonce)
+    if (Option.isNone(entry)) {
+      return undefined
+    }
+    const now = yield* Clock.currentTimeMillis
+    if (entry.value.expiresAt <= now) {
+      yield* challenges.remove(nonce)
+      return undefined
+    }
+    return entry.value.challenge
+  })
 
-      return {
-        insert: (entry) =>
-          Effect.gen(function* () {
-            const k = key(entry.challenge.info.nonce)
-            if (yield* store.has(k)) {
-              return false
-            }
-            yield* store.set(k, yield* S.encodeEffect(StoredChallengeFromJson)(entry))
-            return true
-          }).pipe(Effect.mapError((cause) => new SiwxError({ cause }))),
-
-        get: (nonce) =>
-          Effect.gen(function* () {
-            const raw = yield* store.get(key(nonce))
-            if (raw === undefined) {
-              return undefined
-            }
-            const entry = yield* S.decodeUnknownEffect(StoredChallengeFromJson)(raw)
-            const now = yield* Clock.currentTimeMillis
-            if (entry.expiresAt <= now) {
-              yield* store.remove(key(nonce))
-              return undefined
-            }
-            return entry.challenge
-          }).pipe(Effect.mapError((cause) => new SiwxError({ cause }))),
-
-        consume: (nonce) =>
-          Effect.gen(function* () {
-            const k = key(nonce)
-            const raw = yield* store.get(k)
-            if (raw === undefined) {
-              return false
-            }
-            const entry = yield* S.decodeUnknownEffect(StoredChallengeFromJson)(raw)
-            const now = yield* Clock.currentTimeMillis
-            yield* store.remove(k)
-            return entry.expiresAt > now
-          }).pipe(Effect.mapError((cause) => new SiwxError({ cause }))),
-      }
-    }),
-  )
-
-export const layerChallengeMemory = layerChallengeKeyValueStore().pipe(Layer.provide(KeyValueStore.layerMemory))
+export const consume = (nonce: string) =>
+  Effect.gen(function* () {
+    const challenges = yield* store
+    const entry = yield* challenges.get(nonce)
+    if (Option.isNone(entry)) {
+      return false
+    }
+    const now = yield* Clock.currentTimeMillis
+    yield* challenges.remove(nonce)
+    return entry.value.expiresAt > now
+  })

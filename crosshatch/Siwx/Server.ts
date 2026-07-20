@@ -2,7 +2,6 @@ import { Context, Effect, Option, pipe, Schema as S, type Types } from "effect"
 import { Headers, HttpRouter, HttpServerRequest, HttpServerResponse } from "effect/unstable/http"
 
 import { RequiredUrl } from "../Required.ts"
-import { ChallengeStore } from "./ChallengeStore.ts"
 import { SiwxError } from "./Error.ts"
 import { type AuthenticatedIdentity, Identity } from "./Identity.ts"
 import { ProofFromBase64JsonString, SIGN_IN_WITH_X } from "./Schema.ts"
@@ -20,8 +19,6 @@ export const layerMiddleware = <const Verifiers extends ReadonlyArray<Verifier.A
     readonly provides: AuthenticatedIdentity
   }>()(
     Effect.gen(function* () {
-      const store = yield* ChallengeStore
-
       return (effect: Effect.Effect<HttpServerResponse.HttpServerResponse, Types.unhandled, AuthenticatedIdentity>) =>
         Effect.gen(function* () {
           const request = yield* HttpServerRequest.HttpServerRequest
@@ -61,7 +58,7 @@ export const layerMiddleware = <const Verifiers extends ReadonlyArray<Verifier.A
               ),
             ),
           )
-        }).pipe(Effect.provideService(ChallengeStore, store))
+        })
     }),
     { global: true },
   )

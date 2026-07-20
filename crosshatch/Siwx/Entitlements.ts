@@ -1,5 +1,5 @@
-import { Context, Effect, Layer, type Types } from "effect"
-import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
+import { Context, Effect } from "effect"
+import { KeyValueStore } from "effect/unstable/persistence"
 
 import type { Builder, CaAccountId } from "../CaAccountId/CaAccountId.ts"
 import { builder as eip155Builder } from "../CaAccountId/eip155.ts"
@@ -7,9 +7,11 @@ import { builder as solanaBuilder } from "../CaAccountId/solana.ts"
 import * as Facilitator from "../Facilitator.ts"
 import type { Payload } from "../Payload.ts"
 import type { Id } from "./Entitlement.ts"
-import { EntitlementStore, layerEntitlementMemory } from "./EntitlementStore.ts"
 import { SiwxError } from "./Error.ts"
 import { Identity } from "./Identity.ts"
+
+const key = ({ id, accountId }: { readonly id: typeof Id.Type; readonly accountId: typeof CaAccountId.Type }) =>
+  `siwx:entitlement:${JSON.stringify([id, accountId])}`
 
 export class Builders extends Context.Reference<ReadonlyArray<Builder>>("crosshatch/Siwx/Builders", {
   defaultValue: () => [eip155Builder, solanaBuilder],
@@ -27,9 +29,7 @@ export const accountIdIfOwner = Effect.fnUntraced(function* (network: string, pa
     return yield* new SiwxError({})
   }
 
-  const accountId = yield* builder
-    .accountId(network, payer)
-    .pipe(Effect.mapError((cause) => new SiwxError({ cause })))
+  const accountId = yield* builder.accountId(network, payer)
 
   return identity.accountId === accountId ? identity.accountId : undefined
 })
@@ -39,8 +39,8 @@ export const isEntitled = Effect.fnUntraced(function* (id: typeof Id.Type) {
   if (identity === undefined) {
     return false
   }
-  const store = yield* EntitlementStore
-  return yield* store.has({ id, accountId: identity.accountId })
+  const store = yield* KeyValueStore.KeyValueStore
+  return yield* store.has(key({ id, accountId: identity.accountId }))
 })
 
 export const record = Effect.fnUntraced(function* ({
@@ -50,8 +50,8 @@ export const record = Effect.fnUntraced(function* ({
   readonly id: typeof Id.Type
   readonly accountId: typeof CaAccountId.Type
 }) {
-  const store = yield* EntitlementStore
-  yield* store.record({ id, accountId })
+  const store = yield* KeyValueStore.KeyValueStore
+  yield* store.set(key({ id, accountId }), "1")
 })
 
 export const purchase = Effect.fnUntraced(function* ({
@@ -91,12 +91,3 @@ export const purchase = Effect.fnUntraced(function* ({
   )
   return settlement
 })
-
-export const layerProvideMemory = HttpRouter.middleware<{ readonly provides: EntitlementStore }>()(
-  Effect.gen(function* () {
-    const store = yield* EntitlementStore
-    return (effect: Effect.Effect<HttpServerResponse.HttpServerResponse, Types.unhandled, EntitlementStore>) =>
-      Effect.provideService(effect, EntitlementStore, store)
-  }),
-  { global: true },
-).pipe(Layer.provide(layerEntitlementMemory))

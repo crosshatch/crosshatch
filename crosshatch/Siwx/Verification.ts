@@ -1,6 +1,7 @@
 import { DateTime, Effect, Schema as S } from "effect"
+import { KeyValueStore } from "effect/unstable/persistence"
 
-import { ChallengeStore } from "./ChallengeStore.ts"
+import * as ChallengeStore from "./ChallengeStore.ts"
 import { SiwxError } from "./Error.ts"
 import type { AuthenticatedIdentity } from "./Identity.ts"
 import { CHALLENGE_MAX_AGE_MS, Info, type Proof } from "./Schema.ts"
@@ -17,17 +18,18 @@ export const verifyProof = <const Verifiers extends ReadonlyArray<Verifier.Any>>
 ): ((
   proof: typeof Proof.Type,
   requestUrl: URL,
-) => Effect.Effect<AuthenticatedIdentity, SiwxError, ChallengeStore | Verifier.Context<Verifiers[number]>>) =>
+) => Effect.Effect<
+  AuthenticatedIdentity,
+  SiwxError,
+  KeyValueStore.KeyValueStore | Verifier.Context<Verifiers[number]>
+>) =>
   Effect.fnUntraced(function* (proof: typeof Proof.Type, requestUrl: URL) {
-    const store = yield* ChallengeStore
-    const challenge = yield* store.get(proof.nonce).pipe(Effect.mapError((cause) => new SiwxError({ cause })))
+    const challenge = yield* ChallengeStore.get(proof.nonce).pipe(Effect.mapError((cause) => new SiwxError({ cause })))
     if (challenge === undefined) {
       return yield* new SiwxError({})
     }
 
-    const info = yield* S.decodeUnknownEffect(Info)(proof).pipe(
-      Effect.mapError((cause) => new SiwxError({ cause })),
-    )
+    const info = yield* S.decodeUnknownEffect(Info)(proof).pipe(Effect.mapError((cause) => new SiwxError({ cause })))
     if (!S.toEquivalence(Info)(info, challenge.info)) {
       return yield* new SiwxError({})
     }
@@ -66,9 +68,9 @@ export const verifyProof = <const Verifiers extends ReadonlyArray<Verifier.Any>>
 
     const identity = yield* verifier.verify(proof).pipe(Effect.mapError((cause) => new SiwxError({ cause })))
 
-    const consumed = yield* store
-      .consume(proof.nonce)
-      .pipe(Effect.mapError((cause) => new SiwxError({ cause })))
+    const consumed = yield* ChallengeStore.consume(proof.nonce).pipe(
+      Effect.mapError((cause) => new SiwxError({ cause })),
+    )
     if (!consumed) {
       return yield* new SiwxError({})
     }
