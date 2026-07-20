@@ -2,7 +2,8 @@ import { Effect, Layer, flow } from "effect"
 
 import { Bridge, CreateTraceError, ProposeError } from "../Bridge.ts"
 import * as Payer from "../Payer.ts"
-import { FacadeClient } from "./Facade/Facade.ts"
+import { FacadeClient } from "./Facade/FacadeClient.ts"
+import * as FacadePrelude from "./Facade/FacadePrelude.ts"
 import { PrerequisitesWidget } from "./Widgets.ts"
 
 const BridgeLive = Layer.effect(
@@ -28,6 +29,6 @@ const BridgeLive = Layer.effect(
       ),
     }
   }),
-).pipe(Layer.provide(FacadeClient.layer))
+)
 
-export const layer = Payer.layerBridge.pipe(Layer.provideMerge(BridgeLive))
+export const layer = Payer.layerBridge.pipe(Layer.provideMerge(BridgeLive), Layer.provideMerge(FacadePrelude.layer))

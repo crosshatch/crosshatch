@@ -1,4 +1,4 @@
-import { Context, Layer, Schema as S, PubSub } from "effect"
+import { Context, Schema as S, SubscriptionRef } from "effect"
 
 import { LinkChallengeId } from "../LinkChallengeId.ts"
 
@@ -16,10 +16,6 @@ const FacadeState_ = S.Struct({
 export interface FacadeState extends FacadeState_ {}
 
 export const FacadeState = Object.assign(
-  Context.Service<FacadeState, PubSub.PubSub<FacadeState>>()("link.crosshatch.dev/FacadeState", {
-    make: PubSub.unbounded<FacadeState>({ replay: 1 }),
-  }),
+  Context.Service<FacadeState, SubscriptionRef.SubscriptionRef<FacadeState>>()("crosshatch/Browser/FacadeState"),
   FacadeState_,
 )
-
-export const layer = Layer.effect(FacadeState, FacadeState.make)

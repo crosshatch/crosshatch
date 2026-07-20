@@ -3,14 +3,18 @@ import { Atom } from "effect/unstable/reactivity"
 import * as Boundary from "liminal-util/Boundary"
 
 import * as Amount from "../Amount.ts"
+import { Proposal } from "../Bridge.ts"
 import { ChxEnv } from "../ChxEnv.ts"
-import * as BrowserPayer from "./BrowserPayer.ts"
+import * as BrowserServices from "./BrowserServices.ts"
 import { FacadeClient } from "./Facade/Facade.ts"
+import { FacadeState } from "./Facade/FacadeState.ts"
 import { ActivityWidget, IdWidget, LinkWidget } from "./Widgets.ts"
 
-const runtime = Atom.runtime(BrowserPayer.layer)
+const runtime = Atom.runtime(BrowserServices.layer)
 
-export const stateAtom = runtime.atom(FacadeClient.state).pipe(Atom.keepAlive, Atom.mapResult(Struct.get("status")))
+export const stateAtom = runtime
+  .subscriptionRef(FacadeState)
+  .pipe(Atom.keepAlive, Atom.mapResult(Struct.get("session")))
 
 export const isLinkedAtom = stateAtom.pipe(Atom.mapResult((v) => v._tag === "Linked"))
 
@@ -23,9 +27,19 @@ export const challengedAtom = runtime.atom((ctx) =>
   ),
 )
 
-export const rescindAtom = runtime.fn(FacadeClient.fn("Rescind"))
+export const rescindAtom = runtime.fn<void>()(
+  Effect.fnUntraced(function* () {
+    const facade = yield* FacadeClient
+    yield* facade.Rescind()
+  }),
+)
 
-export const proposeAtom = runtime.fn(FacadeClient.fn("Propose"))
+export const proposeAtom = runtime.fn<Proposal>()(
+  Effect.fnUntraced(function* (proposal) {
+    const facade = yield* FacadeClient
+    yield* facade.Propose(proposal)
+  }),
+)
 
 export const openAtom = runtime.fn<void>()(
   Effect.fnUntraced(function* (_, get) {
