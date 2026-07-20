@@ -1,6 +1,7 @@
 import { Array as A, Effect, Option, Schema as S } from "effect"
 
 import { Accept } from "../Accept.ts"
+import { ChainId } from "../ChainId.ts"
 import type { Resolver } from "../ChxHttp/Resolver.ts"
 import { SiwxError } from "./Error.ts"
 import type { Prover } from "./Prover.ts"
@@ -23,27 +24,30 @@ export const resolver = <const Provers extends ReadonlyArray<Prover.Any>>(
       return yield* new SiwxError({})
     }
 
-    const answers = A.flatMap(challenge.supportedChains, (entry) =>
+    const candidates = A.flatMap(challenge.supportedChains, (entry) =>
       A.findFirst(provers, (prover) => prover(challenge.info, entry)).pipe(
         Option.map((sign) => ({ entry, sign })),
         A.fromOption,
       ),
     )
 
-    const paymentChain = yield* Effect.serviceOption(Accept).pipe(
-      Effect.map(Option.map((accept) => Effect.option(Effect.map(accept({ required }), ({ chainId }) => chainId)))),
-      Effect.flatMap(Option.getOrElse(() => Effect.succeedNone)),
+    const accept = yield* Effect.serviceOption(Accept)
+    const paymentChain = Option.isSome(accept)
+      ? yield* accept.value({ required }).pipe(
+          Effect.map(({ chainId }) => chainId),
+          Effect.option,
+        )
+      : Option.none<typeof ChainId.Type>()
+
+    const candidate = Option.orElse(
+      Option.flatMap(paymentChain, (chainId) => A.findFirst(candidates, ({ entry }) => entry.chainId === chainId)),
+      () => A.head(candidates),
     )
 
-    const answer = Option.orElse(
-      Option.flatMap(paymentChain, (chainId) => A.findFirst(answers, ({ entry }) => entry.chainId === chainId)),
-      () => A.head(answers),
-    )
-
-    if (Option.isNone(answer)) {
+    if (Option.isNone(candidate)) {
       return
     }
 
-    const header = yield* answer.value.sign.pipe(Effect.flatMap(S.encodeEffect(ProofFromBase64JsonString)))
+    const header = yield* candidate.value.sign.pipe(Effect.flatMap(S.encodeEffect(ProofFromBase64JsonString)))
     return { headers: { [SIGN_IN_WITH_X]: header } }
   })
