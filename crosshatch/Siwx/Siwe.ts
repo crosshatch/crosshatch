@@ -14,14 +14,9 @@ import { makeScheme } from "./Scheme.ts"
 
 const Signature = S.TemplateLiteral([S.Literal("0x"), S.String]).check(S.isPattern(/^0x[a-fA-F0-9]+$/u))
 
-const createSigningMessage = Effect.fnUntraced(function* (
-  unsigned: Omit<typeof Proof.Type, "signature" | "signatureScheme">,
-) {
-  const [, chainId] = yield* S.decodeUnknownEffect(eip155ChainId)(unsigned.chainId).pipe(
-    Effect.mapError((cause) => new SiwxError({ cause })),
-  )
-  return yield* Effect.try({
-    try: () =>
+const createSigningMessage = (unsigned: Omit<typeof Proof.Type, "signature" | "signatureScheme">) =>
+  S.decodeUnknownEffect(eip155ChainId)(unsigned.chainId).pipe(
+    Effect.map(([, chainId]) =>
       new SiweMessage({
         address: unsigned.address,
         chainId,
@@ -36,9 +31,8 @@ const createSigningMessage = Effect.fnUntraced(function* (
         ...(unsigned.requestId !== undefined && { requestId: unsigned.requestId }),
         ...(unsigned.resources !== undefined && { resources: [...unsigned.resources] }),
       }).prepareMessage(),
-    catch: (cause) => new SiwxError({ cause }),
-  })
-})
+    ),
+  )
 
 export type Verify = (input: {
   readonly chainId: string
@@ -47,15 +41,16 @@ export type Verify = (input: {
   readonly signature: `0x${string}`
 }) => Effect.Effect<boolean, SiwxError>
 
-export const Eip155Verify = Context.Reference<Verify>("crosshatch/Siwx/Eip155Verify", {
-  defaultValue:
-    () =>
-    ({ address, message, signature }) =>
-      Effect.tryPromise({
-        try: () => verifyMessage({ address, message, signature }),
-        catch: (cause) => new SiwxError({ cause }),
-      }),
-})
+export class Eip155Verify extends Context.Service<Eip155Verify, Verify>()("crosshatch/Siwx/Eip155Verify") {}
+
+export const layerVerifierLocal = Layer.succeed(
+  Eip155Verify,
+  ({ address, message, signature }) =>
+    Effect.tryPromise({
+      try: () => verifyMessage({ address, message, signature }),
+      catch: (cause) => new SiwxError({ cause }),
+    }),
+)
 
 export const layerVerifierRpc = (clients: Readonly<Record<string, PublicClient>>) =>
   Layer.succeed(Eip155Verify, ({ chainId, address, message, signature }) => {

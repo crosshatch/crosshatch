@@ -23,4 +23,6 @@ export * as Verifier from "./Verifier.ts"
 
 export const layerProvers = Layer.mergeAll(Eip155Signer.layerMnemonic, SolanaSigner.layerMnemonic)
 
-export const layerVerifiersRpc = Siwe.layerVerifierRpc
+export const layerVerifierLocal = Siwe.layerVerifierLocal
+
+export const layerVerifierRpc = Siwe.layerVerifierRpc
