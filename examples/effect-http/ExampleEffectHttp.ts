@@ -59,14 +59,17 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
           )
           return yield* ChxHttp.require({ required })
         }
-        const settlement = yield* Siwx.Entitlements.purchase({
+        return yield* Siwx.Entitlements.purchase({
           id: paidResource,
           payload,
-        })
-        if (settlement === undefined) {
-          return HttpServerResponse.empty({ status: 403 })
-        }
-        return HttpServerResponse.text("Premium content unlocked.").pipe(ChxHttp.addResponseHeader(settlement))
+        }).pipe(
+          Effect.map((settlement) =>
+            HttpServerResponse.text("Premium content unlocked.").pipe(ChxHttp.addResponseHeader(settlement))
+          ),
+          Effect.catchTag("PurchaseError", (error) =>
+            Effect.succeed(HttpServerResponse.text(`Purchase failed: ${error.reason}`, { status: 403 }))
+          ),
+        )
       }),
     ).pipe(
       Layer.provide([

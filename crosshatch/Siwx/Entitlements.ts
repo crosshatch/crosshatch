@@ -1,4 +1,4 @@
-import { Effect } from "effect"
+import { Data, Effect } from "effect"
 import { KeyValueStore } from "effect/unstable/persistence"
 
 import type { CaAccountId } from "../CaAccountId.ts"
@@ -19,6 +19,11 @@ export const isEntitled = Effect.fnUntraced(function* (id: typeof Id.Type) {
   return yield* store.has(key({ id, accountId: identity.accountId }))
 })
 
+export class PurchaseError extends Data.TaggedError("PurchaseError")<{
+  readonly reason: "not-signed-in" | "wrong-chain" | "payer-mismatch" | "payer-unknown" | "settlement-failed"
+  readonly message?: string
+}> {}
+
 export const purchase = Effect.fnUntraced(function* ({
   id,
   payload,
@@ -27,18 +32,30 @@ export const purchase = Effect.fnUntraced(function* ({
   readonly payload: Payload
 }) {
   const identity = yield* Identity
-  if (identity === undefined || identity.chainId !== payload.accepted.network) {
-    return undefined
+  if (identity === undefined) {
+    return yield* new PurchaseError({ reason: "not-signed-in" })
+  }
+  if (identity.chainId !== payload.accepted.network) {
+    return yield* new PurchaseError({
+      reason: "wrong-chain",
+      message: `expected ${payload.accepted.network}, got ${identity.chainId}`,
+    })
   }
 
   const verification = yield* Facilitator.verify({ payload })
-  if (verification.payer === undefined || identity.address.toLowerCase() !== verification.payer.toLowerCase()) {
-    return undefined
+  if (verification.payer === undefined) {
+    return yield* new PurchaseError({ reason: "payer-unknown" })
+  }
+  if (identity.address.toLowerCase() !== verification.payer.toLowerCase()) {
+    return yield* new PurchaseError({
+      reason: "payer-mismatch",
+      message: `expected ${identity.address}, got ${verification.payer}`,
+    })
   }
 
   const settlement = yield* Facilitator.settle({ payload })
   if (!settlement.success || settlement.payer === undefined) {
-    return undefined
+    return yield* new PurchaseError({ reason: "settlement-failed" })
   }
 
   const store = yield* KeyValueStore.KeyValueStore

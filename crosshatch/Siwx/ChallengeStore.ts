@@ -18,32 +18,20 @@ const store = Effect.map(KeyValueStore.KeyValueStore, (kv) =>
   ),
 )
 
-export const insert = (entry: StoredChallenge) =>
+export const issue = (entry: StoredChallenge) =>
   Effect.gen(function* () {
     const challenges = yield* store
-    const nonce = entry.challenge.info.nonce
-    if (yield* challenges.has(nonce)) {
-      return false
-    }
-    yield* challenges.set(nonce, entry)
-    return true
+    yield* challenges.set(entry.challenge.info.nonce, entry)
   })
 
-export const get = (nonce: string) =>
+export const peek = (nonce: string) =>
   Effect.gen(function* () {
     const challenges = yield* store
     const entry = yield* challenges.get(nonce)
-    if (Option.isNone(entry)) {
-      return undefined
-    }
-    if (entry.value.expiresAt <= (yield* Clock.currentTimeMillis)) {
-      yield* challenges.remove(nonce)
-      return undefined
-    }
-    return entry.value.challenge
+    return Option.isNone(entry) ? undefined : entry.value.challenge
   })
 
-export const consume = (nonce: string) =>
+export const take = (nonce: string) =>
   Effect.gen(function* () {
     const challenges = yield* store
     const entry = yield* challenges.get(nonce)

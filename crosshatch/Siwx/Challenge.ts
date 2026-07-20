@@ -64,10 +64,7 @@ export const make = Effect.fnUntraced(
       schema: proofSchema,
     } satisfies typeof ChallengeSchema.Type
 
-    const inserted = yield* ChallengeStore.insert({ challenge, expiresAt: expirationTime ?? maxExpiresAt })
-    if (!inserted) {
-      return yield* new SiwxError({})
-    }
+    yield* ChallengeStore.issue({ challenge, expiresAt: expirationTime ?? maxExpiresAt })
     return challenge
   },
   Effect.catchTag("SchemaError", (cause) => new SiwxError({ cause })),

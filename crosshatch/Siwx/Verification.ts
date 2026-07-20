@@ -8,7 +8,7 @@ import type { Verifier } from "./Verifier.ts"
 export const verifyProof = <const Verifiers extends ReadonlyArray<Verifier.Any>>(...verifiers: Verifiers) =>
   Effect.fnUntraced(
     function* (proof: typeof Proof.Type, requestUrl: URL) {
-      const challenge = yield* ChallengeStore.get(proof.nonce)
+      const challenge = yield* ChallengeStore.peek(proof.nonce)
       if (challenge === undefined) {
         return yield* new SiwxError({})
       }
@@ -53,7 +53,7 @@ export const verifyProof = <const Verifiers extends ReadonlyArray<Verifier.Any>>
 
       const identity = yield* verifier.verify(proof).pipe(Effect.mapError((cause) => new SiwxError({ cause })))
 
-      yield* ChallengeStore.consume(proof.nonce).pipe(
+      yield* ChallengeStore.take(proof.nonce).pipe(
         Effect.filterOrFail(
           (s) => s,
           () => new SiwxError({}),
