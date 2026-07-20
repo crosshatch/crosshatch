@@ -5,8 +5,6 @@ import { SiwxError } from "./Error.ts"
 import { CHALLENGE_MAX_AGE_MS, Info, type Proof } from "./Schema.ts"
 import type { Verifier } from "./Verifier.ts"
 
-const infoEquivalence = S.toEquivalence(Info)
-
 export const verifyProof = <const Verifiers extends ReadonlyArray<Verifier.Any>>(...verifiers: Verifiers) =>
   Effect.fnUntraced(
     function* (proof: typeof Proof.Type, requestUrl: URL) {
@@ -15,7 +13,7 @@ export const verifyProof = <const Verifiers extends ReadonlyArray<Verifier.Any>>
         return yield* new SiwxError({})
       }
 
-      if (!infoEquivalence(proof, challenge.info)) {
+      if (!S.toEquivalence(Info)(proof, challenge.info)) {
         return yield* new SiwxError({})
       }
 
@@ -32,24 +30,24 @@ export const verifyProof = <const Verifiers extends ReadonlyArray<Verifier.Any>>
       )(challenge.info)
 
       const now = yield* DateTime.now
-      if (
-        !DateTime.between(issuedAt, {
-          minimum: DateTime.subtractDuration(now, CHALLENGE_MAX_AGE_MS),
-          maximum: now,
-        }) ||
-        (expirationTime !== undefined && DateTime.isLessThanOrEqualTo(expirationTime, now)) ||
-        (notBefore !== undefined && DateTime.isLessThan(now, notBefore))
-      ) {
+      const fresh = DateTime.between(issuedAt, {
+        minimum: DateTime.subtractDuration(now, CHALLENGE_MAX_AGE_MS),
+        maximum: now,
+      })
+      const unexpired = expirationTime === undefined || DateTime.isLessThan(now, expirationTime)
+      const started = notBefore === undefined || DateTime.isGreaterThanOrEqualTo(now, notBefore)
+      if (!fresh || !unexpired || !started) {
+        return yield* new SiwxError({})
+      }
+
+      if (!challenge.supportedChains.some((entry) => entry.chainId === proof.chainId && entry.type === proof.type)) {
         return yield* new SiwxError({})
       }
 
       const verifier = verifiers.find(
         (candidate) => candidate.type === proof.type && candidate.supportsChainId(proof.chainId),
       )
-      if (
-        verifier === undefined ||
-        !challenge.supportedChains.some((entry) => entry.chainId === proof.chainId && entry.type === proof.type)
-      ) {
+      if (verifier === undefined) {
         return yield* new SiwxError({})
       }
 

@@ -8,13 +8,14 @@ export interface StoredChallenge {
   readonly expiresAt: number
 }
 
-const StoredChallengeJson = S.Struct({
-  challenge: Challenge,
-  expiresAt: S.Finite,
-})
-
 const store = Effect.map(KeyValueStore.KeyValueStore, (kv) =>
-  KeyValueStore.toSchemaStore(KeyValueStore.prefix(kv, "siwx:challenge:"), StoredChallengeJson),
+  KeyValueStore.toSchemaStore(
+    KeyValueStore.prefix(kv, "siwx:challenge:"),
+    S.Struct({
+      challenge: Challenge,
+      expiresAt: S.Finite,
+    }),
+  ),
 )
 
 export const insert = (entry: StoredChallenge) =>
@@ -35,8 +36,7 @@ export const get = (nonce: string) =>
     if (Option.isNone(entry)) {
       return undefined
     }
-    const now = yield* Clock.currentTimeMillis
-    if (entry.value.expiresAt <= now) {
+    if (entry.value.expiresAt <= (yield* Clock.currentTimeMillis)) {
       yield* challenges.remove(nonce)
       return undefined
     }
@@ -50,7 +50,6 @@ export const consume = (nonce: string) =>
     if (Option.isNone(entry)) {
       return false
     }
-    const now = yield* Clock.currentTimeMillis
     yield* challenges.remove(nonce)
-    return entry.value.expiresAt > now
+    return entry.value.expiresAt > (yield* Clock.currentTimeMillis)
   })
