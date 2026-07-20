@@ -1,9 +1,9 @@
-import { Context, Effect, Option, pipe, Schema as S, type Types } from "effect"
-import { Headers, HttpRouter, HttpServerRequest, HttpServerResponse } from "effect/unstable/http"
+import { Context, Effect, Option, pipe, Schema as S } from "effect"
+import { Headers, HttpRouter, HttpServerRequest } from "effect/unstable/http"
 
 import { RequiredUrl } from "../Required.ts"
 import { SiwxError } from "./Error.ts"
-import { type AuthenticatedIdentity, Identity } from "./Identity.ts"
+import { Identity } from "./Identity.ts"
 import { ProofFromBase64JsonString, SIGN_IN_WITH_X } from "./Schema.ts"
 import * as Verification from "./Verification.ts"
 import type { Verifier } from "./Verifier.ts"
@@ -14,12 +14,10 @@ export const layerMiddleware = <const Verifiers extends ReadonlyArray<Verifier.A
 }: {
   readonly verifiers: Verifiers
   readonly origin: string
-}) => {
-  return HttpRouter.middleware<{
-    readonly provides: AuthenticatedIdentity
-  }>()(
+}) =>
+  HttpRouter.middleware()(
     Effect.gen(function* () {
-      return (effect: Effect.Effect<HttpServerResponse.HttpServerResponse, Types.unhandled, AuthenticatedIdentity>) =>
+      return (effect) =>
         Effect.gen(function* () {
           const request = yield* HttpServerRequest.HttpServerRequest
           const requestUrl = HttpServerRequest.toURL(request).pipe(
@@ -62,4 +60,3 @@ export const layerMiddleware = <const Verifiers extends ReadonlyArray<Verifier.A
     }),
     { global: true },
   )
-}

@@ -1,7 +1,7 @@
 import { Effect } from "effect"
 import { KeyValueStore } from "effect/unstable/persistence"
 
-import type { CaAccountId } from "../CaAccountId/CaAccountId.ts"
+import type { CaAccountId } from "../CaAccountId.ts"
 import * as Facilitator from "../Facilitator.ts"
 import type { Payload } from "../Payload.ts"
 import type { Id } from "./Entitlement.ts"
