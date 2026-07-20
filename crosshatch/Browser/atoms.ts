@@ -3,7 +3,7 @@ import { Atom } from "effect/unstable/reactivity"
 import * as Boundary from "liminal-util/Boundary"
 
 import * as Amount from "../Amount.ts"
-import { Stage } from "../Stage.ts"
+import { ChxEnv } from "../ChxEnv.ts"
 import * as BrowserPayer from "./BrowserPayer.ts"
 import { FacadeClient } from "./Facade/Facade.ts"
 import { ActivityWidget, IdWidget, LinkWidget } from "./Widgets.ts"
@@ -31,7 +31,7 @@ export const openAtom = runtime.fn<void>()(
   Effect.fnUntraced(function* (_, get) {
     const state = yield* get.result(stateAtom)
     const common = { referrer: location.href }
-    const { url } = yield* Stage
+    const { url } = yield* ChxEnv
     const internal = origin.startsWith(url("link"))
     const amount = yield* Amount.from(10)
     yield* Match.valueTags(state, {

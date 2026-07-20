@@ -1,6 +1,6 @@
 export * as Amount from "./Amount.ts"
 export * as Payer from "./Payer.ts"
-export * from "./Stage.ts"
+export * as ChxEnv from "./ChxEnv.ts"
 export * as Requirements from "./Requirements.ts"
 export * as ChainId from "./ChainId.ts"
 export * as Asset from "./Asset.ts"

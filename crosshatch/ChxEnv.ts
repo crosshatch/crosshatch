@@ -1,27 +1,17 @@
 import { Context, Config, Effect, Option, Schema as S } from "effect"
 
-export const StageName = S.Union([
+export type Stage = typeof Stage.Type
+export const Stage = S.Union([
   S.TemplateLiteral(["dev_", S.String]),
   S.TemplateLiteral(["staging-", S.Finite]),
   S.Literal("prod"),
 ])
 
-export interface Stage {
-  readonly name: typeof StageName.Type
+export class ChxEnv extends Context.Reference<{
+  readonly stage: Stage
   readonly domain: (sub?: string, pathname?: string) => string
   readonly url: (sub?: string, pathname?: string) => string
-}
-
-const make = (name: typeof StageName.Type) => {
-  const domain = (sub?: string, pathname?: string) =>
-    `${name.startsWith("staging-") ? `${name}.` : ""}${sub ? `${sub}.` : ""}crosshatch.dev${name.startsWith("dev_") ? ".localhost" : ""}${pathname ? `/${pathname}` : ""}`
-
-  const url = (sub?: string, pathname?: string) => `https://${domain(sub, pathname)}`
-
-  return { name, domain, url }
-}
-
-export const Stage = Context.Reference<Stage>("crosshatch/Stage", {
+}>("crosshatch/ChxEnv", {
   defaultValue: () =>
     Effect.gen(function* () {
       const raw =
@@ -34,7 +24,10 @@ export const Stage = Context.Reference<Stage>("crosshatch/Stage", {
             ConfigError: Effect.die,
           }),
         ))
-      const name = yield* S.decodeUnknownEffect(StageName)(raw).pipe(Effect.orElseSucceed(() => "prod" as const))
-      return make(name)
+      const stage = yield* S.decodeUnknownEffect(Stage)(raw).pipe(Effect.orElseSucceed(() => "prod" as const))
+      const domain = (sub?: string, pathname?: string) =>
+        `${stage.startsWith("staging-") ? `${stage}.` : ""}${sub ? `${sub}.` : ""}crosshatch.dev${stage.startsWith("dev_") ? ".localhost" : ""}${pathname ? `/${pathname}` : ""}`
+      const url = (sub?: string, pathname?: string) => `https://${domain(sub, pathname)}`
+      return { stage, domain, url }
     }).pipe(Effect.runSync),
-})
+}) {}

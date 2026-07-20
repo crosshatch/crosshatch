@@ -5,7 +5,7 @@ import { Data, Effect, pipe, Schema as S, SchemaGetter, Stream } from "effect"
 import { Url, UrlParams } from "effect/unstable/http"
 import * as Boundary from "liminal-util/Boundary"
 
-import { Stage } from "../Stage.ts"
+import { ChxEnv } from "../ChxEnv.ts"
 import { Allowance } from "./Allowance.ts"
 import { LinkChallengeId } from "./LinkChallengeId.ts"
 import { PrerequisitesUnmetError } from "./Prerequisite.ts"
@@ -44,7 +44,7 @@ const widget = <Payload extends S.Codec<any, any>, Item extends S.Codec<any, any
       S.encodeEffect(Payload),
       Effect.flatMap(
         Effect.fn(function* (x) {
-          const { url } = yield* Stage
+          const { url } = yield* ChxEnv
           const { href: src } = yield* Url.make(url("link", pathname), UrlParams.make([["x", x]]), undefined).pipe(
             Effect.fromResult,
           )

@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
   <style>
+    @font-face { font-family: "Manrope"; src: url("../../liminal/liminal-util/fonts/Manrope/Manrope-Light.ttf") format("truetype"); font-weight: 300; }
     @font-face { font-family: "Manrope"; src: url("../../liminal/liminal-util/fonts/Manrope/Manrope-Regular.ttf") format("truetype"); font-weight: 400; }
     @font-face { font-family: "Manrope"; src: url("../../liminal/liminal-util/fonts/Manrope/Manrope-SemiBold.ttf") format("truetype"); font-weight: 600; }
     @font-face { font-family: "Manrope"; src: url("../../liminal/liminal-util/fonts/Manrope/Manrope-Bold.ttf") format("truetype"); font-weight: 700; }
@@ -19,7 +20,7 @@
   <g filter="url(#shadow)"><rect x="38" y="38" width="1124" height="554" rx="22" fill="url(#panel)" stroke="#56d7ff" stroke-opacity="0.2"/></g>
   <text x="142" y="170" fill="#9ee7ff" font-family="Manrope, ui-sans-serif, system-ui, sans-serif" font-size="29" font-weight="700" letter-spacing="3.3">EFFECT-NATIVE X402</text>
   <text x="140" y="345" fill="#ffffff" fill-opacity="0.96" font-family="Manrope, ui-sans-serif, system-ui, sans-serif" font-size="112" font-weight="600" letter-spacing="-4">CROSSHATCH</text>
-  <text x="144" y="432" fill="#ffffff" fill-opacity="0.66" font-family="Manrope, ui-sans-serif, system-ui, sans-serif" font-size="38" font-weight="400" letter-spacing="-0.8">Build x402 clients and merchants with Effect</text>
+  <text x="144" y="432" fill="#ffffff" fill-opacity="0.66" font-family="Manrope, ui-sans-serif, system-ui, sans-serif" font-size="39" font-weight="300" letter-spacing="-0.8">Build x402 clients and merchants with Effect</text>
   <path d="M142 505H510" stroke="#56d7ff" stroke-opacity="0.3" stroke-width="1.5"/>
   <path d="M142 506H292" stroke="#9ee7ff" stroke-opacity="0.72" stroke-width="1.5"/>
 </svg>
