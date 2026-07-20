@@ -1,4 +1,4 @@
-import { Context, Data, Effect, Layer, type Types } from "effect"
+import { Context, Effect, Layer, type Types } from "effect"
 import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
 
 import type { Builder, CaAccountId } from "../CaAccountId/CaAccountId.ts"
@@ -8,15 +8,8 @@ import * as Facilitator from "../Facilitator.ts"
 import type { Payload } from "../Payload.ts"
 import type { Id } from "./Entitlement.ts"
 import { EntitlementStore, layerEntitlementMemory } from "./EntitlementStore.ts"
+import { SiwxError } from "./Error.ts"
 import { Identity } from "./Identity.ts"
-
-export class EntitlementRecordError extends Data.TaggedError("EntitlementRecordError")<{
-  readonly cause?: unknown
-}> {}
-
-export class UnsupportedNetworkError extends Data.TaggedError("UnsupportedNetworkError")<{
-  readonly network: string
-}> {}
 
 export class Builders extends Context.Reference<ReadonlyArray<Builder>>("crosshatch/Siwx/Builders", {
   defaultValue: () => [eip155Builder, solanaBuilder],
@@ -31,12 +24,12 @@ export const accountIdIfOwner = Effect.fnUntraced(function* (network: string, pa
   const builders = yield* Builders
   const builder = builders.find((candidate) => candidate.supports(network))
   if (builder === undefined) {
-    return yield* new UnsupportedNetworkError({ network })
+    return yield* new SiwxError({})
   }
 
   const accountId = yield* builder
     .accountId(network, payer)
-    .pipe(Effect.mapError((cause) => new EntitlementRecordError({ cause })))
+    .pipe(Effect.mapError((cause) => new SiwxError({ cause })))
 
   return identity.accountId === accountId ? identity.accountId : undefined
 })

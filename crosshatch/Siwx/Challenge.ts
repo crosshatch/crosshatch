@@ -1,7 +1,8 @@
-import { Array as A, Clock, Data, Effect, Encoding, pipe, Schema as S } from "effect"
+import { Array as A, Clock, Effect, Encoding, pipe, Schema as S } from "effect"
 
 import type { Required } from "../Required.ts"
 import { ChallengeStore } from "./ChallengeStore.ts"
+import { SiwxError } from "./Error.ts"
 import {
   Challenge as ChallengeSchema,
   CHALLENGE_MAX_AGE_MS,
@@ -10,16 +11,6 @@ import {
   SIGN_IN_WITH_X,
 } from "./Schema.ts"
 import type { Verifier } from "./Verifier.ts"
-
-export class ChallengeError extends Data.TaggedError("ChallengeError")<{ readonly cause?: unknown }> {}
-
-export class NoSupportedChainsError extends Data.TaggedError("NoSupportedChainsError")<{
-  readonly networks: ReadonlyArray<string>
-}> {}
-
-export class ChallengeExistsError extends Data.TaggedError("ChallengeExistsError")<{ readonly nonce: string }> {}
-
-export class NoResourceUrlError extends Data.TaggedError("NoResourceUrlError")<{}> {}
 
 const PositiveFiniteSeconds = S.Finite.check(S.isGreaterThan(0))
 
@@ -50,7 +41,7 @@ export const make = Effect.fnUntraced(
       ),
     )
     if (!A.isReadonlyArrayNonEmpty(supportedChains)) {
-      return yield* new NoSupportedChainsError({ networks })
+      return yield* new SiwxError({})
     }
 
     const now = yield* Clock.currentTimeMillis
@@ -77,11 +68,11 @@ export const make = Effect.fnUntraced(
       Effect.flatMap(({ insert }) => insert({ challenge, expiresAt: expirationTime ?? maxExpiresAt })),
     )
     if (!inserted) {
-      return yield* new ChallengeExistsError({ nonce: challenge.info.nonce })
+      return yield* new SiwxError({})
     }
     return challenge
   },
-  Effect.mapError((cause) => new ChallengeError({ cause })),
+  Effect.catchTag("SchemaError", (cause) => new SiwxError({ cause })),
 )
 
 export const extend =
@@ -95,7 +86,7 @@ export const extend =
     Effect.gen(function* () {
       const required = yield* effect
       const uri = yield* Effect.fromNullishOr(required.resource.url).pipe(
-        Effect.catchTag("NoSuchElementError", () => new NoResourceUrlError()),
+        Effect.catchTag("NoSuchElementError", () => new SiwxError({})),
       )
       const networks =
         options.networks ??
@@ -106,7 +97,7 @@ export const extend =
         )
       const challenge = yield* make({ ...options, uri, networks })
       const extension = yield* S.encodeEffect(ChallengeFromJson)(challenge).pipe(
-        Effect.mapError((cause) => new ChallengeError({ cause })),
+        Effect.mapError((cause) => new SiwxError({ cause })),
       )
       return {
         ...required,

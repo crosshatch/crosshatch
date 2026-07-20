@@ -3,6 +3,7 @@ import { Headers, HttpRouter, HttpServerRequest, HttpServerResponse } from "effe
 
 import { RequiredUrl } from "../Required.ts"
 import { ChallengeStore } from "./ChallengeStore.ts"
+import { SiwxError } from "./Error.ts"
 import { type AuthenticatedIdentity, Identity } from "./Identity.ts"
 import { ProofFromBase64JsonString, SIGN_IN_WITH_X } from "./Schema.ts"
 import * as Verification from "./Verification.ts"
@@ -32,14 +33,14 @@ export const layerMiddleware = <const Verifiers extends ReadonlyArray<Verifier.A
             Option.map(({ encodedProof, requestUrl }) =>
               Effect.gen(function* () {
                 const proof = yield* S.decodeUnknownEffect(ProofFromBase64JsonString)(encodedProof).pipe(
-                  Effect.mapError((cause) => new Verification.VerificationError({ cause })),
+                  Effect.mapError((cause) => new SiwxError({ cause })),
                 )
                 return yield* Verification.verifyProof(...verifiers)(proof, requestUrl)
               }),
             ),
             Effect.transposeOption,
             Effect.map(Option.getOrUndefined),
-            Effect.catchTag("VerificationError", (error) =>
+            Effect.catchTag("SiwxError", (error) =>
               Effect.logWarning("siwx.verification.rejected").pipe(
                 Effect.annotateLogs({ cause: error.cause }),
                 Effect.as(undefined),

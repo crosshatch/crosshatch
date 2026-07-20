@@ -1,12 +1,8 @@
-import { Clock, Context, Data, Effect, Layer, Schema as S } from "effect"
+import { Clock, Context, Effect, Layer, Schema as S } from "effect"
 import { KeyValueStore } from "effect/unstable/persistence"
 
+import { SiwxError } from "./Error.ts"
 import { Challenge } from "./Schema.ts"
-
-export class ChallengeStoreError extends Data.TaggedError("ChallengeStoreError")<{
-  readonly operation: "ChallengeStore.insert" | "ChallengeStore.get" | "ChallengeStore.consume"
-  readonly cause?: unknown
-}> {}
 
 export interface StoredChallenge {
   readonly challenge: typeof Challenge.Type
@@ -23,9 +19,9 @@ export const StoredChallengeFromJson = S.fromJsonString(S.toCodecJson(StoredChal
 export class ChallengeStore extends Context.Service<
   ChallengeStore,
   {
-    readonly insert: (entry: StoredChallenge) => Effect.Effect<boolean, ChallengeStoreError>
-    readonly get: (nonce: string) => Effect.Effect<typeof Challenge.Type | undefined, ChallengeStoreError>
-    readonly consume: (nonce: string) => Effect.Effect<boolean, ChallengeStoreError>
+    readonly insert: (entry: StoredChallenge) => Effect.Effect<boolean, SiwxError>
+    readonly get: (nonce: string) => Effect.Effect<typeof Challenge.Type | undefined, SiwxError>
+    readonly consume: (nonce: string) => Effect.Effect<boolean, SiwxError>
   }
 >()("crosshatch/Siwx/ChallengeStore") {}
 
@@ -46,7 +42,7 @@ export const layerChallengeKeyValueStore = (options?: { readonly prefix?: string
             }
             yield* store.set(k, yield* S.encodeEffect(StoredChallengeFromJson)(entry))
             return true
-          }).pipe(Effect.mapError((cause) => new ChallengeStoreError({ operation: "ChallengeStore.insert", cause }))),
+          }).pipe(Effect.mapError((cause) => new SiwxError({ cause }))),
 
         get: (nonce) =>
           Effect.gen(function* () {
@@ -61,7 +57,7 @@ export const layerChallengeKeyValueStore = (options?: { readonly prefix?: string
               return undefined
             }
             return entry.challenge
-          }).pipe(Effect.mapError((cause) => new ChallengeStoreError({ operation: "ChallengeStore.get", cause }))),
+          }).pipe(Effect.mapError((cause) => new SiwxError({ cause }))),
 
         consume: (nonce) =>
           Effect.gen(function* () {
@@ -74,7 +70,7 @@ export const layerChallengeKeyValueStore = (options?: { readonly prefix?: string
             const now = yield* Clock.currentTimeMillis
             yield* store.remove(k)
             return entry.expiresAt > now
-          }).pipe(Effect.mapError((cause) => new ChallengeStoreError({ operation: "ChallengeStore.consume", cause }))),
+          }).pipe(Effect.mapError((cause) => new SiwxError({ cause }))),
       }
     }),
   )

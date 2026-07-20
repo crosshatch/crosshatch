@@ -1,4 +1,4 @@
-import { Context, Data, Effect, Layer, Option, Schema as S } from "effect"
+import { Context, Effect, Layer, Option, Schema as S } from "effect"
 import { Base58 } from "ox"
 
 import { Address } from "../Address.ts"
@@ -8,13 +8,10 @@ import { CryptoKey, Ed25519Pair, Ed25519PublicKey } from "../Crypto/Crypto.ts"
 import * as Mnemonic from "../Mnemonic.ts"
 import { SOLANA_DERIVATION_PATH } from "../Solana/_common.ts"
 import * as SolanaAddress from "../Solana/SolanaAddress.ts"
+import { SiwxError } from "./Error.ts"
 import type { AuthenticatedIdentity } from "./Identity.ts"
 import { Proof } from "./Schema.ts"
 import { makeScheme } from "./Scheme.ts"
-
-export class SiwsError extends Data.TaggedError("SiwsError")<{ readonly cause?: unknown }> {}
-
-export class SiwsInvalidSignatureError extends Data.TaggedError("SiwsInvalidSignatureError")<{}> {}
 
 export class SolanaMessageSigner extends Context.Service<
   SolanaMessageSigner,
@@ -104,7 +101,7 @@ const createSigningMessage = Effect.fnUntraced(
         : ["Resources:", ...unsigned.resources.map((resource) => `- ${resource}`)]),
     ].join("\n")
   },
-  Effect.mapError((cause) => new SiwsError({ cause })),
+  Effect.mapError((cause) => new SiwxError({ cause })),
 )
 
 export const layerMnemonic = Layer.effect(
@@ -131,10 +128,10 @@ export const { prover, verifier } = makeScheme({
     const message = yield* createSigningMessage({ ...info, address: signer.address, chainId, type: "ed25519" as const })
     const signature = yield* Effect.tryPromise({
       try: () => signer.signMessage(textEncoder.encode(message)),
-      catch: (cause) => new SiwsError({ cause }),
+      catch: (cause) => new SiwxError({ cause }),
     })
     if (signature.byteLength !== 64) {
-      return yield* new SiwsInvalidSignatureError()
+      return yield* new SiwxError({})
     }
     return { address: signer.address, signature: Base58.fromBytes(signature) }
   }),
@@ -144,7 +141,7 @@ export const { prover, verifier } = makeScheme({
     const publicKey = yield* Ed25519PublicKey.fromBytes(Base58.toBytes(proof.address))
     const verified = yield* Ed25519PublicKey.verify(publicKey, Base58.toBytes(signature), textEncoder.encode(message))
     if (!verified) {
-      return yield* new SiwsInvalidSignatureError()
+      return yield* new SiwxError({})
     }
     const accountId = yield* solanaAccount.accountId(proof.chainId, proof.address)
     const chainId = yield* S.decodeUnknownEffect(ChainId)(proof.chainId)

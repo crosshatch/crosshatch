@@ -1,13 +1,9 @@
-import { Context, Data, Effect, Layer } from "effect"
+import { Context, Effect, Layer } from "effect"
 import { KeyValueStore } from "effect/unstable/persistence"
 
 import type { CaAccountId } from "../CaAccountId.ts"
 import type { Id } from "./Entitlement.ts"
-
-export class EntitlementStoreError extends Data.TaggedError("EntitlementStoreError")<{
-  readonly operation: "EntitlementStore.has" | "EntitlementStore.record"
-  readonly cause?: unknown
-}> {}
+import { SiwxError } from "./Error.ts"
 
 export interface EntitlementRecord {
   readonly id: typeof Id.Type
@@ -17,8 +13,8 @@ export interface EntitlementRecord {
 export class EntitlementStore extends Context.Service<
   EntitlementStore,
   {
-    readonly has: (entitlement: EntitlementRecord) => Effect.Effect<boolean, EntitlementStoreError>
-    readonly record: (entitlement: EntitlementRecord) => Effect.Effect<void, EntitlementStoreError>
+    readonly has: (entitlement: EntitlementRecord) => Effect.Effect<boolean, SiwxError>
+    readonly record: (entitlement: EntitlementRecord) => Effect.Effect<void, SiwxError>
   }
 >()("crosshatch/Siwx/EntitlementStore") {}
 
@@ -31,16 +27,9 @@ export const layerEntitlementKeyValueStore = (options?: { readonly prefix?: stri
       const key = ({ id, accountId }: EntitlementRecord) => `${prefix}${JSON.stringify([id, accountId])}`
 
       return {
-        has: (entitlement) =>
-          store
-            .has(key(entitlement))
-            .pipe(Effect.mapError((cause) => new EntitlementStoreError({ operation: "EntitlementStore.has", cause }))),
+        has: (entitlement) => store.has(key(entitlement)).pipe(Effect.mapError((cause) => new SiwxError({ cause }))),
         record: (entitlement) =>
-          store
-            .set(key(entitlement), "1")
-            .pipe(
-              Effect.mapError((cause) => new EntitlementStoreError({ operation: "EntitlementStore.record", cause })),
-            ),
+          store.set(key(entitlement), "1").pipe(Effect.mapError((cause) => new SiwxError({ cause }))),
       }
     }),
   )
