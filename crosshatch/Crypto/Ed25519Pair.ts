@@ -1,7 +1,9 @@
 import { Effect, Schema as S, Context } from "effect"
 
+import * as Mnemonic from "../Mnemonic.ts"
 import * as Ed25519PrivateKey from "./Ed25519PrivateKey.ts"
 import * as Ed25519PublicKey from "./Ed25519PublicKey.ts"
+import * as Slip10 from "./Slip10.ts"
 
 const TypeId = "crosshatch/Ed25519Pair" as const
 
@@ -49,3 +51,8 @@ export const fromSeed = (bytes: Uint8Array) =>
     ),
     privateKey: Ed25519PrivateKey.fromSeed(bytes),
   }).pipe(Effect.map((v) => Ed25519Pair.make(v, { disableChecks: true })))
+
+export const fromMnemonic = (mnemonic: Mnemonic.Mnemonic, path: ReadonlyArray<number>) =>
+  Slip10.derive(Mnemonic.toSeed(mnemonic), path).pipe(
+    Effect.flatMap(({ privateKeySeed }) => fromSeed(privateKeySeed)),
+  )

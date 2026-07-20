@@ -10,6 +10,7 @@
     "alchemy": "catalog:",
     "crosshatch": "workspace:*",
     "effect": "catalog:",
+    "viem": "catalog:",
     "vitest": "catalog:"
   }
 }

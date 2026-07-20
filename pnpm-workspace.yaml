@@ -6,6 +6,7 @@ packages:
   - examples/*/*
   - scratchpad
   - "!konfik"
+  - "!liminal"
 
 catalog:
   "@changesets/changelog-github": ^0.7.0
@@ -32,6 +33,7 @@ catalog:
   "@playwright/test": ^1.58.2
   "@scure/bip39": ^2.2.0
   "@standard-schema/spec": ^1.1.0
+  "@signinwithethereum/siwe": ^4.2.0
   "@solana-program/memo": ^0.11.2
   "@solana-program/compute-budget": ^0.16.0
   "@solana-program/token": ^0.14.0
@@ -154,6 +156,7 @@ minimumReleaseAgeExclude:
   - "@effect/tsgo-win32-arm64@0.24.2"
   - "@effect/tsgo-win32-x64@0.24.2"
   - "@effect/tsgo@0.24.2"
+  - '@x402/core@2.19.0'
 
 allowBuilds:
   bigint-buffer: false

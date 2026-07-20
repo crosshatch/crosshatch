@@ -31,6 +31,13 @@ export const eip155 = {
     version: "2",
     schemes: [Erc3009Scheme.Erc3009Scheme, Permit2Scheme.Permit2Scheme],
   },
+  84532: {
+    asset: Eip155Asset.Eip155Asset.make("0x036CbD53842c5426634e7929541eC2318f3dCF7e"),
+    decimals: 6,
+    name: "USDC",
+    version: "2",
+    schemes: [Erc3009Scheme.Erc3009Scheme, Permit2Scheme.Permit2Scheme],
+  },
   42161: {
     asset: Eip155Asset.Eip155Asset.make("0xaf88d065e77c8cC2239327C5EDb3A432268e5831", { disableChecks: true }),
     decimals: 6,

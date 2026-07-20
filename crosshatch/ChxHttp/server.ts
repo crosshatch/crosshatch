@@ -12,6 +12,7 @@ export const require = Effect.fnUntraced(function* ({ required }: { readonly req
   const traceId = yield* TraceId
   const paymentRequired = yield* S.encodeEffect(RequiredFromBase64JsonString)(required)
   return HttpServerResponse.empty({
+    status: 402,
     headers: {
       [PAYMENT_REQUIRED]: paymentRequired,
       ...(traceId && { [CROSSHATCH_TRACE_ID]: traceId }),
@@ -28,7 +29,8 @@ export const layerMiddleware = <X extends ReadonlyArray<Extension.Extension.Any>
   HttpRouter.middleware<{ readonly provides: Payload | InstanceType<X[number]> }>()(
     (effect) =>
       Effect.gen(function* () {
-        const { headers } = yield* HttpServerRequest.HttpServerRequest
+        const request = yield* HttpServerRequest.HttpServerRequest
+        const { headers } = request
         const payload = Headers.get(PAYMENT_SIGNATURE)(headers).pipe(
           Option.flatMap(S.decodeUnknownOption(PayloadFromBase64JsonString)),
           Option.getOrUndefined,
