@@ -12,7 +12,6 @@ export const require = Effect.fnUntraced(function* ({ required }: { readonly req
   const traceId = yield* TraceId
   const paymentRequired = yield* S.encodeEffect(RequiredFromBase64JsonString)(required)
   return HttpServerResponse.empty({
-    status: 402,
     headers: {
       [PAYMENT_REQUIRED]: paymentRequired,
       ...(traceId && { [CROSSHATCH_TRACE_ID]: traceId }),
