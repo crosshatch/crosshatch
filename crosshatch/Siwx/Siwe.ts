@@ -1,6 +1,6 @@
 import { SiweMessage } from "@signinwithethereum/siwe"
 import { Effect, Option, Schema as S } from "effect"
-import { type PublicClient } from "viem"
+import { type PublicClient, verifyMessage, type VerifyMessageParameters } from "viem"
 
 import { Address } from "../Address.ts"
 import { CaAccountId } from "../CaAccountId.ts"
@@ -57,26 +57,16 @@ export const prover = {
   }),
 } satisfies Prover.Prover<Eip155Signer>
 
-export const makeVerifier = (
-  clients: Readonly<Record<string, Pick<PublicClient, "verifyMessage">>>,
-): Verifier.Verifier => ({
-  type: "eip191",
-  scheme: "eip191",
-  supportsChainId,
-  verify: Effect.fnUntraced(
+const verifyWith = (check: (input: VerifyMessageParameters) => Promise<boolean>) =>
+  Effect.fnUntraced(
     function* (proof: typeof Proof.Type) {
-      const client = clients[proof.chainId]
-      if (client === undefined) {
-        return yield* new ProofRejected({ reason: "unsupported-chain" })
-      }
-
       const message = yield* createSigningMessage(proof)
       const { address, signature } = yield* S.decodeUnknownEffect(
         S.Struct({ address: Eip155Address, signature: S.TemplateLiteral([S.Literal("0x"), S.String]) }),
       )(proof)
 
       const valid = yield* Effect.tryPromise({
-        try: () => client.verifyMessage({ address, message, signature }),
+        try: () => check({ address, message, signature }),
         catch: (cause) => new ProofRejected({ reason: "invalid-signature", cause }),
       })
       if (!valid) {
@@ -90,5 +80,26 @@ export const makeVerifier = (
     Effect.catchTags({
       SchemaError: (cause) => new ProofRejected({ reason: "malformed-proof", cause }),
     }),
-  ),
+  )
+
+export const verifier = {
+  type: "eip191",
+  scheme: "eip191",
+  supportsChainId,
+  verify: verifyWith(verifyMessage),
+} satisfies Verifier.Verifier
+
+export const makeClientVerifier = (
+  clients: Readonly<Record<string, Pick<PublicClient, "verifyMessage">>>,
+): Verifier.Verifier => ({
+  type: "eip191",
+  scheme: "eip191",
+  supportsChainId,
+  verify: Effect.fnUntraced(function* (proof: typeof Proof.Type) {
+    const client = clients[proof.chainId]
+    if (client === undefined) {
+      return yield* new ProofRejected({ reason: "unsupported-chain" })
+    }
+    return yield* verifyWith(client.verifyMessage)(proof)
+  }),
 })

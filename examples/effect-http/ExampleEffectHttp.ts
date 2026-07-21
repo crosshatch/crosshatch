@@ -6,11 +6,8 @@ import * as Siwx from "crosshatch/Siwx"
 import { Config, Effect, Layer, Schema as S } from "effect"
 import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
 import { KeyValueStore } from "effect/unstable/persistence"
-import { createPublicClient, http } from "viem"
-import { base } from "viem/chains"
 
-const baseClient = createPublicClient({ chain: base, transport: http() })
-const verifiers = [Siwx.Siwe.makeVerifier({ "eip155:8453": baseClient }), Siwx.Siws.verifier] as const
+const verifiers = [Siwx.Siwe.verifier, Siwx.Siws.verifier] as const
 const paidResource = Siwx.Entitlement.Id.make("paid-resource")
 
 export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHttp>()(
