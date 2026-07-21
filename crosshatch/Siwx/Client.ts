@@ -1,19 +1,14 @@
-import { Array as A, Data, Effect, Option, Schema as S } from "effect"
+import { Array as A, Effect, Option, Schema as S } from "effect"
 
 import { Accept } from "../Accept.ts"
 import { ChainId } from "../ChainId.ts"
-import type { Resolver } from "../ChxHttp/Resolver.ts"
-import type { SignError } from "./Error.ts"
+import { ResolverError, type Resolver } from "../ChxHttp/Resolver.ts"
 import type { Prover } from "./Prover.ts"
 import { ChallengeFromJson, ProofFromBase64JsonString, SIGN_IN_WITH_X } from "./Schema.ts"
 
-class ResolverError extends Data.TaggedError("ResolverError")<{
-  readonly cause?: unknown
-}> {}
-
 export const resolver = <const Provers extends ReadonlyArray<Prover.Any>>(
   ...provers: Provers
-): Resolver<ResolverError | SignError, Prover.Context<Provers[number]>> =>
+): Resolver<Prover.Context<Provers[number]>> =>
   Effect.fnUntraced(
     function* ({ request, required }) {
       const challengeJson = required.extensions?.[SIGN_IN_WITH_X]

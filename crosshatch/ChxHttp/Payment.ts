@@ -1,13 +1,11 @@
 import { Effect, Schema as S } from "effect"
 
-import type { AcceptError } from "../Accept.ts"
 import { Payer } from "../Payer.ts"
 import { PayloadFromBase64JsonString } from "../Payload.ts"
-import type { CreatePayloadError } from "../Scheme.ts"
 import { PAYMENT_SIGNATURE } from "./constants.ts"
-import type { Resolver } from "./Resolver.ts"
+import { ResolverError, type Resolver } from "./Resolver.ts"
 
-export const resolver: Resolver<AcceptError | CreatePayloadError | S.SchemaError, Payer> = Effect.fnUntraced(
+export const resolver: Resolver<Payer> = Effect.fnUntraced(
   function* ({ request, required, traceId }) {
     if (request.headers[PAYMENT_SIGNATURE] !== undefined) {
       return
@@ -20,4 +18,5 @@ export const resolver: Resolver<AcceptError | CreatePayloadError | S.SchemaError
       },
     }
   },
+  Effect.mapError((cause) => new ResolverError({ cause })),
 )
