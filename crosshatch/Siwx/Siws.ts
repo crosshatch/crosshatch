@@ -1,4 +1,4 @@
-import { createSignableMessage } from "@solana/kit"
+import { createSignableMessage, type SignatureBytes } from "@solana/kit"
 import { Effect, Option, Schema as S } from "effect"
 import { Base58 } from "ox"
 
@@ -98,16 +98,18 @@ export const prover = {
   sign: Effect.fnUntraced(function* (info, chainId) {
     const signer = yield* SolanaSigner
     const address = SolanaAddress.SolanaAddress.make(signer.address)
-    const message = yield* createSigningMessage({ ...info, address, chainId, type: "ed25519" })
-    const [signatures] = yield* Effect.tryPromise({
-      try: () => signer.signMessages([createSignableMessage(new TextEncoder().encode(message))]),
-      catch: (cause) => new SignError({ cause }),
-    })
-    const signature = signatures?.[signer.address]
-    if (signature === undefined || signature.byteLength !== 64) {
-      return yield* Effect.die("siws: signer did not return a 64-byte signature")
-    }
-    return { address, signature: Base58.fromBytes(signature) }
+    const signature = yield* createSigningMessage({ ...info, address, chainId, type: "ed25519" }).pipe(
+      Effect.flatMap((message) =>
+        Effect.tryPromise(() => signer.signMessages([createSignableMessage(new TextEncoder().encode(message))])),
+      ),
+      Effect.map(([signatures]) => signatures?.[signer.address]),
+      Effect.filterOrFail(
+        (signature): signature is SignatureBytes => signature !== undefined && signature.byteLength === 64,
+      ),
+      Effect.map(Base58.fromBytes),
+      Effect.mapError((cause) => new SignError({ cause })),
+    )
+    return { address, signature }
   }),
 } satisfies Prover.Prover<SolanaSigner>
 

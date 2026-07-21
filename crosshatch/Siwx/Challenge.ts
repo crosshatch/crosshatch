@@ -13,7 +13,7 @@ import type { Verifier } from "./Verifier.ts"
 
 const PositiveFiniteSeconds = S.Finite.check(S.isGreaterThan(0))
 
-export const make = Effect.fnUntraced(function* ({
+export const issue = Effect.fnUntraced(function* ({
   uri,
   networks,
   verifiers,
@@ -49,7 +49,7 @@ export const make = Effect.fnUntraced(function* ({
 
   const schema = yield* S.decodeUnknownEffect(S.Record(S.String, S.Json))(S.toJsonSchemaDocument(Proof).schema)
 
-  return yield* Effect.succeed({
+  const challenge = {
     info: {
       domain: url.host,
       uri: url.href,
@@ -62,9 +62,11 @@ export const make = Effect.fnUntraced(function* ({
     },
     supportedChains,
     schema,
-  } satisfies typeof ChallengeSchema.Type).pipe(
-    Effect.tap((challenge) => ChallengeStore.issue({ challenge, expiresAt: expirationTime ?? maxExpiresAt })),
-  )
+  } satisfies typeof ChallengeSchema.Type
+
+  yield* ChallengeStore.issue({ challenge, expiresAt: expirationTime ?? maxExpiresAt })
+
+  return challenge
 })
 
 export const extend =
@@ -74,12 +76,10 @@ export const extend =
     readonly expirationSeconds?: number | undefined
     readonly networks?: ReadonlyArray<string> | undefined
   }) =>
-  <E, R>(effect: Effect.Effect<Required, E, R>) =>
+  (effect: Effect.Effect<Required, unknown, unknown>) =>
     Effect.gen(function* () {
       const { extensions, ...required } = yield* effect
-      const uri = yield* Effect.fromNullishOr(required.resource.url).pipe(
-        Effect.catchTag("NoSuchElementError", Effect.die),
-      )
+      const uri = yield* Effect.fromNullishOr(required.resource.url).pipe(Effect.orDie)
 
       const networks =
         options.networks ??
@@ -89,9 +89,8 @@ export const extend =
           A.dedupe,
         )
 
-      return yield* make({ ...options, uri, networks }).pipe(
+      return yield* issue({ ...options, uri, networks }).pipe(
         Effect.flatMap(S.encodeEffect(ChallengeFromJson)),
-        Effect.catchTag("SchemaError", (cause) => Effect.die(cause)),
         Effect.map((extension) => ({
           ...required,
           extensions: { ...extensions, [SIGN_IN_WITH_X]: extension },
