@@ -13,8 +13,6 @@ import * as Prover from "./Prover.ts"
 import { Proof } from "./Schema.ts"
 import type * as Verifier from "./Verifier.ts"
 
-const Signature = S.TemplateLiteral([S.Literal("0x"), S.String]).check(S.isPattern(/^0x[a-fA-F0-9]+$/u))
-
 const createSigningMessage = (unsigned: Omit<typeof Proof.Type, "signature" | "signatureScheme">) =>
   S.decodeUnknownEffect(eip155ChainId)(unsigned.chainId).pipe(
     Effect.map(([, chainId]) =>
@@ -33,7 +31,7 @@ const createSigningMessage = (unsigned: Omit<typeof Proof.Type, "signature" | "s
         ...(unsigned.resources !== undefined && { resources: [...unsigned.resources] }),
       }).prepareMessage(),
     ),
-    Effect.mapError((cause) => new ProofRejected({ cause, reason: "malformed-proof" })),
+    Effect.catchTag("SchemaError", (cause) => new ProofRejected({ cause, reason: "malformed-proof" })),
   )
 
 class Eip155Verify extends Context.Service<
@@ -83,7 +81,7 @@ export const verifier = {
     function* (proof: typeof Proof.Type) {
       const message = yield* createSigningMessage(proof)
       const { address, signature } = yield* S.decodeUnknownEffect(
-        S.Struct({ address: Eip155Address, signature: Signature }),
+        S.Struct({ address: Eip155Address, signature: S.TemplateLiteral([S.Literal("0x"), S.String]) }),
       )(proof)
 
       yield* Eip155Verify.pipe(

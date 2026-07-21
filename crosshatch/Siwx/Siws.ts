@@ -77,6 +77,7 @@ const createSigningMessage = (input: Omit<typeof Proof.Type, "signature" | "sign
       }
       return lines.join("\n")
     }),
+    Effect.catchTag("SchemaError", (cause) => new ProofRejected({ cause, reason: "malformed-proof" })),
   )
 
 export const prover = Prover.make({
@@ -99,7 +100,7 @@ export const prover = Prover.make({
       return { address, signature: Base58.fromBytes(signature) }
     },
     Effect.catchTags({
-      SchemaError: (cause) => new SignError({ cause }),
+      ProofRejected: (cause) => new SignError({ cause }),
     }),
   ),
 })
