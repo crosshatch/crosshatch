@@ -71,8 +71,8 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
           Effect.map((settlement) =>
             HttpServerResponse.text("Premium content unlocked.").pipe(ChxHttp.addResponseHeader(settlement)),
           ),
-          Effect.catchTag("PurchaseError", (error) =>
-            Effect.succeed(HttpServerResponse.text(`Purchase failed: ${error.reason}`, { status: 403 })),
+          Effect.catchTag("PurchaseError", ({ reason }) =>
+            Effect.succeed(HttpServerResponse.text(`Purchase failed: ${reason}`, { status: 403 })),
           ),
         )
       }),

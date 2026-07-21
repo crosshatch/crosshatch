@@ -16,10 +16,12 @@ export const resolver = <const Provers extends ReadonlyArray<Prover.Any>>(
         return
       }
 
-      const requestUrl = yield* S.decodeUnknownEffect(S.URLFromString)(request.url)
+      const { requestUrl, challenge } = yield* S.decodeEffect(
+        S.Struct({ requestUrl: S.URLFromString, challenge: ChallengeFromJson }),
+      )({ requestUrl: request.url, challenge: challengeJson })
 
-      const challenge = yield* S.decodeUnknownEffect(ChallengeFromJson)(challengeJson)
       const challengeUri = URL.parse(challenge.info.uri)
+
       if (challenge.info.domain !== requestUrl.host || challengeUri?.href !== requestUrl.href) {
         return
       }
@@ -28,10 +30,10 @@ export const resolver = <const Provers extends ReadonlyArray<Prover.Any>>(
         pipe(
           A.findFirst(
             provers,
-            (prover) =>
-              prover.type === entry.type &&
-              (entry.signatureScheme === undefined || entry.signatureScheme === prover.scheme) &&
-              prover.supportsChainId(entry.chainId),
+            ({ type, scheme, supportsChainId }) =>
+              type === entry.type &&
+              (entry.signatureScheme === undefined || entry.signatureScheme === scheme) &&
+              supportsChainId(entry.chainId),
           ),
           Option.map((prover) => ({ entry, prover })),
           A.fromOption,
