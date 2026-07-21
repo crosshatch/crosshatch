@@ -41,5 +41,3 @@ export const CHALLENGE_MAX_AGE_MS = 300_000
 export const ProofFromBase64JsonString = S.StringFromBase64.pipe(S.decodeTo(S.fromJsonString(S.toCodecJson(Proof))))
 
 export const ChallengeFromJson = S.toCodecJson(Challenge)
-
-export const proofSchema = S.decodeUnknownSync(S.Record(S.String, S.Json))(S.toJsonSchemaDocument(Proof).schema)

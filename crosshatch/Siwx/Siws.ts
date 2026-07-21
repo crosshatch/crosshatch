@@ -8,7 +8,7 @@ import { ChainId } from "../ChainId.ts"
 import { Ed25519PublicKey } from "../Crypto/Crypto.ts"
 import * as SolanaAddress from "../Solana/SolanaAddress.ts"
 import { SolanaSigner } from "../Solana/SolanaSigner.ts"
-import { SiwxError } from "./Error.ts"
+import { ProofRejected, SignError } from "./Error.ts"
 import type { AuthenticatedIdentity } from "./Identity.ts"
 import { Proof } from "./Schema.ts"
 import { makeScheme } from "./Scheme.ts"
@@ -76,55 +76,62 @@ const createSigningMessage = (input: Omit<typeof Proof.Type, "signature" | "sign
       }
       return lines.join("\n")
     }),
-    Effect.catchTag("SchemaError", (cause) => new SiwxError({ cause })),
   )
 
 export const { prover, verifier } = makeScheme({
   type: "ed25519",
   scheme: "siws",
   supportsChainId: (value) => solanaAccount.supports(value),
-  sign: Effect.fnUntraced(function* (info, chainId) {
-    const signer = yield* SolanaSigner
-    const address = SolanaAddress.SolanaAddress.make(signer.address)
-    const message = yield* createSigningMessage({ ...info, address, chainId, type: "ed25519" })
-    const [signatures] = yield* Effect.tryPromise({
-      try: () => signer.signMessages([createSignableMessage(new TextEncoder().encode(message))]),
-      catch: (cause) => new SiwxError({ cause }),
-    })
-    const signature = signatures?.[signer.address]
-    if (signature === undefined || signature.byteLength !== 64) {
-      return yield* new SiwxError({})
-    }
-    return { address, signature: Base58.fromBytes(signature) }
-  }),
-  verify: Effect.fnUntraced(function* (proof) {
-    const message = yield* createSigningMessage(proof)
-    const signature = yield* S.decodeUnknownEffect(
-      S.String.check(
-        S.isPattern(/^[1-9A-HJ-NP-Za-km-z]+$/u),
-        S.makeFilter((value) =>
-          Base58.toBytes(value).byteLength === 64 ? undefined : "Expected a 64-byte Base58 Ed25519 signature",
+  sign: Effect.fnUntraced(
+    function* (info, chainId) {
+      const signer = yield* SolanaSigner
+      const address = SolanaAddress.SolanaAddress.make(signer.address)
+      const message = yield* createSigningMessage({ ...info, address, chainId, type: "ed25519" })
+      const [signatures] = yield* Effect.tryPromise({
+        try: () => signer.signMessages([createSignableMessage(new TextEncoder().encode(message))]),
+        catch: (cause) => new SignError({ cause }),
+      })
+      const signature = signatures?.[signer.address]
+      if (signature === undefined || signature.byteLength !== 64) {
+        return yield* Effect.die("siws: signer did not return a 64-byte signature")
+      }
+      return { address, signature: Base58.fromBytes(signature) }
+    },
+    Effect.catchTags({
+      SchemaError: (cause) => new SignError({ cause }),
+    }),
+  ),
+  verify: Effect.fnUntraced(
+    function* (proof) {
+      const message = yield* createSigningMessage(proof)
+      const signature = yield* S.decodeUnknownEffect(
+        S.String.check(
+          S.isPattern(/^[1-9A-HJ-NP-Za-km-z]+$/u),
+          S.makeFilter((value) =>
+            Base58.toBytes(value).byteLength === 64 ? undefined : "Expected a 64-byte Base58 Ed25519 signature",
+          ),
         ),
-      ),
-    )(proof.signature)
+      )(proof.signature)
 
-    const publicKey = yield* Ed25519PublicKey.fromBytes(Base58.toBytes(proof.address))
-    const verified = yield* Ed25519PublicKey.verify(
-      publicKey,
-      Base58.toBytes(signature),
-      new TextEncoder().encode(message),
-    )
-    if (!verified) {
-      return yield* new SiwxError({})
-    }
+      const publicKey = yield* Ed25519PublicKey.fromBytes(Base58.toBytes(proof.address))
+      const verified = yield* Ed25519PublicKey.verify(
+        publicKey,
+        Base58.toBytes(signature),
+        new TextEncoder().encode(message),
+      )
+      if (!verified) {
+        return yield* new ProofRejected({ reason: "invalid-signature" })
+      }
 
-    const accountId = yield* solanaAccount.accountId(proof.chainId, proof.address)
-    const chainId = yield* S.decodeUnknownEffect(ChainId)(proof.chainId)
+      const accountId = yield* solanaAccount.accountId(proof.chainId, proof.address)
+      const chainId = yield* S.decodeUnknownEffect(ChainId)(proof.chainId)
 
-    return {
-      accountId,
-      address: Address.make(proof.address),
-      chainId,
-    } satisfies AuthenticatedIdentity
-  }),
+      return {
+        accountId,
+        address: Address.make(proof.address),
+        chainId,
+      } satisfies AuthenticatedIdentity
+    },
+    Effect.catchTag("SchemaError", (cause) => new ProofRejected({ reason: "malformed-proof", cause })),
+  ),
 })

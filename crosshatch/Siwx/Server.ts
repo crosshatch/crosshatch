@@ -30,8 +30,8 @@ export const layerMiddleware = <const Verifiers extends ReadonlyArray<Verifier.A
             ),
             Effect.transposeOption,
             Effect.map(Option.getOrUndefined),
-            Effect.catchTag("SiwxError", () => Effect.succeed(undefined)),
           )
+
           return yield* effect.pipe(
             Effect.provideService(Identity, identity),
             Effect.provideService(
