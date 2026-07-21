@@ -1,4 +1,4 @@
-import { getAddressFromPublicKey, isAddress } from "@solana/addresses"
+import { getAddressFromPublicKey } from "@solana/addresses"
 import { Effect, Schema as S } from "effect"
 
 import * as Address from "../Address.ts"
@@ -6,10 +6,7 @@ import { Ed25519Pair } from "../Crypto/Crypto.ts"
 import type * as Mnemonic from "../Mnemonic.ts"
 import { brand, SOLANA_DERIVATION_PATH } from "./_common.ts"
 
-export const SolanaAddress = S.String.check(
-  S.isPattern(/^[1-9A-HJ-NP-Za-km-z]{32,44}$/u),
-  S.makeFilter((value) => (isAddress(value) ? undefined : "Expected a 32-byte Base58 Solana address")),
-).pipe(Address.brand, brand)
+export const SolanaAddress = S.String.check(S.isPattern(/^[1-9A-HJ-NP-Za-km-z]{32,44}$/u)).pipe(Address.brand, brand)
 
 export const fromPublicKey = (publicKey: CryptoKey) =>
   Effect.promise(() => getAddressFromPublicKey(publicKey)).pipe(
