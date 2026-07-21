@@ -1,6 +1,10 @@
-import type { Effect } from "effect"
+import { Data, type Effect } from "effect"
 
 import type { Info } from "./Schema.ts"
+
+export class SignError extends Data.TaggedError("SignError")<{
+  readonly cause?: unknown
+}> {}
 
 export interface Prover<R = never> {
   readonly type: string
@@ -9,7 +13,7 @@ export interface Prover<R = never> {
   readonly sign: (
     info: typeof Info.Type,
     chainId: string,
-  ) => Effect.Effect<{ readonly address: string; readonly signature: string }, unknown, R>
+  ) => Effect.Effect<{ readonly address: string; readonly signature: string }, SignError, R>
 }
 
 export declare namespace Prover {

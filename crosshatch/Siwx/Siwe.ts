@@ -7,10 +7,9 @@ import { CaAccountId } from "../CaAccountId.ts"
 import { ChainId } from "../ChainId.ts"
 import { Eip155Address } from "../Eip155/Eip155Address.ts"
 import { Eip155Signer } from "../Eip155/Eip155Signer.ts"
-import { ProofRejected, SignError } from "./Error.ts"
 import * as Prover from "./Prover.ts"
 import { Proof } from "./Schema.ts"
-import type * as Verifier from "./Verifier.ts"
+import * as Verifier from "./Verifier.ts"
 
 const reference = S.String.check(S.isPattern(/^\d+$/u)).pipe(
   S.decodeTo(S.FiniteFromString),
@@ -39,7 +38,7 @@ const createSigningMessage = (unsigned: Omit<typeof Proof.Type, "signature" | "s
         ...(unsigned.resources !== undefined && { resources: [...unsigned.resources] }),
       }).prepareMessage(),
     ),
-    Effect.catchTag("SchemaError", (cause) => new ProofRejected({ cause, reason: "malformed-proof" })),
+    Effect.catchTag("SchemaError", (cause) => new Verifier.VerifyError({ cause })),
   )
 
 export const prover = {
@@ -48,10 +47,12 @@ export const prover = {
   supportsChainId,
   sign: Effect.fnUntraced(function* (info, chainId) {
     const { address, signMessage } = yield* Eip155Signer
-    const message = yield* createSigningMessage({ ...info, address, chainId, type: "eip191" })
+    const message = yield* createSigningMessage({ ...info, address, chainId, type: "eip191" }).pipe(
+      Effect.mapError((cause) => new Prover.SignError({ cause })),
+    )
     const signature = yield* Effect.tryPromise({
       try: async () => await signMessage({ message }),
-      catch: (cause) => new SignError({ cause }),
+      catch: (cause) => new Prover.SignError({ cause }),
     })
     return { address, signature }
   }),
@@ -67,10 +68,10 @@ const verifyWith = (check: (input: VerifyMessageParameters) => Promise<boolean>)
 
       const valid = yield* Effect.tryPromise({
         try: () => check({ address, message, signature }),
-        catch: (cause) => new ProofRejected({ reason: "invalid-signature", cause }),
+        catch: (cause) => new Verifier.VerifyError({ cause }),
       })
       if (!valid) {
-        return yield* new ProofRejected({ reason: "invalid-signature" })
+        return yield* new Verifier.VerifyError({})
       }
 
       const chainId = yield* S.decodeUnknownEffect(ChainId)(proof.chainId)
@@ -78,7 +79,7 @@ const verifyWith = (check: (input: VerifyMessageParameters) => Promise<boolean>)
       return { accountId, address: Address.make(address), chainId }
     },
     Effect.catchTags({
-      SchemaError: (cause) => new ProofRejected({ reason: "malformed-proof", cause }),
+      SchemaError: (cause) => new Verifier.VerifyError({ cause }),
     }),
   )
 
@@ -98,7 +99,7 @@ export const makeClientVerifier = (
   verify: Effect.fnUntraced(function* (proof: typeof Proof.Type) {
     const client = clients[proof.chainId]
     if (client === undefined) {
-      return yield* new ProofRejected({ reason: "unsupported-chain" })
+      return yield* new Verifier.VerifyError({})
     }
     return yield* verifyWith(client.verifyMessage)(proof)
   }),

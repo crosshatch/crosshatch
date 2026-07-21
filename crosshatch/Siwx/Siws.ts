@@ -9,7 +9,6 @@ import { Ed25519PublicKey } from "../Crypto/Crypto.ts"
 import { Reference } from "../Reference.ts"
 import * as SolanaAddress from "../Solana/SolanaAddress.ts"
 import { SolanaSigner } from "../Solana/SolanaSigner.ts"
-import { ProofRejected, SignError } from "./Error.ts"
 import * as Prover from "./Prover.ts"
 import { Proof } from "./Schema.ts"
 import * as Verifier from "./Verifier.ts"
@@ -88,7 +87,7 @@ const createSigningMessage = (input: Omit<typeof Proof.Type, "signature" | "sign
       }
       return lines.join("\n")
     }),
-    Effect.catchTag("SchemaError", (cause) => new ProofRejected({ cause, reason: "malformed-proof" })),
+    Effect.catchTag("SchemaError", (cause) => new Verifier.VerifyError({ cause })),
   )
 
 export const prover = {
@@ -107,7 +106,7 @@ export const prover = {
         (signature): signature is SignatureBytes => signature !== undefined && signature.byteLength === 64,
       ),
       Effect.map(Base58.fromBytes),
-      Effect.mapError((cause) => new SignError({ cause })),
+      Effect.mapError((cause) => new Prover.SignError({ cause })),
     )
     return { address, signature }
   }),
@@ -135,7 +134,7 @@ export const verifier = {
         ),
       )
       if (!verified) {
-        return yield* new ProofRejected({ reason: "invalid-signature" })
+        return yield* new Verifier.VerifyError({})
       }
 
       const chainId = yield* S.decodeUnknownEffect(ChainId)(proof.chainId)
@@ -147,7 +146,7 @@ export const verifier = {
       }
     },
     Effect.catchTags({
-      SchemaError: (cause) => new ProofRejected({ reason: "malformed-proof", cause }),
+      SchemaError: (cause) => new Verifier.VerifyError({ cause }),
     }),
   ),
 } satisfies Verifier.Verifier

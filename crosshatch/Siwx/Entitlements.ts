@@ -10,6 +10,10 @@ import { Identity } from "./Identity.ts"
 const key = ({ id, accountId }: { readonly id: typeof Id.Type; readonly accountId: typeof CaAccountId.Type }) =>
   `siwx:entitlement:${JSON.stringify([id, accountId])}`
 
+export class PurchaseError extends Data.TaggedError("PurchaseError")<{
+  readonly cause?: unknown
+}> {}
+
 export const isEntitled = Effect.fnUntraced(function* (id: typeof Id.Type) {
   const identity = yield* Identity
   if (identity === undefined) {
@@ -18,11 +22,6 @@ export const isEntitled = Effect.fnUntraced(function* (id: typeof Id.Type) {
   const store = yield* KeyValueStore.KeyValueStore
   return yield* store.has(key({ id, accountId: identity.accountId }))
 })
-
-export class PurchaseError extends Data.TaggedError("PurchaseError")<{
-  readonly reason: "not-signed-in" | "wrong-chain" | "payer-mismatch" | "payer-unknown" | "settlement-failed"
-  readonly message?: string
-}> {}
 
 export const purchase = Effect.fnUntraced(function* ({
   id,
@@ -33,29 +32,23 @@ export const purchase = Effect.fnUntraced(function* ({
 }) {
   const identity = yield* Identity
   if (identity === undefined) {
-    return yield* new PurchaseError({ reason: "not-signed-in" })
+    return yield* new PurchaseError({})
   }
   if (identity.chainId !== payload.accepted.network) {
-    return yield* new PurchaseError({
-      reason: "wrong-chain",
-      message: `expected ${payload.accepted.network}, got ${identity.chainId}`,
-    })
+    return yield* new PurchaseError({})
   }
 
   const verification = yield* Facilitator.verify({ payload })
   if (verification.payer === undefined) {
-    return yield* new PurchaseError({ reason: "payer-unknown" })
+    return yield* new PurchaseError({})
   }
   if (identity.address.toLowerCase() !== verification.payer.toLowerCase()) {
-    return yield* new PurchaseError({
-      reason: "payer-mismatch",
-      message: `expected ${identity.address}, got ${verification.payer}`,
-    })
+    return yield* new PurchaseError({})
   }
 
   const settlement = yield* Facilitator.settle({ payload })
   if (!settlement.success || settlement.payer === undefined) {
-    return yield* new PurchaseError({ reason: "settlement-failed" })
+    return yield* new PurchaseError({})
   }
 
   const store = yield* KeyValueStore.KeyValueStore

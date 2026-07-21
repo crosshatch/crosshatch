@@ -1,12 +1,15 @@
-import type { Effect } from "effect"
+import { Data, type Effect } from "effect"
 
-import { ProofRejected } from "./Error.ts"
 import type { AuthenticatedIdentity } from "./Identity.ts"
 import type { Proof } from "./Schema.ts"
+
+export class VerifyError extends Data.TaggedError("VerifyError")<{
+  readonly cause?: unknown
+}> {}
 
 export interface Verifier {
   readonly type: string
   readonly scheme: string
   readonly supportsChainId: (chainId: string) => boolean
-  readonly verify: (proof: typeof Proof.Type) => Effect.Effect<AuthenticatedIdentity, ProofRejected, unknown>
+  readonly verify: (proof: typeof Proof.Type) => Effect.Effect<AuthenticatedIdentity, VerifyError, unknown>
 }

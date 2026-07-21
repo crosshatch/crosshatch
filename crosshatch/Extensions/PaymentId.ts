@@ -1,4 +1,4 @@
-import { Effect, Schema as S } from "effect"
+import { Schema as S } from "effect"
 
 import * as Extension from "../Extension.ts"
 
