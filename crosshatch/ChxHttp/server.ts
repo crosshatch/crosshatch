@@ -29,8 +29,7 @@ export const layerMiddleware = <X extends ReadonlyArray<Extension.Extension.Any>
   HttpRouter.middleware<{ readonly provides: Payload | InstanceType<X[number]> }>()(
     (effect) =>
       Effect.gen(function* () {
-        const request = yield* HttpServerRequest.HttpServerRequest
-        const { headers } = request
+        const { headers } = yield* HttpServerRequest.HttpServerRequest
         const payload = Headers.get(PAYMENT_SIGNATURE)(headers).pipe(
           Option.flatMap(S.decodeUnknownOption(PayloadFromBase64JsonString)),
           Option.getOrUndefined,
