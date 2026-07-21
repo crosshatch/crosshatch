@@ -47,13 +47,13 @@ export const prover = {
   scheme: "eip191",
   supportsChainId,
   sign: Effect.fnUntraced(function* (info, chainId) {
-    const signer = yield* Eip155Signer
-    const message = yield* createSigningMessage({ ...info, address: signer.address, chainId, type: "eip191" })
+    const { address, signMessage } = yield* Eip155Signer
+    const message = yield* createSigningMessage({ ...info, address, chainId, type: "eip191" })
     const signature = yield* Effect.tryPromise({
-      try: async () => await signer.signMessage({ message }),
+      try: async () => await signMessage({ message }),
       catch: (cause) => new SignError({ cause }),
     })
-    return { address: signer.address, signature }
+    return { address, signature }
   }),
 } satisfies Prover.Prover<Eip155Signer>
 
