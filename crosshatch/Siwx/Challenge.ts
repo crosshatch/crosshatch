@@ -1,14 +1,10 @@
 import { Array as A, Clock, Effect, Encoding, pipe, Schema as S } from "effect"
 
-import type { Required } from "../Required.ts"
+import * as Required from "../Required.ts"
+import type { Required as RequiredType } from "../Required.ts"
 import * as ChallengeStore from "./ChallengeStore.ts"
-import {
-  Challenge as ChallengeSchema,
-  CHALLENGE_MAX_AGE_MS,
-  ChallengeFromJson,
-  SIGN_IN_WITH_X,
-  Proof,
-} from "./Schema.ts"
+import { Siwx } from "./Extension.ts"
+import { Challenge as ChallengeSchema, CHALLENGE_MAX_AGE_MS, Proof } from "./Schema.ts"
 import type { Verifier } from "./Verifier.ts"
 
 const PositiveFiniteSeconds = S.Finite.check(S.isGreaterThan(0))
@@ -76,9 +72,9 @@ export const extend =
     readonly expirationSeconds?: number | undefined
     readonly networks?: ReadonlyArray<string> | undefined
   }) =>
-  (effect: Effect.Effect<Required, unknown, unknown>) =>
+  <E, R>(effect: Effect.Effect<RequiredType, E, R>) =>
     Effect.gen(function* () {
-      const { extensions, ...required } = yield* effect
+      const required = yield* effect
       const uri = yield* Effect.fromNullishOr(required.resource.url).pipe(Effect.orDie)
 
       const networks =
@@ -89,11 +85,6 @@ export const extend =
           A.dedupe,
         )
 
-      return yield* issue({ ...options, uri, networks }).pipe(
-        Effect.flatMap(S.encodeEffect(ChallengeFromJson)),
-        Effect.map((extension) => ({
-          ...required,
-          extensions: { ...extensions, [SIGN_IN_WITH_X]: extension },
-        })),
-      )
+      const challenge = yield* issue({ ...options, uri, networks })
+      return yield* Required.extend(Siwx, challenge)(Effect.succeed(required))
     })

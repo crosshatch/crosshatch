@@ -1,4 +1,4 @@
-import { Array, Schema as S, Context, Effect, Layer, Record, Predicate, flow } from "effect"
+import { Array as A, Schema as S, Context, Effect, Layer, Record, Predicate, Result, flow, pipe } from "effect"
 
 import { Accept, type AcceptError } from "./Accept.ts"
 import { Bridge } from "./Bridge.ts"
@@ -13,7 +13,11 @@ export class Payer extends Context.Service<
     readonly createPayload: (config: {
       readonly traceId?: string | undefined
       readonly required: Required
-    }) => Effect.Effect<{ readonly payload: Payload }, AcceptError | CreatePayloadError>
+      readonly request?: Request | undefined
+    }) => Effect.Effect<
+      { readonly payload: Payload; readonly headers?: Record<string, string> | undefined },
+      AcceptError | CreatePayloadError
+    >
   }
 >()("crosshatch/Payer") {}
 
@@ -23,11 +27,12 @@ export const layer = Layer.effect(
     const accept = yield* Accept
     const registry = yield* ExtensionRegistry
     return {
-      createPayload: Effect.fnUntraced(function* ({ required }) {
+      createPayload: Effect.fnUntraced(function* ({ required, request }) {
         const { accepted, adapt } = yield* accept({ required })
         const { extensions: infos = {} } = required
         const payload = yield* adapt
-        const extensions = yield* Effect.forEach(
+
+        const resolved = yield* Effect.forEach(
           Record.toEntries(infos),
           Effect.fnUntraced(
             function* ([identifier, infoJson]) {
@@ -35,21 +40,36 @@ export const layer = Layer.effect(
               if (!extension) {
                 return
               }
-              const [{ info: Info, enrichment: Enrichment }, f] = extension
+              const [{ info: Info, enrichment: Enrichment, header }, f] = extension
               const info = yield* S.decodeUnknownEffect(S.toCodecJson(Info))(infoJson)
-              const enrichment = yield* f({ accepted, info, payload, required }).pipe(
-                Effect.flatMap(S.encodeEffect(S.toCodecJson(Enrichment))),
-              )
-              return [identifier, enrichment] as const
+              const enrichment = yield* f({ accepted, info, payload, required, request })
+              if (header !== undefined) {
+                const value = yield* S.encodeEffect(
+                  S.StringFromBase64.pipe(S.decodeTo(S.fromJsonString(S.toCodecJson(Enrichment)))),
+                )(enrichment)
+                return { kind: "header" as const, header, value }
+              }
+              const value = yield* S.encodeEffect(S.toCodecJson(Enrichment))(enrichment)
+              return { kind: "payload" as const, identifier, value }
             },
             Effect.catchTags({
               SchemaError: () => Effect.undefined,
             }),
           ),
           { concurrency: "unbounded" },
-        ).pipe(Effect.map(flow(Array.filter(Predicate.isNotUndefined), Record.fromEntries)))
+        ).pipe(Effect.map(A.filter(Predicate.isNotUndefined)))
+
+        const [extensions, headers] = pipe(
+          A.partition(resolved, (item) => (item.kind === "header" ? Result.succeed(item) : Result.fail(item))),
+          ([payloads, headers]) => [
+            Record.fromEntries(payloads.map(({ identifier, value }) => [identifier, value])),
+            Record.fromEntries(headers.map(({ header, value }) => [header, value])),
+          ],
+        )
+
         return {
-          payload: { x402Version: 2, payload, accepted, extensions },
+          payload: { x402Version: 2, payload, accepted, extensions } satisfies Payload,
+          ...(Record.size(headers) > 0 ? { headers } : {}),
         }
       }),
     }

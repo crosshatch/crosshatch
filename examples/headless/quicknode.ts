@@ -1,11 +1,19 @@
 import { ChxHttp, Mnemonic } from "crosshatch"
-import { Eip155Signer } from "crosshatch/Eip155"
+import { Eip155Signer } from "crosshatch/Eip155/Eip155"
 import * as Siwx from "crosshatch/Siwx"
+import { SolanaSigner } from "crosshatch/Solana/Solana"
 import { Console, Effect, Layer } from "effect"
-import { FetchHttpClient, HttpClient, HttpClientRequest } from "effect/unstable/http"
+import { HttpClient, HttpClientRequest } from "effect/unstable/http"
 
-const Live = ChxHttp.layerClient(Siwx.Client.resolver(Siwx.Siwe.prover)).pipe(
-  Layer.provide([FetchHttpClient.layer, Eip155Signer.layerMnemonic.pipe(Layer.provide(Mnemonic.layerEnv))]),
+import { PayerLive } from "./PayerLive.ts"
+
+const SiwxHttpClientLive = Layer.mergeAll(
+  ChxHttp.layerClient.pipe(Layer.provide(PayerLive)),
+  Siwx.Client.layer(Siwx.Siwe.prover, Siwx.Siws.prover).pipe(
+    Layer.provide(
+      Layer.mergeAll(Eip155Signer.layerMnemonic, SolanaSigner.layerMnemonic).pipe(Layer.provide(Mnemonic.layerEnv)),
+    ),
+  ),
 )
 
 Effect.gen(function* () {
@@ -27,4 +35,4 @@ Effect.gen(function* () {
       paid: second.headers[ChxHttp.PAYMENT_RESPONSE] !== undefined,
     },
   })
-}).pipe(Effect.provide(Live), Effect.runFork)
+}).pipe(Effect.provide(SiwxHttpClientLive), Effect.runFork)

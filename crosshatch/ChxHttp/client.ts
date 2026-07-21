@@ -1,73 +1,55 @@
-import { Array as A, Effect, Layer, Predicate, Schema as S } from "effect"
-import { HttpClient, HttpClientError, HttpClientRequest } from "effect/unstable/http"
+import { Effect, Schema as S, Layer, Data, Option } from "effect"
+import { FetchHttpClient } from "effect/unstable/http"
 
+import { Payer } from "../Payer.ts"
+import { PayloadFromBase64JsonString } from "../Payload.ts"
 import { RequiredFromBase64JsonString } from "../Required.ts"
-import { CROSSHATCH_TRACE_ID, PAYMENT_REQUIRED } from "./constants.ts"
-import type { Resolver } from "./Resolver.ts"
+import { runtime } from "../runtime.ts"
+import { CROSSHATCH_TRACE_ID, PAYMENT_REQUIRED, PAYMENT_SIGNATURE } from "./constants.ts"
 
-export function layerClient<const Resolvers extends ReadonlyArray<Resolver.Any> = ReadonlyArray<Resolver.Any>>(
-  ...resolvers: Resolvers
-): Layer.Layer<HttpClient.HttpClient, never, HttpClient.HttpClient | Resolver.Context<Resolvers[number]>> {
-  return Layer.effect(
-    HttpClient.HttpClient,
-    Effect.gen(function* () {
-      const client = yield* HttpClient.HttpClient
-      const context = yield* Effect.context<any>()
+export class PaymentAlreadyAttemptedError extends Data.TaggedError("PaymentAlreadyAttemptedError")<{}> {}
 
-      return HttpClient.transform(client, (effect, request) =>
-        Effect.gen(function* () {
-          const response = yield* effect
-          if (response.status !== 402) {
-            return response
+export class NoSuchRequiredError extends Data.TaggedError("NoSuchRequiredError")<{}> {}
+
+export const layerFetch = Layer.effect(
+  FetchHttpClient.Fetch,
+  Effect.gen(function* () {
+    const payer = yield* Payer
+    const fetch = yield* Effect.serviceOption(FetchHttpClient.Fetch).pipe(
+      Effect.map(Option.getOrElse(() => globalThis.fetch)),
+    )
+    return (input, init) =>
+      Effect.gen(function* () {
+        const request = new Request(input, init)
+        const retry = request.clone()
+        const response = yield* Effect.promise(() => fetch(request))
+        if (response.status !== 402) {
+          return response
+        }
+        if (retry.headers.has(PAYMENT_SIGNATURE)) {
+          return yield* new PaymentAlreadyAttemptedError()
+        }
+        const traceId = response.headers.get(CROSSHATCH_TRACE_ID) ?? undefined
+        const requiredHeader = response.headers.get(PAYMENT_REQUIRED)
+        if (!requiredHeader) {
+          return yield* new NoSuchRequiredError()
+        }
+        const required = yield* S.decodeUnknownEffect(RequiredFromBase64JsonString)(requiredHeader)
+        const { payload, headers } = yield* payer.createPayload({ required, traceId, request })
+        const encoded = yield* S.encodeEffect(PayloadFromBase64JsonString)(payload)
+        retry.headers.set(PAYMENT_SIGNATURE, encoded)
+        if (headers) {
+          for (const [key, value] of Object.entries(headers)) {
+            retry.headers.set(key, value)
           }
-
-          const requiredHeader = response.headers[PAYMENT_REQUIRED]
-          if (requiredHeader === undefined) {
-            return yield* new HttpClientError.HttpClientError({
-              reason: new HttpClientError.DecodeError({
-                request: response.request,
-                response,
-                description: `Missing ${PAYMENT_REQUIRED} header`,
-              }),
-            })
-          }
-          const required = yield* S.decodeUnknownEffect(RequiredFromBase64JsonString)(requiredHeader).pipe(
-            Effect.mapError(
-              (cause) =>
-                new HttpClientError.HttpClientError({
-                  reason: new HttpClientError.DecodeError({ request: response.request, response, cause }),
-                }),
-            ),
-          )
-
-          const resolutions = yield* Effect.forEach(resolvers, (resolver) =>
-            resolver({
-              request,
-              required,
-              traceId: response.headers[CROSSHATCH_TRACE_ID],
-            }).pipe(
-              Effect.mapError(
-                (cause) =>
-                  new HttpClientError.HttpClientError({
-                    reason: new HttpClientError.EncodeError({ request, cause }),
-                  }),
-              ),
-              Effect.provide(context),
-            ),
-          )
-          const resolved = A.filter(resolutions, Predicate.isNotUndefined)
-
-          if (resolved.length === 0) {
-            return response
-          }
-
-          return yield* client.execute(
-            A.reduce(resolved, request, (acc, resolution) =>
-              HttpClientRequest.setHeaders(acc, new Headers(resolution.headers)),
-            ),
-          )
+        }
+        return yield* Effect.promise(() => fetch(retry))
+      }).pipe((effect) =>
+        runtime.runPromise(effect, {
+          signal: init?.signal ?? undefined,
         }),
       )
-    }),
-  )
-}
+  }),
+)
+
+export const layerClient = FetchHttpClient.layer.pipe(Layer.provide(layerFetch))

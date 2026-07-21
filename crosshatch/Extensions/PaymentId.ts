@@ -1,4 +1,4 @@
-import { Schema as S } from "effect"
+import { Effect, Schema as S } from "effect"
 
 import * as Extension from "../Extension.ts"
 
@@ -44,3 +44,7 @@ export class FromEither extends Extension.Service<FromEither>()("crosshatch/From
     id: PaymentId,
   }),
 }) {}
+
+export const layerGenerate = Extension.layerHandler(FromClient, ({ info }) =>
+  Effect.succeed({ required: info.required, id: random() }),
+)

@@ -14,7 +14,7 @@ export interface Extension<
   Id extends string,
   Identifier extends string,
   Info extends Extension.Info,
-  Enrichment extends Extension.Enrichment<Info>,
+  Enrichment extends Extension.Enrichment,
 > extends Context.Service<Self, Service<Enrichment>> {
   new (_: never): Context.ServiceClass.Shape<Id, Service<Enrichment>>
 
@@ -26,6 +26,8 @@ export interface Extension<
 
   readonly enrichment: Enrichment
 
+  readonly header: string | undefined
+
   readonly decodeRequired: (required: Required) => Effect.Effect<Info["Type"], S.SchemaError, Info["DecodingServices"]>
 
   readonly decodePayload: (
@@ -36,27 +38,20 @@ export interface Extension<
 export declare namespace Extension {
   export type Info = S.Top & { readonly DecodingServices: never }
 
-  export type Enrichment<T extends S.Top> = S.Top & {
-    readonly Type: T["Type"]
-    readonly EncodingServices: never
-  }
+  export type Enrichment = S.Top & { readonly EncodingServices: never }
 
-  export type Any = Extension<any, string, string, Info, Enrichment<Info>>
+  export type Any = Extension<any, string, string, Info, Enrichment>
 }
 
 export const Service =
   <Self>() =>
-  <
-    Id extends string,
-    Identifier extends string,
-    Info extends Extension.Info,
-    Enrichment extends Extension.Enrichment<Info>,
-  >(
+  <Id extends string, Identifier extends string, Info extends Extension.Info, Enrichment extends Extension.Enrichment>(
     id: Id,
     definition: {
       readonly identifier: Identifier
       readonly info: Info
       readonly enrichment: Enrichment
+      readonly header?: string | undefined
     },
   ): Extension<Self, Id, Identifier, Info, Enrichment> => {
     const tag = Context.Service<Self, Service<Enrichment>>()(id)
@@ -70,6 +65,7 @@ export const Service =
 
     return Object.assign(tag, {
       [TypeId]: TypeId,
+      header: undefined,
       ...definition,
       decodeRequired,
       decodePayload,
@@ -81,7 +77,7 @@ export const layerPayload = <
   Id extends string,
   Identifier extends string,
   Info extends Extension.Info,
-  Enrichment extends Extension.Enrichment<Info>,
+  Enrichment extends Extension.Enrichment,
 >(
   extension: Extension<Self, Id, Identifier, Info, Enrichment>,
   payload: Payload | undefined,
@@ -102,6 +98,7 @@ export interface ExtensionHandlerConfig<Info extends S.Top> {
   readonly payload: SchemePayload
   readonly accepted: Requirements
   readonly required: Required
+  readonly request?: Request | undefined
 }
 
 export class ExtensionRegistry extends Context.Reference<
@@ -115,11 +112,11 @@ export const layerHandler = Effect.fnUntraced(function* <
   Id extends string,
   Identifier extends string,
   Info extends Extension.Info,
-  Enrichment extends Extension.Enrichment<Info>,
+  Enrichment extends Extension.Enrichment,
   R,
 >(
   extension: Extension<Self, Id, Identifier, Info, Enrichment>,
-  f: (payload: ExtensionHandlerConfig<Info>) => Effect.Effect<Enrichment["Type"], never, R>,
+  f: (payload: ExtensionHandlerConfig<Info>) => Effect.Effect<Enrichment["Type"] | undefined, never, R>,
 ) {
   const registry = yield* ExtensionRegistry
   const context = yield* Effect.context<R>()

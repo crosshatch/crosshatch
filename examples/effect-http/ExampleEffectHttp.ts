@@ -9,10 +9,9 @@ import { KeyValueStore } from "effect/unstable/persistence"
 import { createPublicClient, http } from "viem"
 import { base } from "viem/chains"
 
-const verifiers = [Siwx.Siwe.verifier, Siwx.Siws.verifier] as const
-const paidResource = Siwx.Entitlement.Id.make("paid-resource")
-
 const baseClient = createPublicClient({ chain: base, transport: http() })
+const verifiers = [Siwx.Siwe.makeVerifier({ "eip155:8453": baseClient }), Siwx.Siws.verifier] as const
+const paidResource = Siwx.Entitlement.Id.make("paid-resource")
 
 export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHttp>()(
   "ExampleEffectHttp",
@@ -79,7 +78,6 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
     ).pipe(
       Layer.provide([
         Facilitator.layer(),
-        Siwx.Siwe.layerVerifier({ "eip155:8453": baseClient }),
         HttpRouter.cors({
           allowedHeaders: ["*"],
           allowedMethods: ["*"],

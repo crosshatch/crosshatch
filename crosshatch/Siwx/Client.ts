@@ -1,28 +1,26 @@
-import { Array as A, Effect, Option, pipe, Schema as S } from "effect"
+import { Array as A, Effect, Layer, Option, pipe, Schema as S } from "effect"
 
-import { Accept } from "../Accept.ts"
-import { ChainId } from "../ChainId.ts"
-import { ResolverError, type Resolver } from "../ChxHttp/Resolver.ts"
+import * as Extension from "../Extension.ts"
+import { Siwx } from "./Extension.ts"
 import type { Prover } from "./Prover.ts"
-import { ChallengeFromJson, ProofFromBase64JsonString, SIGN_IN_WITH_X } from "./Schema.ts"
 
-export const resolver = <const Provers extends ReadonlyArray<Prover.Any>>(
+export const layer = <const Provers extends ReadonlyArray<Prover.Any>>(
   ...provers: Provers
-): Resolver<Prover.Context<Provers[number]>> =>
-  Effect.fnUntraced(
-    function* ({ request, required }) {
-      const challengeJson = required.extensions?.[SIGN_IN_WITH_X]
-      if (challengeJson === undefined) {
+): Layer.Layer<never, never, Prover.Context<Provers[number]>> =>
+  Extension.layerHandler(
+    Siwx,
+    Effect.fnUntraced(function* ({ info: challenge, request, accepted }) {
+      if (request === undefined) {
         return
       }
 
-      const { requestUrl, challenge } = yield* S.decodeEffect(
-        S.Struct({ requestUrl: S.URLFromString, challenge: ChallengeFromJson }),
-      )({ requestUrl: request.url, challenge: challengeJson })
+      const requestUrl = yield* S.decodeUnknownEffect(S.URLFromString)(request.url).pipe(Effect.option)
+      if (Option.isNone(requestUrl)) {
+        return
+      }
 
       const challengeUri = URL.parse(challenge.info.uri)
-
-      if (challenge.info.domain !== requestUrl.host || challengeUri?.href !== requestUrl.href) {
+      if (challenge.info.domain !== requestUrl.value.host || challengeUri?.href !== requestUrl.value.href) {
         return
       }
 
@@ -40,40 +38,28 @@ export const resolver = <const Provers extends ReadonlyArray<Prover.Any>>(
         ),
       )
 
-      const accept = yield* Effect.serviceOption(Accept)
-      const paymentChain = Option.isSome(accept)
-        ? yield* accept.value({ required }).pipe(
-            Effect.map(({ chainId }) => chainId),
-            Effect.option,
-          )
-        : Option.none<typeof ChainId.Type>()
-
-      const candidate = Option.orElse(
-        Option.flatMap(paymentChain, (chainId) => A.findFirst(candidates, ({ entry }) => entry.chainId === chainId)),
+      const selected = Option.orElse(
+        A.findFirst(candidates, ({ entry }) => entry.chainId === accepted.network),
         () => A.head(candidates),
       )
 
-      if (Option.isNone(candidate)) {
+      if (Option.isNone(selected)) {
         return
       }
 
-      const { entry, prover } = candidate.value
-      const header = yield* prover.sign(challenge.info, entry.chainId).pipe(
-        Effect.map(({ address, signature }) => ({
-          ...challenge.info,
-          address,
-          chainId: entry.chainId,
-          type: prover.type,
-          signatureScheme: prover.scheme,
-          signature,
-        })),
-        Effect.flatMap(S.encodeEffect(ProofFromBase64JsonString)),
-        Effect.mapError((cause) => new ResolverError({ cause })),
-      )
+      const { entry, prover } = selected.value
+      const signed = yield* prover.sign(challenge.info, entry.chainId).pipe(Effect.option)
+      if (Option.isNone(signed)) {
+        return
+      }
 
-      return { headers: { [SIGN_IN_WITH_X]: header } }
-    },
-    Effect.catchTags({
-      SchemaError: (cause) => new ResolverError({ cause }),
+      return {
+        ...challenge.info,
+        address: signed.value.address,
+        chainId: entry.chainId,
+        type: prover.type,
+        signatureScheme: prover.scheme,
+        signature: signed.value.signature,
+      }
     }),
   )

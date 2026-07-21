@@ -14,10 +14,6 @@ export class ProofRejected extends Data.TaggedError("ProofRejected")<{
   readonly cause?: unknown
 }> {}
 
-export class SignatureCheckError extends Data.TaggedError("SignatureCheckError")<{
-  readonly cause?: unknown
-}> {}
-
 export class SignError extends Data.TaggedError("SignError")<{
   readonly cause?: unknown
 }> {}

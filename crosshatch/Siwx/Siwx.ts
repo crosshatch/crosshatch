@@ -5,6 +5,7 @@ import * as Siws from "./Siws.ts"
 
 export * as Challenge from "./Challenge.ts"
 export * as Client from "./Client.ts"
+export * as Extension from "./Extension.ts"
 export * as Entitlement from "./Entitlement.ts"
 export * as Entitlements from "./Entitlements.ts"
 export * as Error from "./Error.ts"
