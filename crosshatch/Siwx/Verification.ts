@@ -5,7 +5,7 @@ import { ProofRejected } from "./Error.ts"
 import { CHALLENGE_MAX_AGE_MS, Info, type Proof } from "./Schema.ts"
 import type { Verifier } from "./Verifier.ts"
 
-export const verifyProof = <const Verifiers extends ReadonlyArray<Verifier.Any>>(...verifiers: Verifiers) =>
+export const verifyProof = <const Verifiers extends ReadonlyArray<Verifier>>(...verifiers: Verifiers) =>
   Effect.fnUntraced(
     function* (proof: typeof Proof.Type, requestUrl: URL) {
       const challenge = yield* ChallengeStore.peek(proof.nonce)
@@ -44,7 +44,10 @@ export const verifyProof = <const Verifiers extends ReadonlyArray<Verifier.Any>>
       }
 
       const verifier = verifiers.find(
-        ({ supportsChainId, type }) => type === proof.type && supportsChainId(proof.chainId),
+        ({ scheme, supportsChainId, type }) =>
+          type === proof.type &&
+          (proof.signatureScheme === undefined || proof.signatureScheme === scheme) &&
+          supportsChainId(proof.chainId),
       )
 
       if (verifier === undefined) {

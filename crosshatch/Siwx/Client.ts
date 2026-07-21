@@ -1,4 +1,4 @@
-import { Array as A, Effect, Option, Schema as S } from "effect"
+import { Array as A, Effect, Option, pipe, Schema as S } from "effect"
 
 import { Accept } from "../Accept.ts"
 import { ChainId } from "../ChainId.ts"
@@ -25,8 +25,15 @@ export const resolver = <const Provers extends ReadonlyArray<Prover.Any>>(
       }
 
       const candidates = A.flatMap(challenge.supportedChains, (entry) =>
-        A.findFirst(provers, (prover) => prover(challenge.info, entry)).pipe(
-          Option.map((sign) => ({ entry, sign })),
+        pipe(
+          A.findFirst(
+            provers,
+            (prover) =>
+              prover.type === entry.type &&
+              (entry.signatureScheme === undefined || entry.signatureScheme === prover.scheme) &&
+              prover.supportsChainId(entry.chainId),
+          ),
+          Option.map((prover) => ({ entry, prover })),
           A.fromOption,
         ),
       )
@@ -48,7 +55,16 @@ export const resolver = <const Provers extends ReadonlyArray<Prover.Any>>(
         return
       }
 
-      const header = yield* candidate.value.sign.pipe(
+      const { entry, prover } = candidate.value
+      const header = yield* prover.sign(challenge.info, entry.chainId).pipe(
+        Effect.map(({ address, signature }) => ({
+          ...challenge.info,
+          address,
+          chainId: entry.chainId,
+          type: prover.type,
+          signatureScheme: prover.scheme,
+          signature,
+        })),
         Effect.flatMap(S.encodeEffect(ProofFromBase64JsonString)),
         Effect.mapError((cause) => new ResolverError({ cause })),
       )

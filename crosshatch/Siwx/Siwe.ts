@@ -70,8 +70,9 @@ export const layerVerifier = (clients: Readonly<Record<string, Pick<PublicClient
     })
   })
 
-export const prover = Prover.make({
+export const prover = {
   type: "eip191",
+  scheme: "eip191",
   supportsChainId,
   sign: Effect.fnUntraced(function* (info, chainId) {
     const signer = yield* Eip155Signer
@@ -82,7 +83,7 @@ export const prover = Prover.make({
     })
     return { address: signer.address, signature }
   }),
-})
+} satisfies Prover.Prover<Eip155Signer>
 
 export const verifier = {
   type: "eip191",
@@ -114,4 +115,4 @@ export const verifier = {
       NoSuchElementError: (cause) => new ProofRejected({ reason: "invalid-signature", cause }),
     }),
   ),
-} satisfies Verifier.Verifier<Eip155Verify>
+} satisfies Verifier.Verifier

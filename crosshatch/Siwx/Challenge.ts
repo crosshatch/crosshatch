@@ -22,7 +22,7 @@ export const make = Effect.fnUntraced(function* ({
 }: {
   readonly uri: string
   readonly networks: ReadonlyArray<string>
-  readonly verifiers: ReadonlyArray<Verifier.Any>
+  readonly verifiers: ReadonlyArray<Verifier>
   readonly statement?: string | undefined
   readonly expirationSeconds?: number | undefined
 }) {
@@ -69,7 +69,7 @@ export const make = Effect.fnUntraced(function* ({
 
 export const extend =
   (options: {
-    readonly verifiers: ReadonlyArray<Verifier.Any>
+    readonly verifiers: ReadonlyArray<Verifier>
     readonly statement?: string | undefined
     readonly expirationSeconds?: number | undefined
     readonly networks?: ReadonlyArray<string> | undefined

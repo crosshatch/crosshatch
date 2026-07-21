@@ -91,7 +91,7 @@ const createSigningMessage = (input: Omit<typeof Proof.Type, "signature" | "sign
     Effect.catchTag("SchemaError", (cause) => new ProofRejected({ cause, reason: "malformed-proof" })),
   )
 
-export const prover = Prover.make({
+export const prover = {
   type: "ed25519",
   scheme: "siws",
   supportsChainId,
@@ -109,7 +109,7 @@ export const prover = Prover.make({
     }
     return { address, signature: Base58.fromBytes(signature) }
   }),
-})
+} satisfies Prover.Prover<SolanaSigner>
 
 export const verifier = {
   type: "ed25519",

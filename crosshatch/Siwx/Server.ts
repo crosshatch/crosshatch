@@ -7,7 +7,7 @@ import { ProofFromBase64JsonString, SIGN_IN_WITH_X } from "./Schema.ts"
 import * as Verification from "./Verification.ts"
 import type { Verifier } from "./Verifier.ts"
 
-export const layerMiddleware = <const Verifiers extends ReadonlyArray<Verifier.Any>>({
+export const layerMiddleware = <const Verifiers extends ReadonlyArray<Verifier>>({
   verifiers,
   origin,
 }: {
