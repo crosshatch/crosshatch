@@ -9,7 +9,6 @@ import { Ed25519PublicKey } from "../Crypto/Crypto.ts"
 import * as SolanaAddress from "../Solana/SolanaAddress.ts"
 import { SolanaSigner } from "../Solana/SolanaSigner.ts"
 import { ProofRejected, SignError } from "./Error.ts"
-import type { AuthenticatedIdentity } from "./Identity.ts"
 import * as Prover from "./Prover.ts"
 import { Proof } from "./Schema.ts"
 import * as Verifier from "./Verifier.ts"
@@ -84,25 +83,20 @@ export const prover = Prover.make({
   type: "ed25519",
   scheme: "siws",
   supportsChainId: solanaAccount.supports,
-  sign: Effect.fnUntraced(
-    function* (info, chainId) {
-      const signer = yield* SolanaSigner
-      const address = SolanaAddress.SolanaAddress.make(signer.address)
-      const message = yield* createSigningMessage({ ...info, address, chainId, type: "ed25519" })
-      const [signatures] = yield* Effect.tryPromise({
-        try: () => signer.signMessages([createSignableMessage(new TextEncoder().encode(message))]),
-        catch: (cause) => new SignError({ cause }),
-      })
-      const signature = signatures?.[signer.address]
-      if (signature === undefined || signature.byteLength !== 64) {
-        return yield* Effect.die("siws: signer did not return a 64-byte signature")
-      }
-      return { address, signature: Base58.fromBytes(signature) }
-    },
-    Effect.catchTags({
-      ProofRejected: (cause) => new SignError({ cause }),
-    }),
-  ),
+  sign: Effect.fnUntraced(function* (info, chainId) {
+    const signer = yield* SolanaSigner
+    const address = SolanaAddress.SolanaAddress.make(signer.address)
+    const message = yield* createSigningMessage({ ...info, address, chainId, type: "ed25519" })
+    const [signatures] = yield* Effect.tryPromise({
+      try: () => signer.signMessages([createSignableMessage(new TextEncoder().encode(message))]),
+      catch: (cause) => new SignError({ cause }),
+    })
+    const signature = signatures?.[signer.address]
+    if (signature === undefined || signature.byteLength !== 64) {
+      return yield* Effect.die("siws: signer did not return a 64-byte signature")
+    }
+    return { address, signature: Base58.fromBytes(signature) }
+  }),
 })
 
 export const verifier = {
@@ -137,7 +131,7 @@ export const verifier = {
         accountId,
         address: Address.make(proof.address),
         chainId,
-      } satisfies AuthenticatedIdentity
+      }
     },
     Effect.catchTags({
       SchemaError: (cause) => new ProofRejected({ reason: "malformed-proof", cause }),

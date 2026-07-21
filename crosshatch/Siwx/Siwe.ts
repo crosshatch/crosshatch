@@ -8,7 +8,6 @@ import { ChainId } from "../ChainId.ts"
 import { Eip155Address } from "../Eip155/Eip155Address.ts"
 import { Eip155Signer } from "../Eip155/Eip155Signer.ts"
 import { ProofRejected, SignError, SignatureCheckError } from "./Error.ts"
-import type { AuthenticatedIdentity } from "./Identity.ts"
 import * as Prover from "./Prover.ts"
 import { Proof } from "./Schema.ts"
 import type * as Verifier from "./Verifier.ts"
@@ -59,18 +58,15 @@ export const layerVerifier = (clients: Readonly<Record<string, Pick<PublicClient
 export const prover = Prover.make({
   type: "eip191",
   supportsChainId: eip155Account.supports,
-  sign: Effect.fnUntraced(
-    function* (info, chainId) {
-      const signer = yield* Eip155Signer
-      const message = yield* createSigningMessage({ ...info, address: signer.address, chainId, type: "eip191" })
-      const signature = yield* Effect.tryPromise({
-        try: async () => await signer.signMessage({ message }),
-        catch: (cause) => new SignError({ cause }),
-      })
-      return { address: signer.address, signature }
-    },
-    Effect.catchTags({ ProofRejected: ({ cause }) => new SignError({ cause }) }),
-  ),
+  sign: Effect.fnUntraced(function* (info, chainId) {
+    const signer = yield* Eip155Signer
+    const message = yield* createSigningMessage({ ...info, address: signer.address, chainId, type: "eip191" })
+    const signature = yield* Effect.tryPromise({
+      try: async () => await signer.signMessage({ message }),
+      catch: (cause) => new SignError({ cause }),
+    })
+    return { address: signer.address, signature }
+  }),
 })
 
 export const verifier = {
@@ -96,7 +92,7 @@ export const verifier = {
         accountId,
         address: Address.make(proof.address),
         chainId,
-      } satisfies AuthenticatedIdentity
+      }
     },
     Effect.catchTags({
       SignatureCheckError: (cause) => new ProofRejected({ reason: "invalid-signature", cause }),
@@ -105,4 +101,4 @@ export const verifier = {
       NoSuchElementError: (cause) => new ProofRejected({ reason: "invalid-signature", cause }),
     }),
   ),
-} satisfies Verifier.Verifier<unknown, Eip155Verify>
+} satisfies Verifier.Verifier<Eip155Verify>

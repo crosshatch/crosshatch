@@ -1,16 +1,17 @@
-import { Effect } from "effect"
+import type { Effect } from "effect"
 
+import { ProofRejected } from "./Error.ts"
 import type { AuthenticatedIdentity } from "./Identity.ts"
-import { Proof } from "./Schema.ts"
+import type { Proof } from "./Schema.ts"
 
-export interface Verifier<E = unknown, R = never> {
+export interface Verifier<R = never> {
   readonly type: string
   readonly scheme: string
   readonly supportsChainId: (chainId: string) => boolean
-  readonly verify: (proof: typeof Proof.Type) => Effect.Effect<AuthenticatedIdentity, E, R>
+  readonly verify: (proof: typeof Proof.Type) => Effect.Effect<AuthenticatedIdentity, ProofRejected, R>
 }
 
 export declare namespace Verifier {
-  export type Any = Verifier<any, any>
-  export type Context<T extends Any> = T extends Verifier<any, infer R> ? R : never
+  export type Any = Verifier<any>
+  export type Context<T extends Any> = T extends Verifier<infer R> ? R : never
 }
