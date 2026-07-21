@@ -1,9 +1,11 @@
+// TODO: Is using the KeyValueStore interface preferable over a custom Context.Service that exposes the exact methods needed? (something similar to Invoices for example).
+
 import { Clock, Effect, Option, Schema as S } from "effect"
 import { KeyValueStore } from "effect/unstable/persistence"
 
 import { Challenge } from "./Schema.ts"
 
-const StoredChallenge = S.Struct({ challenge: Challenge, expiresAt: S.Finite })
+const StoredChallenge = S.Struct({ challenge: Challenge, expiresAt: S.Finite.check(S.isGreaterThan(0)) })
 
 const store = Effect.map(KeyValueStore.KeyValueStore, (kv) =>
   KeyValueStore.toSchemaStore(KeyValueStore.prefix(kv, "siwx:challenge:"), StoredChallenge),

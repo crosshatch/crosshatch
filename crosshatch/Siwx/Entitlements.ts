@@ -4,17 +4,22 @@ import { KeyValueStore } from "effect/unstable/persistence"
 import type { CaAccountId } from "../CaAccountId.ts"
 import * as Facilitator from "../Facilitator.ts"
 import type { Payload } from "../Payload.ts"
-import type { Id } from "./Entitlement.ts"
+import type { EntitlementId } from "./Entitlement.ts"
 import { Identity } from "./Identity.ts"
 
-const storeKey = ({ id, accountId }: { readonly id: typeof Id.Type; readonly accountId: typeof CaAccountId.Type }) =>
-  `siwx:entitlement:${JSON.stringify([id, accountId])}`
+const storeKey = ({
+  id,
+  accountId,
+}: {
+  readonly id: typeof EntitlementId.Type
+  readonly accountId: typeof CaAccountId.Type
+}) => `siwx:entitlement:${JSON.stringify([id, accountId])}`
 
 export class PurchaseError extends Data.TaggedError("PurchaseError")<{
   readonly cause?: unknown
 }> {}
 
-export const isEntitled = Effect.fnUntraced(function* (id: typeof Id.Type) {
+export const isEntitled = Effect.fnUntraced(function* (id: typeof EntitlementId.Type) {
   const identity = yield* Identity
   if (identity === undefined) {
     return false
@@ -27,7 +32,7 @@ export const purchase = Effect.fnUntraced(function* ({
   id,
   payload,
 }: {
-  readonly id: typeof Id.Type
+  readonly id: typeof EntitlementId.Type
   readonly payload: Payload
 }) {
   const identity = yield* Identity

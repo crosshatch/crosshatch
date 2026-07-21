@@ -2,4 +2,4 @@
 "crosshatch": minor
 ---
 
-Add SIWX integration.
+Add SIWX extension.

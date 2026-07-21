@@ -1,4 +1,4 @@
-import { Array as A, Schema as S, Context, Effect, Layer, Record, Predicate, Result, flow, pipe } from "effect"
+import { Array, Schema as S, Context, Effect, Layer, Record, Predicate, Result, flow, pipe } from "effect"
 
 import { Accept, type AcceptError } from "./Accept.ts"
 import { Bridge } from "./Bridge.ts"
@@ -43,7 +43,7 @@ export const layer = Layer.effect(
               const [{ info: Info, enrichment: Enrichment, header }, f] = extension
               const info = yield* S.decodeUnknownEffect(S.toCodecJson(Info))(infoJson)
               const enrichment = yield* f({ accepted, info, payload, required, request })
-              if (header !== undefined) {
+              if (header) {
                 const value = yield* S.encodeEffect(
                   S.StringFromBase64.pipe(S.decodeTo(S.fromJsonString(S.toCodecJson(Enrichment)))),
                 )(enrichment)
@@ -57,10 +57,10 @@ export const layer = Layer.effect(
             }),
           ),
           { concurrency: "unbounded" },
-        ).pipe(Effect.map(A.filter(Predicate.isNotUndefined)))
+        ).pipe(Effect.map(Array.filter(Predicate.isNotUndefined)))
 
         const [extensions, headers] = pipe(
-          A.partition(resolved, (item) => (item.kind === "header" ? Result.succeed(item) : Result.fail(item))),
+          Array.partition(resolved, (item) => (item.kind === "header" ? Result.succeed(item) : Result.fail(item))),
           ([payloads, headers]) => [
             Record.fromEntries(payloads.map(({ identifier, value }) => [identifier, value])),
             Record.fromEntries(headers.map(({ header, value }) => [header, value])),

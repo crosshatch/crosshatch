@@ -1,4 +1,4 @@
-import { Array as A, Effect, Layer, Option, pipe, Schema as S } from "effect"
+import { Array, Effect, Layer, Option, pipe, Schema as S } from "effect"
 
 import * as Extension from "../Extension.ts"
 import { Siwx } from "./Extension.ts"
@@ -10,12 +10,12 @@ export const layer = <const Provers extends ReadonlyArray<Prover.Any>>(
   Extension.layerHandler(
     Siwx,
     Effect.fnUntraced(function* ({ info: challenge, request, accepted }) {
-      if (request === undefined) {
+      if (!request) {
         return
       }
 
-      const requestUrl = yield* S.decodeUnknownEffect(S.URLFromString)(request.url).pipe(Effect.option)
-      if (Option.isNone(requestUrl)) {
+      const requestUrl = S.decodeOption(S.URLFromString)(request.url)
+      if (requestUrl._tag === "None") {
         return
       }
 
@@ -24,9 +24,9 @@ export const layer = <const Provers extends ReadonlyArray<Prover.Any>>(
         return
       }
 
-      const candidates = A.flatMap(challenge.supportedChains, (entry) =>
+      const candidates = Array.flatMap(challenge.supportedChains, (entry) =>
         pipe(
-          A.findFirst(
+          Array.findFirst(
             provers,
             ({ type, scheme, supportsChainId }) =>
               type === entry.type &&
@@ -34,22 +34,22 @@ export const layer = <const Provers extends ReadonlyArray<Prover.Any>>(
               supportsChainId(entry.chainId),
           ),
           Option.map((prover) => ({ entry, prover })),
-          A.fromOption,
+          Array.fromOption,
         ),
       )
 
       const selected = Option.orElse(
-        A.findFirst(candidates, ({ entry }) => entry.chainId === accepted.network),
-        () => A.head(candidates),
+        Array.findFirst(candidates, ({ entry }) => entry.chainId === accepted.network),
+        () => Array.head(candidates),
       )
 
-      if (Option.isNone(selected)) {
+      if (selected._tag === "None") {
         return
       }
 
       const { entry, prover } = selected.value
       const signed = yield* prover.sign(challenge.info, entry.chainId).pipe(Effect.option)
-      if (Option.isNone(signed)) {
+      if (signed._tag === "None") {
         return
       }
 

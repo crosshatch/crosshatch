@@ -54,7 +54,7 @@ const createSigningMessage = (input: Omit<typeof Proof.Type, "signature" | "sign
   S.decodeUnknownEffect(Message)(input).pipe(
     Effect.map(({ chainId: [, reference], ...unsigned }) => {
       const lines = [`${unsigned.domain} wants you to sign in with your Solana account:`, unsigned.address]
-      if (unsigned.statement !== undefined) {
+      if (unsigned.statement) {
         lines.push("", unsigned.statement)
       }
       lines.push(
@@ -65,16 +65,16 @@ const createSigningMessage = (input: Omit<typeof Proof.Type, "signature" | "sign
         `Nonce: ${unsigned.nonce}`,
         `Issued At: ${unsigned.issuedAt}`,
       )
-      if (unsigned.expirationTime !== undefined) {
+      if (unsigned.expirationTime) {
         lines.push(`Expiration Time: ${unsigned.expirationTime}`)
       }
-      if (unsigned.notBefore !== undefined) {
+      if (unsigned.notBefore) {
         lines.push(`Not Before: ${unsigned.notBefore}`)
       }
-      if (unsigned.requestId !== undefined) {
+      if (unsigned.requestId) {
         lines.push(`Request ID: ${unsigned.requestId}`)
       }
-      if (unsigned.resources !== undefined) {
+      if (unsigned.resources) {
         lines.push("Resources:", ...unsigned.resources.map((resource) => `- ${resource}`))
       }
       return lines.join("\n")

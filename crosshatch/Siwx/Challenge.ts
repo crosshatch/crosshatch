@@ -1,13 +1,16 @@
-import { Array as A, Clock, Effect, Encoding, pipe, Schema as S } from "effect"
+import { Array, Clock, Data, Effect, Encoding, pipe, Schema as S } from "effect"
 
+import { JsonRecord } from "../_util.ts"
+import { Random } from "../Crypto/Crypto.ts"
 import * as Required from "../Required.ts"
-import type { Required as RequiredType } from "../Required.ts"
 import * as ChallengeStore from "./ChallengeStore.ts"
 import { Siwx } from "./Extension.ts"
-import { Challenge as ChallengeSchema, CHALLENGE_MAX_AGE_MS, Proof } from "./Schema.ts"
+import { Challenge, CHALLENGE_MAX_AGE_MS, Proof } from "./Schema.ts"
 import type { Verifier } from "./Verifier.ts"
 
-const PositiveFiniteSeconds = S.Finite.check(S.isGreaterThan(0))
+class NoSuchVerifierError extends Data.TaggedError("NoSuchVerifierError")<{
+  readonly cause?: unknown
+}> {}
 
 export const issue = Effect.fnUntraced(function* ({
   uri,
@@ -22,20 +25,20 @@ export const issue = Effect.fnUntraced(function* ({
   readonly statement?: string | undefined
   readonly expirationSeconds?: number | undefined
 }) {
-  if (expirationSeconds !== undefined) {
-    yield* S.decodeUnknownEffect(PositiveFiniteSeconds)(expirationSeconds)
+  if (expirationSeconds) {
+    yield* S.decodeUnknownEffect(S.Finite.check(S.isGreaterThan(0)))(expirationSeconds)
   }
-  const url = yield* S.decodeUnknownEffect(S.URLFromString)(uri)
+  const { host, href } = yield* S.decodeUnknownEffect(S.URLFromString)(uri)
 
   const supportedChains = verifiers.flatMap((verifier) =>
     pipe(
       networks,
-      A.filter(verifier.supportsChainId),
-      A.map((network) => ({ chainId: network, type: verifier.type, signatureScheme: verifier.scheme })),
+      Array.filter(verifier.supportsChainId),
+      Array.map((network) => ({ chainId: network, type: verifier.type, signatureScheme: verifier.scheme })),
     ),
   )
-  if (!A.isReadonlyArrayNonEmpty(supportedChains)) {
-    return yield* Effect.die("siwx: no verifier supports any of the given networks")
+  if (!Array.isReadonlyArrayNonEmpty(supportedChains)) {
+    return yield* new NoSuchVerifierError({})
   }
 
   const now = yield* Clock.currentTimeMillis
@@ -43,22 +46,20 @@ export const issue = Effect.fnUntraced(function* ({
   const expirationTime =
     expirationSeconds === undefined ? undefined : Math.min(now + expirationSeconds * 1_000, maxExpiresAt)
 
-  const schema = yield* S.decodeUnknownEffect(S.Record(S.String, S.Json))(S.toJsonSchemaDocument(Proof).schema)
-
   const challenge = {
     info: {
-      domain: url.host,
-      uri: url.href,
+      domain: host,
+      uri: href,
       version: "1",
-      nonce: Encoding.encodeHex(crypto.getRandomValues(new Uint8Array(16))),
+      nonce: Encoding.encodeHex(Random.bytes(16)),
       issuedAt: new Date(now).toISOString(),
-      resources: [url.href],
-      ...(expirationTime !== undefined && { expirationTime: new Date(expirationTime).toISOString() }),
-      ...(statement !== undefined && { statement }),
+      resources: [href],
+      ...(expirationTime && { expirationTime: new Date(expirationTime).toISOString() }),
+      ...(statement && { statement }),
     },
     supportedChains,
-    schema,
-  } satisfies typeof ChallengeSchema.Type
+    schema: yield* S.decodeUnknownEffect(JsonRecord)(S.toJsonSchemaDocument(Proof).schema),
+  } satisfies typeof Challenge.Type
 
   yield* ChallengeStore.issue({ challenge, expiresAt: expirationTime ?? maxExpiresAt })
 
@@ -72,7 +73,7 @@ export const extend =
     readonly expirationSeconds?: number | undefined
     readonly networks?: ReadonlyArray<string> | undefined
   }) =>
-  <E, R>(effect: Effect.Effect<RequiredType, E, R>) =>
+  <E, R>(effect: Effect.Effect<Required.Required, E, R>) =>
     Effect.gen(function* () {
       const required = yield* effect
       const uri = yield* Effect.fromNullishOr(required.resource.url).pipe(Effect.orDie)
@@ -81,8 +82,8 @@ export const extend =
         options.networks ??
         pipe(
           required.accepts,
-          A.map(({ network }) => network),
-          A.dedupe,
+          Array.map(({ network }) => network),
+          Array.dedupe,
         )
 
       const challenge = yield* issue({ ...options, uri, networks })

@@ -8,7 +8,7 @@ import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
 import { KeyValueStore } from "effect/unstable/persistence"
 
 const verifiers = [Siwx.Siwe.verifier, Siwx.Siws.verifier] as const
-const paidResource = Siwx.Entitlement.Id.make("paid-resource")
+const paidResource = Siwx.Entitlement.EntitlementId.make("paid-resource")
 
 export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHttp>()(
   "ExampleEffectHttp",

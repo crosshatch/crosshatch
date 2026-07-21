@@ -1,4 +1,4 @@
-import { Effect, Schema as S, Layer, Data, Option } from "effect"
+import { Effect, Schema as S, Layer, Data, Option, Record } from "effect"
 import { FetchHttpClient } from "effect/unstable/http"
 
 import { Payer } from "../Payer.ts"
@@ -39,7 +39,7 @@ export const layerFetch = Layer.effect(
         const encoded = yield* S.encodeEffect(PayloadFromBase64JsonString)(payload)
         retry.headers.set(PAYMENT_SIGNATURE, encoded)
         if (headers) {
-          for (const [key, value] of Object.entries(headers)) {
+          for (const [key, value] of Record.toEntries(headers)) {
             retry.headers.set(key, value)
           }
         }
