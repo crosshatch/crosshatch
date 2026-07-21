@@ -3,33 +3,20 @@ import { KeyValueStore } from "effect/unstable/persistence"
 
 import { Challenge } from "./Schema.ts"
 
-export interface StoredChallenge {
-  readonly challenge: typeof Challenge.Type
-  readonly expiresAt: number
-}
+const StoredChallenge = S.Struct({ challenge: Challenge, expiresAt: S.Finite })
 
 const store = Effect.map(KeyValueStore.KeyValueStore, (kv) =>
-  KeyValueStore.toSchemaStore(
-    KeyValueStore.prefix(kv, "siwx:challenge:"),
-    S.Struct({
-      challenge: Challenge,
-      expiresAt: S.Finite,
-    }),
-  ),
+  KeyValueStore.toSchemaStore(KeyValueStore.prefix(kv, "siwx:challenge:"), StoredChallenge),
 )
 
-export const issue = (entry: StoredChallenge) =>
-  Effect.gen(function* () {
-    const challenges = yield* store
-    yield* challenges.set(entry.challenge.info.nonce, entry)
-  })
+export const issue = (entry: typeof StoredChallenge.Type) =>
+  store.pipe(Effect.flatMap((challenges) => challenges.set(entry.challenge.info.nonce, entry)))
 
 export const peek = (nonce: string) =>
-  Effect.gen(function* () {
-    const challenges = yield* store
-    const entry = yield* challenges.get(nonce)
-    return Option.isNone(entry) ? undefined : entry.value.challenge
-  })
+  store.pipe(
+    Effect.flatMap(({ get }) => get(nonce)),
+    Effect.map((entry) => (Option.isNone(entry) ? undefined : entry.value.challenge)),
+  )
 
 export const take = (nonce: string) =>
   Effect.gen(function* () {
