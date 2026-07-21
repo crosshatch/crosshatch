@@ -36,7 +36,7 @@ const createSigningMessage = (unsigned: Omit<typeof Proof.Type, "signature" | "s
     Effect.mapError((cause) => new ProofRejected({ cause, reason: "malformed-proof" })),
   )
 
-export class Eip155Verify extends Context.Service<
+class Eip155Verify extends Context.Service<
   Eip155Verify,
   (input: {
     readonly chainId: string
