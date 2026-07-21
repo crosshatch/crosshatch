@@ -44,7 +44,3 @@ export class FromEither extends Extension.Service<FromEither>()("crosshatch/From
     id: PaymentId,
   }),
 }) {}
-
-export const layerGenerate = Extension.layerHandler(FromClient, ({ info }) =>
-  Effect.succeed({ required: info.required, id: random() }),
-)
