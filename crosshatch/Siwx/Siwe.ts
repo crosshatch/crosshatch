@@ -21,12 +21,6 @@ const eip155ChainId = S.TemplateLiteralParser(["eip155:", reference])
 
 const supportsChainId = (chainId: string) => Option.isSome(S.decodeUnknownOption(eip155ChainId)(chainId))
 
-const accountId = Effect.fnUntraced(function* (chainId: string, address: string) {
-  const [, reference] = yield* S.decodeUnknownEffect(eip155ChainId)(chainId)
-  const eip155Address = yield* S.decodeUnknownEffect(Eip155Address)(address)
-  return CaAccountId.make(`eip155:${reference}:${eip155Address.toLowerCase()}`)
-})
-
 const createSigningMessage = (unsigned: Omit<typeof Proof.Type, "signature" | "signatureScheme">) =>
   S.decodeUnknownEffect(eip155ChainId)(unsigned.chainId).pipe(
     Effect.map(([, chainId]) =>
@@ -102,12 +96,9 @@ export const verifier = {
       )
 
       const chainId = yield* S.decodeUnknownEffect(ChainId)(proof.chainId)
+      const accountId = yield* S.decodeUnknownEffect(CaAccountId)(`${chainId}:${address.toLowerCase()}`)
 
-      return {
-        accountId: yield* accountId(proof.chainId, proof.address),
-        address: Address.make(proof.address),
-        chainId,
-      }
+      return { accountId, address: Address.make(address), chainId }
     },
     Effect.catchTags({
       SignatureCheckError: (cause) => new ProofRejected({ reason: "invalid-signature", cause }),
