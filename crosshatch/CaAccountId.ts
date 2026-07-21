@@ -1,3 +1,6 @@
-export * from "./CaAccountId/CaAccountId.ts"
-export * as eip155 from "./CaAccountId/eip155.ts"
-export * as solana from "./CaAccountId/solana.ts"
+import { Schema as S } from "effect"
+
+import { Address } from "./Address.ts"
+import { ChainId } from "./ChainId.ts"
+
+export const CaAccountId = S.TemplateLiteral([ChainId, ":", Address]).pipe(S.brand("crosshatch/CaAccountId"))

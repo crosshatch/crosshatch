@@ -3,15 +3,27 @@ import { Effect, Option, Schema as S } from "effect"
 import { Base58 } from "ox"
 
 import { Address } from "../Address.ts"
-import { builder as solanaAccount, solanaChainId } from "../CaAccountId/solana.ts"
+import { CaAccountId } from "../CaAccountId.ts"
 import { ChainId } from "../ChainId.ts"
 import { Ed25519PublicKey } from "../Crypto/Crypto.ts"
+import { Reference } from "../Reference.ts"
 import * as SolanaAddress from "../Solana/SolanaAddress.ts"
 import { SolanaSigner } from "../Solana/SolanaSigner.ts"
 import { ProofRejected, SignError } from "./Error.ts"
 import * as Prover from "./Prover.ts"
 import { Proof } from "./Schema.ts"
 import * as Verifier from "./Verifier.ts"
+
+const solanaChainId = S.TemplateLiteralParser(["solana:", S.String.check(S.isPattern(/^[-_a-zA-Z0-9]{1,32}$/u))])
+
+const supportsChainId = (chainId: string) => Option.isSome(S.decodeUnknownOption(solanaChainId)(chainId))
+
+const accountId = Effect.fnUntraced(function* (chainId: string, address: string) {
+  const [, reference] = yield* S.decodeUnknownEffect(solanaChainId)(chainId)
+  const validatedAddress = yield* S.decodeUnknownEffect(SolanaAddress.SolanaAddress)(address)
+  const validatedReference = yield* S.decodeUnknownEffect(Reference)(reference)
+  return CaAccountId.make(`solana:${validatedReference}:${validatedAddress}`)
+})
 
 const Rfc3339 = S.String.check(
   S.isPattern(/^\d{4}-\d{2}-\d{2}[Tt]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:[Zz]|[+-]\d{2}:\d{2})$/u),
@@ -82,7 +94,7 @@ const createSigningMessage = (input: Omit<typeof Proof.Type, "signature" | "sign
 export const prover = Prover.make({
   type: "ed25519",
   scheme: "siws",
-  supportsChainId: solanaAccount.supports,
+  supportsChainId,
   sign: Effect.fnUntraced(function* (info, chainId) {
     const signer = yield* SolanaSigner
     const address = SolanaAddress.SolanaAddress.make(signer.address)
@@ -102,7 +114,7 @@ export const prover = Prover.make({
 export const verifier = {
   type: "ed25519",
   scheme: "siws",
-  supportsChainId: solanaAccount.supports,
+  supportsChainId,
   verify: Effect.fnUntraced(
     function* (proof: typeof Proof.Type) {
       const message = yield* createSigningMessage(proof)
@@ -124,18 +136,16 @@ export const verifier = {
         return yield* new ProofRejected({ reason: "invalid-signature" })
       }
 
-      const accountId = yield* solanaAccount.accountId(proof.chainId, proof.address)
       const chainId = yield* S.decodeUnknownEffect(ChainId)(proof.chainId)
 
       return {
-        accountId,
+        accountId: yield* accountId(proof.chainId, proof.address),
         address: Address.make(proof.address),
         chainId,
       }
     },
     Effect.catchTags({
       SchemaError: (cause) => new ProofRejected({ reason: "malformed-proof", cause }),
-      CaAccountIdError: (cause) => new ProofRejected({ reason: "invalid-signature", cause }),
     }),
   ),
 } satisfies Verifier.Verifier

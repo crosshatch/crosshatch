@@ -1,9 +1,9 @@
 import { SiweMessage } from "@signinwithethereum/siwe"
-import { Context, Effect, Layer, Schema as S } from "effect"
+import { Context, Effect, Layer, Option, Schema as S } from "effect"
 import { type PublicClient } from "viem"
 
 import { Address } from "../Address.ts"
-import { builder as eip155Account, eip155ChainId } from "../CaAccountId/eip155.ts"
+import { CaAccountId } from "../CaAccountId.ts"
 import { ChainId } from "../ChainId.ts"
 import { Eip155Address } from "../Eip155/Eip155Address.ts"
 import { Eip155Signer } from "../Eip155/Eip155Signer.ts"
@@ -11,6 +11,21 @@ import { ProofRejected, SignError, SignatureCheckError } from "./Error.ts"
 import * as Prover from "./Prover.ts"
 import { Proof } from "./Schema.ts"
 import type * as Verifier from "./Verifier.ts"
+
+const reference = S.String.check(S.isPattern(/^\d+$/u)).pipe(
+  S.decodeTo(S.FiniteFromString),
+  S.check(S.isInt(), S.isGreaterThan(0)),
+)
+
+const eip155ChainId = S.TemplateLiteralParser(["eip155:", reference])
+
+const supportsChainId = (chainId: string) => Option.isSome(S.decodeUnknownOption(eip155ChainId)(chainId))
+
+const accountId = Effect.fnUntraced(function* (chainId: string, address: string) {
+  const [, reference] = yield* S.decodeUnknownEffect(eip155ChainId)(chainId)
+  const eip155Address = yield* S.decodeUnknownEffect(Eip155Address)(address)
+  return CaAccountId.make(`eip155:${reference}:${eip155Address.toLowerCase()}`)
+})
 
 const createSigningMessage = (unsigned: Omit<typeof Proof.Type, "signature" | "signatureScheme">) =>
   S.decodeUnknownEffect(eip155ChainId)(unsigned.chainId).pipe(
@@ -57,7 +72,7 @@ export const layerVerifier = (clients: Readonly<Record<string, Pick<PublicClient
 
 export const prover = Prover.make({
   type: "eip191",
-  supportsChainId: eip155Account.supports,
+  supportsChainId,
   sign: Effect.fnUntraced(function* (info, chainId) {
     const signer = yield* Eip155Signer
     const message = yield* createSigningMessage({ ...info, address: signer.address, chainId, type: "eip191" })
@@ -72,7 +87,7 @@ export const prover = Prover.make({
 export const verifier = {
   type: "eip191",
   scheme: "eip191",
-  supportsChainId: eip155Account.supports,
+  supportsChainId,
   verify: Effect.fnUntraced(
     function* (proof: typeof Proof.Type) {
       const message = yield* createSigningMessage(proof)
@@ -85,18 +100,16 @@ export const verifier = {
         Effect.filterOrFail((s) => s),
       )
 
-      const accountId = yield* eip155Account.accountId(proof.chainId, proof.address)
       const chainId = yield* S.decodeUnknownEffect(ChainId)(proof.chainId)
 
       return {
-        accountId,
+        accountId: yield* accountId(proof.chainId, proof.address),
         address: Address.make(proof.address),
         chainId,
       }
     },
     Effect.catchTags({
       SignatureCheckError: (cause) => new ProofRejected({ reason: "invalid-signature", cause }),
-      CaAccountIdError: (cause) => new ProofRejected({ reason: "malformed-proof", cause }),
       SchemaError: (cause) => new ProofRejected({ reason: "malformed-proof", cause }),
       NoSuchElementError: (cause) => new ProofRejected({ reason: "invalid-signature", cause }),
     }),
