@@ -64,6 +64,5 @@ export const verifyProof = <const Verifiers extends ReadonlyArray<Verifier.Any>>
     },
     Effect.catchTags({
       SchemaError: (cause) => new SiwxError({ cause }),
-      KeyValueStoreError: ({ cause }) => new SiwxError({ cause }),
     }),
   )

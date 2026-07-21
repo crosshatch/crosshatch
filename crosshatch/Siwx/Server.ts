@@ -35,12 +35,7 @@ export const layerMiddleware = <const Verifiers extends ReadonlyArray<Verifier.A
             ),
             Effect.transposeOption,
             Effect.map(Option.getOrUndefined),
-            Effect.catchTag("SiwxError", (error) =>
-              Effect.logWarning("siwx.verification.rejected").pipe(
-                Effect.annotateLogs({ cause: error.cause }),
-                Effect.as(undefined),
-              ),
-            ),
+            Effect.catchTag("SiwxError", Effect.as(undefined)),
           )
 
           return yield* Effect.provideContext(

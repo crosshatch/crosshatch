@@ -1,13 +1,9 @@
 import { Effect, Schema as S } from "effect"
 
-export const SignatureType = S.String
-
-export const SignatureScheme = S.String
-
 export const SupportedChain = S.Struct({
   chainId: S.String,
-  type: SignatureType,
-  signatureScheme: SignatureScheme.pipe(S.optional),
+  type: S.String,
+  signatureScheme: S.String.pipe(S.optional),
 })
 
 export const Info = S.Struct({
@@ -33,8 +29,8 @@ export const Proof = S.Struct({
   ...Info.fields,
   address: S.String,
   chainId: S.String,
-  type: SignatureType,
-  signatureScheme: SignatureScheme.pipe(S.optional),
+  type: S.String,
+  signatureScheme: S.String.pipe(S.optional),
   signature: S.String,
 })
 
