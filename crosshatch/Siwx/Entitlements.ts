@@ -7,7 +7,7 @@ import type { Payload } from "../Payload.ts"
 import type { Id } from "./Entitlement.ts"
 import { Identity } from "./Identity.ts"
 
-const key = ({ id, accountId }: { readonly id: typeof Id.Type; readonly accountId: typeof CaAccountId.Type }) =>
+const storeKey = ({ id, accountId }: { readonly id: typeof Id.Type; readonly accountId: typeof CaAccountId.Type }) =>
   `siwx:entitlement:${JSON.stringify([id, accountId])}`
 
 export class PurchaseError extends Data.TaggedError("PurchaseError")<{
@@ -20,7 +20,7 @@ export const isEntitled = Effect.fnUntraced(function* (id: typeof Id.Type) {
     return false
   }
   const store = yield* KeyValueStore.KeyValueStore
-  return yield* store.has(key({ id, accountId: identity.accountId }))
+  return yield* store.has(storeKey({ id, accountId: identity.accountId }))
 })
 
 export const purchase = Effect.fnUntraced(function* ({
@@ -52,6 +52,6 @@ export const purchase = Effect.fnUntraced(function* ({
   }
 
   const store = yield* KeyValueStore.KeyValueStore
-  yield* store.set(key({ id, accountId: identity.accountId }), "1")
+  yield* store.set(storeKey({ id, accountId: identity.accountId }), "1")
   return settlement
 })
