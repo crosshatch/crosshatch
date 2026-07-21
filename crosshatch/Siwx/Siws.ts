@@ -10,8 +10,9 @@ import * as SolanaAddress from "../Solana/SolanaAddress.ts"
 import { SolanaSigner } from "../Solana/SolanaSigner.ts"
 import { ProofRejected, SignError } from "./Error.ts"
 import type { AuthenticatedIdentity } from "./Identity.ts"
+import * as Prover from "./Prover.ts"
 import { Proof } from "./Schema.ts"
-import { makeScheme } from "./Scheme.ts"
+import * as Verifier from "./Verifier.ts"
 
 const Rfc3339 = S.String.check(
   S.isPattern(/^\d{4}-\d{2}-\d{2}[Tt]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:[Zz]|[+-]\d{2}:\d{2})$/u),
@@ -78,10 +79,10 @@ const createSigningMessage = (input: Omit<typeof Proof.Type, "signature" | "sign
     }),
   )
 
-export const { prover, verifier } = makeScheme({
+export const prover = Prover.make({
   type: "ed25519",
   scheme: "siws",
-  supportsChainId: (value) => solanaAccount.supports(value),
+  supportsChainId: solanaAccount.supports,
   sign: Effect.fnUntraced(
     function* (info, chainId) {
       const signer = yield* SolanaSigner
@@ -101,8 +102,14 @@ export const { prover, verifier } = makeScheme({
       SchemaError: (cause) => new SignError({ cause }),
     }),
   ),
+})
+
+export const verifier = {
+  type: "ed25519",
+  scheme: "siws",
+  supportsChainId: solanaAccount.supports,
   verify: Effect.fnUntraced(
-    function* (proof) {
+    function* (proof: typeof Proof.Type) {
       const message = yield* createSigningMessage(proof)
       const signature = yield* S.decodeUnknownEffect(
         S.String.check(
@@ -136,4 +143,4 @@ export const { prover, verifier } = makeScheme({
       CaAccountIdError: (cause) => new ProofRejected({ reason: "invalid-signature", cause }),
     }),
   ),
-})
+} satisfies Verifier.Verifier

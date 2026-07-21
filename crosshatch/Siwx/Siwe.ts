@@ -9,8 +9,9 @@ import { Eip155Address } from "../Eip155/Eip155Address.ts"
 import { Eip155Signer } from "../Eip155/Eip155Signer.ts"
 import { ProofRejected, SignError, SignatureCheckError } from "./Error.ts"
 import type { AuthenticatedIdentity } from "./Identity.ts"
+import * as Prover from "./Prover.ts"
 import { Proof } from "./Schema.ts"
-import { makeScheme } from "./Scheme.ts"
+import type * as Verifier from "./Verifier.ts"
 
 const Signature = S.TemplateLiteral([S.Literal("0x"), S.String]).check(S.isPattern(/^0x[a-fA-F0-9]+$/u))
 
@@ -57,9 +58,9 @@ export const layerVerifierRpc = (clients: Readonly<Record<string, Pick<PublicCli
     })
   })
 
-export const { prover, verifier } = makeScheme({
+export const prover = Prover.make({
   type: "eip191",
-  supportsChainId: (value) => eip155Account.supports(value),
+  supportsChainId: eip155Account.supports,
   sign: Effect.fnUntraced(
     function* (info, chainId) {
       const signer = yield* Eip155Signer
@@ -70,12 +71,16 @@ export const { prover, verifier } = makeScheme({
       })
       return { address: signer.address, signature }
     },
-    Effect.catchTags({
-      ProofRejected: ({ cause }) => new SignError({ cause }),
-    }),
+    Effect.catchTags({ ProofRejected: ({ cause }) => new SignError({ cause }) }),
   ),
+})
+
+export const verifier = {
+  type: "eip191",
+  scheme: "eip191",
+  supportsChainId: eip155Account.supports,
   verify: Effect.fnUntraced(
-    function* (proof) {
+    function* (proof: typeof Proof.Type) {
       const message = yield* createSigningMessage(proof)
       const { address, signature } = yield* S.decodeUnknownEffect(
         S.Struct({ address: Eip155Address, signature: Signature }),
@@ -102,4 +107,4 @@ export const { prover, verifier } = makeScheme({
       NoSuchElementError: (cause) => new ProofRejected({ reason: "invalid-signature", cause }),
     }),
   ),
-})
+} satisfies Verifier.Verifier<unknown, Eip155Verify>

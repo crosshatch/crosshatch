@@ -12,11 +12,9 @@ export const verifyProof = <const Verifiers extends ReadonlyArray<Verifier.Any>>
       if (challenge === undefined) {
         return yield* new ProofRejected({ reason: "unknown-nonce" })
       }
-
       if (!S.toEquivalence(Info)(proof, challenge.info)) {
         return yield* new ProofRejected({ reason: "challenge-mismatch" })
       }
-
       if (challenge.info.uri !== requestUrl.href) {
         return yield* new ProofRejected({ reason: "uri-mismatch" })
       }
@@ -30,29 +28,25 @@ export const verifyProof = <const Verifiers extends ReadonlyArray<Verifier.Any>>
       )(challenge.info)
 
       const now = yield* DateTime.now
-      const fresh = DateTime.between(issuedAt, {
-        minimum: DateTime.subtractDuration(now, CHALLENGE_MAX_AGE_MS),
-        maximum: now,
-      })
-      if (!fresh) {
+      if (
+        !DateTime.between(issuedAt, { minimum: DateTime.subtractDuration(now, CHALLENGE_MAX_AGE_MS), maximum: now })
+      ) {
         return yield* new ProofRejected({ reason: "stale" })
       }
-      const unexpired = expirationTime === undefined || DateTime.isLessThan(now, expirationTime)
-      if (!unexpired) {
+      if (!(expirationTime === undefined || DateTime.isLessThan(now, expirationTime))) {
         return yield* new ProofRejected({ reason: "expired" })
       }
-      const started = notBefore === undefined || DateTime.isGreaterThanOrEqualTo(now, notBefore)
-      if (!started) {
+      if (!(notBefore === undefined || DateTime.isGreaterThanOrEqualTo(now, notBefore))) {
         return yield* new ProofRejected({ reason: "not-yet-valid" })
       }
-
       if (!challenge.supportedChains.some(({ chainId, type }) => chainId === proof.chainId && type === proof.type)) {
         return yield* new ProofRejected({ reason: "unsupported-chain" })
       }
 
       const verifier = verifiers.find(
-        (candidate) => candidate.type === proof.type && candidate.supportsChainId(proof.chainId),
+        ({ supportsChainId, type }) => type === proof.type && supportsChainId(proof.chainId),
       )
+
       if (verifier === undefined) {
         return yield* new ProofRejected({ reason: "unsupported-chain" })
       }
@@ -70,5 +64,8 @@ export const verifyProof = <const Verifiers extends ReadonlyArray<Verifier.Any>>
 
       return identity
     },
-    Effect.catchTag("SchemaError", (cause) => new ProofRejected({ reason: "malformed-proof", cause })),
+    Effect.catchTags({
+      SchemaError: (cause) => new ProofRejected({ reason: "malformed-proof", cause }),
+      KeyValueStoreError: ({ cause }) => new ProofRejected({ reason: "malformed-proof", cause }),
+    }),
   )

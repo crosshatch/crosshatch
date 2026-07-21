@@ -9,7 +9,7 @@ import { KeyValueStore } from "effect/unstable/persistence"
 import { createPublicClient, http } from "viem"
 import { base } from "viem/chains"
 
-const verifiers = [Siwx.Siwe.verifier] as const
+const verifiers = [Siwx.Siwe.verifier, Siwx.Siws.verifier] as const
 const paidResource = Siwx.Entitlement.Id.make("paid-resource")
 
 const baseClient = createPublicClient({ chain: base, transport: http() })
