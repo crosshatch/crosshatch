@@ -1,6 +1,6 @@
 import { SiweMessage } from "@signinwithethereum/siwe"
 import { Context, Effect, Layer, Schema as S } from "effect"
-import { type PublicClient, verifyMessage } from "viem"
+import { type PublicClient } from "viem"
 
 import { Address } from "../Address.ts"
 import { builder as eip155Account, eip155ChainId } from "../CaAccountId/eip155.ts"
@@ -45,18 +45,11 @@ export class Eip155Verify extends Context.Service<
   }) => Effect.Effect<boolean, ProofRejected | SignatureCheckError>
 >()("crosshatch/Siwx/Eip155Verify") {}
 
-export const layerVerifierLocal = Layer.succeed(Eip155Verify, ({ address, message, signature }) =>
-  Effect.tryPromise({
-    try: () => verifyMessage({ address, message, signature }),
-    catch: (cause) => new ProofRejected({ reason: "malformed-proof", cause }),
-  }),
-)
-
-export const layerVerifierRpc = (clients: Readonly<Record<string, PublicClient>>) =>
+export const layerVerifierRpc = (clients: Readonly<Record<string, Pick<PublicClient, "verifyMessage">>>) =>
   Layer.succeed(Eip155Verify, ({ chainId, address, message, signature }) => {
     const client = clients[chainId]
     if (client === undefined) {
-      return new SignatureCheckError({ cause: new Error(`siwe: no RPC client for chain ${chainId}`) })
+      return new SignatureCheckError({})
     }
     return Effect.tryPromise({
       try: () => client.verifyMessage({ address, message, signature }),
@@ -85,17 +78,14 @@ export const { prover, verifier } = makeScheme({
     function* (proof) {
       const message = yield* createSigningMessage(proof)
       const { address, signature } = yield* S.decodeUnknownEffect(
-        S.Struct({
-          address: Eip155Address,
-          signature: Signature,
-        }),
-      )(proof).pipe(Effect.catchTag("SchemaError", (cause) => new ProofRejected({ reason: "malformed-proof", cause })))
+        S.Struct({ address: Eip155Address, signature: Signature }),
+      )(proof)
 
-      const verify = yield* Eip155Verify
-      const verified = yield* verify({ chainId: proof.chainId, address, message, signature })
-      if (!verified) {
-        return yield* new ProofRejected({ reason: "invalid-signature" })
-      }
+      yield* Eip155Verify.pipe(
+        Effect.flatMap((verify) => verify({ chainId: proof.chainId, address, message, signature })),
+        Effect.filterOrFail((s) => s),
+      )
+
       const accountId = yield* eip155Account.accountId(proof.chainId, proof.address)
       const chainId = yield* S.decodeUnknownEffect(ChainId)(proof.chainId)
 
@@ -109,6 +99,7 @@ export const { prover, verifier } = makeScheme({
       SignatureCheckError: (cause) => new ProofRejected({ reason: "invalid-signature", cause }),
       CaAccountIdError: (cause) => new ProofRejected({ reason: "malformed-proof", cause }),
       SchemaError: (cause) => new ProofRejected({ reason: "malformed-proof", cause }),
+      NoSuchElementError: (cause) => new ProofRejected({ reason: "invalid-signature", cause }),
     }),
   ),
 })

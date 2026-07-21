@@ -6,9 +6,13 @@ import * as Siwx from "crosshatch/Siwx"
 import { Config, Effect, Layer, Schema as S } from "effect"
 import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
 import { KeyValueStore } from "effect/unstable/persistence"
+import { createPublicClient, http } from "viem"
+import { base } from "viem/chains"
 
 const verifiers = [Siwx.Siwe.verifier] as const
 const paidResource = Siwx.Entitlement.Id.make("paid-resource")
+
+const baseClient = createPublicClient({ chain: base, transport: http() })
 
 export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHttp>()(
   "ExampleEffectHttp",
@@ -59,21 +63,23 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
           )
           return yield* ChxHttp.require({ required })
         }
+
         return yield* Siwx.Entitlements.purchase({
           id: paidResource,
           payload,
         }).pipe(
           Effect.map((settlement) =>
-            HttpServerResponse.text("Premium content unlocked.").pipe(ChxHttp.addResponseHeader(settlement))
+            HttpServerResponse.text("Premium content unlocked.").pipe(ChxHttp.addResponseHeader(settlement)),
           ),
           Effect.catchTag("PurchaseError", (error) =>
-            Effect.succeed(HttpServerResponse.text(`Purchase failed: ${error.reason}`, { status: 403 }))
+            Effect.succeed(HttpServerResponse.text(`Purchase failed: ${error.reason}`, { status: 403 })),
           ),
         )
       }),
     ).pipe(
       Layer.provide([
         Facilitator.layer(),
+        Siwx.Siwe.layerVerifierRpc({ "eip155:8453": baseClient }),
         HttpRouter.cors({
           allowedHeaders: ["*"],
           allowedMethods: ["*"],

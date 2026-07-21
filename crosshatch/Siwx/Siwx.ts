@@ -1,7 +1,3 @@
-import { Layer } from "effect"
-
-import * as Eip155Signer from "../Eip155/Eip155Signer.ts"
-import * as SolanaSigner from "../Solana/SolanaSigner.ts"
 // oxlint-disable-next-line unicorn/prefer-export-from
 import * as Siwe from "./Siwe.ts"
 // oxlint-disable-next-line unicorn/prefer-export-from
@@ -19,9 +15,3 @@ export * as Server from "./Server.ts"
 export { Siwe, Siws }
 export * as Verification from "./Verification.ts"
 export * as Verifier from "./Verifier.ts"
-
-export const layerProvers = Layer.mergeAll(Eip155Signer.layerMnemonic, SolanaSigner.layerMnemonic)
-
-export const layerVerifierLocal = Siwe.layerVerifierLocal
-
-export const layerVerifierRpc = Siwe.layerVerifierRpc

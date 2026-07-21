@@ -113,11 +113,10 @@ export const { prover, verifier } = makeScheme({
         ),
       )(proof.signature)
 
-      const publicKey = yield* Ed25519PublicKey.fromBytes(Base58.toBytes(proof.address))
-      const verified = yield* Ed25519PublicKey.verify(
-        publicKey,
-        Base58.toBytes(signature),
-        new TextEncoder().encode(message),
+      const verified = yield* Ed25519PublicKey.fromBytes(Base58.toBytes(proof.address)).pipe(
+        Effect.flatMap((publicKey) =>
+          Ed25519PublicKey.verify(publicKey, Base58.toBytes(signature), new TextEncoder().encode(message)),
+        ),
       )
       if (!verified) {
         return yield* new ProofRejected({ reason: "invalid-signature" })
@@ -132,6 +131,9 @@ export const { prover, verifier } = makeScheme({
         chainId,
       } satisfies AuthenticatedIdentity
     },
-    Effect.catchTag("SchemaError", (cause) => new ProofRejected({ reason: "malformed-proof", cause })),
+    Effect.catchTags({
+      SchemaError: (cause) => new ProofRejected({ reason: "malformed-proof", cause }),
+      CaAccountIdError: (cause) => new ProofRejected({ reason: "invalid-signature", cause }),
+    }),
   ),
 })

@@ -1,5 +1,7 @@
 import { ChxHttp, Mnemonic } from "crosshatch"
+import { Eip155Signer } from "crosshatch/Eip155/Eip155"
 import * as Siwx from "crosshatch/Siwx"
+import { SolanaSigner } from "crosshatch/Solana/Solana"
 import { Config, Console, Effect, Layer } from "effect"
 import { FetchHttpClient, HttpClient } from "effect/unstable/http"
 
@@ -8,7 +10,13 @@ import { PayerLive } from "./PayerLive.ts"
 const SiwxHttpClientLive = ChxHttp.layerClient(
   Siwx.Client.resolver(Siwx.Siwe.prover, Siwx.Siws.prover),
   ChxHttp.Payment.resolver,
-).pipe(Layer.provide([FetchHttpClient.layer, PayerLive, Siwx.layerProvers.pipe(Layer.provide(Mnemonic.layerEnv))]))
+).pipe(
+  Layer.provide([
+    FetchHttpClient.layer,
+    PayerLive,
+    Layer.mergeAll(Eip155Signer.layerMnemonic, SolanaSigner.layerMnemonic).pipe(Layer.provide(Mnemonic.layerEnv)),
+  ]),
+)
 
 Effect.gen(function* () {
   const url = yield* Config.string("SIWX_URL").pipe(
