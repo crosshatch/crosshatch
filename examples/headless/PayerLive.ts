@@ -6,11 +6,15 @@ import { Config, Layer } from "effect"
 // Solana signing needs the latest blockhash to bound ttl.
 const SolanaStateLive = Config.string("SOLANA_RPC_URL").pipe(Config.map(SolanaState.layer), Layer.unwrap)
 
-const SchemesLive = Layer.mergeAll(
-  Layer.mergeAll(Erc3009Scheme.layer, Permit2Scheme.layer).pipe(Layer.provideMerge(Eip155Signer.layerMnemonic)),
-  SolanaScheme.layer.pipe(Layer.provideMerge([SolanaSigner.layerMnemonic, SolanaStateLive])),
-).pipe(Layer.provideMerge(Mnemonic.layerEnv))
-
-const AcceptLive = Accept.layer(KnownAssets.Usd).pipe(Layer.provideMerge(SchemesLive))
-
-export const PayerLive = Payer.layer.pipe(Layer.provideMerge(AcceptLive))
+export const PayerLive = Payer.layer.pipe(
+  Layer.provide(
+    Accept.layer(KnownAssets.Usd).pipe(
+      Layer.provide(
+        Layer.mergeAll(
+          Layer.mergeAll(Erc3009Scheme.layer, Permit2Scheme.layer).pipe(Layer.provide(Eip155Signer.layerMnemonic)),
+          SolanaScheme.layer.pipe(Layer.provide([SolanaSigner.layerMnemonic, SolanaStateLive])),
+        ).pipe(Layer.provide(Mnemonic.layerEnv)),
+      ),
+    ),
+  ),
+)
