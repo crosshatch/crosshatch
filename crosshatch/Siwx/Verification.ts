@@ -28,17 +28,11 @@ export const verifyProof = <const Verifiers extends ReadonlyArray<Verifier>>(...
 
       const now = yield* DateTime.now
       if (
-        !DateTime.between(issuedAt, { minimum: DateTime.subtractDuration(now, CHALLENGE_MAX_AGE_MS), maximum: now })
+        !DateTime.between(issuedAt, { minimum: DateTime.subtractDuration(now, CHALLENGE_MAX_AGE_MS), maximum: now }) ||
+        !(expirationTime === undefined || DateTime.isLessThan(now, expirationTime)) ||
+        !(notBefore === undefined || DateTime.isGreaterThanOrEqualTo(now, notBefore)) ||
+        !challenge.supportedChains.some(({ chainId, type }) => chainId === proof.chainId && type === proof.type)
       ) {
-        return yield* new VerifyError({})
-      }
-      if (!(expirationTime === undefined || DateTime.isLessThan(now, expirationTime))) {
-        return yield* new VerifyError({})
-      }
-      if (!(notBefore === undefined || DateTime.isGreaterThanOrEqualTo(now, notBefore))) {
-        return yield* new VerifyError({})
-      }
-      if (!challenge.supportedChains.some(({ chainId, type }) => chainId === proof.chainId && type === proof.type)) {
         return yield* new VerifyError({})
       }
 
@@ -53,9 +47,7 @@ export const verifyProof = <const Verifiers extends ReadonlyArray<Verifier>>(...
         return yield* new VerifyError({})
       }
 
-      const identity = yield* verifier
-        .verify(proof)
-        .pipe(Effect.mapError((cause) => new VerifyError({ cause })))
+      const identity = yield* verifier.verify(proof).pipe(Effect.mapError((cause) => new VerifyError({ cause })))
 
       yield* ChallengeStore.take(proof.nonce).pipe(
         Effect.filterOrFail(
