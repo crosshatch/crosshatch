@@ -31,8 +31,6 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
     const recipient = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
     const publicOrigin = yield* Config.schema(S.URLFromString, "PUBLIC_ORIGIN")
 
-    const siwxServer = Siwx.Server.layerMiddleware({ verifiers, origin: publicOrigin.origin })
-
     const handler = HttpRouter.add(
       "GET",
       "/paid",
@@ -82,7 +80,7 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
           exposedHeaders: ChxHttp.HEADERS,
         }),
         ChxHttp.layerMiddleware({ extensions: [PaymentId.FromMerchant] }),
-        siwxServer,
+        Siwx.Server.layerMiddleware({ verifiers, origin: publicOrigin.origin }),
         KeyValueStore.layerMemory,
       ]),
       HttpRouter.toHttpEffect,
