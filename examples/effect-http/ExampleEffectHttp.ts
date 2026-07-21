@@ -79,7 +79,7 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
     ).pipe(
       Layer.provide([
         Facilitator.layer(),
-        Siwx.Siwe.layerVerifierRpc({ "eip155:8453": baseClient }),
+        Siwx.Siwe.layerVerifier({ "eip155:8453": baseClient }),
         HttpRouter.cors({
           allowedHeaders: ["*"],
           allowedMethods: ["*"],

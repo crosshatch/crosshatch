@@ -46,7 +46,7 @@ class Eip155Verify extends Context.Service<
   }) => Effect.Effect<boolean, ProofRejected | SignatureCheckError>
 >()("crosshatch/Siwx/Eip155Verify") {}
 
-export const layerVerifierRpc = (clients: Readonly<Record<string, Pick<PublicClient, "verifyMessage">>>) =>
+export const layerVerifier = (clients: Readonly<Record<string, Pick<PublicClient, "verifyMessage">>>) =>
   Layer.succeed(Eip155Verify, ({ chainId, address, message, signature }) => {
     const client = clients[chainId]
     if (client === undefined) {
