@@ -1,26 +1,26 @@
-import { Effect, Layer, Schema as S } from "effect"
+import { Array as A, Effect, Layer, Predicate, Schema as S } from "effect"
 import { HttpClient, HttpClientError, HttpClientRequest } from "effect/unstable/http"
 
 import { RequiredFromBase64JsonString } from "../Required.ts"
 import { CROSSHATCH_TRACE_ID, PAYMENT_REQUIRED } from "./constants.ts"
 import type { Resolver } from "./Resolver.ts"
 
-export function layerClient<const Resolvers extends ReadonlyArray<Resolver.Any>>(
+export function layerClient<const Resolvers extends ReadonlyArray<Resolver.Any> = ReadonlyArray<Resolver.Any>>(
   ...resolvers: Resolvers
-): Layer.Layer<HttpClient.HttpClient, never, HttpClient.HttpClient | Resolver.Context<Resolvers[number]>>
-
-export function layerClient<R>(...resolvers: ReadonlyArray<Resolver<unknown, R>>) {
+): Layer.Layer<HttpClient.HttpClient, never, HttpClient.HttpClient | Resolver.Context<Resolvers[number]>> {
   return Layer.effect(
     HttpClient.HttpClient,
     Effect.gen(function* () {
       const client = yield* HttpClient.HttpClient
-      const context = yield* Effect.context<R>()
+      const context = yield* Effect.context<any>()
+
       return HttpClient.transform(client, (effect, request) =>
         Effect.gen(function* () {
           const response = yield* effect
           if (response.status !== 402) {
             return response
           }
+
           const requiredHeader = response.headers[PAYMENT_REQUIRED]
           if (requiredHeader === undefined) {
             return yield* new HttpClientError.HttpClientError({
@@ -39,29 +39,33 @@ export function layerClient<R>(...resolvers: ReadonlyArray<Resolver<unknown, R>>
                 }),
             ),
           )
-          let resolved = false
-          for (const resolver of resolvers) {
-            const resolution = yield* resolver({
+
+          const resolutions = yield* Effect.forEach(resolvers, (resolver) =>
+            resolver({
               request,
               required,
               traceId: response.headers[CROSSHATCH_TRACE_ID],
             }).pipe(
               Effect.provide(context),
               Effect.mapError(
-                // oxlint-disable-next-line no-loop-func
                 (cause) =>
                   new HttpClientError.HttpClientError({
                     reason: new HttpClientError.EncodeError({ request, cause }),
                   }),
               ),
-            )
-            if (resolution === undefined) {
-              continue
-            }
-            request = HttpClientRequest.setHeaders(request, new Headers(resolution.headers))
-            resolved = true
+            ),
+          )
+          const resolved = A.filter(resolutions, Predicate.isNotUndefined)
+
+          if (resolved.length === 0) {
+            return response
           }
-          return resolved ? yield* client.execute(request) : response
+
+          return yield* client.execute(
+            A.reduce(resolved, request, (acc, resolution) =>
+              HttpClientRequest.setHeaders(acc, new Headers(resolution.headers)),
+            ),
+          )
         }),
       )
     }),
