@@ -8,9 +8,7 @@ import { PayerLive } from "./PayerLive.ts"
 const BlockrunLive = OpenAiLanguageModel.layer({ model: "deepseek/deepseek-chat" }).pipe(
   Layer.provide(
     OpenAiClient.layer({ apiUrl: "https://blockrun.ai/api/v1" }).pipe(
-      Layer.provide(
-        ChxHttp.layerClient.pipe(Layer.provide(PayerLive)),
-      ),
+      Layer.provide(ChxHttp.layerClient.pipe(Layer.provide(PayerLive))),
     ),
   ),
 )
