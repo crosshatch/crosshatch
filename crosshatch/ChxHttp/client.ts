@@ -46,13 +46,13 @@ export function layerClient<const Resolvers extends ReadonlyArray<Resolver.Any> 
               required,
               traceId: response.headers[CROSSHATCH_TRACE_ID],
             }).pipe(
-              Effect.provide(context),
               Effect.mapError(
                 (cause) =>
                   new HttpClientError.HttpClientError({
                     reason: new HttpClientError.EncodeError({ request, cause }),
                   }),
               ),
+              Effect.provide(context),
             ),
           )
           const resolved = A.filter(resolutions, Predicate.isNotUndefined)
