@@ -1,3 +1,4 @@
+// Test values obtained from https://github.com/saiashirwad/solana-kit-tests
 import { describe, expect, it } from "@effect/vitest"
 import { Effect, Exit, Schema as S } from "effect"
 
