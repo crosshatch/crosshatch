@@ -56,12 +56,6 @@
     "@effect/platform-node": "catalog:",
     "@napi-rs/keyring": "catalog:",
     "@scure/bip39": "catalog:",
-    "@solana-program/compute-budget": "catalog:",
-    "@solana-program/memo": "catalog:",
-    "@solana-program/token": "catalog:",
-    "@solana/addresses": "catalog:",
-    "@solana/kit": "catalog:",
-    "@solana/transactions": "catalog:",
     "@standard-schema/spec": "catalog:",
     "effect": "catalog:",
     "ox": "catalog:"

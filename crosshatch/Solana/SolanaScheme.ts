@@ -1,20 +1,18 @@
-import { getSetComputeUnitLimitInstruction, getSetComputeUnitPriceInstruction } from "@solana-program/compute-budget"
-import { getAddMemoInstruction } from "@solana-program/memo"
-import { findAssociatedTokenPda, getTransferCheckedInstruction } from "@solana-program/token"
-import { address, type Address } from "@solana/addresses"
-import {
-  appendTransactionMessageInstructions,
-  createTransactionMessage,
-  getBase64EncodedWireTransaction,
-  partiallySignTransactionMessageWithSigners,
-  setTransactionMessageFeePayer,
-  setTransactionMessageLifetimeUsingBlockhash,
-  pipe as solanaPipe,
-} from "@solana/kit"
 import { Effect, Encoding, Schema as S } from "effect"
 
 import { Random } from "../Crypto/Crypto.ts"
 import * as Scheme from "../Scheme.ts"
+import {
+  SvmAddress,
+  buildTransactionMessage,
+  compileTransaction,
+  findAssociatedTokenPda,
+  getAddMemoInstruction,
+  getBase64EncodedWireTransaction,
+  getSetComputeUnitLimitInstruction,
+  getSetComputeUnitPriceInstruction,
+  getTransferCheckedInstruction,
+} from "./Protocol/Protocol.ts"
 import * as SolanaAddress from "./SolanaAddress.ts"
 import * as SolanaAsset from "./SolanaAsset.ts"
 import { SolanaSigner } from "./SolanaSigner.ts"
@@ -47,50 +45,45 @@ export const layer = SolanaScheme.layer(
       function* ({ physical, accepted }) {
         const signer = yield* SolanaSigner
         const { getLatestBlockhash } = yield* SolanaState
-        const latestBlockhash = yield* getLatestBlockhash
+        const lifetimeConstraint = yield* getLatestBlockhash
 
         const mintAsset = yield* S.decodeUnknownEffect(SolanaAsset.SolanaAsset)(accepted.asset)
-        const mint = address(mintAsset)
-        const tokenProgram = address(tokenProgramId)
+        const { mint, tokenProgram, feePayerAddress, authority } = yield* Effect.all({
+          mint: S.decodeEffect(SvmAddress)(mintAsset),
+          tokenProgram: S.decodeEffect(SvmAddress)(tokenProgramId),
+          feePayerAddress: S.decodeEffect(SvmAddress)(feePayer),
+          authority: S.decodeEffect(SvmAddress)(signer.address),
+        })
 
-        const ata = (owner: Address) =>
-          Effect.promise(() =>
-            findAssociatedTokenPda({
-              owner: address(owner),
-              tokenProgram,
+        const [[sourceAta], [destAta]] = yield* Effect.all([
+          findAssociatedTokenPda({ owner: authority, tokenProgram, mint }),
+          S.decodeEffect(SvmAddress)(accepted.payTo).pipe(
+            Effect.flatMap((owner) => findAssociatedTokenPda({ owner, tokenProgram, mint })),
+          ),
+        ])
+
+        const message = buildTransactionMessage({
+          feePayer: feePayerAddress,
+          lifetimeConstraint,
+          instructions: [
+            yield* getSetComputeUnitLimitInstruction(20000),
+            yield* getSetComputeUnitPriceInstruction(1n),
+            yield* getTransferCheckedInstruction({
+              source: sourceAta,
               mint,
+              destination: destAta,
+              authority,
+              tokenProgram,
+              amount: BigInt(accepted.amount),
+              decimals: physical.decimals,
             }),
-          )
-        const [[sourceAta], [destAta]] = yield* Effect.all([ata(signer.address), ata(address(accepted.payTo))])
+            getAddMemoInstruction(memo ?? Encoding.encodeHex(Random.bytes(16))),
+          ],
+        })
 
-        const message = solanaPipe(
-          createTransactionMessage({ version: 0 }),
-          (v) => setTransactionMessageFeePayer(address(feePayer), v),
-          (v) => setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, v),
-          (v) =>
-            appendTransactionMessageInstructions(
-              [
-                getSetComputeUnitLimitInstruction({ units: 20000 }),
-                getSetComputeUnitPriceInstruction({ microLamports: 1n }),
-                getTransferCheckedInstruction(
-                  {
-                    source: sourceAta,
-                    mint,
-                    destination: destAta,
-                    authority: signer,
-                    amount: BigInt(accepted.amount),
-                    decimals: physical.decimals,
-                  },
-                  { programAddress: tokenProgram },
-                ),
-                getAddMemoInstruction({ memo: memo ?? Encoding.encodeHex(Random.bytes(16)) }),
-              ],
-              v,
-            ),
-        )
-
-        const transaction = yield* Effect.promise(() => partiallySignTransactionMessageWithSigners(message)).pipe(
-          Effect.map(getBase64EncodedWireTransaction),
+        const transaction = yield* compileTransaction(message).pipe(
+          Effect.flatMap(signer.signTransaction),
+          Effect.flatMap(getBase64EncodedWireTransaction),
         )
 
         return { transaction }
