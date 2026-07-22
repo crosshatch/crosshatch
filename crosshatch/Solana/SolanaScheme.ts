@@ -62,24 +62,24 @@ export const layer = SolanaScheme.layer(
           ),
         ])
 
-        const message = buildTransactionMessage({
-          feePayer: feePayerAddress,
-          lifetimeConstraint,
-          instructions: [
-            yield* getSetComputeUnitLimitInstruction(20000),
-            yield* getSetComputeUnitPriceInstruction(1n),
-            yield* getTransferCheckedInstruction({
-              source: sourceAta,
-              mint,
-              destination: destAta,
-              authority,
-              tokenProgram,
-              amount: BigInt(accepted.amount),
-              decimals: physical.decimals,
-            }),
-            getAddMemoInstruction(memo ?? Encoding.encodeHex(Random.bytes(16))),
-          ],
-        })
+        const message = yield* Effect.all([
+          getSetComputeUnitLimitInstruction(20000),
+          getSetComputeUnitPriceInstruction(1n),
+          getTransferCheckedInstruction({
+            source: sourceAta,
+            mint,
+            destination: destAta,
+            authority,
+            tokenProgram,
+            amount: BigInt(accepted.amount),
+            decimals: physical.decimals,
+          }),
+          Effect.succeed(getAddMemoInstruction(memo ?? Encoding.encodeHex(Random.bytes(16)))),
+        ]).pipe(
+          Effect.map((instructions) =>
+            buildTransactionMessage({ feePayer: feePayerAddress, lifetimeConstraint, instructions }),
+          ),
+        )
 
         const transaction = yield* compileTransaction(message).pipe(
           Effect.flatMap(signer.signTransaction),
