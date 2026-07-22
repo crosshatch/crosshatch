@@ -61,6 +61,7 @@ export const openAtom = runtime.fn<void>()(
               ...common,
             }),
       Linked: () => ActivityWidget.host(common),
+      Rescinded: Effect.die,
     }).pipe(
       Boundary.span("open", import.meta.url, {
         attributes: { stateTag: state._tag, internal },
