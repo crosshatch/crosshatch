@@ -1,81 +1,31 @@
-/* oxlint-disable no-bitwise -- byte-level codec */
-import { Effect, Option, Schema as S, Data } from "effect"
+import { Effect, Option, Schema as S } from "effect"
 
+import * as Base58 from "../../Crypto/Base58.ts"
 import * as CryptoKey from "../../Crypto/CryptoKey.ts"
-import { compressedPointIsOnCurve } from "./Curve.ts"
+import * as Ed25519Point from "../../Crypto/Ed25519Point.ts"
+import * as Hash from "../../Crypto/Hash.ts"
+import { SvmProtocolError } from "./Error.ts"
 
-export class SvmProtocolError extends Data.TaggedError("SvmProtocolError")<{
-  readonly message: string
-  readonly cause?: unknown
-}> {}
-
-const ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
-const ALPHABET_INDEX = new Map(Array.from(ALPHABET, (character, index) => [character, BigInt(index)]))
 const PDA_MARKER = new TextEncoder().encode("ProgramDerivedAddress")
-
-const base58Encode = (bytes: Uint8Array): string => {
-  let integer = 0n
-  for (const byte of bytes) integer = (integer << 8n) | BigInt(byte)
-
-  let encoded = ""
-  while (integer > 0n) {
-    encoded = ALPHABET[Number(integer % 58n)]! + encoded
-    integer /= 58n
-  }
-  let leadingZeroes = 0
-  while (leadingZeroes < bytes.length && bytes[leadingZeroes] === 0) leadingZeroes++
-  return "1".repeat(leadingZeroes) + encoded
-}
-
-const base58Decode = (value: string): Option.Option<Uint8Array> => {
-  let integer = 0n
-  for (const character of value) {
-    const digit = ALPHABET_INDEX.get(character)
-    if (digit === undefined) return Option.none()
-    integer = integer * 58n + digit
-  }
-
-  const body: number[] = []
-  while (integer > 0n) {
-    body.push(Number(integer & 0xffn))
-    integer >>= 8n
-  }
-  body.reverse()
-  let leadingZeroes = 0
-  while (leadingZeroes < value.length && value[leadingZeroes] === "1") leadingZeroes++
-  const bytes = new Uint8Array(leadingZeroes + body.length)
-  bytes.set(body, leadingZeroes)
-  return Option.some(bytes)
-}
 
 export const Address = S.String.check(
   S.makeFilter(
-    (value) =>
-      Option.match(base58Decode(value), {
-        onNone: () => false,
-        onSome: (bytes) => bytes.byteLength === 32,
-      }),
+    (value) => Option.match(Base58.decode(value), { onNone: () => false, onSome: (bytes) => bytes.byteLength === 32 }),
     { expected: "a Base58-encoded 32-byte Solana address" },
   ),
 ).pipe(S.brand("crosshatch/SvmAddress"))
+export type Address = typeof Address.Type
 
 export const Blockhash = Address.pipe(S.brand("crosshatch/Blockhash"))
-
-export type Address = typeof Address.Type
 export type Blockhash = typeof Blockhash.Type
-type ProgramDerivedAddress = readonly [Address, number]
 
 const addressFromBytes = (bytes: Uint8Array) =>
   bytes.byteLength === 32
-    ? Effect.succeed(Address.make(base58Encode(bytes)))
-    : Effect.fail(
-        new SvmProtocolError({
-          message: `Solana address requires 32 bytes; got ${bytes.byteLength}`,
-        }),
-      )
+    ? Effect.succeed(Address.make(Base58.encode(bytes)))
+    : Effect.fail(new SvmProtocolError({ message: `Solana address requires 32 bytes; got ${bytes.byteLength}` }))
 
-export const addressToBytes = (value: Address): Uint8Array => Option.getOrThrow(base58Decode(value))
-export const addressFromPublicKey = (publicKey: typeof CryptoKey.CryptoKey.Type) =>
+export const toBytes = (value: Address): Uint8Array => Option.getOrThrow(Base58.decode(value))
+export const fromPublicKey = (publicKey: typeof CryptoKey.CryptoKey.Type) =>
   CryptoKey.toBytes(publicKey).pipe(Effect.flatMap(addressFromBytes))
 
 const createProgramAddress = Effect.fnUntraced(function* (programAddress: Address, seeds: ReadonlyArray<Uint8Array>) {
@@ -87,30 +37,27 @@ const createProgramAddress = Effect.fnUntraced(function* (programAddress: Addres
       return yield* new SvmProtocolError({ message: `PDA seed ${index} exceeds 32 bytes` })
     }
   }
-  const seedLength = seeds.reduce((total, seed) => total + seed.byteLength, 0)
-  const input = new Uint8Array(seedLength + 32 + PDA_MARKER.length)
+  const input = new Uint8Array(seeds.reduce((total, seed) => total + seed.byteLength, 0) + 32 + PDA_MARKER.length)
   let offset = 0
   for (const seed of seeds) {
     input.set(seed, offset)
     offset += seed.length
   }
-  input.set(addressToBytes(programAddress), offset)
+  input.set(toBytes(programAddress), offset)
   input.set(PDA_MARKER, offset + 32)
-  const digest = yield* Effect.promise(() => crypto.subtle.digest("SHA-256", input)).pipe(
-    Effect.map((v) => new Uint8Array(v)),
-  )
-  if (compressedPointIsOnCurve(digest)) return Option.none<Address>()
+  const digest = yield* Hash.sha256(input)
+  if (Ed25519Point.isOnCurve(digest)) return Option.none<Address>()
   return Option.some(yield* addressFromBytes(digest))
 })
 
 export const findProgramDerivedAddress = Effect.fnUntraced(function* (
   programAddress: Address,
   seeds: ReadonlyArray<Uint8Array>,
-) {
+): Effect.fn.Return<readonly [Address, number], SvmProtocolError> {
   for (let bump = 255; bump > 0; bump--) {
     const candidate = yield* createProgramAddress(programAddress, [...seeds, Uint8Array.of(bump)])
-    if (Option.isSome(candidate)) {
-      return [candidate.value, bump] as const satisfies ProgramDerivedAddress
+    if (candidate._tag === "Some") {
+      return [candidate.value, bump] as const
     }
   }
   return yield* new SvmProtocolError({ message: "Unable to find a viable PDA bump" })

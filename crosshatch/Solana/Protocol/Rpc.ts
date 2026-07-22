@@ -1,7 +1,8 @@
 import { Effect, Schema as S } from "effect"
 import { FetchHttpClient, HttpClient, HttpClientRequest, HttpClientResponse } from "effect/unstable/http"
 
-import { Blockhash, SvmProtocolError } from "./Address.ts"
+import { Blockhash } from "./Address.ts"
+import { SvmProtocolError } from "./Error.ts"
 
 const GetLatestBlockhashResponse = S.Struct({
   body: S.Struct({

@@ -1,4 +1,4 @@
-export { SvmProtocolError, addressFromPublicKey, Blockhash, Address } from "./Address.ts"
+export { fromPublicKey as addressFromPublicKey, Blockhash, Address } from "./Address.ts"
 export {
   compileTransaction,
   getBase64EncodedWireTransaction,
@@ -15,3 +15,4 @@ export {
   getSetComputeUnitPriceInstruction,
   getTransferCheckedInstruction,
 } from "./Instructions.ts"
+export { SvmProtocolError } from "./Error.ts"

@@ -2,16 +2,18 @@
 import { Effect, Encoding } from "effect"
 
 import { Ed25519PrivateKey } from "../../Crypto/Crypto.ts"
-import { addressFromPublicKey, addressToBytes, type Address, SvmProtocolError } from "./Address.ts"
+import * as Address from "./Address.ts"
+import { concat, encodeShortU16 } from "./Codec.ts"
+import { SvmProtocolError } from "./Error.ts"
 import { AccountRole, type Instruction, type TransactionMessage } from "./TransactionMessage.ts"
 
 export interface Transaction {
   readonly messageBytes: Uint8Array
-  readonly signatures: Readonly<Record<Address, Uint8Array | null>>
+  readonly signatures: Readonly<Record<Address.Address, Uint8Array | null>>
 }
 
 interface OrderedAccount {
-  readonly address: Address
+  readonly address: Address.Address
   readonly role: AccountRole
   readonly feePayer: boolean
 }
@@ -28,35 +30,16 @@ const ADDRESS_COMPARATOR = new Intl.Collator("en", {
   usage: "sort",
 }).compare
 
-const concat = (...parts: ReadonlyArray<Uint8Array>): Uint8Array => {
-  const output = new Uint8Array(parts.reduce((length, part) => length + part.length, 0))
-  let offset = 0
-  for (const part of parts) {
-    output.set(part, offset)
-    offset += part.length
-  }
-  return output
-}
-
-const encodeShortU16 = (value: number): Uint8Array => {
-  const bytes: number[] = []
-  let remaining = value
-  do {
-    let byte = remaining & 0x7f
-    remaining >>>= 7
-    if (remaining > 0) byte |= 0x80
-    bytes.push(byte)
-  } while (remaining > 0)
-  return Uint8Array.from(bytes)
-}
-
-const getOrderedAccounts = Effect.fnUntraced(function* (feePayer: Address, instructions: ReadonlyArray<Instruction>) {
-  const accounts = new Map<Address, OrderedAccount>([
+const getOrderedAccounts = Effect.fnUntraced(function* (
+  feePayer: Address.Address,
+  instructions: ReadonlyArray<Instruction>,
+) {
+  const accounts = new Map<Address.Address, OrderedAccount>([
     [feePayer, { address: feePayer, role: AccountRole.WRITABLE_SIGNER, feePayer: true }],
   ])
-  const invokedPrograms = new Set<Address>()
+  const invokedPrograms = new Set<Address.Address>()
 
-  const upsert = (accountAddress: Address, role: AccountRole) => {
+  const upsert = (accountAddress: Address.Address, role: AccountRole) => {
     const existing = accounts.get(accountAddress)
     if (existing?.feePayer) return Effect.void
     const mergedRole = existing === undefined ? role : ((existing.role | role) as AccountRole)
@@ -100,7 +83,7 @@ const getOrderedAccounts = Effect.fnUntraced(function* (feePayer: Address, instr
 
 const encodeCompiledInstruction = (
   instruction: Instruction,
-  accountIndex: ReadonlyMap<Address, number>,
+  accountIndex: ReadonlyMap<Address.Address, number>,
 ): Effect.Effect<Uint8Array, SvmProtocolError> => {
   const programIndex = accountIndex.get(instruction.programAddress)
   if (programIndex === undefined) {
@@ -167,14 +150,14 @@ export const compileTransaction = Effect.fnUntraced(function* (message: Transact
   const messageBytes = concat(
     Uint8Array.of(0x80, signerAccounts.length, numReadonlySignerAccounts, numReadonlyNonSignerAccounts),
     encodeShortU16(accounts.length),
-    ...accounts.map((account) => addressToBytes(account.address)),
-    addressToBytes(message.lifetimeConstraint.blockhash),
+    ...accounts.map((account) => Address.toBytes(account.address)),
+    Address.toBytes(message.lifetimeConstraint.blockhash),
     encodeShortU16(compiledInstructions.length),
     ...compiledInstructions,
     encodeShortU16(0),
   )
   const signatures = Object.fromEntries(signerAccounts.map((account) => [account.address, null])) as Record<
-    Address,
+    Address.Address,
     Uint8Array | null
   >
   return { messageBytes, signatures } satisfies Transaction
@@ -184,9 +167,9 @@ export const partiallySignTransaction = Effect.fnUntraced(function* <T extends T
   keyPairs: ReadonlyArray<CryptoKeyPair>,
   transaction: T,
 ) {
-  const signatures: Record<Address, Uint8Array | null> = { ...transaction.signatures }
+  const signatures: Record<Address.Address, Uint8Array | null> = { ...transaction.signatures }
   for (const keyPair of keyPairs) {
-    const address = yield* addressFromPublicKey(keyPair.publicKey)
+    const address = yield* Address.fromPublicKey(keyPair.publicKey)
     if (!(address in signatures)) {
       return yield* new SvmProtocolError({
         message: `Address is not required to sign this transaction: ${address}`,

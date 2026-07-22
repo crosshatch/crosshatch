@@ -42,7 +42,7 @@ const squareRootRatio = (u: bigint, v: bigint): bigint | undefined => {
   return x
 }
 
-export const compressedPointIsOnCurve = (bytes: Uint8Array): boolean => {
+export const isOnCurve = (bytes: Uint8Array): boolean => {
   if (bytes.byteLength !== 32) return false
   const copy = bytes.slice()
   const xIsOdd = (copy[31]! & 0x80) !== 0
