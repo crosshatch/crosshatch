@@ -65,8 +65,6 @@ export type Address = typeof SvmAddress.Type
 export type Blockhash = typeof Blockhash.Type
 export type ProgramDerivedAddress = readonly [Address, number]
 
-export const address = (value: string) => S.decodeEffect(SvmAddress)(value)
-
 export const addressFromBytes = (bytes: Uint8Array) =>
   bytes.byteLength === 32
     ? Effect.succeed(SvmAddress.make(base58Encode(bytes)))

@@ -200,9 +200,6 @@ export const partiallySignTransaction = Effect.fnUntraced(function* <T extends T
   return { ...transaction, signatures } as T
 })
 
-export const signTransactionMessage = (message: TransactionMessage, keyPairs: ReadonlyArray<CryptoKeyPair>) =>
-  compileTransaction(message).pipe(Effect.flatMap((tx) => partiallySignTransaction(keyPairs, tx)))
-
 const getWireTransactionBytes = (transaction: Transaction) => {
   const signatures = Object.values(transaction.signatures)
   if (signatures.length === 0) {
@@ -221,6 +218,3 @@ const getWireTransactionBytes = (transaction: Transaction) => {
 
 export const getBase64EncodedWireTransaction = (transaction: Transaction) =>
   getWireTransactionBytes(transaction).pipe(Effect.map(Encoding.encodeBase64))
-
-export const encodeSignedTransactionMessage = (message: TransactionMessage, keyPairs: ReadonlyArray<CryptoKeyPair>) =>
-  signTransactionMessage(message, keyPairs).pipe(Effect.flatMap(getBase64EncodedWireTransaction))
