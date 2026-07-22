@@ -13,7 +13,7 @@ const ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 const ALPHABET_INDEX = new Map(Array.from(ALPHABET, (character, index) => [character, BigInt(index)]))
 const PDA_MARKER = new TextEncoder().encode("ProgramDerivedAddress")
 
-export const base58Encode = (bytes: Uint8Array): string => {
+const base58Encode = (bytes: Uint8Array): string => {
   let integer = 0n
   for (const byte of bytes) integer = (integer << 8n) | BigInt(byte)
 
@@ -27,7 +27,7 @@ export const base58Encode = (bytes: Uint8Array): string => {
   return "1".repeat(leadingZeroes) + encoded
 }
 
-export const base58Decode = (value: string): Option.Option<Uint8Array> => {
+const base58Decode = (value: string): Option.Option<Uint8Array> => {
   let integer = 0n
   for (const character of value) {
     const digit = ALPHABET_INDEX.get(character)
@@ -65,7 +65,7 @@ export type Address = typeof SvmAddress.Type
 export type Blockhash = typeof Blockhash.Type
 export type ProgramDerivedAddress = readonly [Address, number]
 
-export const addressFromBytes = (bytes: Uint8Array) =>
+const addressFromBytes = (bytes: Uint8Array) =>
   bytes.byteLength === 32
     ? Effect.succeed(SvmAddress.make(base58Encode(bytes)))
     : Effect.fail(
@@ -74,23 +74,7 @@ export const addressFromBytes = (bytes: Uint8Array) =>
         }),
       )
 
-export const addressToBytes = (value: Address): Uint8Array => {
-  let integer = 0n
-  for (const character of value) {
-    integer = integer * 58n + ALPHABET_INDEX.get(character)!
-  }
-  const body: number[] = []
-  while (integer > 0n) {
-    body.push(Number(integer & 0xffn))
-    integer >>= 8n
-  }
-  body.reverse()
-  let leadingZeroes = 0
-  while (leadingZeroes < value.length && value[leadingZeroes] === "1") leadingZeroes++
-  const bytes = new Uint8Array(leadingZeroes + body.length)
-  bytes.set(body, leadingZeroes)
-  return bytes
-}
+export const addressToBytes = (value: Address): Uint8Array => Option.getOrThrow(base58Decode(value))
 export const addressFromPublicKey = (publicKey: typeof CryptoKey.CryptoKey.Type) =>
   CryptoKey.toBytes(publicKey).pipe(Effect.flatMap(addressFromBytes))
 
