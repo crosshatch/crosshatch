@@ -8,6 +8,6 @@ export class SolanaState extends State.Service<SolanaState, Blockhash>()("crossh
 export const layer = (url: string) =>
   Layer.succeed(SolanaState, {
     getLatestBlockhash: getLatestBlockhash(url).pipe(
-      Effect.mapError(({ cause }) => new State.GetLatestBlockhashError({ cause })),
+      Effect.mapError((cause) => new State.GetLatestBlockhashError({ cause })),
     ),
   })
