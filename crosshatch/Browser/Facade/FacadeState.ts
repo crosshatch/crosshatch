@@ -5,10 +5,13 @@ import { LinkChallengeId } from "../LinkChallengeId.ts"
 type FacadeState_ = typeof FacadeState_.Type
 const FacadeState_ = S.Struct({
   session: S.TaggedUnion({
-    Challenged: {
-      challengeId: LinkChallengeId,
+    Challenged: { challengeId: LinkChallengeId },
+    Linked: {
+      // TODO
+      // allowanceRemaining
+      // addresses
     },
-    Linked: {},
+    Rescinded: {},
   }),
 })
 
