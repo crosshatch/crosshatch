@@ -19,14 +19,14 @@ export type Address = typeof Address.Type
 export const Blockhash = Address.pipe(S.brand("crosshatch/Blockhash"))
 export type Blockhash = typeof Blockhash.Type
 
-const addressFromBytes = (bytes: Uint8Array) =>
+const fromBytes = (bytes: Uint8Array) =>
   bytes.byteLength === 32
     ? Effect.succeed(Address.make(Base58.encode(bytes)))
     : Effect.fail(new SvmProtocolError({ message: `Solana address requires 32 bytes; got ${bytes.byteLength}` }))
 
 export const toBytes = (value: Address): Uint8Array => Option.getOrThrow(Base58.decode(value))
 export const fromPublicKey = (publicKey: typeof CryptoKey.CryptoKey.Type) =>
-  CryptoKey.toBytes(publicKey).pipe(Effect.flatMap(addressFromBytes))
+  CryptoKey.toBytes(publicKey).pipe(Effect.flatMap(fromBytes))
 
 const createProgramAddress = Effect.fnUntraced(function* (programAddress: Address, seeds: ReadonlyArray<Uint8Array>) {
   if (seeds.length > 16) {
@@ -47,7 +47,7 @@ const createProgramAddress = Effect.fnUntraced(function* (programAddress: Addres
   input.set(PDA_MARKER, offset + 32)
   const digest = yield* Hash.sha256(input)
   if (Ed25519Point.isOnCurve(digest)) return Option.none<Address>()
-  return Option.some(yield* addressFromBytes(digest))
+  return Option.some(yield* fromBytes(digest))
 })
 
 export const findProgramDerivedAddress = Effect.fnUntraced(function* (

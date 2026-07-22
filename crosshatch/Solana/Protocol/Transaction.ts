@@ -15,7 +15,6 @@ export interface Transaction {
 interface OrderedAccount {
   readonly address: Address.Address
   readonly role: AccountRole
-  readonly feePayer: boolean
 }
 
 const isSigner = (role: AccountRole) => (role & AccountRole.READONLY_SIGNER) !== 0
@@ -34,51 +33,40 @@ const getOrderedAccounts = Effect.fnUntraced(function* (
   feePayer: Address.Address,
   instructions: ReadonlyArray<Instruction>,
 ) {
-  const accounts = new Map<Address.Address, OrderedAccount>([
-    [feePayer, { address: feePayer, role: AccountRole.WRITABLE_SIGNER, feePayer: true }],
-  ])
-  const invokedPrograms = new Set<Address.Address>()
-
-  const upsert = (accountAddress: Address.Address, role: AccountRole) => {
-    const existing = accounts.get(accountAddress)
-    if (existing?.feePayer) return Effect.void
-    const mergedRole = existing === undefined ? role : ((existing.role | role) as AccountRole)
-    if (invokedPrograms.has(accountAddress) && isWritable(mergedRole)) {
-      return Effect.fail(
-        new SvmProtocolError({
-          message: `Invoked program cannot be writable: ${accountAddress}`,
-        }),
-      )
-    }
-    accounts.set(accountAddress, { address: accountAddress, role: mergedRole, feePayer: false })
-    return Effect.void
-  }
+  const roles = new Map<Address.Address, AccountRole>([[feePayer, AccountRole.WRITABLE_SIGNER]])
+  const programs = new Set<Address.Address>()
 
   for (const instruction of instructions) {
-    invokedPrograms.add(instruction.programAddress)
-    const existingProgram = accounts.get(instruction.programAddress)
-    if (existingProgram?.feePayer) {
-      return yield* new SvmProtocolError({
-        message: "An invoked program cannot pay transaction fees",
-      })
-    }
-    if (existingProgram !== undefined && isWritable(existingProgram.role)) {
-      return yield* new SvmProtocolError({
-        message: `Invoked program cannot be writable: ${instruction.programAddress}`,
-      })
-    }
-    yield* upsert(instruction.programAddress, AccountRole.READONLY)
+    programs.add(instruction.programAddress)
+    roles.set(instruction.programAddress, roles.get(instruction.programAddress) ?? AccountRole.READONLY)
     for (const account of instruction.accounts ?? []) {
-      yield* upsert(account.address, account.role)
+      roles.set(account.address, ((roles.get(account.address) ?? AccountRole.READONLY) | account.role) as AccountRole)
     }
   }
 
-  return [...accounts.values()].toSorted((left, right) => {
-    if (left.feePayer !== right.feePayer) return left.feePayer ? -1 : 1
-    if (isSigner(left.role) !== isSigner(right.role)) return isSigner(left.role) ? -1 : 1
-    if (isWritable(left.role) !== isWritable(right.role)) return isWritable(left.role) ? -1 : 1
-    return ADDRESS_COMPARATOR(left.address, right.address)
-  }) as ReadonlyArray<OrderedAccount>
+  for (const program of programs) {
+    if (program === feePayer) {
+      return yield* new SvmProtocolError({ message: "An invoked program cannot pay transaction fees" })
+    }
+    if (isWritable(roles.get(program)!)) {
+      return yield* new SvmProtocolError({ message: `Invoked program cannot be writable: ${program}` })
+    }
+  }
+
+  const rank = (account: OrderedAccount) =>
+    account.address === feePayer
+      ? 0
+      : isSigner(account.role)
+        ? isWritable(account.role)
+          ? 1
+          : 2
+        : isWritable(account.role)
+          ? 3
+          : 4
+
+  return [...roles]
+    .map(([address, role]) => ({ address, role }))
+    .toSorted((left, right) => rank(left) - rank(right) || ADDRESS_COMPARATOR(left.address, right.address))
 })
 
 const encodeCompiledInstruction = (
