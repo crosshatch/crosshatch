@@ -58,7 +58,6 @@
     "@effect/platform-node": "catalog:",
     "@napi-rs/keyring": "catalog:",
     "@scure/bip39": "catalog:",
-    "@signinwithethereum/siwe": "catalog:",
     "@solana-program/compute-budget": "catalog:",
     "@solana-program/memo": "catalog:",
     "@solana-program/token": "catalog:",

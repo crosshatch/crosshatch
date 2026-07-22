@@ -1,6 +1,5 @@
-import { SiweMessage } from "@signinwithethereum/siwe"
 import { Effect, Schema as S } from "effect"
-import { type PublicClient, verifyMessage, type VerifyMessageParameters } from "viem"
+import { Address as OxAddress, Hex, PersonalMessage, Secp256k1, Signature } from "ox"
 
 import { Address } from "../Address.ts"
 import { CaAccountId } from "../CaAccountId.ts"
@@ -22,22 +21,36 @@ const supportsChainId = S.is(eip155ChainId)
 
 const createSigningMessage = (unsigned: Omit<typeof Proof.Type, "signature" | "signatureScheme">) =>
   S.decodeUnknownEffect(eip155ChainId)(unsigned.chainId).pipe(
-    Effect.map(([, chainId]) =>
-      new SiweMessage({
-        address: unsigned.address,
-        chainId,
-        domain: unsigned.domain,
-        nonce: unsigned.nonce,
-        uri: unsigned.uri,
-        version: "1",
-        issuedAt: unsigned.issuedAt,
-        ...(unsigned.statement && { statement: unsigned.statement }),
-        ...(unsigned.expirationTime && { expirationTime: unsigned.expirationTime }),
-        ...(unsigned.notBefore && { notBefore: unsigned.notBefore }),
-        ...(unsigned.requestId && { requestId: unsigned.requestId }),
-        ...(unsigned.resources && { resources: [...unsigned.resources] }),
-      }).prepareMessage(),
-    ),
+    Effect.map(([, chainId]) => {
+      const lines = [
+        `${unsigned.domain} wants you to sign in with your Ethereum account:`,
+        OxAddress.checksum(unsigned.address),
+      ]
+      if (unsigned.statement) {
+        lines.push("", unsigned.statement)
+      }
+      lines.push(
+        "",
+        `URI: ${unsigned.uri}`,
+        `Version: 1`,
+        `Chain ID: ${chainId}`,
+        `Nonce: ${unsigned.nonce}`,
+        `Issued At: ${unsigned.issuedAt}`,
+      )
+      if (unsigned.expirationTime) {
+        lines.push(`Expiration Time: ${unsigned.expirationTime}`)
+      }
+      if (unsigned.notBefore) {
+        lines.push(`Not Before: ${unsigned.notBefore}`)
+      }
+      if (unsigned.requestId) {
+        lines.push(`Request ID: ${unsigned.requestId}`)
+      }
+      if (unsigned.resources) {
+        lines.push("Resources:", ...unsigned.resources.map((resource) => `- ${resource}`))
+      }
+      return lines.join("\n")
+    }),
     Effect.catchTag("SchemaError", (cause) => new Verifier.VerifyError({ cause })),
   )
 
@@ -58,7 +71,24 @@ export const prover = {
   }),
 } satisfies Prover.Prover<Eip155Signer>
 
-const verifyWith = (check: (input: VerifyMessageParameters) => Promise<boolean>) =>
+const verifyMessage = ({
+  address,
+  message,
+  signature,
+}: {
+  readonly address: `0x${string}`
+  readonly signature: `0x${string}`
+  readonly message: string
+}) =>
+  Promise.resolve(
+    Secp256k1.verify({
+      address,
+      payload: PersonalMessage.getSignPayload(Hex.fromString(message)),
+      signature: Signature.fromHex(signature),
+    }),
+  )
+
+const verifyWith = (check: typeof verifyMessage) =>
   Effect.fnUntraced(
     function* (proof: typeof Proof.Type) {
       const message = yield* createSigningMessage(proof)
@@ -90,9 +120,7 @@ export const verifier = {
   verify: verifyWith(verifyMessage),
 } satisfies Verifier.Verifier
 
-export const makeClientVerifier = (
-  clients: Readonly<Record<string, Pick<PublicClient, "verifyMessage">>>,
-): Verifier.Verifier => ({
+export const makeClientVerifier = (clients: Readonly<Record<string, typeof verifyMessage>>): Verifier.Verifier => ({
   type: "eip191",
   scheme: "eip191",
   supportsChainId,
@@ -101,6 +129,6 @@ export const makeClientVerifier = (
     if (!client) {
       return yield* new Verifier.VerifyError({})
     }
-    return yield* verifyWith(client.verifyMessage)(proof)
+    return yield* verifyWith(client)(proof)
   }),
 })
