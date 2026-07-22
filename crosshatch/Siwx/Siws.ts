@@ -10,11 +10,12 @@ import * as SolanaAddress from "../Solana/SolanaAddress.ts"
 import { SolanaSigner } from "../Solana/SolanaSigner.ts"
 import * as Prover from "./Prover.ts"
 import { Proof } from "./Schema.ts"
+import { buildSiwxMessage } from "./SiwxMessage.ts"
 import * as Verifier from "./Verifier.ts"
 
-const solanaChainId = S.TemplateLiteralParser(["solana:", S.String.check(S.isPattern(/^[-_a-zA-Z0-9]{1,32}$/u))])
+const SolanaChainId = S.TemplateLiteralParser(["solana:", S.String.check(S.isPattern(/^[-_a-zA-Z0-9]{1,32}$/u))])
 
-const supportsChainId = (chainId: string) => Option.isSome(S.decodeUnknownOption(solanaChainId)(chainId))
+const supportsChainId = (chainId: string) => Option.isSome(S.decodeUnknownOption(SolanaChainId)(chainId))
 
 const Rfc3339 = S.String.check(
   S.isPattern(/^\d{4}-\d{2}-\d{2}[Tt]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:[Zz]|[+-]\d{2}:\d{2})$/u),
@@ -38,7 +39,7 @@ const Message = S.Struct({
     }),
   ),
   address: SolanaAddress.SolanaAddress,
-  chainId: solanaChainId,
+  chainId: SolanaChainId,
   uri: Uri,
   version: S.Literal("1"),
   statement: S.String.check(S.isPattern(/^[^\r\n]+$/u)).pipe(S.optional),
@@ -52,33 +53,15 @@ const Message = S.Struct({
 
 const createSigningMessage = (input: Omit<typeof Proof.Type, "signature" | "signatureScheme">) =>
   S.decodeUnknownEffect(Message)(input).pipe(
-    Effect.map(({ chainId: [, reference], ...unsigned }) => {
-      const lines = [`${unsigned.domain} wants you to sign in with your Solana account:`, unsigned.address]
-      if (unsigned.statement) {
-        lines.push("", unsigned.statement)
-      }
-      lines.push(
-        "",
-        `URI: ${unsigned.uri}`,
-        `Version: ${unsigned.version}`,
-        `Chain ID: ${reference}`,
-        `Nonce: ${unsigned.nonce}`,
-        `Issued At: ${unsigned.issuedAt}`,
-      )
-      if (unsigned.expirationTime) {
-        lines.push(`Expiration Time: ${unsigned.expirationTime}`)
-      }
-      if (unsigned.notBefore) {
-        lines.push(`Not Before: ${unsigned.notBefore}`)
-      }
-      if (unsigned.requestId) {
-        lines.push(`Request ID: ${unsigned.requestId}`)
-      }
-      if (unsigned.resources) {
-        lines.push("Resources:", ...unsigned.resources.map((resource) => `- ${resource}`))
-      }
-      return lines.join("\n")
-    }),
+    Effect.map(({ chainId: [, chainId], address, domain, ...rest }) =>
+      buildSiwxMessage({
+        header: `${domain} wants you to sign in with your Solana account:`,
+        address,
+        chainId,
+        domain,
+        ...rest,
+      }),
+    ),
     Effect.catchTag("SchemaError", (cause) => new Verifier.VerifyError({ cause })),
   )
 

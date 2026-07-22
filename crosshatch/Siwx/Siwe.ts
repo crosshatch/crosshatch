@@ -8,48 +8,28 @@ import { Eip155Address } from "../Eip155/Eip155Address.ts"
 import { Eip155Signer } from "../Eip155/Eip155Signer.ts"
 import * as Prover from "./Prover.ts"
 import { Proof } from "./Schema.ts"
+import { buildSiwxMessage } from "./SiwxMessage.ts"
 import * as Verifier from "./Verifier.ts"
 
-const reference = S.String.check(S.isPattern(/^\d+$/u)).pipe(
-  S.decodeTo(S.FiniteFromString),
-  S.check(S.isInt(), S.isGreaterThan(0)),
-)
+const reference = S.String.check(S.isPattern(/^[1-9]\d*$/u))
 
 const eip155ChainId = S.TemplateLiteralParser(["eip155:", reference])
 
 const supportsChainId = (chainId: string) => Option.isSome(S.decodeUnknownOption(eip155ChainId)(chainId))
 
-const createSigningMessage = (unsigned: Omit<typeof Proof.Type, "signature" | "signatureScheme">) =>
-  S.decodeUnknownEffect(eip155ChainId)(unsigned.chainId).pipe(
+const createSigningMessage = ({
+  chainId,
+  address,
+  ...fields
+}: Omit<typeof Proof.Type, "signature" | "signatureScheme">) =>
+  S.decodeUnknownEffect(eip155ChainId)(chainId).pipe(
     Effect.map(([, chainId]) => {
-      const lines = [
-        `${unsigned.domain} wants you to sign in with your Ethereum account:`,
-        OxAddress.checksum(unsigned.address),
-      ]
-      if (unsigned.statement) {
-        lines.push("", unsigned.statement)
-      }
-      lines.push(
-        "",
-        `URI: ${unsigned.uri}`,
-        `Version: 1`,
-        `Chain ID: ${chainId}`,
-        `Nonce: ${unsigned.nonce}`,
-        `Issued At: ${unsigned.issuedAt}`,
-      )
-      if (unsigned.expirationTime) {
-        lines.push(`Expiration Time: ${unsigned.expirationTime}`)
-      }
-      if (unsigned.notBefore) {
-        lines.push(`Not Before: ${unsigned.notBefore}`)
-      }
-      if (unsigned.requestId) {
-        lines.push(`Request ID: ${unsigned.requestId}`)
-      }
-      if (unsigned.resources) {
-        lines.push("Resources:", ...unsigned.resources.map((resource) => `- ${resource}`))
-      }
-      return lines.join("\n")
+      return buildSiwxMessage({
+        header: `${fields.domain} wants you to sign in with your Ethereum account:`,
+        address: OxAddress.checksum(address),
+        chainId,
+        ...fields,
+      })
     }),
     Effect.catchTag("SchemaError", (cause) => new Verifier.VerifyError({ cause })),
   )
