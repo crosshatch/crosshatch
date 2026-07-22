@@ -1,5 +1,7 @@
 import { Effect, Schema as S } from "effect"
 
+import { JsonRecord } from "../_util.ts"
+
 export const SupportedChain = S.Struct({
   chainId: S.String,
   type: S.String,
@@ -22,7 +24,7 @@ export const Info = S.Struct({
 export const Challenge = S.Struct({
   info: Info,
   supportedChains: S.Array(SupportedChain),
-  schema: S.Record(S.String, S.Json).pipe(S.withDecodingDefault(Effect.succeed({}))),
+  schema: JsonRecord.pipe(S.withDecodingDefault(Effect.succeed({}))),
 })
 
 export const Proof = S.Struct({

@@ -30,7 +30,7 @@ export const layer = <const Provers extends ReadonlyArray<Prover.Any>>(
             provers,
             ({ type, scheme, supportsChainId }) =>
               type === entry.type &&
-              (entry.signatureScheme === undefined || entry.signatureScheme === scheme) &&
+              (!entry.signatureScheme || entry.signatureScheme === scheme) &&
               supportsChainId(entry.chainId),
           ),
           Option.map((prover) => ({ entry, prover })),

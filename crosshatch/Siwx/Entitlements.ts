@@ -21,7 +21,7 @@ export class PurchaseError extends Data.TaggedError("PurchaseError")<{
 
 export const isEntitled = Effect.fnUntraced(function* (id: typeof EntitlementId.Type) {
   const identity = yield* Identity
-  if (identity === undefined) {
+  if (!identity) {
     return false
   }
   const store = yield* KeyValueStore.KeyValueStore
@@ -36,7 +36,7 @@ export const purchase = Effect.fnUntraced(function* ({
   readonly payload: Payload
 }) {
   const identity = yield* Identity
-  if (identity === undefined) {
+  if (!identity) {
     return yield* new PurchaseError({})
   }
   if (identity.chainId !== payload.accepted.network) {
@@ -44,7 +44,7 @@ export const purchase = Effect.fnUntraced(function* ({
   }
 
   const verification = yield* Facilitator.verify({ payload })
-  if (verification.payer === undefined) {
+  if (!verification.payer) {
     return yield* new PurchaseError({})
   }
   if (identity.address.toLowerCase() !== verification.payer.toLowerCase()) {
@@ -52,7 +52,7 @@ export const purchase = Effect.fnUntraced(function* ({
   }
 
   const settlement = yield* Facilitator.settle({ payload })
-  if (!settlement.success || settlement.payer === undefined) {
+  if (!settlement.success || !settlement.payer) {
     return yield* new PurchaseError({})
   }
 

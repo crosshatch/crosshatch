@@ -1,5 +1,5 @@
 import { SiweMessage } from "@signinwithethereum/siwe"
-import { Effect, Option, Schema as S } from "effect"
+import { Effect, Schema as S } from "effect"
 import { type PublicClient, verifyMessage, type VerifyMessageParameters } from "viem"
 
 import { Address } from "../Address.ts"
@@ -18,7 +18,7 @@ const reference = S.String.check(S.isPattern(/^\d+$/u)).pipe(
 
 const eip155ChainId = S.TemplateLiteralParser(["eip155:", reference])
 
-const supportsChainId = (chainId: string) => Option.isSome(S.decodeUnknownOption(eip155ChainId)(chainId))
+const supportsChainId = S.is(eip155ChainId)
 
 const createSigningMessage = (unsigned: Omit<typeof Proof.Type, "signature" | "signatureScheme">) =>
   S.decodeUnknownEffect(eip155ChainId)(unsigned.chainId).pipe(
@@ -98,7 +98,7 @@ export const makeClientVerifier = (
   supportsChainId,
   verify: Effect.fnUntraced(function* (proof: typeof Proof.Type) {
     const client = clients[proof.chainId]
-    if (client === undefined) {
+    if (!client) {
       return yield* new Verifier.VerifyError({})
     }
     return yield* verifyWith(client.verifyMessage)(proof)

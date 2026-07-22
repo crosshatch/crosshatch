@@ -14,7 +14,7 @@ import * as Verifier from "./Verifier.ts"
 
 const solanaChainId = S.TemplateLiteralParser(["solana:", S.String.check(S.isPattern(/^[-_a-zA-Z0-9]{1,32}$/u))])
 
-const supportsChainId = (chainId: string) => Option.isSome(S.decodeUnknownOption(solanaChainId)(chainId))
+const supportsChainId = S.is(solanaChainId)
 
 const Rfc3339 = S.String.check(
   S.isPattern(/^\d{4}-\d{2}-\d{2}[Tt]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:[Zz]|[+-]\d{2}:\d{2})$/u),
@@ -34,7 +34,7 @@ const Message = S.Struct({
   domain: S.String.check(
     S.makeFilter((value) => {
       const url = URL.parse(`https://${value}`)
-      return url !== null && url.host === value ? undefined : "Expected an RFC 3986 authority"
+      return url && url.host === value ? undefined : "Expected an RFC 3986 authority"
     }),
   ),
   address: SolanaAddress.SolanaAddress,

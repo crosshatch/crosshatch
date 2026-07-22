@@ -11,6 +11,6 @@ Effect.gen(function* () {
   const response = yield* HttpClient.get(url)
   yield* Console.log({
     status: response.status,
-    paid: response.headers[ChxHttp.PAYMENT_RESPONSE] !== undefined,
+    paid: response.headers[ChxHttp.PAYMENT_RESPONSE],
   })
 }).pipe(Effect.provide(SiwxHttpClientLive), Effect.runFork)

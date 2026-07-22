@@ -40,7 +40,7 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
           return HttpServerResponse.text("Premium content unlocked.")
         }
         const payload = yield* Payload.Payload
-        if (identity === undefined || payload === undefined) {
+        if (!identity || !payload) {
           const required = yield* Required.make`Access the paid resource.`.pipe(
             Required.extend(PaymentId.FromMerchant, {
               required: true,

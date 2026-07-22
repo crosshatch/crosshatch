@@ -20,26 +20,24 @@ export const layerMiddleware = <const Verifiers extends ReadonlyArray<Verifier>>
       return (effect) =>
         Effect.gen(function* () {
           const request = yield* HttpServerRequest.HttpServerRequest
-          const requestUrl = Option.liftThrowable((url: string) => new URL(url, origin))(request.url)
+          const requestUrl = Option.fromNullishOr(URL.parse(request.url, origin))
 
           const proof = yield* pipe(
             Option.fromNullishOr(Siwx.header),
             Option.flatMap((header) => Headers.get(header)(request.headers)),
             Option.map(S.decodeUnknownEffect(ProofFromBase64JsonString)),
             Effect.transposeOption,
-            Effect.map(Option.getOrUndefined),
           )
 
           const identity = yield* pipe(
-            Option.all({ proof: Option.fromNullishOr(proof), requestUrl }),
+            Option.all({ proof, requestUrl }),
             Option.map(({ proof, requestUrl }) => Verification.verifyProof(...verifiers)(proof, requestUrl)),
             Effect.transposeOption,
-            Effect.map(Option.getOrUndefined),
           )
 
           return yield* effect.pipe(
-            Effect.provideService(Identity, identity),
-            Effect.provideService(Siwx, proof),
+            Effect.provideService(Identity, Option.getOrUndefined(identity)),
+            Effect.provideService(Siwx, Option.getOrUndefined(proof)),
             Effect.provideService(
               RequiredUrl,
               requestUrl.pipe(

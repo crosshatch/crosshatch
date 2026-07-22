@@ -59,11 +59,13 @@ export const layer = Layer.effect(
           { concurrency: "unbounded" },
         ).pipe(Effect.map(Array.filter(Predicate.isNotUndefined)))
 
+        // Array.partition returns failures first, then successes. Payload entries fail the
+        // filter and header entries pass it.
         const [extensions, headers] = pipe(
           Array.partition(resolved, (item) => (item.kind === "header" ? Result.succeed(item) : Result.fail(item))),
-          ([payloads, headers]) => [
-            Record.fromEntries(payloads.map(({ identifier, value }) => [identifier, value])),
-            Record.fromEntries(headers.map(({ header, value }) => [header, value])),
+          ([extensionEntries, headerEntries]) => [
+            Record.fromEntries(extensionEntries.map(({ identifier, value }) => [identifier, value])),
+            Record.fromEntries(headerEntries.map(({ header, value }) => [header, value])),
           ],
         )
 

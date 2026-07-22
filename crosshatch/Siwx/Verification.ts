@@ -1,4 +1,4 @@
-import { DateTime, Effect, Schema as S } from "effect"
+import { Array, DateTime, Effect, Schema as S } from "effect"
 
 import * as ChallengeStore from "./ChallengeStore.ts"
 import { CHALLENGE_MAX_AGE_MS, Info, type Proof } from "./Schema.ts"
@@ -8,7 +8,7 @@ export const verifyProof = <const Verifiers extends ReadonlyArray<Verifier>>(...
   Effect.fnUntraced(
     function* (proof: typeof Proof.Type, requestUrl: URL) {
       const challenge = yield* ChallengeStore.peek(proof.nonce)
-      if (challenge === undefined) {
+      if (!challenge) {
         return yield* new VerifyError({})
       }
       if (!S.toEquivalence(Info)(proof, challenge.info)) {
@@ -29,25 +29,26 @@ export const verifyProof = <const Verifiers extends ReadonlyArray<Verifier>>(...
       const now = yield* DateTime.now
       if (
         !DateTime.between(issuedAt, { minimum: DateTime.subtractDuration(now, CHALLENGE_MAX_AGE_MS), maximum: now }) ||
-        !(expirationTime === undefined || DateTime.isLessThan(now, expirationTime)) ||
-        !(notBefore === undefined || DateTime.isGreaterThanOrEqualTo(now, notBefore)) ||
-        !challenge.supportedChains.some(({ chainId, type }) => chainId === proof.chainId && type === proof.type)
+        (expirationTime && !DateTime.isLessThan(now, expirationTime)) ||
+        (notBefore && !DateTime.isGreaterThanOrEqualTo(now, notBefore)) ||
+        !Array.some(challenge.supportedChains, ({ chainId, type }) => chainId === proof.chainId && type === proof.type)
       ) {
         return yield* new VerifyError({})
       }
 
-      const verifier = verifiers.find(
+      const verifier = Array.findFirst(
+        verifiers,
         ({ scheme, supportsChainId, type }) =>
           type === proof.type &&
-          (proof.signatureScheme === undefined || proof.signatureScheme === scheme) &&
+          (!proof.signatureScheme || proof.signatureScheme === scheme) &&
           supportsChainId(proof.chainId),
       )
 
-      if (verifier === undefined) {
+      if (verifier._tag === "None") {
         return yield* new VerifyError({})
       }
 
-      const identity = yield* verifier.verify(proof).pipe(Effect.mapError((cause) => new VerifyError({ cause })))
+      const identity = yield* verifier.value.verify(proof).pipe(Effect.mapError((cause) => new VerifyError({ cause })))
 
       yield* ChallengeStore.take(proof.nonce).pipe(
         Effect.filterOrFail(

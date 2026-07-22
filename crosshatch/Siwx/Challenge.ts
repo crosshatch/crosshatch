@@ -30,7 +30,7 @@ export const issue = Effect.fnUntraced(function* ({
   }
   const { host, href } = yield* S.decodeUnknownEffect(S.URLFromString)(uri)
 
-  const supportedChains = verifiers.flatMap((verifier) =>
+  const supportedChains = Array.flatMap(verifiers, (verifier) =>
     pipe(
       networks,
       Array.filter(verifier.supportsChainId),
@@ -44,7 +44,7 @@ export const issue = Effect.fnUntraced(function* ({
   const now = yield* Clock.currentTimeMillis
   const maxExpiresAt = now + CHALLENGE_MAX_AGE_MS
   const expirationTime =
-    expirationSeconds === undefined ? undefined : Math.min(now + expirationSeconds * 1_000, maxExpiresAt)
+    expirationSeconds ? Math.min(now + expirationSeconds * 1_000, maxExpiresAt) : undefined
 
   const challenge = {
     info: {
