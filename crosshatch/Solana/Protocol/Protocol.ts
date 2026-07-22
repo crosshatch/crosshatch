@@ -6,6 +6,7 @@ export {
   type Transaction,
 } from "./Transaction.ts"
 export { buildTransactionMessage } from "./TransactionMessage.ts"
+export { getLatestBlockhash } from "./Rpc.ts"
 export {
   findAssociatedTokenPda,
   getAddMemoInstruction,
