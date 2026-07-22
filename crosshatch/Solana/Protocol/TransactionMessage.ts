@@ -9,7 +9,7 @@ export const AccountRole = {
 
 export type AccountRole = (typeof AccountRole)[keyof typeof AccountRole]
 
-export interface AccountMeta {
+interface AccountMeta {
   readonly address: Address
   readonly role: AccountRole
 }
@@ -20,7 +20,7 @@ export interface Instruction {
   readonly data?: Uint8Array
 }
 
-export interface LifetimeConstraint {
+interface LifetimeConstraint {
   readonly blockhash: Blockhash
   readonly lastValidBlockHeight: bigint
 }

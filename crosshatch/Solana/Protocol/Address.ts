@@ -63,7 +63,7 @@ export const Blockhash = SolanaProtocolAddress.pipe(S.brand("crosshatch/Blockhas
 
 export type Address = typeof SolanaProtocolAddress.Type
 export type Blockhash = typeof Blockhash.Type
-export type ProgramDerivedAddress = readonly [Address, number]
+type ProgramDerivedAddress = readonly [Address, number]
 
 const addressFromBytes = (bytes: Uint8Array) =>
   bytes.byteLength === 32
