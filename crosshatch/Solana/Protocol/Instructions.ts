@@ -1,4 +1,4 @@
-import { Effect, Schema as S } from "effect"
+import { Effect, flow, Schema as S } from "effect"
 
 import * as Address from "./Address.ts"
 import { concat, u32le, u64le, U8, U32, U64 } from "./Codec.ts"
@@ -66,8 +66,7 @@ export const findAssociatedTokenPda = (input: {
     Address.toBytes(input.mint),
   ])
 
-export const findAssociatedTokenAddress = (input: {
-  readonly owner: Address.Address
-  readonly tokenProgram: Address.Address
-  readonly mint: Address.Address
-}) => findAssociatedTokenPda(input).pipe(Effect.map(([address]) => address))
+export const findAssociatedTokenAddress = flow(
+  findAssociatedTokenPda,
+  Effect.map(([address]) => address),
+)

@@ -46,7 +46,9 @@ const createProgramAddress = Effect.fnUntraced(function* (programAddress: Addres
   input.set(toBytes(programAddress), offset)
   input.set(PDA_MARKER, offset + 32)
   const digest = yield* Hash.sha256(input)
-  if (Ed25519Point.isOnCurve(digest)) return Option.none<Address>()
+  if (Ed25519Point.isOnCurve(digest)) {
+    return Option.none<Address>()
+  }
   return Option.some(yield* fromBytes(digest))
 })
 
