@@ -4,9 +4,9 @@ import * as Address from "../Address.ts"
 import { Ed25519Pair, Slip10 } from "../Crypto/Crypto.ts"
 import * as Mnemonic from "../Mnemonic.ts"
 import { brand } from "./_common.ts"
-import { addressFromPublicKey, SvmProtocolError } from "./Protocol/Protocol.ts"
+import { addressFromPublicKey, SolanaProtocolAddress, SvmProtocolError } from "./Protocol/Protocol.ts"
 
-export const SolanaAddress = S.String.check(S.isPattern(/^[1-9A-HJ-NP-Za-km-z]{32,44}$/u)).pipe(Address.brand, brand)
+export const SolanaAddress = SolanaProtocolAddress.pipe(Address.brand, brand)
 
 export const fromPublicKey = (publicKey: CryptoKey) =>
   addressFromPublicKey(publicKey).pipe(Effect.map((value) => SolanaAddress.make(value, { disableChecks: true })))

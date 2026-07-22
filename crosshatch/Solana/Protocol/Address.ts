@@ -48,7 +48,7 @@ const base58Decode = (value: string): Option.Option<Uint8Array> => {
   return Option.some(bytes)
 }
 
-export const SvmAddress = S.String.check(
+export const SolanaProtocolAddress = S.String.check(
   S.makeFilter(
     (value) =>
       Option.match(base58Decode(value), {
@@ -59,15 +59,15 @@ export const SvmAddress = S.String.check(
   ),
 ).pipe(S.brand("crosshatch/SvmAddress"))
 
-export const Blockhash = SvmAddress.pipe(S.brand("crosshatch/Blockhash"))
+export const Blockhash = SolanaProtocolAddress.pipe(S.brand("crosshatch/Blockhash"))
 
-export type Address = typeof SvmAddress.Type
+export type Address = typeof SolanaProtocolAddress.Type
 export type Blockhash = typeof Blockhash.Type
 export type ProgramDerivedAddress = readonly [Address, number]
 
 const addressFromBytes = (bytes: Uint8Array) =>
   bytes.byteLength === 32
-    ? Effect.succeed(SvmAddress.make(base58Encode(bytes)))
+    ? Effect.succeed(SolanaProtocolAddress.make(base58Encode(bytes)))
     : Effect.fail(
         new SvmProtocolError({
           message: `Solana address requires 32 bytes; got ${bytes.byteLength}`,

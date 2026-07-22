@@ -3,7 +3,7 @@ import { Effect, Encoding, flow, Schema as S } from "effect"
 import { Random } from "../Crypto/Crypto.ts"
 import * as Scheme from "../Scheme.ts"
 import {
-  SvmAddress,
+  SolanaProtocolAddress,
   buildTransactionMessage,
   compileTransaction,
   findAssociatedTokenPda,
@@ -47,19 +47,13 @@ export const layer = SolanaScheme.layer(
         const { getLatestBlockhash } = yield* SolanaState
         const lifetimeConstraint = yield* getLatestBlockhash
 
-        const mintAsset = yield* S.decodeUnknownEffect(SolanaAsset.SolanaAsset)(accepted.asset)
-        const { mint, tokenProgram, feePayerAddress, authority } = yield* Effect.all({
-          mint: S.decodeEffect(SvmAddress)(mintAsset),
-          tokenProgram: S.decodeEffect(SvmAddress)(tokenProgramId),
-          feePayerAddress: S.decodeEffect(SvmAddress)(feePayer),
-          authority: S.decodeEffect(SvmAddress)(signer.address),
-        })
+        const mint = yield* S.decodeUnknownEffect(SolanaAsset.SolanaAsset)(accepted.asset)
 
         const [[source], [destination]] = yield* Effect.all([
-          findAssociatedTokenPda({ owner: authority, tokenProgram, mint }),
+          findAssociatedTokenPda({ owner: signer.address, tokenProgram: tokenProgramId, mint }),
           flow(
-            S.decodeEffect(SvmAddress),
-            Effect.flatMap((owner) => findAssociatedTokenPda({ owner, tokenProgram, mint })),
+            S.decodeEffect(SolanaProtocolAddress),
+            Effect.flatMap((owner) => findAssociatedTokenPda({ owner, tokenProgram: tokenProgramId, mint })),
           )(accepted.payTo),
         ])
 
@@ -70,17 +64,13 @@ export const layer = SolanaScheme.layer(
             source,
             mint,
             destination,
-            authority,
-            tokenProgram,
+            authority: signer.address,
+            tokenProgram: tokenProgramId,
             amount: BigInt(accepted.amount),
             decimals: physical.decimals,
           }),
           Effect.succeed(getAddMemoInstruction(memo ?? Encoding.encodeHex(Random.bytes(16)))),
-        ]).pipe(
-          Effect.map((instructions) =>
-            buildTransactionMessage({ feePayer: feePayerAddress, lifetimeConstraint, instructions }),
-          ),
-        )
+        ]).pipe(Effect.map((instructions) => buildTransactionMessage({ feePayer, lifetimeConstraint, instructions })))
 
         const transaction = yield* compileTransaction(message).pipe(
           Effect.flatMap(signer.signTransaction),

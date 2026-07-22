@@ -1,4 +1,4 @@
-export { SvmProtocolError, addressFromPublicKey, Blockhash, SvmAddress } from "./Address.ts"
+export { SvmProtocolError, addressFromPublicKey, Blockhash, SolanaProtocolAddress } from "./Address.ts"
 export {
   compileTransaction,
   getBase64EncodedWireTransaction,
