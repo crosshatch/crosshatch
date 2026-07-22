@@ -14,7 +14,9 @@ export const encode = (bytes: Uint8Array): string => {
     integer /= 58n
   }
   let leadingZeroes = 0
-  while (leadingZeroes < bytes.length && bytes[leadingZeroes] === 0) leadingZeroes++
+  while (leadingZeroes < bytes.length && bytes[leadingZeroes] === 0) {
+    leadingZeroes++
+  }
   return "1".repeat(leadingZeroes) + encoded
 }
 
@@ -22,7 +24,9 @@ export const decode = (value: string): Option.Option<Uint8Array> => {
   let integer = 0n
   for (const character of value) {
     const digit = ALPHABET_INDEX.get(character)
-    if (digit === undefined) return Option.none()
+    if (digit === undefined) {
+      return Option.none()
+    }
     integer = integer * 58n + digit
   }
 
@@ -33,7 +37,9 @@ export const decode = (value: string): Option.Option<Uint8Array> => {
   }
   body.reverse()
   let leadingZeroes = 0
-  while (leadingZeroes < value.length && value[leadingZeroes] === "1") leadingZeroes++
+  while (leadingZeroes < value.length && value[leadingZeroes] === "1") {
+    leadingZeroes++
+  }
   const bytes = new Uint8Array(leadingZeroes + body.length)
   bytes.set(body, leadingZeroes)
   return Option.some(bytes)
