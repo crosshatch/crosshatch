@@ -1,9 +1,9 @@
 /* oxlint-disable no-bitwise -- byte-level codec */
-import { Effect, Encoding } from "effect"
+import { Effect, Encoding, flow, Record } from "effect"
 
 import { Ed25519PrivateKey } from "../../Crypto/Crypto.ts"
 import * as Address from "./Address.ts"
-import { concat, encodeShortU16 } from "./Codec.ts"
+import * as Codec from "./Codec.ts"
 import { SvmProtocolError } from "./Error.ts"
 import { AccountRole, type Instruction, type TransactionMessage } from "./TransactionMessage.ts"
 
@@ -28,6 +28,13 @@ const ADDRESS_COMPARATOR = new Intl.Collator("en", {
   sensitivity: "variant",
   usage: "sort",
 }).compare
+
+const MAX_INSTRUCTIONS = 64
+const MAX_ACCOUNTS_PER_INSTRUCTION = 255
+const MAX_ACCOUNTS = 64
+const MAX_SIGNERS = 12
+const MAX_WIRE_BYTES = 1232
+const SIGNATURE_BYTES = 64
 
 const getOrderedAccounts = Effect.fnUntraced(function* (
   feePayer: Address.Address,
@@ -70,122 +77,95 @@ const getOrderedAccounts = Effect.fnUntraced(function* (
 })
 
 const encodeCompiledInstruction = (
-  instruction: Instruction,
+  { accounts, programAddress, data: data_ }: Instruction,
   accountIndex: ReadonlyMap<Address.Address, number>,
-): Effect.Effect<Uint8Array, SvmProtocolError> => {
-  const programIndex = accountIndex.get(instruction.programAddress)
-  if (programIndex === undefined) {
-    return Effect.fail(
-      new SvmProtocolError({
-        message: `Missing program account: ${instruction.programAddress}`,
-      }),
-    )
-  }
-  const indices: number[] = []
-  for (const account of instruction.accounts ?? []) {
-    const index = accountIndex.get(account.address)
-    if (index === undefined) {
-      return Effect.fail(new SvmProtocolError({ message: `Missing instruction account: ${account.address}` }))
-    }
-    indices.push(index)
-  }
-  const accountIndices = Uint8Array.from(indices)
-  const data = instruction.data ?? new Uint8Array()
-  return Effect.succeed(
-    concat(
-      Uint8Array.of(programIndex),
-      encodeShortU16(accountIndices.length),
-      accountIndices,
-      encodeShortU16(data.length),
-      data,
-    ),
+): Uint8Array => {
+  const accountIndices = Uint8Array.from((accounts ?? []).map(({ address }) => accountIndex.get(address)!))
+  const data = data_ ?? new Uint8Array()
+
+  return Codec.concat(
+    Uint8Array.of(accountIndex.get(programAddress)!),
+    Codec.encodeShortU16(accountIndices.length),
+    accountIndices,
+    Codec.encodeShortU16(data.length),
+    data,
   )
 }
 
-export const compileTransaction = Effect.fnUntraced(function* (message: TransactionMessage) {
-  if (message.instructions.length > 64) {
-    return yield* new SvmProtocolError({
-      message: "A transaction supports at most 64 instructions",
-    })
-  }
-  for (const [index, instruction] of message.instructions.entries()) {
-    if ((instruction.accounts?.length ?? 0) > 255) {
-      return yield* new SvmProtocolError({
-        message: `Instruction ${index} has too many accounts`,
-      })
-    }
+export const compileTransaction = Effect.fnUntraced(function* ({
+  instructions,
+  feePayer,
+  lifetimeConstraint,
+}: TransactionMessage) {
+  if (instructions.length > MAX_INSTRUCTIONS) {
+    return yield* new SvmProtocolError({ message: `A transaction supports at most ${MAX_INSTRUCTIONS} instructions` })
   }
 
-  const accounts = yield* getOrderedAccounts(message.feePayer, message.instructions)
-  if (accounts.length > 64) {
-    return yield* new SvmProtocolError({ message: "A transaction supports at most 64 accounts" })
-  }
-  const signerAccounts = accounts.filter((account) => isSigner(account.role))
-  if (signerAccounts.length > 12) {
-    return yield* new SvmProtocolError({ message: "A transaction supports at most 12 signers" })
+  const oversized = instructions.findIndex(({ accounts }) => (accounts?.length ?? 0) > MAX_ACCOUNTS_PER_INSTRUCTION)
+  if (oversized !== -1) {
+    return yield* new SvmProtocolError({ message: `Instruction ${oversized} has too many accounts` })
   }
 
-  const accountIndex = new Map(accounts.map((account, index) => [account.address, index]))
-  const compiledInstructions: Uint8Array[] = []
-  for (const instruction of message.instructions) {
-    compiledInstructions.push(yield* encodeCompiledInstruction(instruction, accountIndex))
+  const accounts = yield* getOrderedAccounts(feePayer, instructions)
+  if (accounts.length > MAX_ACCOUNTS) {
+    return yield* new SvmProtocolError({ message: `A transaction supports at most ${MAX_ACCOUNTS} accounts` })
   }
-  const numReadonlySignerAccounts = signerAccounts.filter((account) => !isWritable(account.role)).length
-  const numReadonlyNonSignerAccounts = accounts.filter(
-    (account) => !isSigner(account.role) && !isWritable(account.role),
-  ).length
 
-  const messageBytes = concat(
-    Uint8Array.of(0x80, signerAccounts.length, numReadonlySignerAccounts, numReadonlyNonSignerAccounts),
-    encodeShortU16(accounts.length),
+  const signers = accounts.filter(({ role }) => isSigner(role))
+  if (signers.length > MAX_SIGNERS) {
+    return yield* new SvmProtocolError({ message: `A transaction supports at most ${MAX_SIGNERS} signers` })
+  }
+
+  const accountIndex = new Map(accounts.map(({ address }, index) => [address, index]))
+  const compiledInstructions = instructions.map((instruction) => encodeCompiledInstruction(instruction, accountIndex))
+  const numReadonlySigners = signers.filter(({ role }) => !isWritable(role)).length
+  const numReadonlyNonSigners = accounts.filter(({ role }) => !isSigner(role) && !isWritable(role)).length
+
+  const messageBytes = Codec.concat(
+    Uint8Array.of(0x80, signers.length, numReadonlySigners, numReadonlyNonSigners),
+    Codec.encodeShortU16(accounts.length),
     ...accounts.map((account) => Address.toBytes(account.address)),
-    Address.toBytes(message.lifetimeConstraint.blockhash),
-    encodeShortU16(compiledInstructions.length),
+    Address.toBytes(lifetimeConstraint.blockhash),
+    Codec.encodeShortU16(compiledInstructions.length),
     ...compiledInstructions,
-    encodeShortU16(0),
+    Codec.encodeShortU16(0),
   )
-  const signatures = Object.fromEntries(signerAccounts.map((account) => [account.address, null])) as Record<
-    Address.Address,
-    Uint8Array | null
-  >
-  return { messageBytes, signatures } satisfies Transaction
+  const signatures = Record.fromEntries(signers.map((account) => [account.address, null]))
+  return { messageBytes, signatures }
 })
 
-export const partiallySignTransaction = Effect.fnUntraced(function* <T extends Transaction>(
+export const partiallySignTransaction = Effect.fnUntraced(function* (
   keyPairs: ReadonlyArray<CryptoKeyPair>,
-  transaction: T,
+  transaction: Transaction,
 ) {
-  const signatures: Record<Address.Address, Uint8Array | null> = { ...transaction.signatures }
-  for (const keyPair of keyPairs) {
-    const address = yield* Address.fromPublicKey(keyPair.publicKey)
+  const signatures = { ...transaction.signatures }
+  for (const { privateKey, publicKey } of keyPairs) {
+    const address = yield* Address.fromPublicKey(publicKey)
     if (!(address in signatures)) {
-      return yield* new SvmProtocolError({
-        message: `Address is not required to sign this transaction: ${address}`,
-      })
+      return yield* new SvmProtocolError({ message: `Address is not required to sign this transaction: ${address}` })
     }
     signatures[address] = yield* Ed25519PrivateKey.sign(
-      Ed25519PrivateKey.Ed25519PrivateKey.make(keyPair.privateKey),
+      Ed25519PrivateKey.Ed25519PrivateKey.make(privateKey),
       transaction.messageBytes,
     )
   }
-  return { ...transaction, signatures } as T
+  return { ...transaction, signatures }
 })
 
-const getWireTransactionBytes = (transaction: Transaction) => {
-  const signatures = Object.values(transaction.signatures)
-  if (signatures.length === 0) {
-    return Effect.fail(new SvmProtocolError({ message: "A transaction must have at least one signer" }))
-  }
-  const wire = concat(
-    encodeShortU16(signatures.length),
-    ...signatures.map((signature) => signature ?? new Uint8Array(64)),
-    transaction.messageBytes,
+const getWireTransactionBytes = Effect.fnUntraced(function* (transaction: Transaction) {
+  const signatures = Record.values(transaction.signatures).map(
+    (signature) => signature ?? new Uint8Array(SIGNATURE_BYTES),
   )
-  if (wire.length > 1232) {
-    return Effect.fail(new SvmProtocolError({ message: `Transaction exceeds 1232 bytes: ${wire.length}` }))
+  if (signatures.length === 0) {
+    return yield* new SvmProtocolError({ message: "A transaction must have at least one signer" })
   }
-  return Effect.succeed(wire)
-}
 
-export const getBase64EncodedWireTransaction = (transaction: Transaction) =>
-  getWireTransactionBytes(transaction).pipe(Effect.map(Encoding.encodeBase64))
+  const wire = Codec.concat(Codec.encodeShortU16(signatures.length), ...signatures, transaction.messageBytes)
+  if (wire.length > MAX_WIRE_BYTES) {
+    return yield* new SvmProtocolError({ message: `Transaction exceeds ${MAX_WIRE_BYTES} bytes: ${wire.length}` })
+  }
+
+  return wire
+})
+
+export const getBase64EncodedWireTransaction = flow(getWireTransactionBytes, Effect.map(Encoding.encodeBase64))
