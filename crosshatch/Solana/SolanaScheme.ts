@@ -1,4 +1,4 @@
-import { Effect, Encoding, Schema as S } from "effect"
+import { Effect, Encoding, flow, Schema as S } from "effect"
 
 import { Random } from "../Crypto/Crypto.ts"
 import * as Scheme from "../Scheme.ts"
@@ -55,20 +55,21 @@ export const layer = SolanaScheme.layer(
           authority: S.decodeEffect(SvmAddress)(signer.address),
         })
 
-        const [[sourceAta], [destAta]] = yield* Effect.all([
+        const [[source], [destination]] = yield* Effect.all([
           findAssociatedTokenPda({ owner: authority, tokenProgram, mint }),
-          S.decodeEffect(SvmAddress)(accepted.payTo).pipe(
+          flow(
+            S.decodeEffect(SvmAddress),
             Effect.flatMap((owner) => findAssociatedTokenPda({ owner, tokenProgram, mint })),
-          ),
+          )(accepted.payTo),
         ])
 
         const message = yield* Effect.all([
           getSetComputeUnitLimitInstruction(20000),
           getSetComputeUnitPriceInstruction(1n),
           getTransferCheckedInstruction({
-            source: sourceAta,
+            source,
             mint,
-            destination: destAta,
+            destination,
             authority,
             tokenProgram,
             amount: BigInt(accepted.amount),
