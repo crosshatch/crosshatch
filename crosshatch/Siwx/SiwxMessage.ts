@@ -1,46 +1,58 @@
-interface SiwxMessageParams {
-  readonly header: string
+interface SiwxParams {
   readonly address: string
   readonly chainId: string
-  readonly domain: string
-  readonly uri: string
-  readonly version?: string | undefined
-  readonly statement?: string | undefined
-  readonly nonce: string
-  readonly issuedAt: string
   readonly expirationTime?: string | undefined
+  readonly header: string
+  readonly issuedAt: string
+  readonly nonce: string
   readonly notBefore?: string | undefined
   readonly requestId?: string | undefined
   readonly resources?: ReadonlyArray<string> | undefined
+  readonly statement?: string | undefined
+  readonly uri: string
+  readonly version?: string | undefined
 }
 
-export const buildSiwxMessage = ({ header, address, chainId, ...unsigned }: SiwxMessageParams) => {
+export const buildSiwxMessage = ({
+  address,
+  chainId,
+  expirationTime,
+  header,
+  issuedAt,
+  nonce,
+  notBefore,
+  requestId,
+  resources,
+  statement,
+  uri,
+  version,
+}: SiwxParams) => {
   const lines = [header, address]
 
-  if (unsigned.statement) {
-    lines.push("", unsigned.statement)
+  if (statement) {
+    lines.push("", statement)
   }
 
   lines.push(
     "",
-    `URI: ${unsigned.uri}`,
-    `Version: ${unsigned.version ?? "1"}`,
+    `URI: ${uri}`,
+    `Version: ${version ?? "1"}`,
     `Chain ID: ${chainId}`,
-    `Nonce: ${unsigned.nonce}`,
-    `Issued At: ${unsigned.issuedAt}`,
+    `Nonce: ${nonce}`,
+    `Issued At: ${issuedAt}`,
   )
 
-  if (unsigned.expirationTime) {
-    lines.push(`Expiration Time: ${unsigned.expirationTime}`)
+  if (expirationTime) {
+    lines.push(`Expiration Time: ${expirationTime}`)
   }
-  if (unsigned.notBefore) {
-    lines.push(`Not Before: ${unsigned.notBefore}`)
+  if (notBefore) {
+    lines.push(`Not Before: ${notBefore}`)
   }
-  if (unsigned.requestId) {
-    lines.push(`Request ID: ${unsigned.requestId}`)
+  if (requestId) {
+    lines.push(`Request ID: ${requestId}`)
   }
-  if (unsigned.resources) {
-    lines.push("Resources:", ...unsigned.resources.map((resource) => `- ${resource}`))
+  if (resources) {
+    lines.push("Resources:", ...resources.map((resource) => `- ${resource}`))
   }
 
   return lines.join("\n")

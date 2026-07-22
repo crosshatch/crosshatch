@@ -58,7 +58,6 @@ const createSigningMessage = (input: Omit<typeof Proof.Type, "signature" | "sign
         header: `${domain} wants you to sign in with your Solana account:`,
         address,
         chainId,
-        domain,
         ...rest,
       }),
     ),

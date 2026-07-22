@@ -20,17 +20,18 @@ const supportsChainId = (chainId: string) => Option.isSome(S.decodeUnknownOption
 const createSigningMessage = ({
   chainId,
   address,
+  domain,
   ...fields
 }: Omit<typeof Proof.Type, "signature" | "signatureScheme">) =>
   S.decodeUnknownEffect(eip155ChainId)(chainId).pipe(
-    Effect.map(([, chainId]) => {
-      return buildSiwxMessage({
-        header: `${fields.domain} wants you to sign in with your Ethereum account:`,
+    Effect.map(([, chainId]) =>
+      buildSiwxMessage({
+        header: `${domain} wants you to sign in with your Ethereum account:`,
         address: OxAddress.checksum(address),
         chainId,
         ...fields,
-      })
-    }),
+      }),
+    ),
     Effect.catchTag("SchemaError", (cause) => new Verifier.VerifyError({ cause })),
   )
 
