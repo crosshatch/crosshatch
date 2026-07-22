@@ -4,7 +4,7 @@ import * as Address from "../Address.ts"
 import { Ed25519Pair, Slip10 } from "../Crypto/Crypto.ts"
 import * as Mnemonic from "../Mnemonic.ts"
 import { brand } from "./_common.ts"
-import { addressFromPublicKey, SolanaProtocolAddress, SvmProtocolError } from "./Protocol/Protocol.ts"
+import { addressFromPublicKey, Address as SolanaProtocolAddress, SvmProtocolError } from "./Protocol/Protocol.ts"
 
 export const SolanaAddress = SolanaProtocolAddress.pipe(Address.brand, brand)
 

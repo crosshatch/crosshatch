@@ -1,13 +1,11 @@
 import { Effect, Schema as S } from "effect"
 
-import { addressToBytes, findProgramDerivedAddress, SolanaProtocolAddress, type Address } from "./Address.ts"
+import { addressToBytes, findProgramDerivedAddress, Address } from "./Address.ts"
 import { AccountRole, type Instruction } from "./TransactionMessage.ts"
 
-export const ASSOCIATED_TOKEN_PROGRAM_ADDRESS = SolanaProtocolAddress.make(
-  "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
-)
-export const COMPUTE_BUDGET_PROGRAM_ADDRESS = SolanaProtocolAddress.make("ComputeBudget111111111111111111111111111111")
-export const MEMO_PROGRAM_ADDRESS = SolanaProtocolAddress.make("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr")
+export const ASSOCIATED_TOKEN_PROGRAM_ADDRESS = Address.make("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL")
+export const COMPUTE_BUDGET_PROGRAM_ADDRESS = Address.make("ComputeBudget111111111111111111111111111111")
+export const MEMO_PROGRAM_ADDRESS = Address.make("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr")
 
 const U32 = S.toType(S.Int.check(S.isBetween({ minimum: 0, maximum: 0xffffffff })))
 const U8 = S.toType(S.Int.check(S.isBetween({ minimum: 0, maximum: 255 })))
