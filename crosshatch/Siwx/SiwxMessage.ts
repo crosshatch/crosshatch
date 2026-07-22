@@ -1,3 +1,36 @@
+import { Option, Schema as S } from "effect"
+
+const Rfc3339 = S.String.check(
+  S.isPattern(/^\d{4}-\d{2}-\d{2}[Tt]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:[Zz]|[+-]\d{2}:\d{2})$/u),
+  S.makeFilter((value) =>
+    Option.isSome(S.decodeUnknownOption(S.DateTimeUtcFromString)(value)) ? undefined : "Expected an RFC 3339 date-time",
+  ),
+)
+
+const Uri = S.String.check(
+  S.makeFilter((value) =>
+    Option.isSome(S.decodeUnknownOption(S.URLFromString)(value)) ? undefined : "Expected an RFC 3986 URI",
+  ),
+)
+
+export const messageFields = {
+  domain: S.String.check(
+    S.makeFilter((value) => {
+      const url = URL.parse(`https://${value}`)
+      return url && url.host === value ? undefined : "Expected an RFC 3986 authority"
+    }),
+  ),
+  uri: Uri,
+  version: S.Literal("1"),
+  statement: S.String.check(S.isPattern(/^[^\r\n]+$/u)).pipe(S.optional),
+  nonce: S.String.check(S.isPattern(/^[a-zA-Z0-9]{8,}$/u)),
+  issuedAt: Rfc3339,
+  expirationTime: Rfc3339.pipe(S.optional),
+  notBefore: Rfc3339.pipe(S.optional),
+  requestId: S.String.check(S.isPattern(/^(?:[a-zA-Z0-9._~!$&'()*+,;=:@-]|%[a-fA-F0-9]{2})*$/u)).pipe(S.optional),
+  resources: S.Array(Uri).pipe(S.optional),
+}
+
 interface SiwxParams {
   readonly address: string
   readonly chainId: string

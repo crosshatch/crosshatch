@@ -1,5 +1,5 @@
 import { createSignableMessage, type SignatureBytes } from "@solana/kit"
-import { Effect, Option, Schema as S } from "effect"
+import { Effect, Option, pipe, Schema as S } from "effect"
 import { Base58 } from "ox"
 
 import { Address } from "../Address.ts"
@@ -9,52 +9,22 @@ import { Ed25519PublicKey } from "../Crypto/Crypto.ts"
 import * as SolanaAddress from "../Solana/SolanaAddress.ts"
 import { SolanaSigner } from "../Solana/SolanaSigner.ts"
 import * as Prover from "./Prover.ts"
-import { Proof } from "./Schema.ts"
-import { buildSiwxMessage } from "./SiwxMessage.ts"
+import { Proof, type UnsignedProof } from "./Schema.ts"
+import * as SiwxMessage from "./SiwxMessage.ts"
 import * as Verifier from "./Verifier.ts"
 
 const SolanaChainId = S.TemplateLiteralParser(["solana:", S.String.check(S.isPattern(/^[-_a-zA-Z0-9]{1,32}$/u))])
 
 const supportsChainId = (chainId: string) => Option.isSome(S.decodeUnknownOption(SolanaChainId)(chainId))
 
-const Rfc3339 = S.String.check(
-  S.isPattern(/^\d{4}-\d{2}-\d{2}[Tt]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:[Zz]|[+-]\d{2}:\d{2})$/u),
-  S.makeFilter((value) =>
-    Option.isSome(S.decodeUnknownOption(S.DateTimeUtcFromString)(value)) ? undefined : "Expected an RFC 3339 date-time",
-  ),
-)
-const Pchar = /^(?:[a-zA-Z0-9._~!$&'()*+,;=:@-]|%[a-fA-F0-9]{2})*$/u
-
-const Uri = S.String.check(
-  S.makeFilter((value) =>
-    Option.isSome(S.decodeUnknownOption(S.URLFromString)(value)) ? undefined : "Expected an RFC 3986 URI",
-  ),
-)
-
-const Message = S.Struct({
-  domain: S.String.check(
-    S.makeFilter((value) => {
-      const url = URL.parse(`https://${value}`)
-      return url && url.host === value ? undefined : "Expected an RFC 3986 authority"
-    }),
-  ),
-  address: SolanaAddress.SolanaAddress,
-  chainId: SolanaChainId,
-  uri: Uri,
-  version: S.Literal("1"),
-  statement: S.String.check(S.isPattern(/^[^\r\n]+$/u)).pipe(S.optional),
-  nonce: S.String.check(S.isPattern(/^[a-zA-Z0-9]{8,}$/u)),
-  issuedAt: Rfc3339,
-  expirationTime: Rfc3339.pipe(S.optional),
-  notBefore: Rfc3339.pipe(S.optional),
-  requestId: S.String.check(S.isPattern(Pchar)).pipe(S.optional),
-  resources: S.Array(Uri).pipe(S.optional),
-})
-
-const createSigningMessage = (input: Omit<typeof Proof.Type, "signature" | "signatureScheme">) =>
-  S.decodeUnknownEffect(Message)(input).pipe(
+const createSigningMessage = (input: UnsignedProof) =>
+  pipe(
+    input,
+    S.decodeUnknownEffect(
+      S.Struct({ ...SiwxMessage.messageFields, address: SolanaAddress.SolanaAddress, chainId: SolanaChainId }),
+    ),
     Effect.map(({ chainId: [, chainId], address, domain, ...rest }) =>
-      buildSiwxMessage({
+      SiwxMessage.buildSiwxMessage({
         header: `${domain} wants you to sign in with your Solana account:`,
         address,
         chainId,

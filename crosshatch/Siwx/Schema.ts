@@ -36,6 +36,8 @@ export const Proof = S.Struct({
   signature: S.String,
 })
 
+export type UnsignedProof = Omit<typeof Proof.Type, "signature" | "signatureScheme">
+
 export const SIGN_IN_WITH_X = "sign-in-with-x" as const
 
 export const CHALLENGE_MAX_AGE_MS = 300_000

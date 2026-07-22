@@ -1,4 +1,4 @@
-import { Effect, Option, Schema as S } from "effect"
+import { Effect, Option, pipe, Schema as S } from "effect"
 import { Address as OxAddress, Hex, PersonalMessage, Secp256k1, Signature } from "ox"
 
 import { Address } from "../Address.ts"
@@ -7,29 +7,32 @@ import { ChainId } from "../ChainId.ts"
 import { Eip155Address } from "../Eip155/Eip155Address.ts"
 import { Eip155Signer } from "../Eip155/Eip155Signer.ts"
 import * as Prover from "./Prover.ts"
-import { Proof } from "./Schema.ts"
-import { buildSiwxMessage } from "./SiwxMessage.ts"
+import { Proof, type UnsignedProof } from "./Schema.ts"
+import * as SiwxMessage from "./SiwxMessage.ts"
 import * as Verifier from "./Verifier.ts"
 
 const reference = S.String.check(S.isPattern(/^[1-9]\d*$/u))
 
-const eip155ChainId = S.TemplateLiteralParser(["eip155:", reference])
+const Eip155ChainId = S.TemplateLiteralParser(["eip155:", reference])
 
-const supportsChainId = (chainId: string) => Option.isSome(S.decodeUnknownOption(eip155ChainId)(chainId))
+const supportsChainId = (chainId: string) => Option.isSome(S.decodeUnknownOption(Eip155ChainId)(chainId))
 
-const createSigningMessage = ({
-  chainId,
-  address,
-  domain,
-  ...fields
-}: Omit<typeof Proof.Type, "signature" | "signatureScheme">) =>
-  S.decodeUnknownEffect(eip155ChainId)(chainId).pipe(
-    Effect.map(([, chainId]) =>
-      buildSiwxMessage({
+const createSigningMessage = (input: UnsignedProof) =>
+  pipe(
+    input,
+    S.decodeUnknownEffect(
+      S.Struct({
+        ...SiwxMessage.messageFields,
+        address: Eip155Address,
+        chainId: Eip155ChainId,
+      }),
+    ),
+    Effect.map(({ chainId: [, chainId], address, domain, ...rest }) =>
+      SiwxMessage.buildSiwxMessage({
         header: `${domain} wants you to sign in with your Ethereum account:`,
         address: OxAddress.checksum(address),
         chainId,
-        ...fields,
+        ...rest,
       }),
     ),
     Effect.catchTag("SchemaError", (cause) => new Verifier.VerifyError({ cause })),
