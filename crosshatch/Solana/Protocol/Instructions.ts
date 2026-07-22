@@ -93,3 +93,9 @@ export const findAssociatedTokenPda = (input: {
     addressToBytes(input.tokenProgram),
     addressToBytes(input.mint),
   ])
+
+export const findAssociatedTokenAddress = (input: {
+  readonly owner: Address
+  readonly tokenProgram: Address
+  readonly mint: Address
+}) => findAssociatedTokenPda(input).pipe(Effect.map(([address]) => address))

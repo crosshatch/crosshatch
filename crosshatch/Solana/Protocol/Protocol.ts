@@ -8,6 +8,7 @@ export {
 export { buildTransactionMessage } from "./TransactionMessage.ts"
 export { getLatestBlockhash } from "./Rpc.ts"
 export {
+  findAssociatedTokenAddress,
   findAssociatedTokenPda,
   getAddMemoInstruction,
   getSetComputeUnitLimitInstruction,

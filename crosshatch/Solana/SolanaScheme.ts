@@ -1,4 +1,4 @@
-import { Effect, Encoding, flow, Schema as S } from "effect"
+import { Effect, Encoding, Schema as S } from "effect"
 
 import { Random } from "../Crypto/Crypto.ts"
 import * as Scheme from "../Scheme.ts"
@@ -6,7 +6,7 @@ import {
   SolanaProtocolAddress,
   buildTransactionMessage,
   compileTransaction,
-  findAssociatedTokenPda,
+  findAssociatedTokenAddress,
   getAddMemoInstruction,
   getBase64EncodedWireTransaction,
   getSetComputeUnitLimitInstruction,
@@ -49,12 +49,11 @@ export const layer = SolanaScheme.layer(
 
         const mint = yield* S.decodeUnknownEffect(SolanaAsset.SolanaAsset)(accepted.asset)
 
-        const [[source], [destination]] = yield* Effect.all([
-          findAssociatedTokenPda({ owner: signer.address, tokenProgram: tokenProgramId, mint }),
-          flow(
-            S.decodeEffect(SolanaProtocolAddress),
-            Effect.flatMap((owner) => findAssociatedTokenPda({ owner, tokenProgram: tokenProgramId, mint })),
-          )(accepted.payTo),
+        const [source, destination] = yield* Effect.all([
+          findAssociatedTokenAddress({ owner: signer.address, tokenProgram: tokenProgramId, mint }),
+          S.decodeEffect(SolanaProtocolAddress)(accepted.payTo).pipe(
+            Effect.flatMap((owner) => findAssociatedTokenAddress({ owner, tokenProgram: tokenProgramId, mint })),
+          ),
         ])
 
         const message = yield* Effect.all([
