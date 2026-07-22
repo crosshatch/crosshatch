@@ -3,7 +3,7 @@ import { Effect, Encoding, Schema as S } from "effect"
 import { Random } from "../Crypto/Crypto.ts"
 import * as Scheme from "../Scheme.ts"
 import {
-  SolanaProtocolAddress,
+  type Address,
   buildTransactionMessage,
   compileTransaction,
   findAssociatedTokenAddress,
@@ -12,6 +12,7 @@ import {
   getSetComputeUnitLimitInstruction,
   getSetComputeUnitPriceInstruction,
   getTransferCheckedInstruction,
+  SolanaProtocolAddress,
 } from "./Protocol/Protocol.ts"
 import * as SolanaAddress from "./SolanaAddress.ts"
 import * as SolanaAsset from "./SolanaAsset.ts"
@@ -49,11 +50,11 @@ export const layer = SolanaScheme.layer(
 
         const mint = yield* S.decodeUnknownEffect(SolanaAsset.SolanaAsset)(accepted.asset)
 
+        const ata = (owner: Address) => findAssociatedTokenAddress({ owner, tokenProgram: tokenProgramId, mint })
+
         const [source, destination] = yield* Effect.all([
-          findAssociatedTokenAddress({ owner: signer.address, tokenProgram: tokenProgramId, mint }),
-          S.decodeEffect(SolanaProtocolAddress)(accepted.payTo).pipe(
-            Effect.flatMap((owner) => findAssociatedTokenAddress({ owner, tokenProgram: tokenProgramId, mint })),
-          ),
+          ata(signer.address),
+          S.decodeEffect(SolanaProtocolAddress)(accepted.payTo).pipe(Effect.flatMap(ata)),
         ])
 
         const message = yield* Effect.all([
