@@ -1,6 +1,6 @@
 import { Effect, Schema as S } from "effect"
 
-import { JsonRecord } from "../_util.ts"
+import { Base64JsonString, JsonRecord } from "../_util.ts"
 
 export const SupportedChain = S.Struct({
   chainId: S.String,
@@ -40,6 +40,4 @@ export const SIGN_IN_WITH_X = "sign-in-with-x" as const
 
 export const CHALLENGE_MAX_AGE_MS = 300_000
 
-export const ProofFromBase64JsonString = S.StringFromBase64.pipe(S.decodeTo(S.fromJsonString(S.toCodecJson(Proof))))
-
-export const ChallengeFromJson = S.toCodecJson(Challenge)
+export const ProofFromBase64JsonString = Base64JsonString(Proof)

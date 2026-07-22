@@ -27,12 +27,14 @@ export const layerMiddleware = <const Verifiers extends ReadonlyArray<Verifier>>
             Option.flatMap((header) => Headers.get(header)(request.headers)),
             Option.map(S.decodeUnknownEffect(ProofFromBase64JsonString)),
             Effect.transposeOption,
+            Effect.catchTag("SchemaError", () => Effect.succeed(Option.none())),
           )
 
           const identity = yield* pipe(
             Option.all({ proof, requestUrl }),
             Option.map(({ proof, requestUrl }) => Verification.verifyProof(...verifiers)(proof, requestUrl)),
             Effect.transposeOption,
+            Effect.catchTag("VerifyError", () => Effect.succeed(Option.none())),
           )
 
           return yield* effect.pipe(

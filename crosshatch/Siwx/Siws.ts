@@ -14,7 +14,7 @@ import * as Verifier from "./Verifier.ts"
 
 const solanaChainId = S.TemplateLiteralParser(["solana:", S.String.check(S.isPattern(/^[-_a-zA-Z0-9]{1,32}$/u))])
 
-const supportsChainId = S.is(solanaChainId)
+const supportsChainId = (chainId: string) => Option.isSome(S.decodeUnknownOption(solanaChainId)(chainId))
 
 const Rfc3339 = S.String.check(
   S.isPattern(/^\d{4}-\d{2}-\d{2}[Tt]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:[Zz]|[+-]\d{2}:\d{2})$/u),

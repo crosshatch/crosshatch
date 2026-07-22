@@ -6,6 +6,7 @@ import { ExtensionRegistry } from "./Extension.ts"
 import type { Payload } from "./Payload.ts"
 import type { Required } from "./Required.ts"
 import { CreatePayloadError } from "./Scheme.ts"
+import { Base64JsonString } from "./_util.ts"
 
 export class Payer extends Context.Service<
   Payer,
@@ -44,9 +45,7 @@ export const layer = Layer.effect(
               const info = yield* S.decodeUnknownEffect(S.toCodecJson(Info))(infoJson)
               const enrichment = yield* f({ accepted, info, payload, required, request })
               if (header) {
-                const value = yield* S.encodeEffect(
-                  S.StringFromBase64.pipe(S.decodeTo(S.fromJsonString(S.toCodecJson(Enrichment)))),
-                )(enrichment)
+                const value = yield* S.encodeEffect(Base64JsonString(Enrichment))(enrichment)
                 return { kind: "header" as const, header, value }
               }
               const value = yield* S.encodeEffect(S.toCodecJson(Enrichment))(enrichment)

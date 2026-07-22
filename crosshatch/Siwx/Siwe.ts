@@ -1,4 +1,4 @@
-import { Effect, Schema as S } from "effect"
+import { Effect, Option, Schema as S } from "effect"
 import { Address as OxAddress, Hex, PersonalMessage, Secp256k1, Signature } from "ox"
 
 import { Address } from "../Address.ts"
@@ -17,7 +17,7 @@ const reference = S.String.check(S.isPattern(/^\d+$/u)).pipe(
 
 const eip155ChainId = S.TemplateLiteralParser(["eip155:", reference])
 
-const supportsChainId = S.is(eip155ChainId)
+const supportsChainId = (chainId: string) => Option.isSome(S.decodeUnknownOption(eip155ChainId)(chainId))
 
 const createSigningMessage = (unsigned: Omit<typeof Proof.Type, "signature" | "signatureScheme">) =>
   S.decodeUnknownEffect(eip155ChainId)(unsigned.chainId).pipe(
@@ -91,10 +91,10 @@ const verifyMessage = ({
 const verifyWith = (check: typeof verifyMessage) =>
   Effect.fnUntraced(
     function* (proof: typeof Proof.Type) {
-      const message = yield* createSigningMessage(proof)
       const { address, signature } = yield* S.decodeUnknownEffect(
         S.Struct({ address: Eip155Address, signature: S.TemplateLiteral([S.Literal("0x"), S.String]) }),
       )(proof)
+      const message = yield* createSigningMessage(proof)
 
       const valid = yield* Effect.tryPromise({
         try: () => check({ address, message, signature }),

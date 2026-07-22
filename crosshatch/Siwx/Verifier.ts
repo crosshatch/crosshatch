@@ -11,5 +11,5 @@ export interface Verifier {
   readonly type: string
   readonly scheme: string
   readonly supportsChainId: (chainId: string) => boolean
-  readonly verify: (proof: typeof Proof.Type) => Effect.Effect<AuthenticatedIdentity, VerifyError, unknown>
+  readonly verify: (proof: typeof Proof.Type) => Effect.Effect<AuthenticatedIdentity, VerifyError, never>
 }
