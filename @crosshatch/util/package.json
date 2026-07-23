@@ -1,6 +1,7 @@
 {
   "name": "@crosshatch/util",
   "version": "0.0.0",
+  "private": false,
   "bugs": {
     "url": "https://github.com/crosshatch/crosshatch/issues"
   },
