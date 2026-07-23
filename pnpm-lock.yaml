@@ -46,7 +46,7 @@ catalogs:
       specifier: ^1.3.0
       version: 1.3.0
     '@oxlint/plugins':
-      specifier: ^1.73.0
+      specifier: ^1.75.0
       version: 1.75.0
     '@scure/bip39':
       specifier: ^2.2.0
@@ -109,7 +109,7 @@ catalogs:
       specifier: ^0.58.0
       version: 0.58.0
     oxlint:
-      specifier: ^1.73.0
+      specifier: ^1.75.0
       version: 1.75.0
     pkg-pr-new:
       specifier: ^0.0.78
