@@ -4,6 +4,7 @@ packages:
   - crosshatch
   - examples/*
   - examples/*/*
+  - "!konfik"
 
 catalog:
   "@changesets/changelog-github": ^0.7.0
