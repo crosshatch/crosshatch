@@ -157,8 +157,6 @@ export const PayerLive = Payer.layer.pipe(
 ```
 git clone --recurse-submodules=konfik git@github.com:crosshatch/crosshatch.git
 cd crosshatch
-git submodule update --init liminal
-git -C liminal submodule update --init konfik
 pnpm i
 pnpm build
 pnpm test

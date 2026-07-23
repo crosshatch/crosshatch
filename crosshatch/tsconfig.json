@@ -6,5 +6,5 @@
   },
   "include": [".", "package.json"],
   "exclude": ["dist", "vitest.config.ts"],
-  "references": [{ "path": "../@crosshatch/widget" }, { "path": "../../liminal" }, { "path": "../@crosshatch/util" }]
+  "references": [{ "path": "../@crosshatch/widget" }, { "path": "../@crosshatch/util" }]
 }
