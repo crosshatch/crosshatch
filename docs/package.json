@@ -6,6 +6,7 @@
     "dev": "alchemy dev --env-file ../../.env"
   },
   "dependencies": {
+    "@crosshatch/util": "workspace:*",
     "@effect/ai-openai-compat": "catalog:",
     "@effect/atom-react": "catalog:",
     "@icons-pack/react-simple-icons": "catalog:",
@@ -13,7 +14,6 @@
     "alchemy": "catalog:",
     "crosshatch": "workspace:*",
     "effect": "catalog:",
-    "liminal-util": "workspace:*",
     "lucide-static": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",

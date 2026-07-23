@@ -1,4 +1,4 @@
-@import "liminal-util/vocs.css";
+@import "@crosshatch/util/vocs.css";
 
 body:has(.crosshatch-landing) {
   --vocs-spacing-content: 80rem;

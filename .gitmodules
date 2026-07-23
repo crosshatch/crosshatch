@@ -1,6 +1,6 @@
-[submodule "liminal"]
-	path = liminal
-	url = git@github.com:harrysolovay/liminal.git
+[submodule "konfik"]
+	path = konfik
+	url = git@github.com:crosshatch/konfik.git
 [submodule "repos/Effect-TS/effect"]
 	path = repos/Effect-TS/effect
 	url = git@github.com:Effect-TS/effect.git
@@ -25,9 +25,6 @@
 [submodule "repos/vitejs/vite"]
 	path = repos/vitejs/vite
 	url = git@github.com:vitejs/vite.git
-[submodule "konfik"]
-	path = konfik
-	url = git@github.com:crosshatch/konfik.git
 [submodule "repos/tempoxyz/accounts"]
 	path = repos/tempoxyz/accounts
 	url = git@github.com:tempoxyz/accounts.git

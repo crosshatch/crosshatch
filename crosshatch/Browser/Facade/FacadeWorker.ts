@@ -1,9 +1,9 @@
+import * as Boundary from "@crosshatch/util/Boundary"
 import * as Host from "@crosshatch/widget/Host"
 import { BrowserWorker, BrowserStream } from "@effect/platform-browser"
 import { Effect, Fiber, Layer, Stream, Schema as S, Schedule, Data, Record } from "effect"
-import * as Boundary from "liminal-util/Boundary"
 
-import { Stage } from "../../Stage.ts"
+import { ChxEnv } from "../../ChxEnv.ts"
 import { FacadeIntroduction, RequestFacadeIntroduction } from "./handshake.ts"
 
 export class FacadeWorkerError extends Data.TaggedError("FacadeWorkerError")<{
@@ -12,7 +12,7 @@ export class FacadeWorkerError extends Data.TaggedError("FacadeWorkerError")<{
 
 export const layer = Effect.gen(function* () {
   yield* Host.hostListener.pipe(Effect.forkScoped)
-  const { url } = yield* Stage
+  const { url } = yield* ChxEnv
   const fiber = yield* BrowserStream.fromEventListenerWindow("message").pipe(
     Stream.filter(({ data, origin }) => origin.startsWith(url("link")) && S.is(RequestFacadeIntroduction)(data)),
     Stream.take(1),

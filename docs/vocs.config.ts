@@ -1,5 +1,5 @@
+import { VocsConfig } from "@crosshatch/util/vocs"
 import PackageJson from "crosshatch/package.json" with { type: "json" }
-import { VocsConfig } from "liminal-util/vocs"
 import { defineConfig } from "vocs/config"
 
 export default defineConfig({
