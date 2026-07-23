@@ -1,6 +1,6 @@
+import * as Boundary from "@crosshatch/util/Boundary"
 import { Effect, Match, Cause, Struct } from "effect"
 import { Atom } from "effect/unstable/reactivity"
-import * as Boundary from "@crosshatch/util/Boundary"
 
 import * as Amount from "../Amount.ts"
 import { Proposal } from "../Bridge.ts"

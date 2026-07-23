@@ -1,8 +1,8 @@
+import { docs } from "@crosshatch/util/alchemicals/docs"
 import * as Alchemy from "alchemy"
 import * as Cloudflare from "alchemy/Cloudflare"
 import * as GitHub from "alchemy/GitHub"
 import { Effect, Layer } from "effect"
-import { docs } from "@crosshatch/util/alchemicals/docs"
 
 import PackageJson from "./package.json" with { type: "json" }
 
