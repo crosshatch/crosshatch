@@ -1,5 +1,22 @@
 # crosshatch
 
+## 0.0.14
+
+### Patch Changes
+
+- [#135](https://github.com/crosshatch/crosshatch/pull/135)
+  [`d55f9b1`](https://github.com/crosshatch/crosshatch/commit/d55f9b105c2480ada61b3e19211d8c488be55c18)
+  Thanks @harrysolovay! - Extract common functionality into utility package.
+
+- [#129](https://github.com/crosshatch/crosshatch/pull/129)
+  [`a3ac501`](https://github.com/crosshatch/crosshatch/commit/a3ac501ef85a31399b8fd1a199b147fd6de42b70)
+  Thanks @harrysolovay! - Add `Payload.isAcceptable` guard.
+
+- Updated dependencies
+  [[`d55f9b1`](https://github.com/crosshatch/crosshatch/commit/d55f9b105c2480ada61b3e19211d8c488be55c18)]:
+  - @crosshatch/util@0.0.1
+  - @crosshatch/widget@0.0.6
+
 ## 0.0.13
 
 ### Patch Changes
