@@ -1,7 +1,7 @@
 import * as Host from "@crosshatch/widget/Host"
 import { BrowserWorker, BrowserStream } from "@effect/platform-browser"
 import { Effect, Fiber, Layer, Stream, Schema as S, Schedule, Data, Record } from "effect"
-import * as Boundary from "liminal-util/Boundary"
+import * as Boundary from "@crosshatch/util/Boundary"
 
 import { ChxEnv } from "../../ChxEnv.ts"
 import { FacadeIntroduction, RequestFacadeIntroduction } from "./handshake.ts"

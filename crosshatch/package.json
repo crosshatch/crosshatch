@@ -50,6 +50,7 @@
     "dev": "node --watch ./Cli/main.ts dev --port 4647 --otel-endpoint http://127.0.0.1:27686"
   },
   "peerDependencies": {
+    "@crosshatch/util": "workspace:*",
     "@crosshatch/widget": "workspace:*",
     "@effect/platform-browser": "catalog:",
     "@effect/platform-node": "catalog:",
@@ -63,8 +64,6 @@
     "@solana/transactions": "catalog:",
     "@standard-schema/spec": "catalog:",
     "effect": "catalog:",
-    "liminal": "workspace:*",
-    "liminal-util": "workspace:*",
     "ox": "catalog:"
   }
 }

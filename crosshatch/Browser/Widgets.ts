@@ -3,7 +3,7 @@ import { Finished } from "@crosshatch/widget/self"
 import type { StandardSchemaV1 } from "@standard-schema/spec"
 import { Data, Effect, pipe, Schema as S, SchemaGetter, Stream } from "effect"
 import { Url, UrlParams } from "effect/unstable/http"
-import * as Boundary from "liminal-util/Boundary"
+import * as Boundary from "@crosshatch/util/Boundary"
 
 import { ChxEnv } from "../ChxEnv.ts"
 import { Allowance } from "./Allowance.ts"

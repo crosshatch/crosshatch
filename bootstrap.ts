@@ -3,7 +3,7 @@ import * as Cloudflare from "alchemy/Cloudflare"
 import * as Github from "alchemy/GitHub"
 import { Eip155Address } from "crosshatch/Eip155"
 import { Layer, Effect, Config } from "effect"
-import { GithubDeployer } from "liminal-util/alchemicals/GithubDeployer"
+import { GithubDeployer } from "@crosshatch/util/alchemicals/GithubDeployer"
 
 const owner = "crosshatch"
 const repository = "crosshatch"

@@ -1,4 +1,4 @@
-import ./liminal/Caddyfile
+import ./crosshatch/Caddyfile
 
 crosshatch.dev.localhost {
 	tls internal

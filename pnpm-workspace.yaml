@@ -1,11 +1,9 @@
 packages:
+  - "*"
   - "@crosshatch/*"
   - crosshatch
-  - docs
   - examples/*
-  - liminal/*
-  - liminal/examples/*
-  - liminal/examples/*/*
+  - examples/*/*
 
 catalog:
   "@changesets/changelog-github": ^0.7.0
