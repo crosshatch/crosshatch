@@ -10,3 +10,9 @@
 dist/
 node_modules/
 repos
+
+scratchpad/**
+!scratchpad/
+!scratchpad/tsconfig.json
+!scratchpad/package.json
+
