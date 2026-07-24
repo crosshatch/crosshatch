@@ -4,6 +4,7 @@ packages:
   - crosshatch
   - examples/*
   - examples/*/*
+  - scratchpad
   - "!konfik"
 
 catalog:
