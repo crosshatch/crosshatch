@@ -4,7 +4,7 @@ import * as Base58 from "../../Crypto/Base58.ts"
 import * as CryptoKey from "../../Crypto/CryptoKey.ts"
 import * as Ed25519Point from "../../Crypto/Ed25519Point.ts"
 import * as Hash from "../../Crypto/Hash.ts"
-import { SvmProtocolError } from "./Error.ts"
+import { ensure, SvmProtocolError } from "./Error.ts"
 
 const PDA_MARKER = new TextEncoder().encode("ProgramDerivedAddress")
 
@@ -31,13 +31,9 @@ const createProgramAddress = Effect.fnUntraced(function* (
   programAddress: Address,
   seeds: ReadonlyArray<Uint8Array>,
 ): Effect.fn.Return<Option.Option<Address>, SvmProtocolError, never> {
-  if (seeds.length > 16) {
-    return yield* new SvmProtocolError({ message: "A PDA supports at most 16 seeds" })
-  }
+  yield* ensure(seeds.length <= 16, "A PDA supports at most 16 seeds")
   for (const [index, seed] of seeds.entries()) {
-    if (seed.byteLength > 32) {
-      return yield* new SvmProtocolError({ message: `PDA seed ${index} exceeds 32 bytes` })
-    }
+    yield* ensure(seed.byteLength <= 32, `PDA seed ${index} exceeds 32 bytes`)
   }
   const input = new Uint8Array(seeds.reduce((total, seed) => total + seed.byteLength, 0) + 32 + PDA_MARKER.length)
   let offset = 0
