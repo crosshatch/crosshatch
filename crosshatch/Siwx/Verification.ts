@@ -8,7 +8,7 @@ export const verifyProof = <const Verifiers extends ReadonlyArray<Verifier>>(...
   Effect.fnUntraced(
     function* (proof: typeof Proof.Type, requestUrl: URL) {
       const challengeStore = yield* ChallengeStore
-      const challenge = yield* challengeStore.peek(proof.nonce)
+      const challenge = yield* challengeStore.get(proof.nonce)
       if (!challenge) {
         return yield* new VerifyError({})
       }
@@ -49,16 +49,7 @@ export const verifyProof = <const Verifiers extends ReadonlyArray<Verifier>>(...
         return yield* new VerifyError({})
       }
 
-      const identity = yield* verifier.value.verify(proof).pipe(Effect.mapError((cause) => new VerifyError({ cause })))
-
-      yield* challengeStore.consume(proof.nonce).pipe(
-        Effect.filterOrFail(
-          (s) => s,
-          () => new VerifyError({}),
-        ),
-      )
-
-      return identity
+      return yield* verifier.value.verify(proof).pipe(Effect.mapError((cause) => new VerifyError({ cause })))
     },
     Effect.catchTags({
       SchemaError: (cause) => new VerifyError({ cause }),

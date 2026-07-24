@@ -1,12 +1,12 @@
 import { Array, Schema as S, Context, Effect, Layer, Record, Predicate, Result, flow, pipe } from "effect"
 
+import { Base64JsonString } from "./_util.ts"
 import { Accept, type AcceptError } from "./Accept.ts"
 import { Bridge } from "./Bridge.ts"
 import { ExtensionRegistry } from "./Extension.ts"
 import type { Payload } from "./Payload.ts"
 import type { Required } from "./Required.ts"
 import { CreatePayloadError } from "./Scheme.ts"
-import { Base64JsonString } from "./_util.ts"
 
 export class Payer extends Context.Service<
   Payer,
@@ -58,8 +58,6 @@ export const layer = Layer.effect(
           { concurrency: "unbounded" },
         ).pipe(Effect.map(Array.filter(Predicate.isNotUndefined)))
 
-        // Array.partition returns failures first, then successes. Payload entries fail the
-        // filter and header entries pass it.
         const [extensions, headers] = pipe(
           Array.partition(resolved, (item) => (item.kind === "header" ? Result.succeed(item) : Result.fail(item))),
           ([extensionEntries, headerEntries]) => [

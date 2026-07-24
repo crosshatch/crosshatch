@@ -12,11 +12,9 @@ export class ChallengeStore extends Context.Service<
       entry: typeof StoredChallenge.Type,
     ) => Effect.Effect<void, KeyValueStore.KeyValueStoreError | S.SchemaError>
 
-    readonly peek: (
+    readonly get: (
       nonce: string,
     ) => Effect.Effect<typeof Challenge.Type | undefined, KeyValueStore.KeyValueStoreError | S.SchemaError>
-
-    readonly consume: (nonce: string) => Effect.Effect<boolean, KeyValueStore.KeyValueStoreError | S.SchemaError>
   }
 >()("crosshatch/Siwx/ChallengeStore") {}
 
@@ -31,18 +29,16 @@ export const layer = Layer.effect(
     return {
       issue: (entry) => store.set(entry.challenge.info.nonce, entry),
 
-      peek: Effect.fnUntraced(function* (nonce) {
-        const entry = yield* store.get(nonce)
-        return entry._tag === "None" ? undefined : entry.value.challenge
-      }),
-
-      consume: Effect.fnUntraced(function* (nonce) {
+      get: Effect.fnUntraced(function* (nonce) {
         const entry = yield* store.get(nonce)
         if (entry._tag === "None") {
-          return false
+          return undefined
         }
-        yield* store.remove(nonce)
-        return entry.value.expiresAt > (yield* Clock.currentTimeMillis)
+        if (entry.value.expiresAt <= (yield* Clock.currentTimeMillis)) {
+          yield* store.remove(nonce)
+          return undefined
+        }
+        return entry.value.challenge
       }),
     }
   }),

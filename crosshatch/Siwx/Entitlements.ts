@@ -1,5 +1,4 @@
-import { Context, Data, Effect, Layer, Schema as S } from "effect"
-import type { HttpClientError } from "effect/unstable/http"
+import { Context, Data, Effect, Layer } from "effect"
 import { KeyValueStore } from "effect/unstable/persistence"
 
 import type { CaAccountId } from "../CaAccountId.ts"
@@ -21,12 +20,7 @@ export class Entitlements extends Context.Service<
       readonly payload: Payload
     }) => Effect.Effect<
       Extract<typeof SettleResponse.Type, { readonly success: true }>,
-      | HttpClientError.HttpClientError
-      | KeyValueStore.KeyValueStoreError
-      | PurchaseError
-      | S.SchemaError
-      | Facilitator.SettlementError
-      | Facilitator.VerificationError,
+      PurchaseError,
       Facilitator.Facilitator
     >
   }
@@ -40,7 +34,7 @@ export const layer = Layer.effect(
   Effect.gen(function* () {
     const store = KeyValueStore.prefix(yield* KeyValueStore.KeyValueStore, "siwx:entitlement:")
     return {
-      isEntitled: Effect.fnUntraced(function* (id: typeof EntitlementId.Type) {
+      isEntitled: Effect.fnUntraced(function* (id) {
         const identity = yield* Identity
         if (!identity) {
           return false
@@ -48,37 +42,40 @@ export const layer = Layer.effect(
         return yield* store.has(entitlementKey(id, identity.accountId))
       }),
 
-      purchase: Effect.fnUntraced(function* ({
-        id,
-        payload,
-      }: {
-        readonly id: typeof EntitlementId.Type
-        readonly payload: Payload
-      }) {
-        const identity = yield* Identity
-        if (!identity) {
-          return yield* new PurchaseError({})
-        }
-        if (identity.chainId !== payload.accepted.network) {
-          return yield* new PurchaseError({})
-        }
+      purchase: Effect.fnUntraced(
+        function* ({ id, payload }) {
+          const identity = yield* Identity
+          if (!identity) {
+            return yield* new PurchaseError({})
+          }
+          if (identity.chainId !== payload.accepted.network) {
+            return yield* new PurchaseError({})
+          }
 
-        const verification = yield* Facilitator.verify({ payload })
-        if (!verification.payer) {
-          return yield* new PurchaseError({})
-        }
-        if (identity.address.toLowerCase() !== verification.payer.toLowerCase()) {
-          return yield* new PurchaseError({})
-        }
+          const verification = yield* Facilitator.verify({ payload }).pipe(
+            Effect.mapError((cause) => new PurchaseError({ cause })),
+          )
+          if (!verification.payer) {
+            return yield* new PurchaseError({})
+          }
+          if (identity.address.toLowerCase() !== verification.payer.toLowerCase()) {
+            return yield* new PurchaseError({})
+          }
 
-        const settlement = yield* Facilitator.settle({ payload })
-        if (!settlement.payer) {
-          return yield* new PurchaseError({})
-        }
+          const settlement = yield* Facilitator.settle({ payload }).pipe(
+            Effect.mapError((cause) => new PurchaseError({ cause })),
+          )
+          if (!settlement.payer) {
+            return yield* new PurchaseError({})
+          }
 
-        yield* store.set(entitlementKey(id, identity.accountId), "1")
-        return settlement
-      }),
+          yield* store.set(entitlementKey(id, identity.accountId), "1")
+          return settlement
+        },
+        Effect.catchTags({
+          KeyValueStoreError: ({ cause }) => new PurchaseError({ cause }),
+        }),
+      ),
     }
   }),
 )
