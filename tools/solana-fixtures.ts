@@ -17,8 +17,9 @@ import {
   setTransactionMessageLifetimeUsingBlockhash,
   type Address,
   type Blockhash,
+  type ReadonlyUint8Array,
 } from "@solana/kit"
-import { Console, Effect, FileSystem, Path, pipe } from "effect"
+import { Console, Effect, FileSystem, Path, pipe, Record } from "effect"
 import { FastCheck } from "effect/testing"
 import { Command } from "effect/unstable/cli"
 
@@ -78,19 +79,19 @@ const generateAssociatedTokenPdas = () =>
 const generateComputeUnitLimits = () =>
   [0, 1, 20000, U32_MAX, ...sample(u32, 16)].map((units) => ({
     units,
-    data: Uint8Array.from(getSetComputeUnitLimitInstruction({ units }).data),
+    data: getSetComputeUnitLimitInstruction({ units }).data,
   }))
 
 const generateComputeUnitPrices = () =>
   [0n, 1n, U64_MAX, ...sample(u64, 16)].map((microLamports) => ({
     microLamports,
-    data: Uint8Array.from(getSetComputeUnitPriceInstruction({ microLamports }).data),
+    data: getSetComputeUnitPriceInstruction({ microLamports }).data,
   }))
 
 const generateMemos = () =>
   ["", "crosshatch", "🚀 ünïcode ✓", ...sample(memoText, 16)].map((memo) => ({
     memo,
-    data: Uint8Array.from(getAddMemoInstruction({ memo }).data),
+    data: getAddMemoInstruction({ memo }).data,
   }))
 
 const generateTransfers = () =>
@@ -106,31 +107,21 @@ const generateTransfers = () =>
     }),
     24,
   ).map((input) => {
-    const source = toAddress(input.source)
-    const mint = toAddress(input.mint)
-    const destination = toAddress(input.destination)
-    const authority = toAddress(input.authority)
+    const transfer = {
+      ...input,
+      source: toAddress(input.source),
+      mint: toAddress(input.mint),
+      destination: toAddress(input.destination),
+      authority: toAddress(input.authority),
+    }
     const instruction = getTransferCheckedInstruction(
-      {
-        source,
-        mint,
-        destination,
-        authority: createNoopSigner(authority),
-        amount: input.amount,
-        decimals: input.decimals,
-      },
-      { programAddress: input.tokenProgram },
+      { ...transfer, authority: createNoopSigner(transfer.authority) },
+      { programAddress: transfer.tokenProgram },
     )
     return {
-      source,
-      mint,
-      destination,
-      authority,
-      tokenProgram: input.tokenProgram,
-      amount: input.amount,
-      decimals: input.decimals,
-      data: Uint8Array.from(instruction.data),
-      accounts: instruction.accounts.map((account) => ({ address: account.address, role: account.role })),
+      ...transfer,
+      data: instruction.data,
+      accounts: instruction.accounts.map(({ address, role }) => ({ address, role })),
     }
   })
 
@@ -149,39 +140,37 @@ interface TransactionInput {
 }
 
 const generateTransaction = async (input: TransactionInput) => {
-  const keyPair = await createKeyPairFromPrivateKeyBytes(input.signerSeed)
+  const {
+    signerSeed,
+    feePayer,
+    recipient,
+    mint,
+    tokenProgram,
+    blockhash,
+    units,
+    microLamports,
+    amount,
+    decimals,
+    memo,
+  } = input
+  const keyPair = await createKeyPairFromPrivateKeyBytes(signerSeed)
   const authority = await getAddressFromPublicKey(keyPair.publicKey)
-  const [source] = await findAssociatedTokenPda({
-    owner: authority,
-    tokenProgram: input.tokenProgram,
-    mint: input.mint,
-  })
-  const [destination] = await findAssociatedTokenPda({
-    owner: input.recipient,
-    tokenProgram: input.tokenProgram,
-    mint: input.mint,
-  })
+  const [source] = await findAssociatedTokenPda({ owner: authority, tokenProgram, mint })
+  const [destination] = await findAssociatedTokenPda({ owner: recipient, tokenProgram, mint })
   const message = pipe(
     createTransactionMessage({ version: 0 }),
-    (tx) => setTransactionMessageFeePayer(input.feePayer, tx),
-    (tx) => setTransactionMessageLifetimeUsingBlockhash({ blockhash: input.blockhash, lastValidBlockHeight: 0n }, tx),
+    (tx) => setTransactionMessageFeePayer(feePayer, tx),
+    (tx) => setTransactionMessageLifetimeUsingBlockhash({ blockhash, lastValidBlockHeight: 0n }, tx),
     (tx) =>
       appendTransactionMessageInstructions(
         [
-          getSetComputeUnitLimitInstruction({ units: input.units }),
-          getSetComputeUnitPriceInstruction({ microLamports: input.microLamports }),
+          getSetComputeUnitLimitInstruction({ units }),
+          getSetComputeUnitPriceInstruction({ microLamports }),
           getTransferCheckedInstruction(
-            {
-              source,
-              mint: input.mint,
-              destination,
-              authority: createNoopSigner(authority),
-              amount: input.amount,
-              decimals: input.decimals,
-            },
-            { programAddress: input.tokenProgram },
+            { source, mint, destination, authority: createNoopSigner(authority), amount, decimals },
+            { programAddress: tokenProgram },
           ),
-          getAddMemoInstruction({ memo: input.memo }),
+          getAddMemoInstruction({ memo }),
         ],
         tx,
       ),
@@ -226,43 +215,28 @@ const generateTransactions = async () => {
       }),
       22,
     ).map(
-      async (input): Promise<TransactionInput> => ({
-        signerSeed: input.signerSeed,
-        feePayer: await addressFromSeed(input.feePayerSeed),
-        recipient: toAddress(input.recipient),
-        mint: toAddress(input.mint),
-        tokenProgram: input.tokenProgram,
-        blockhash: toBase58(input.blockhash) as Blockhash,
-        units: input.units,
-        microLamports: input.microLamports,
-        amount: input.amount,
-        decimals: input.decimals,
-        memo: input.memo,
+      async ({ feePayerSeed, recipient, mint, blockhash, ...input }): Promise<TransactionInput> => ({
+        ...input,
+        feePayer: await addressFromSeed(feePayerSeed),
+        recipient: toAddress(recipient),
+        mint: toAddress(mint),
+        blockhash: toBase58(blockhash) as Blockhash,
       }),
     ),
   )
   return Promise.all([goldenTransaction, selfPayingTransaction, ...sampledTransactions].map(generateTransaction))
 }
 
-const literal = (value: unknown): string => {
-  if (value instanceof Uint8Array) return `Uint8Array.of(${Array.from(value).join(", ")})`
+type Value = string | number | bigint | ReadonlyUint8Array | Value[] | { readonly [key: string]: Value }
+
+const isBytes = (value: Value): value is ReadonlyUint8Array => value instanceof Uint8Array
+
+const literal = (value: Value): string => {
+  if (isBytes(value)) return `Uint8Array.of(${value.join(", ")})`
   if (typeof value === "bigint") return `${value}n`
   if (typeof value === "string" || typeof value === "number") return JSON.stringify(value)
   if (Array.isArray(value)) return `[${value.map(literal).join(", ")}]`
-  if (typeof value === "object" && value !== null) {
-    const fields = Object.entries(value).map(([key, field]) => `${key}: ${literal(field)}`)
-    return `{ ${fields.join(", ")} }`
-  }
-  throw new Error(`Cannot serialize value: ${String(value)}`)
-}
-
-const renderModule = (fixtures: Record<string, ReadonlyArray<unknown>>) => {
-  const header =
-    "// Generated from @solana/kit by `node ./tools/main.ts solana-fixtures` — do not edit.\n// oxfmt skips *.gen.ts via ignorePatterns in .oxfmtrc.jsonc.\n"
-  const exports = Object.entries(fixtures).map(
-    ([name, cases]) => `export const ${name} = [\n${cases.map((c) => `  ${literal(c)},`).join("\n")}\n]\n`,
-  )
-  return [header, ...exports].join("\n")
+  return `{ ${Record.collect(value, (key, field) => `${key}: ${literal(field)}`).join(", ")} }`
 }
 
 export const solanaFixtures = Command.make("solana-fixtures", {}).pipe(
@@ -280,7 +254,15 @@ export const solanaFixtures = Command.make("solana-fixtures", {}).pipe(
       const fs = yield* FileSystem.FileSystem
       const path = yield* Path.Path
       const out = path.join(import.meta.dirname, "..", "crosshatch", "Solana", "Protocol", "Protocol.fixtures.gen.ts")
-      yield* fs.writeFileString(out, renderModule(fixtures))
+
+      const exports = Record.collect(
+        fixtures,
+        (name, cases) => `export const ${name} = [\n${cases.map((c) => `  ${literal(c)},`).join("\n")}\n]\n`,
+      )
+      yield* fs.writeFileString(
+        out,
+        ["// Generated from @solana/kit using `tools/solana-fixtures.ts` — do not edit.", ...exports].join("\n"),
+      )
       yield* Console.log(`Wrote ${out}`)
     }),
   ),
