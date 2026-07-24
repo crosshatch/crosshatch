@@ -28,3 +28,6 @@ export const handler = <
   _endpoint: EndpointIdentifier,
   f: HttpApiEndpoint.HandlerWithIdentifier<EndpointsOf<Api, GroupIdentifier>, EndpointIdentifier, never, R>,
 ) => f
+
+export const Base64JsonString = <A extends S.Top>(schema: A) =>
+  S.StringFromBase64.pipe(S.decodeTo(S.fromJsonString(S.toCodecJson(schema))))

@@ -28,6 +28,7 @@
     "./Facade": "./Browser/Facade/Facade.ts",
     "./FacilitatorApi": "./FacilitatorApi/FacilitatorApi.ts",
     "./Ramp": "./Ramp/Ramp.ts",
+    "./Siwx": "./Siwx/Siwx.ts",
     "./Solana": "./Solana/Solana.ts",
     "./package.json": "./package.json"
   },
@@ -42,6 +43,7 @@
       "./Facade": "./dist/Browser/Facade/Facade.js",
       "./FacilitatorApi": "./dist/FacilitatorApi/FacilitatorApi.js",
       "./Ramp": "./dist/Ramp/Ramp.js",
+      "./Siwx": "./dist/Siwx/Siwx.js",
       "./Solana": "./dist/Solana/Solana.js",
       "./package.json": "./package.json"
     }

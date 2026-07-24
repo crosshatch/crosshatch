@@ -1,5 +1,5 @@
 import { Redacted, Context, Layer, Effect } from "effect"
-import { Address, Hash, Hex, Mnemonic as OxMnemonic, Secp256k1, Signature, TypedData } from "ox"
+import { Address, Hash, Hex, Mnemonic as OxMnemonic, PersonalMessage, Secp256k1, Signature, TypedData } from "ox"
 
 import * as Mnemonic from "../Mnemonic.ts"
 
@@ -7,6 +7,7 @@ export class Eip155Signer extends Context.Service<
   Eip155Signer,
   {
     readonly address: Address.Address
+    readonly signMessage: (value: { readonly message: string }) => Hex.Hex | Promise<Hex.Hex>
     readonly signTypedData: <
       const typedData extends TypedData.TypedData | Record<string, unknown>,
       primaryType extends keyof typedData | "EIP712Domain",
@@ -24,6 +25,14 @@ export const layerMnemonic = Layer.effect(
     const publicKey = Secp256k1.getPublicKey({ privateKey })
     return {
       address: Address.fromPublicKey(publicKey, { checksum: true }),
+      signMessage: ({ message }: { readonly message: string }) =>
+        Signature.toHex(
+          Secp256k1.sign({
+            extraEntropy: false,
+            payload: PersonalMessage.getSignPayload(Hex.fromString(message)),
+            privateKey,
+          }),
+        ),
       signTypedData: <
         const typedData extends TypedData.TypedData | Record<string, unknown>,
         primaryType extends keyof typedData | "EIP712Domain",

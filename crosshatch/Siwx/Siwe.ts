@@ -1,0 +1,118 @@
+import { Effect, Option, pipe, Schema as S } from "effect"
+import { Address as OxAddress, Hex, PersonalMessage, Secp256k1, Signature } from "ox"
+
+import { Address } from "../Address.ts"
+import { CaAccountId } from "../CaAccountId.ts"
+import { ChainId } from "../ChainId.ts"
+import { Eip155Address } from "../Eip155/Eip155Address.ts"
+import { Eip155Signer } from "../Eip155/Eip155Signer.ts"
+import * as Prover from "./Prover.ts"
+import { Proof, type UnsignedProof } from "./Schema.ts"
+import * as SiwxMessage from "./SiwxMessage.ts"
+import * as Verifier from "./Verifier.ts"
+
+const reference = S.String.check(S.isPattern(/^[1-9]\d*$/u))
+
+const Eip155ChainId = S.TemplateLiteralParser(["eip155:", reference])
+
+const supportsChainId = (chainId: string) => Option.isSome(S.decodeUnknownOption(Eip155ChainId)(chainId))
+
+const createSigningMessage = (input: UnsignedProof) =>
+  pipe(
+    input,
+    S.decodeUnknownEffect(
+      S.Struct({
+        ...SiwxMessage.messageFields,
+        address: Eip155Address,
+        chainId: Eip155ChainId,
+      }),
+    ),
+    Effect.map(({ chainId: [, chainId], address, domain, ...rest }) =>
+      SiwxMessage.buildSiwxMessage({
+        header: `${domain} wants you to sign in with your Ethereum account:`,
+        address: OxAddress.checksum(address),
+        chainId,
+        ...rest,
+      }),
+    ),
+    Effect.catchTag("SchemaError", (cause) => new Verifier.VerifyError({ cause })),
+  )
+
+export const prover = {
+  type: "eip191",
+  scheme: "eip191",
+  supportsChainId,
+  sign: Effect.fnUntraced(function* (info, chainId) {
+    const { address, signMessage } = yield* Eip155Signer
+    const message = yield* createSigningMessage({ ...info, address, chainId, type: "eip191" }).pipe(
+      Effect.mapError((cause) => new Prover.SignError({ cause })),
+    )
+    const signature = yield* Effect.tryPromise({
+      try: async () => await signMessage({ message }),
+      catch: (cause) => new Prover.SignError({ cause }),
+    })
+    return { address, signature }
+  }),
+} satisfies Prover.Prover<Eip155Signer>
+
+const verifyMessage = ({
+  address,
+  message,
+  signature,
+}: {
+  readonly address: `0x${string}`
+  readonly signature: `0x${string}`
+  readonly message: string
+}) =>
+  Promise.resolve(
+    Secp256k1.verify({
+      address,
+      payload: PersonalMessage.getSignPayload(Hex.fromString(message)),
+      signature: Signature.fromHex(signature),
+    }),
+  )
+
+const verifyWith = (check: typeof verifyMessage) =>
+  Effect.fnUntraced(
+    function* (proof: typeof Proof.Type) {
+      const { address, signature } = yield* S.decodeUnknownEffect(
+        S.Struct({ address: Eip155Address, signature: S.TemplateLiteral([S.Literal("0x"), S.String]) }),
+      )(proof)
+      const message = yield* createSigningMessage(proof)
+
+      const valid = yield* Effect.tryPromise({
+        try: () => check({ address, message, signature }),
+        catch: (cause) => new Verifier.VerifyError({ cause }),
+      })
+      if (!valid) {
+        return yield* new Verifier.VerifyError({})
+      }
+
+      const chainId = yield* S.decodeUnknownEffect(ChainId)(proof.chainId)
+      const accountId = yield* S.decodeUnknownEffect(CaAccountId)(`${chainId}:${address.toLowerCase()}`)
+      return { accountId, address: Address.make(address), chainId }
+    },
+    Effect.catchTags({
+      SchemaError: (cause) => new Verifier.VerifyError({ cause }),
+    }),
+  )
+
+export const verifier = {
+  type: "eip191",
+  scheme: "eip191",
+  supportsChainId,
+  verify: verifyWith(verifyMessage),
+} satisfies Verifier.Verifier
+
+export const makeClientVerifier = (clients: Readonly<Record<string, typeof verifyMessage>>): Verifier.Verifier => ({
+  type: "eip191",
+  scheme: "eip191",
+  supportsChainId,
+  verify: Effect.fnUntraced(function* (proof: typeof Proof.Type) {
+    const client = clients[proof.chainId]
+    if (!client) {
+      return yield* new Verifier.VerifyError({})
+    }
+    return yield* verifyWith(client)(proof)
+  }),
+})

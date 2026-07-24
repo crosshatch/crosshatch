@@ -1,6 +1,6 @@
 import { Context, Effect, Equal, Schema as S } from "effect"
 
-import { JsonRecord } from "./_util.ts"
+import { Base64JsonString, JsonRecord } from "./_util.ts"
 import { Payer } from "./Payer.ts"
 import type { Required } from "./Required.ts"
 import { Requirements } from "./Requirements.ts"
@@ -24,7 +24,7 @@ export const Payload = Object.assign(Context.Service<Payload, Payload | undefine
 export type Acceptable = typeof Acceptable.Type
 export const Acceptable = Payload.pipe(S.brand("crosshatch/Acceptable"))
 
-export const PayloadFromBase64JsonString = S.StringFromBase64.pipe(S.decodeTo(S.fromJsonString(S.toCodecJson(Payload))))
+export const PayloadFromBase64JsonString = Base64JsonString(Payload)
 
 export const make = ({ required }: { readonly required: Required }) =>
   Effect.flatMap(Payer, ({ createPayload }) => createPayload({ required }))

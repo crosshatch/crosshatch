@@ -1,7 +1,7 @@
 import { Schema as S } from "effect"
 import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "effect/unstable/httpapi"
 
-import { CaAccountId } from "./CaAccountId.ts"
+import { CaAccountId } from "../CaAccountId.ts"
 
 export class RampApiGroup extends HttpApiGroup.make("ramp")
   .add(
