@@ -1,16 +1,16 @@
 import { Effect, pipe, Schema as S } from "effect"
 
-import * as Address from "./Address.ts"
+import { Address, toBytes, findProgramDerivedAddress } from "./Address.ts"
 import { concat, u32le, u64le, U8, U32, U64 } from "./Codec.ts"
 import { AccountRole, type Instruction } from "./TransactionMessage.ts"
 
-const ASSOCIATED_TOKEN_PROGRAM_ADDRESS = Address.Address.make("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL")
-const COMPUTE_BUDGET_PROGRAM_ADDRESS = Address.Address.make("ComputeBudget111111111111111111111111111111")
-const MEMO_PROGRAM_ADDRESS = Address.Address.make("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr")
+const ASSOCIATED_TOKEN_PROGRAM_ADDRESS = Address.make("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL")
+const COMPUTE_BUDGET_PROGRAM_ADDRESS = Address.make("ComputeBudget111111111111111111111111111111")
+const MEMO_PROGRAM_ADDRESS = Address.make("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr")
 
 interface Token {
-  readonly mint: Address.Address
-  readonly tokenProgram: Address.Address
+  readonly mint: Address
+  readonly tokenProgram: Address
 }
 
 const dataWithDiscriminator = (discriminator: number, ...fields: Uint8Array[]) =>
@@ -45,9 +45,9 @@ export const getTransferCheckedInstruction = ({
   mint,
   tokenProgram,
 }: Token & {
-  readonly source: Address.Address
-  readonly destination: Address.Address
-  readonly authority: Address.Address
+  readonly source: Address
+  readonly destination: Address
+  readonly authority: Address
   readonly amount: bigint
   readonly decimals: number
 }): Effect.Effect<Instruction, S.SchemaError> =>
@@ -65,18 +65,14 @@ export const getTransferCheckedInstruction = ({
     })),
   )
 
-export const findAssociatedTokenPda = ({ owner, tokenProgram, mint }: Token & { readonly owner: Address.Address }) =>
-  Address.findProgramDerivedAddress(ASSOCIATED_TOKEN_PROGRAM_ADDRESS, [
-    Address.toBytes(owner),
-    Address.toBytes(tokenProgram),
-    Address.toBytes(mint),
-  ])
+export const findAssociatedTokenPda = ({ owner, tokenProgram, mint }: Token & { readonly owner: Address }) =>
+  findProgramDerivedAddress(ASSOCIATED_TOKEN_PROGRAM_ADDRESS, [toBytes(owner), toBytes(tokenProgram), toBytes(mint)])
 
 export const findTokenTransferAccounts = ({
   sender,
   recipient,
   ...token
-}: Token & { readonly sender: Address.Address; readonly recipient: Address.Address }) =>
+}: Token & { readonly sender: Address; readonly recipient: Address }) =>
   Effect.all({
     source: findAssociatedTokenPda({ ...token, owner: sender }),
     destination: findAssociatedTokenPda({ ...token, owner: recipient }),
