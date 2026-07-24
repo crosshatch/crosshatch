@@ -15,7 +15,10 @@ export class Entitlements extends Context.Service<
   {
     readonly isEntitled: (id: typeof EntitlementId.Type) => Effect.Effect<boolean, KeyValueStore.KeyValueStoreError>
 
-    readonly purchase: (args: {
+    readonly purchase: ({
+      id,
+      payload,
+    }: {
       readonly id: typeof EntitlementId.Type
       readonly payload: Payload
     }) => Effect.Effect<
@@ -26,20 +29,19 @@ export class Entitlements extends Context.Service<
   }
 >()("crosshatch/Siwx/Entitlements") {}
 
-const entitlementKey = (id: typeof EntitlementId.Type, accountId: typeof CaAccountId.Type) =>
-  `siwx:entitlement:${JSON.stringify([id, accountId])}`
-
 export const layer = Layer.effect(
   Entitlements,
   Effect.gen(function* () {
     const store = KeyValueStore.prefix(yield* KeyValueStore.KeyValueStore, "siwx:entitlement:")
+    const key = (id: typeof EntitlementId.Type, accountId: typeof CaAccountId.Type) => `${id}:${accountId}`
+
     return {
       isEntitled: Effect.fnUntraced(function* (id) {
         const identity = yield* Identity
         if (!identity) {
           return false
         }
-        return yield* store.has(entitlementKey(id, identity.accountId))
+        return yield* store.has(key(id, identity.accountId))
       }),
 
       purchase: Effect.fnUntraced(
@@ -58,6 +60,7 @@ export const layer = Layer.effect(
           if (!verification.payer) {
             return yield* new PurchaseError({})
           }
+          // TODO: need to verify this is correct
           if (identity.address.toLowerCase() !== verification.payer.toLowerCase()) {
             return yield* new PurchaseError({})
           }
@@ -69,7 +72,7 @@ export const layer = Layer.effect(
             return yield* new PurchaseError({})
           }
 
-          yield* store.set(entitlementKey(id, identity.accountId), "1")
+          yield* store.set(key(id, identity.accountId), "1")
           return settlement
         },
         Effect.catchTags({
