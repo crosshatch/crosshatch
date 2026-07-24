@@ -3,7 +3,7 @@ import { describe, expect, it } from "@effect/vitest"
 import { Effect, Exit, Schema as S } from "effect"
 
 import { Ed25519Pair } from "../../Crypto/Crypto.ts"
-import { findAssociatedTokenAddress, findAssociatedTokenPda } from "./Instructions.ts"
+import { findAssociatedTokenPda, findTokenTransferAccounts } from "./Instructions.ts"
 import {
   Address,
   addressFromPublicKey,
@@ -103,13 +103,9 @@ describe(import.meta.url, () => {
     Effect.fn(function* () {
       const pair = yield* Ed25519Pair.fromSeed(SEED)
       const authority = yield* addressFromPublicKey(pair.publicKey)
-      const source = yield* findAssociatedTokenAddress({
-        owner: authority,
-        tokenProgram: TOKEN_PROGRAM,
-        mint: USDC_MINT,
-      })
-      const destination = yield* findAssociatedTokenAddress({
-        owner: RECIPIENT,
+      const { source, destination } = yield* findTokenTransferAccounts({
+        sender: authority,
+        recipient: RECIPIENT,
         tokenProgram: TOKEN_PROGRAM,
         mint: USDC_MINT,
       })
