@@ -18,7 +18,7 @@ jobs:
           git config user.name "madhatcher"
           git config user.email "144481279+madhatcher@users.noreply.github.com"
       - uses: ./.github/actions/checkout-crosshatch
-      - uses: ./konfik/.github/actions/configure-environment
+      - uses: ./konfik/configure-environment
       - run: pnpm build
       - uses: changesets/action@v1
         with:

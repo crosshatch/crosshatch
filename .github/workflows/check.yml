@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/checkout-crosshatch
-      - uses: ./konfik/.github/actions/configure-environment
+      - uses: ./konfik/configure-environment
       - run: pnpm format --check
       - run: pnpm lint
       - run: pnpm build
