@@ -1,19 +1,13 @@
-import { type Blockhash, createSolanaRpc } from "@solana/kit"
-import { Effect, Layer, Struct } from "effect"
+import { Effect, Layer } from "effect"
 
 import * as State from "../State.ts"
+import { Blockhash, getLatestBlockhash } from "./Protocol/Protocol.ts"
 
 export class SolanaState extends State.Service<SolanaState, Blockhash>()("crosshatch/Solana/SolanaState") {}
 
 export const layer = (url: string) =>
-  Layer.effect(
-    SolanaState,
-    Effect.sync(() => {
-      const rpc = createSolanaRpc(url)
-      const getLatestBlockhash = Effect.tryPromise({
-        try: (abortSignal) => rpc.getLatestBlockhash().send({ abortSignal }),
-        catch: (cause) => new State.GetLatestBlockhashError({ cause }),
-      }).pipe(Effect.map(Struct.get("value")))
-      return { getLatestBlockhash }
-    }),
-  )
+  Layer.succeed(SolanaState, {
+    getLatestBlockhash: getLatestBlockhash(url).pipe(
+      Effect.mapError((cause) => new State.GetLatestBlockhashError({ cause })),
+    ),
+  })

@@ -51,24 +51,6 @@ catalogs:
     '@scure/bip39':
       specifier: ^2.2.0
       version: 2.2.0
-    '@solana-program/compute-budget':
-      specifier: ^0.16.0
-      version: 0.16.0
-    '@solana-program/memo':
-      specifier: ^0.11.2
-      version: 0.11.2
-    '@solana-program/token':
-      specifier: ^0.14.0
-      version: 0.14.0
-    '@solana/addresses':
-      specifier: ^6.5.0
-      version: 6.10.0
-    '@solana/kit':
-      specifier: ^6.5.0
-      version: 6.10.0
-    '@solana/transactions':
-      specifier: ^6.5.0
-      version: 6.10.0
     '@standard-schema/spec':
       specifier: ^1.1.0
       version: 1.1.0
@@ -296,24 +278,6 @@ importers:
       '@scure/bip39':
         specifier: 'catalog:'
         version: 2.2.0
-      '@solana-program/compute-budget':
-        specifier: 'catalog:'
-        version: 0.16.0(@solana/kit@6.10.0(typescript@7.0.2))
-      '@solana-program/memo':
-        specifier: 'catalog:'
-        version: 0.11.2(@solana/kit@6.10.0(typescript@7.0.2))
-      '@solana-program/token':
-        specifier: 'catalog:'
-        version: 0.14.0(@solana/kit@6.10.0(typescript@7.0.2))
-      '@solana/addresses':
-        specifier: 'catalog:'
-        version: 6.10.0(typescript@7.0.2)
-      '@solana/kit':
-        specifier: 'catalog:'
-        version: 6.10.0(typescript@7.0.2)
-      '@solana/transactions':
-        specifier: 'catalog:'
-        version: 6.10.0(typescript@7.0.2)
       '@standard-schema/spec':
         specifier: 'catalog:'
         version: 1.1.0
@@ -440,6 +404,27 @@ importers:
       viem:
         specifier: 'catalog:'
         version: 2.55.7(typescript@7.0.2)(zod@3.25.76)
+
+  tools:
+    dependencies:
+      '@effect/platform-node':
+        specifier: 'catalog:'
+        version: 4.0.0-beta.100(effect@4.0.0-beta.100)(ioredis@5.11.1(supports-color@8.1.1))
+      '@solana-program/compute-budget':
+        specifier: 0.16.0
+        version: 0.16.0(@solana/kit@6.10.0(typescript@7.0.2))
+      '@solana-program/memo':
+        specifier: 0.11.2
+        version: 0.11.2(@solana/kit@6.10.0(typescript@7.0.2))
+      '@solana-program/token':
+        specifier: 0.14.0
+        version: 0.14.0(@solana/kit@6.10.0(typescript@7.0.2))
+      '@solana/kit':
+        specifier: 6.10.0
+        version: 6.10.0(typescript@7.0.2)
+      effect:
+        specifier: 'catalog:'
+        version: 4.0.0-beta.100
 
 packages:
 
@@ -13625,7 +13610,7 @@ snapshots:
     dependencies:
       emoji-regex: 10.6.0
       get-east-asian-width: 1.6.0
-      strip-ansi: 7.1.2
+      strip-ansi: 7.2.0
 
   string-width@8.2.2:
     dependencies:

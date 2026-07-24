@@ -1,0 +1,13 @@
+{
+  "name": "@crosshatch/tools",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@effect/platform-node": "catalog:",
+    "@solana-program/compute-budget": "0.16.0",
+    "@solana-program/memo": "0.11.2",
+    "@solana-program/token": "0.14.0",
+    "@solana/kit": "6.10.0",
+    "effect": "catalog:"
+  }
+}
