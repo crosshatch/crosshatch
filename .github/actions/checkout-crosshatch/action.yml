@@ -1,0 +1,8 @@
+name: Checkout Crosshatch
+description: Initialize required submodules after the repo has been checked out.
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        git -c url.https://github.com/.insteadOf=git@github.com: submodule update --init --depth 1 -- konfik
