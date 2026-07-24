@@ -50,14 +50,14 @@ describe(import.meta.url, () => {
   )
 
   it.effect(
-    "findAssociatedTokenPda derives the address and bump, exercising the on-curve rejection loop",
+    "findAssociatedTokenPda derives the expected address, exercising the on-curve rejection loop",
     Effect.fn(function* () {
       const pda = yield* findAssociatedTokenPda({
         owner: Address.make("4zvwRjXUKGfvwnParsHAS3HuSVzV5cA4McphgmoCtajS"),
         tokenProgram: TOKEN_PROGRAM,
         mint: USDC_MINT,
       })
-      expect(pda).toStrictEqual(["DJcjpsHnWXSucjUpourygEN3mkcQwSHG6d5b2AzLSfSn", 250])
+      expect(pda).toBe("DJcjpsHnWXSucjUpourygEN3mkcQwSHG6d5b2AzLSfSn")
     }),
   )
 

@@ -78,6 +78,6 @@ export const findTokenTransferAccounts = ({
   ...token
 }: Token & { readonly sender: Address.Address; readonly recipient: Address.Address }) =>
   Effect.all({
-    source: Effect.map(findAssociatedTokenPda({ ...token, owner: sender }), ([address]) => address),
-    destination: Effect.map(findAssociatedTokenPda({ ...token, owner: recipient }), ([address]) => address),
+    source: findAssociatedTokenPda({ ...token, owner: sender }),
+    destination: findAssociatedTokenPda({ ...token, owner: recipient }),
   })

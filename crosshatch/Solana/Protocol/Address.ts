@@ -53,11 +53,11 @@ const createProgramAddress = Effect.fnUntraced(function* (
 export const findProgramDerivedAddress = Effect.fnUntraced(function* (
   programAddress: Address,
   seeds: ReadonlyArray<Uint8Array>,
-): Effect.fn.Return<readonly [Address, number], SvmProtocolError> {
+): Effect.fn.Return<Address, SvmProtocolError> {
   for (let bump = 255; bump > 0; bump--) {
     const candidate = yield* createProgramAddress(programAddress, [...seeds, Uint8Array.of(bump)])
     if (candidate._tag === "Some") {
-      return [candidate.value, bump] as const
+      return candidate.value
     }
   }
   return yield* new SvmProtocolError({ message: "Unable to find a viable PDA bump" })
