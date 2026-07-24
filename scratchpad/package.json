@@ -1,4 +1,5 @@
 {
+  "name": "@crosshatch/scratchpad",
   "private": true,
   "type": "module",
   "dependencies": {
