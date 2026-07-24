@@ -1,32 +1,49 @@
-// TODO: Is using the KeyValueStore interface preferable over a custom Context.Service that exposes the exact methods needed? (something similar to Invoices for example).
-
-import { Clock, Effect, Schema as S } from "effect"
+import { Clock, Context, Effect, Layer, Schema as S } from "effect"
 import { KeyValueStore } from "effect/unstable/persistence"
 
 import { Challenge } from "./Schema.ts"
 
 const StoredChallenge = S.Struct({ challenge: Challenge, expiresAt: S.Finite.check(S.isGreaterThan(0)) })
 
-const store = Effect.map(KeyValueStore.KeyValueStore, (kv) =>
-  KeyValueStore.toSchemaStore(KeyValueStore.prefix(kv, "siwx:challenge:"), StoredChallenge),
-)
+export class ChallengeStore extends Context.Service<
+  ChallengeStore,
+  {
+    readonly issue: (
+      entry: typeof StoredChallenge.Type,
+    ) => Effect.Effect<void, KeyValueStore.KeyValueStoreError | S.SchemaError>
 
-export const issue = (entry: typeof StoredChallenge.Type) =>
-  store.pipe(Effect.flatMap((challenges) => challenges.set(entry.challenge.info.nonce, entry)))
+    readonly peek: (
+      nonce: string,
+    ) => Effect.Effect<typeof Challenge.Type | undefined, KeyValueStore.KeyValueStoreError | S.SchemaError>
 
-export const peek = (nonce: string) =>
-  store.pipe(
-    Effect.flatMap(({ get }) => get(nonce)),
-    Effect.map((entry) => (entry._tag === "None" ? undefined : entry.value.challenge)),
-  )
+    readonly consume: (nonce: string) => Effect.Effect<boolean, KeyValueStore.KeyValueStoreError | S.SchemaError>
+  }
+>()("crosshatch/Siwx/ChallengeStore") {}
 
-export const take = (nonce: string) =>
+export const layer = Layer.effect(
+  ChallengeStore,
   Effect.gen(function* () {
-    const challenges = yield* store
-    const entry = yield* challenges.get(nonce)
-    if (entry._tag === "None") {
-      return false
+    const store = KeyValueStore.toSchemaStore(
+      KeyValueStore.prefix(yield* KeyValueStore.KeyValueStore, "siwx:challenge:"),
+      StoredChallenge,
+    )
+
+    return {
+      issue: (entry) => store.set(entry.challenge.info.nonce, entry),
+
+      peek: Effect.fnUntraced(function* (nonce) {
+        const entry = yield* store.get(nonce)
+        return entry._tag === "None" ? undefined : entry.value.challenge
+      }),
+
+      consume: Effect.fnUntraced(function* (nonce) {
+        const entry = yield* store.get(nonce)
+        if (entry._tag === "None") {
+          return false
+        }
+        yield* store.remove(nonce)
+        return entry.value.expiresAt > (yield* Clock.currentTimeMillis)
+      }),
     }
-    yield* challenges.remove(nonce)
-    return entry.value.expiresAt > (yield* Clock.currentTimeMillis)
-  })
+  }),
+)

@@ -1,7 +1,6 @@
 import { Effect, Option, pipe, Schema as S } from "effect"
 import { Headers, HttpRouter, HttpServerRequest } from "effect/unstable/http"
 
-import { RequiredUrl } from "../Required.ts"
 import { Siwx } from "./Extension.ts"
 import { Identity } from "./Identity.ts"
 import { ProofFromBase64JsonString } from "./Schema.ts"
@@ -39,14 +38,7 @@ export const layerMiddleware = <const Verifiers extends ReadonlyArray<Verifier>>
 
           return yield* effect.pipe(
             Effect.provideService(Identity, Option.getOrUndefined(identity)),
-            Effect.provideService(Siwx, Option.getOrUndefined(proof)),
-            Effect.provideService(
-              RequiredUrl,
-              requestUrl.pipe(
-                Option.map(({ href }) => href),
-                Option.getOrUndefined,
-              ),
-            ),
+            // Effect.provideService(Siwx, Option.getOrUndefined(proof)),
           )
         })
     }),

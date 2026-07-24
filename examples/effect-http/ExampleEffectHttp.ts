@@ -36,7 +36,8 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
       "/paid",
       Effect.fn(function* () {
         const identity = yield* Siwx.Identity.Identity
-        if (yield* Siwx.Entitlements.isEntitled(paidResource)) {
+        const entitlements = yield* Siwx.Entitlements.Entitlements
+        if (yield* entitlements.isEntitled(paidResource)) {
           return HttpServerResponse.text("Premium content unlocked.")
         }
         const payload = yield* Payload.Payload
@@ -58,10 +59,7 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
           return yield* ChxHttp.require({ required })
         }
 
-        return yield* Siwx.Entitlements.purchase({
-          id: paidResource,
-          payload,
-        }).pipe(
+        return yield* entitlements.purchase({ id: paidResource, payload }).pipe(
           Effect.map((settlement) =>
             HttpServerResponse.text("Premium content unlocked.").pipe(ChxHttp.addResponseHeader(settlement)),
           ),
@@ -81,7 +79,9 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
         }),
         ChxHttp.layerMiddleware({ extensions: [PaymentId.FromMerchant] }),
         Siwx.Server.layerMiddleware({ verifiers, origin }),
-        KeyValueStore.layerMemory,
+        Layer.mergeAll(Siwx.ChallengeStore.layer, Siwx.Entitlements.layer).pipe(
+          Layer.provide(KeyValueStore.layerMemory),
+        ),
       ]),
       HttpRouter.toHttpEffect,
       Effect.scoped,

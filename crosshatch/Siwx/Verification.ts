@@ -1,13 +1,14 @@
 import { Array, DateTime, Effect, Schema as S } from "effect"
 
-import * as ChallengeStore from "./ChallengeStore.ts"
+import { ChallengeStore } from "./ChallengeStore.ts"
 import { CHALLENGE_MAX_AGE_MS, Info, type Proof } from "./Schema.ts"
 import { VerifyError, type Verifier } from "./Verifier.ts"
 
 export const verifyProof = <const Verifiers extends ReadonlyArray<Verifier>>(...verifiers: Verifiers) =>
   Effect.fnUntraced(
     function* (proof: typeof Proof.Type, requestUrl: URL) {
-      const challenge = yield* ChallengeStore.peek(proof.nonce)
+      const challengeStore = yield* ChallengeStore
+      const challenge = yield* challengeStore.peek(proof.nonce)
       if (!challenge) {
         return yield* new VerifyError({})
       }
@@ -50,7 +51,7 @@ export const verifyProof = <const Verifiers extends ReadonlyArray<Verifier>>(...
 
       const identity = yield* verifier.value.verify(proof).pipe(Effect.mapError((cause) => new VerifyError({ cause })))
 
-      yield* ChallengeStore.take(proof.nonce).pipe(
+      yield* challengeStore.consume(proof.nonce).pipe(
         Effect.filterOrFail(
           (s) => s,
           () => new VerifyError({}),

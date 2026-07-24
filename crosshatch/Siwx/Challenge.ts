@@ -3,7 +3,7 @@ import { Array, Clock, Data, Effect, Encoding, pipe, Schema as S } from "effect"
 import { JsonRecord } from "../_util.ts"
 import { Random } from "../Crypto/Crypto.ts"
 import * as Required from "../Required.ts"
-import * as ChallengeStore from "./ChallengeStore.ts"
+import { ChallengeStore } from "./ChallengeStore.ts"
 import { Siwx } from "./Extension.ts"
 import { Challenge, CHALLENGE_MAX_AGE_MS, Proof } from "./Schema.ts"
 import type { Verifier } from "./Verifier.ts"
@@ -43,8 +43,7 @@ export const issue = Effect.fnUntraced(function* ({
 
   const now = yield* Clock.currentTimeMillis
   const maxExpiresAt = now + CHALLENGE_MAX_AGE_MS
-  const expirationTime =
-    expirationSeconds ? Math.min(now + expirationSeconds * 1_000, maxExpiresAt) : undefined
+  const expirationTime = expirationSeconds ? Math.min(now + expirationSeconds * 1_000, maxExpiresAt) : undefined
 
   const challenge = {
     info: {
@@ -61,7 +60,8 @@ export const issue = Effect.fnUntraced(function* ({
     schema: yield* S.decodeUnknownEffect(JsonRecord)(S.toJsonSchemaDocument(Proof).schema),
   } satisfies typeof Challenge.Type
 
-  yield* ChallengeStore.issue({ challenge, expiresAt: expirationTime ?? maxExpiresAt })
+  const challengeStore = yield* ChallengeStore
+  yield* challengeStore.issue({ challenge, expiresAt: expirationTime ?? maxExpiresAt })
 
   return challenge
 })
