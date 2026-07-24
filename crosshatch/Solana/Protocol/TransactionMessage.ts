@@ -32,8 +32,7 @@ export interface TransactionMessage {
   readonly instructions: ReadonlyArray<Instruction>
 }
 
-export const buildTransactionMessage = (input: {
-  readonly feePayer: Address
-  readonly lifetimeConstraint: LifetimeConstraint
-  readonly instructions: ReadonlyArray<Instruction>
-}): TransactionMessage => ({ version: 0, ...input })
+export const buildTransactionMessage = (input: Omit<TransactionMessage, "version">): TransactionMessage => ({
+  version: 0,
+  ...input,
+})
