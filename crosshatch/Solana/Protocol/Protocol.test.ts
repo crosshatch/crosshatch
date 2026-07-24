@@ -3,14 +3,13 @@ import { describe, expect, it } from "@effect/vitest"
 import { Effect, Exit, Schema as S } from "effect"
 
 import { Ed25519Pair } from "../../Crypto/Crypto.ts"
+import { findAssociatedTokenAddress, findAssociatedTokenPda } from "./Instructions.ts"
 import {
   Address,
   addressFromPublicKey,
   Blockhash,
   buildTransactionMessage,
   compileTransaction,
-  findAssociatedTokenAddress,
-  findAssociatedTokenPda,
   getAddMemoInstruction,
   getBase64EncodedWireTransaction,
   getSetComputeUnitLimitInstruction,

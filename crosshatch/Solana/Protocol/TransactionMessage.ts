@@ -36,9 +36,4 @@ export const buildTransactionMessage = (input: {
   readonly feePayer: Address
   readonly lifetimeConstraint: LifetimeConstraint
   readonly instructions: ReadonlyArray<Instruction>
-}): TransactionMessage => ({
-  version: 0,
-  feePayer: input.feePayer,
-  lifetimeConstraint: input.lifetimeConstraint,
-  instructions: input.instructions,
-})
+}): TransactionMessage => ({ version: 0, ...input })

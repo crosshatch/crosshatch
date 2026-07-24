@@ -5,7 +5,7 @@ import * as Scheme from "../Scheme.ts"
 import {
   buildTransactionMessage,
   compileTransaction,
-  findAssociatedTokenAddress,
+  findTokenTransferAccounts,
   getAddMemoInstruction,
   getBase64EncodedWireTransaction,
   getSetComputeUnitLimitInstruction,
@@ -19,7 +19,7 @@ import { SolanaSigner } from "./SolanaSigner.ts"
 import { SolanaState } from "./SolanaState.ts"
 
 export const Known = S.Struct({
-  tokenProgramId: SolanaAddress.SolanaAddress,
+  tokenProgram: SolanaAddress.SolanaAddress,
 })
 
 export const Extra = S.Struct({
@@ -40,21 +40,22 @@ export class SolanaScheme extends Scheme.Service<SolanaScheme, typeof Known.Type
 
 export const layer = SolanaScheme.layer(
   { known: Known, extra: Extra },
-  ({ known: { tokenProgramId }, extra: { feePayer, memo } }) =>
+  ({ known: { tokenProgram }, extra: { feePayer, memo } }) =>
     Effect.fnUntraced(
       function* ({ physical, accepted }) {
-        const signer = yield* SolanaSigner
-        const { getLatestBlockhash } = yield* SolanaState
-        const lifetimeConstraint = yield* getLatestBlockhash
+        const { address, signTransaction } = yield* SolanaSigner
+        const lifetimeConstraint = yield* SolanaState.pipe(
+          Effect.flatMap(({ getLatestBlockhash }) => getLatestBlockhash),
+        )
 
         const mint = yield* S.decodeUnknownEffect(SolanaAsset.SolanaAsset)(accepted.asset)
 
-        const ata = (owner: Address) => findAssociatedTokenAddress({ owner, tokenProgram: tokenProgramId, mint })
-
-        const [source, destination] = yield* Effect.all([
-          ata(signer.address),
-          S.decodeEffect(Address)(accepted.payTo).pipe(Effect.flatMap(ata)),
-        ])
+        const { source, destination } = yield* findTokenTransferAccounts({
+          tokenProgram,
+          mint,
+          sender: address,
+          recipient: yield* S.decodeEffect(Address)(accepted.payTo),
+        })
 
         const message = yield* Effect.all([
           getSetComputeUnitLimitInstruction(20000),
@@ -63,8 +64,8 @@ export const layer = SolanaScheme.layer(
             source,
             mint,
             destination,
-            authority: signer.address,
-            tokenProgram: tokenProgramId,
+            authority: address,
+            tokenProgram,
             amount: BigInt(accepted.amount),
             decimals: physical.decimals,
           }),
@@ -72,7 +73,7 @@ export const layer = SolanaScheme.layer(
         ]).pipe(Effect.map((instructions) => buildTransactionMessage({ feePayer, lifetimeConstraint, instructions })))
 
         const transaction = yield* compileTransaction(message).pipe(
-          Effect.flatMap(signer.signTransaction),
+          Effect.flatMap(signTransaction),
           Effect.flatMap(getBase64EncodedWireTransaction),
         )
 

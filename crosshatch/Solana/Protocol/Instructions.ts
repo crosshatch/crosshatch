@@ -55,18 +55,33 @@ export const getTransferCheckedInstruction = (input: {
     })),
   )
 
-export const findAssociatedTokenPda = (input: {
+export const findAssociatedTokenPda = ({
+  owner,
+  tokenProgram,
+  mint,
+}: {
   readonly owner: Address.Address
   readonly tokenProgram: Address.Address
   readonly mint: Address.Address
 }) =>
   Address.findProgramDerivedAddress(ASSOCIATED_TOKEN_PROGRAM_ADDRESS, [
-    Address.toBytes(input.owner),
-    Address.toBytes(input.tokenProgram),
-    Address.toBytes(input.mint),
+    Address.toBytes(owner),
+    Address.toBytes(tokenProgram),
+    Address.toBytes(mint),
   ])
 
 export const findAssociatedTokenAddress = flow(
   findAssociatedTokenPda,
   Effect.map(([address]) => address),
 )
+
+export const findTokenTransferAccounts = (input: {
+  readonly tokenProgram: Address.Address
+  readonly mint: Address.Address
+  readonly sender: Address.Address
+  readonly recipient: Address.Address
+}) =>
+  Effect.all({
+    source: findAssociatedTokenAddress({ ...input, owner: input.sender }),
+    destination: findAssociatedTokenAddress({ ...input, owner: input.recipient }),
+  })

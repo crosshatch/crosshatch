@@ -1,4 +1,4 @@
-import { Effect, Option, Schema as S } from "effect"
+import { Effect, flow, Option, Schema as S } from "effect"
 
 import * as Base58 from "../../Crypto/Base58.ts"
 import * as CryptoKey from "../../Crypto/CryptoKey.ts"
@@ -24,11 +24,13 @@ const fromBytes = (bytes: Uint8Array) =>
     ? Effect.succeed(Address.make(Base58.encode(bytes)))
     : Effect.fail(new SvmProtocolError({ message: `Solana address requires 32 bytes; got ${bytes.byteLength}` }))
 
-export const toBytes = (value: Address): Uint8Array => Option.getOrThrow(Base58.decode(value))
-export const fromPublicKey = (publicKey: typeof CryptoKey.CryptoKey.Type) =>
-  CryptoKey.toBytes(publicKey).pipe(Effect.flatMap(fromBytes))
+export const toBytes = flow(Base58.decode, Option.getOrThrow)
+export const fromPublicKey = flow(CryptoKey.toBytes, Effect.flatMap(fromBytes))
 
-const createProgramAddress = Effect.fnUntraced(function* (programAddress: Address, seeds: ReadonlyArray<Uint8Array>) {
+const createProgramAddress = Effect.fnUntraced(function* (
+  programAddress: Address,
+  seeds: ReadonlyArray<Uint8Array>,
+): Effect.fn.Return<Option.Option<Address>, SvmProtocolError, never> {
   if (seeds.length > 16) {
     return yield* new SvmProtocolError({ message: "A PDA supports at most 16 seeds" })
   }
