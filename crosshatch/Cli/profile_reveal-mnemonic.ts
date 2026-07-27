@@ -3,15 +3,22 @@ import { Console, Data, Effect, UndefinedOr } from "effect"
 import { Command, Argument } from "effect/unstable/cli"
 
 import * as X25519PrivateKey from "../Crypto/X25519PrivateKey.ts"
+import * as CliError from "./CliError.ts"
 import * as UserConfig from "./UserConfig.ts"
 
-export class ProfileNotFoundError extends Data.TaggedError("ProfileNotFoundError")<{
-  readonly profile: string
-}> {}
+export class ProfileNotFoundError extends CliError.make(
+  Data.TaggedError("ProfileNotFoundError")<{
+    readonly profile: string
+  }>,
+  ({ profile }) => `Profile "${profile}" was not found.`,
+) {}
 
-export class ProfileSecretNotFoundError extends Data.TaggedError("ProfileSecretNotFoundError")<{
-  readonly profile: string
-}> {}
+export class ProfileSecretNotFoundError extends CliError.make(
+  Data.TaggedError("ProfileSecretNotFoundError")<{
+    readonly profile: string
+  }>,
+  ({ profile }) => `No keychain secret was found for profile "${profile}".`,
+) {}
 
 export const profileRevealMnemonic = Command.make("reveal-mnemonic", {
   profile: Argument.string("profile").pipe(Argument.withDefault("default")),

@@ -11,6 +11,8 @@ export const UserConfig = S.Struct({
     S.Struct({
       address: Address,
       mnemonic: Asymmetric,
+      dateAdded: S.optionalKey(S.DateFromString),
+      description: S.optionalKey(S.String),
     }).pipe(S.mutableKey),
   ),
 })
