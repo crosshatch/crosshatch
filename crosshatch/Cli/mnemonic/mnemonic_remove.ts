@@ -1,4 +1,4 @@
-import { Effect } from "effect"
+import { Console, Effect } from "effect"
 import { Argument, Command, Flag, Prompt } from "effect/unstable/cli"
 
 import * as MnemonicStore from "../../Host/MnemonicStore.ts"
@@ -10,7 +10,10 @@ export const mnemonicRemove = Command.make("remove", {
   Command.withDescription("Remove a stored mnemonic"),
   Command.withHandler(
     Effect.fn(function* ({ name, yes }) {
-      if (!yes && !(yield* Prompt.confirm({ message: `Remove mnemonic "${name}"?` }))) return
+      if (!yes && !(yield* Prompt.confirm({ message: `Remove mnemonic "${name}"?` }))) {
+        yield* Console.log("Operation cancelled.")
+        return
+      }
       yield* MnemonicStore.remove(name)
     }),
   ),

@@ -14,6 +14,7 @@ export const mnemonicReveal = Command.make("reveal", {
         !yes &&
         !(yield* Prompt.confirm({ message: `Reveal mnemonic "${name}"? It will be printed to standard output.` }))
       ) {
+        yield* Console.log("Operation cancelled.")
         return
       }
       const mnemonic = yield* MnemonicStore.get(name)

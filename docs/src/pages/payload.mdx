@@ -56,6 +56,19 @@ const program = Effect.gen(function* () {
 payload may need to select a supported requirement, read wallet configuration,
 sign typed data, and encode chain-specific payload fields.
 
+### CLI
+
+Pass Payment Required JSON directly as the positional argument, or use the
+explicit `--stdin` flag when reading it from a pipe:
+
+```sh
+crosshatch payload make "$PAYMENT_REQUIRED_JSON"
+printf '%s' "$PAYMENT_REQUIRED_JSON" | crosshatch payload make --stdin
+```
+
+The positional JSON argument and `--stdin` are mutually exclusive. The CLI does
+not infer piped input when `--stdin` is omitted.
+
 ## Checking A Payload
 
 Decoding a payload only confirms its shape. Before verification or settlement,
