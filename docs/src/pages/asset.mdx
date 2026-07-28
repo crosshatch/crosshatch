@@ -18,10 +18,9 @@ typically the token contract address. It answers the narrow question: "which
 asset identifier should we use for this deployment?"
 
 ```ts
-import { KnownAssets, type Asset } from "crosshatch"
+import { Known, type Asset } from "crosshatch"
 
-const baseUsdcAsset: typeof Asset.Asset.Type =
-  KnownAssets.Usd.USDC.eip155[8453].asset
+const baseUsdcAsset: typeof Asset.Asset.Type = Known.USD.USDC.eip155[8453].asset
 ```
 
 ## `PhysicalAsset`
@@ -31,10 +30,10 @@ deployment metadata Crosshatch needs to build and validate payments for a single
 namespace/reference pair, such as one EIP-155 chain id.
 
 ```ts
-import { KnownAssets, type Asset } from "crosshatch"
+import { Known, type Asset } from "crosshatch"
 
-const baseUsdc: Asset.PhysicalAsset = KnownAssets.Usd.USDC.eip155[8453]
-const polygonUsdc: Asset.PhysicalAsset = KnownAssets.Usd.USDC.eip155[137]
+const baseUsdc: Asset.PhysicalAsset = Known.USD.USDC.eip155[8453]
+const polygonUsdc: Asset.PhysicalAsset = Known.USD.USDC.eip155[137]
 ```
 
 ## `LogicalAsset`
@@ -44,9 +43,9 @@ deployments that should be treated as the same asset across namespaces and
 references.
 
 ```ts
-import { KnownAssets, type Asset } from "crosshatch"
+import { Known, type Asset } from "crosshatch"
 
-const usdc: Asset.LogicalAsset = KnownAssets.Usd.USDC
+const usdc: Asset.LogicalAsset = Known.USD.USDC
 ```
 
 ## `Denomination`
@@ -57,9 +56,9 @@ bridged USDC.e, and other USD-like assets, each represented by its own
 `Asset.LogicalAsset` lookup.
 
 ```ts
-import { KnownAssets, type Asset } from "crosshatch"
+import { Known, type Asset } from "crosshatch"
 
-const usd: Asset.Denomination = KnownAssets.Usd
+const usd: Asset.Denomination = Known.USD
 ```
 
 ## Why "Physical?"
@@ -81,19 +80,19 @@ Crosshatch ships known asset definitions. These are ready-to-use denominations
 for common units of account.
 
 ```ts
-import { KnownAssets } from "crosshatch"
+import { Known } from "crosshatch"
 
-const { MEGAUSDC, MUSD, SBC, USDC, USDCE, USDT0 } = KnownAssets.Usd
+const { MEGAUSDC, MUSD, SBC, USDC, USDCE, USDT0 } = Known.USD
 ```
 
 Each export is a namespace lookup for one logical asset. For example, `USDC`
 contains multiple EIP-155 physical assets under the `eip155` namespace:
 
 ```ts
-import { KnownAssets } from "crosshatch"
+import { Known } from "crosshatch"
 
-const baseUsdc = KnownAssets.Usd.USDC.eip155[8453]
-const polygonUsdc = KnownAssets.Usd.USDC.eip155[137]
+const baseUsdc = Known.USD.USDC.eip155[8453]
+const polygonUsdc = Known.USD.USDC.eip155[137]
 ```
 
 Those two values refer to different physical token contracts, but they are

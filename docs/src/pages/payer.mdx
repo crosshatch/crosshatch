@@ -10,48 +10,68 @@ description:
 `Payer` is the service that turns a `Required` value into a signed x402
 `Payload`.
 
-Local clients usually provide it with `Payer.layer`, asset metadata for
-requirement selection, and the supported signing schemes:
+For the built-in payer, provide a stored mnemonic from the host and use
+`DefaultPayer.layer`:
 
 ```ts
-import { Accept, KnownAssets, Mnemonic, Payer } from "crosshatch"
-import { Eip155Signer, Erc3009Scheme, Permit2Scheme } from "crosshatch/Eip155"
+import { NodeServices } from "@effect/platform-node"
+import * as DefaultPayer from "crosshatch/DefaultPayer"
+import { HostMnemonic } from "crosshatch/Host"
 import { Layer } from "effect"
 
-const PayerLive = Payer.layer.pipe(
+const PayerLive = DefaultPayer.layer.pipe(
   Layer.provide(
-    Accept.layer(KnownAssets.Usd).pipe(
-      Layer.provide(
-        Layer.mergeAll(Erc3009Scheme.layer, Permit2Scheme.layer).pipe(
-          Layer.provide(
-            Eip155Signer.layerMnemonic.pipe(Layer.provide(Mnemonic.layerEnv)),
-          ),
-        ),
-      ),
-    ),
+    HostMnemonic.layer("default").pipe(Layer.provide(NodeServices.layer)),
   ),
 )
 ```
 
+`DefaultPayer.layer` includes `Known.USD`, `Accept.firstKnown`, EIP-3009,
+Permit2, Solana, and mnemonic-backed EIP-155 and Solana signers. Solana signing
+requires `SOLANA_RPC_URL` so it can obtain a recent blockhash.
+
+Use `Payer.layerLocal` when you need to customize the accepted assets, selection
+policy, or schemes:
+
+```ts
+import { Accept, Known, Payer } from "crosshatch"
+import { Eip155Signer, Erc3009Scheme, Permit2Scheme } from "crosshatch/Eip155"
+import { Layer } from "effect"
+
+const SchemesLive = Layer.mergeAll(
+  Erc3009Scheme.layer,
+  Permit2Scheme.layer,
+).pipe(Layer.provide(Eip155Signer.layerMnemonic))
+
+const PayerLive = Payer.layerLocal({
+  assets: Known.USD,
+  accept: Accept.firstKnown,
+  schemes: SchemesLive,
+})
+```
+
 ## Requirement Selection
 
-`Accept` is the requirement-selection service used by `Payer.layer`.
+`Accept.Accept` is the requirement-selection function used by
+`Payer.layerLocal`.
 
 Given a `Required` invoice, it chooses one compatible entry from
 `required.accepts`, finds the matching physical asset, and returns the scheme
 effect that can create the chain-specific payment payload.
 
-`Accept.layer(denomination)` receives a denomination config. `KnownAssets.Usd`
-is the built-in USD denomination Crosshatch ships. Provide it to `Payer.layer`
-together with the signing schemes your client supports.
+`Accept.firstKnown` is the built-in policy. It searches the configured assets,
+the invoice's accepted options, and each physical asset's schemes in order,
+returning the first usable combination. `Known.USD` is the built-in USD
+denomination.
 
 `Accept` compares the invoice's accepted payment options against the configured
 denomination. A payment option is usable when its network and asset match a
 configured physical asset, and one of that asset's schemes is available in the
 current Effect context.
 
-Most applications do not call `Accept` directly. They provide `Accept.layer` to
-`Payer.layer`, then call `Payer.createPayload`.
+Most applications pass `Accept.firstKnown` to `Payer.layerLocal`, then call
+`Payer.createPayload`. A custom `Accept.Accept` function can implement a
+different selection policy.
 
 If no configured asset and scheme can satisfy the invoice, payment creation
 fails. This usually means the client does not support the merchant's requested

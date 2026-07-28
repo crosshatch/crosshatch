@@ -26,13 +26,7 @@ example uses HTTP, but Crosshatch is not limited to HTTP; route protection is
 just one integration path.
 
 ```ts
-import {
-  ChxHttp,
-  Payload,
-  Required,
-  Requirements,
-  KnownAssets,
-} from "crosshatch"
+import { ChxHttp, Payload, Required, Requirements, Known } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
 import { Config, Effect } from "effect"
 import { HttpServerResponse } from "effect/unstable/http"
@@ -43,7 +37,7 @@ const route = Effect.gen(function* () {
     "PAY_TO_EIP155",
   )
   const payload = yield* Payload.Payload
-  const accepted = yield* Requirements.logical(KnownAssets.Usd.USDC, {
+  const accepted = yield* Requirements.logical(Known.USD.USDC, {
     amount: 0.01,
     recipients: {
       eip155: { 8453: recipient },
@@ -119,20 +113,14 @@ match one of the route's accepted requirements, build a `Required` value and
 return `ChxHttp.require({ required })` with its status set to `402`.
 
 ```ts
-import {
-  ChxHttp,
-  KnownAssets,
-  Payload,
-  Required,
-  Requirements,
-} from "crosshatch"
+import { ChxHttp, Known, Payload, Required, Requirements } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
 import { Config, Effect } from "effect"
 import { HttpServerResponse } from "effect/unstable/http"
 
 const paidRoute = Effect.gen(function* () {
   const payload = yield* Payload.Payload
-  const accepted = yield* Requirements.logical(KnownAssets.Usd.USDC, {
+  const accepted = yield* Requirements.logical(Known.USD.USDC, {
     amount: 0.01,
     recipients: {
       eip155: {

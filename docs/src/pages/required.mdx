@@ -23,7 +23,7 @@ previous entries. `Required.extend` adds x402 extension payloads.
 
 ```ts
 import { Config, Effect } from "effect"
-import { Required, Requirements, KnownAssets } from "crosshatch"
+import { Known, Required, Requirements } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
 import { PaymentId } from "crosshatch/Extensions"
 
@@ -42,7 +42,7 @@ const makeRequired = Effect.gen(function* () {
       id: PaymentId.random(),
     }),
     Required.accept(
-      Requirements.logical(KnownAssets.Usd.USDC, {
+      Requirements.logical(Known.USD.USDC, {
         amount: 0.01,
         recipients: { eip155: { 8453: recipient } },
       }),
@@ -62,12 +62,12 @@ EIP-155 chains. The `recipients` object chooses which deployments this invoice
 accepts and where payment should be sent on each chain.
 
 ```ts
-import { KnownAssets, Requirements } from "crosshatch"
+import { Known, Requirements } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
 
 declare const payToOnBase: typeof Eip155Address.Eip155Address.Type
 
-Requirements.logical(KnownAssets.Usd.USDC, {
+Requirements.logical(Known.USD.USDC, {
   amount: 0.01,
   recipients: {
     eip155: {
@@ -81,5 +81,5 @@ The USD amount is converted into the asset's atomic units using the selected
 deployment's decimals.
 
 Use `Requirements.denomination` when you want to accept every configured asset
-in a denomination, such as any asset in `KnownAssets.Usd`, with one recipient
+in a denomination, such as any asset in `Known.USD`, with one recipient
 configuration.

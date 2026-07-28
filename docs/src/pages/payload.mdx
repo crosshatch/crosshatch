@@ -26,13 +26,13 @@ signed payment payload for it.
 
 ```ts
 import { Config, Effect } from "effect"
-import { Payload, Required, Requirements, KnownAssets } from "crosshatch"
+import { Known, Payload, Required, Requirements } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
 
 const program = Effect.gen(function* () {
   const required = yield* Required.make`Access to the paid resource.`.pipe(
     Required.accept(
-      Requirements.logical(KnownAssets.Usd.USDC, {
+      Requirements.logical(Known.USD.USDC, {
         amount: 0.01,
         recipients: {
           eip155: {
@@ -58,16 +58,20 @@ sign typed data, and encode chain-specific payload fields.
 
 ### CLI
 
-Pass Payment Required JSON directly as the positional argument, or use the
+First create or import a [stored mnemonic](/mnemonic#cli-mnemonic-store). Then
+pass Payment Required JSON directly as the positional argument, or use the
 explicit `--stdin` flag when reading it from a pipe:
 
 ```sh
 crosshatch payload make "$PAYMENT_REQUIRED_JSON"
 printf '%s' "$PAYMENT_REQUIRED_JSON" | crosshatch payload make --stdin
+crosshatch payload make --mnemonic personal "$PAYMENT_REQUIRED_JSON"
 ```
 
 The positional JSON argument and `--stdin` are mutually exclusive. The CLI does
-not infer piped input when `--stdin` is omitted.
+not infer piped input when `--stdin` is omitted. `--mnemonic` selects a stored
+mnemonic and defaults to `default`. The command uses `DefaultPayer.layer`, emits
+Payment Payload JSON to stdout, and reads `SOLANA_RPC_URL` for Solana support.
 
 ## Checking A Payload
 

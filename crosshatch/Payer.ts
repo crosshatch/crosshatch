@@ -62,7 +62,12 @@ export const layerLocal = <ROut, E, RIn>({
             { concurrency: "unbounded" },
           ).pipe(Effect.map(flow(Array.filter(Predicate.isNotUndefined), Record.fromEntries)))
           return {
-            payload: { x402Version: 2, payload, accepted, extensions },
+            payload: {
+              x402Version: 2 as const,
+              payload,
+              accepted,
+              extensions,
+            },
           }
         }),
       }
