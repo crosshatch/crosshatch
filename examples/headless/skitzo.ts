@@ -1,4 +1,4 @@
-import { KnownAssets, Facilitator, Required, Requirements, Payload } from "crosshatch"
+import { Known, Facilitator, Required, Requirements, Payload } from "crosshatch"
 import { BrowserServices } from "crosshatch/Browser"
 import { Eip155Address } from "crosshatch/Eip155"
 import { Config, Effect, Layer, Console } from "effect"
@@ -12,7 +12,7 @@ Effect.gen(function* () {
   |
   `.pipe(
     Required.accept(
-      Requirements.denomination(KnownAssets.Usd, {
+      Requirements.denomination(Known.USD, {
         amount: 0.01,
         recipients: { eip155: { 8453: recipient } },
         ttl: "1 minutes",

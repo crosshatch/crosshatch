@@ -1,9 +1,11 @@
-import { generateMnemonic, mnemonicToSeedSync } from "@scure/bip39"
+import { generateMnemonic, mnemonicToSeedSync, validateMnemonic } from "@scure/bip39"
 import { wordlist } from "@scure/bip39/wordlists/english.js"
 import { Layer, Redacted, Effect, Schema as S, Config, Context, Brand, flow } from "effect"
 
 export const MnemonicText = S.String.check(
-  S.isPattern(/^(?:(?:[a-z]+ ){11}|(?:[a-z]+ ){14}|(?:[a-z]+ ){17}|(?:[a-z]+ ){20}|(?:[a-z]+ ){23})[a-z]+$/u),
+  S.makeFilter((text: string) => validateMnemonic(text, wordlist), {
+    expected: "a valid BIP-39 English mnemonic",
+  }),
 ).pipe(S.brand("crosshatch/Mnemonic"))
 
 const ID = "crosshatch/Mnemonic" as const

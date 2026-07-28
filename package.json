@@ -12,7 +12,8 @@
     "aliases": "caddy run --config ./Caddyfile",
     "test": "vitest run",
     "motel": "motel",
-    "lint": "oxlint --disable-nested-config"
+    "lint": "oxlint --disable-nested-config",
+    "crosshatch": "node ./crosshatch/Cli/main.ts"
   },
   "devDependencies": {
     "@changesets/changelog-github": "catalog:",

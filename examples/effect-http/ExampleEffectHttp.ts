@@ -1,5 +1,5 @@
 import * as Cloudflare from "alchemy/Cloudflare"
-import { Required, Requirements, ChxHttp, KnownAssets, Payload, Facilitator } from "crosshatch"
+import { Required, Requirements, ChxHttp, Known, Payload, Facilitator } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
 import { PaymentId } from "crosshatch/Extensions"
 import { Layer, Effect, Config } from "effect"
@@ -29,7 +29,7 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
       "/paid",
       Effect.gen(function* () {
         const payload = yield* Payload.Payload
-        const accepted = yield* Requirements.denomination(KnownAssets.Usd, {
+        const accepted = yield* Requirements.denomination(Known.USD, {
           amount: 0.01,
           recipients: { eip155: { 8453: recipient } },
         })

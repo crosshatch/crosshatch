@@ -48,6 +48,7 @@ export const verify = Effect.fnUntraced(function* ({ payload }: { readonly paylo
   if (!response.isValid) {
     return yield* new VerificationError(response)
   }
+  return response
 })
 
 export class SettlementError extends S.TaggedErrorClass<SettlementError>()("SettlementError", {
