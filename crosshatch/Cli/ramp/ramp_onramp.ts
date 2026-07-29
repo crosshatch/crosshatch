@@ -1,4 +1,4 @@
-import { Console, Effect, flow, Schema as S, Struct } from "effect"
+import { Effect, flow, Schema as S, Struct } from "effect"
 import { Command, Flag } from "effect/unstable/cli"
 
 import * as Amount from "../../Amount.ts"
@@ -8,6 +8,7 @@ import * as Mnemonic from "../../Mnemonic.ts"
 import { CaAccountId } from "../../Ramp/CaAccountId.ts"
 import { Providers } from "../../Ramp/RampApi.ts"
 import { RampClient } from "../../Ramp/RampClient.ts"
+import { openBrowser } from "@crosshatch/widget/openBrowser"
 import { Reference } from "../../Reference.ts"
 
 export const onramp = Command.make("onramp", {
@@ -22,17 +23,21 @@ export const onramp = Command.make("onramp", {
   Command.withDescription("Create an onramp URL for a stored mnemonic"),
   Command.withHandler(
     Effect.fn(
-      function* ({ amount: amount_, chain, provider }) {
-        const amount = yield* Amount.from(amount_)
+      function* ({ amount, chain, provider }) {
         const chainRef = chain === undefined ? Reference.make("8453") : yield* S.decodeUnknownEffect(Reference)(chain)
-        const chainId = `eip155:${chainRef}`
         const mnemonic = yield* Mnemonic.Mnemonic
         const address = yield* Eip155Address.fromMnemonic(mnemonic)
-        const recipient = yield* S.decodeUnknownEffect(CaAccountId)(`${chainId}:${address}`)
         const ramp = yield* RampClient
+        const recipient = CaAccountId.make(`eip155:${chainRef}:${address}`, { disableChecks: true })
         yield* ramp
-          .onramp({ payload: { amount, provider, recipient } })
-          .pipe(Effect.flatMap(flow(Struct.get("onrampUrl"), Console.log)))
+          .onramp({
+            payload: {
+              provider,
+              amount: yield* Amount.from(amount),
+              recipient,
+            },
+          })
+          .pipe(Effect.flatMap(flow(Struct.get("onrampUrl"), openBrowser)))
       },
       (effect, { mnemonic }) => Effect.provide(effect, HostMnemonic.layer(mnemonic)),
     ),
