@@ -1,17 +1,16 @@
 import { Console, Effect, Layer, Schema as S } from "effect"
-import { Argument, CliError, Command, Flag } from "effect/unstable/cli"
+import { Argument, Command, Flag } from "effect/unstable/cli"
 
-import * as DefaultPayer from "../../DefaultPayer.ts"
+import * as Accept from "../../Accept.ts"
+import { DefaultScheme } from "../../Defaults/Defaults.ts"
 import * as HostMnemonic from "../../Host/HostMnemonic.ts"
+import * as Known from "../../Known/Known.ts"
 import * as Payer from "../../Payer.ts"
 import * as Payload from "../../Payload.ts"
 import * as Required from "../../Required.ts"
 import * as Input from "../Input.ts"
 
-const required = Argument.string("payment-required-json").pipe(
-  Argument.withDescription("Payment Required JSON"),
-  Argument.optional,
-)
+const required = Argument.string("required").pipe(Argument.withDescription("Payment Required JSON"), Argument.optional)
 
 export const payloadMake = Command.make("make", {
   required,
@@ -22,9 +21,9 @@ export const payloadMake = Command.make("make", {
   Command.withHandler(
     Effect.fn(
       function* ({ required, stdin }) {
-        const input = yield* Input.read(required, stdin, "payment-required-json")
+        const input = yield* Input.read(required, stdin, "required")
         const decoded = yield* S.decodeEffect(S.fromJsonString(S.toCodecJson(Required.Required)))(input).pipe(
-          Effect.mapError((cause) => new CliError.UserError({ cause })),
+          Effect.mapError((cause) => new Input.InvalidError({ name: "required", cause })),
         )
         const payer = yield* Payer.Payer
         const { payload } = yield* payer.createPayload({ required: decoded })
@@ -32,7 +31,13 @@ export const payloadMake = Command.make("make", {
         yield* Console.log(json)
       },
       (effect, { mnemonic }) =>
-        Effect.provide(effect, DefaultPayer.layer.pipe(Layer.provide(HostMnemonic.layer(mnemonic)))),
+        Effect.provide(
+          effect,
+          Payer.layerLocal({
+            accept: Accept.first(Known),
+            schemes: DefaultScheme.layer,
+          }).pipe(Layer.provide(HostMnemonic.layer(mnemonic))),
+        ),
     ),
   ),
 )

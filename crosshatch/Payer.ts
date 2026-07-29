@@ -1,7 +1,6 @@
 import { Array, Schema as S, Context, Effect, Layer, Record, Predicate, flow } from "effect"
 
 import type { Accept, AcceptError } from "./Accept.ts"
-import type { Denomination } from "./Asset.ts"
 import { Bridge } from "./Bridge.ts"
 import { ExtensionRegistry } from "./Extension.ts"
 import type { Payload } from "./Payload.ts"
@@ -19,11 +18,9 @@ export class Payer extends Context.Service<
 >()("crosshatch/Payer") {}
 
 export const layerLocal = <ROut, E, RIn>({
-  assets,
   accept,
   schemes,
 }: {
-  readonly assets: Denomination
   readonly schemes: Layer.Layer<ROut, E, RIn>
   readonly accept: Accept
 }) =>
@@ -35,7 +32,7 @@ export const layerLocal = <ROut, E, RIn>({
       const schemesContext = yield* Layer.build(schemes)
       return {
         createPayload: Effect.fnUntraced(function* ({ required }) {
-          const { accepted, adapt } = yield* accept({ required, assets }).pipe(
+          const { accepted, adapt } = yield* accept({ required }).pipe(
             Effect.provideContext(Context.mergeAll(context, schemesContext)),
           )
           const { extensions: infos = {} } = required

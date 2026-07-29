@@ -1,5 +1,5 @@
 import { Console, Data, Effect, Option, Schema as S } from "effect"
-import { Argument, CliError, Command, Flag, Prompt } from "effect/unstable/cli"
+import { Argument, Command, Flag, Prompt } from "effect/unstable/cli"
 
 import * as FacilitatorService from "../../Facilitator.ts"
 import { SettleResponse } from "../../FacilitatorApi/SettleEndpoint.ts"
@@ -13,10 +13,7 @@ export class StdinConfirmationRequiredError extends PrintableError.make(
 ) {}
 
 export const settle = Command.make("settle", {
-  payload: Argument.string("payment-payload-json").pipe(
-    Argument.withDescription("Payment Payload JSON"),
-    Argument.optional,
-  ),
+  payload: Argument.string("payload").pipe(Argument.withDescription("Payment Payload JSON"), Argument.optional),
   stdin: Flag.boolean("stdin").pipe(Flag.withDescription("Read Payment Payload JSON from standard input")),
   baseUrl: Flag.string("url").pipe(
     Flag.withDescription("Facilitator base URL"),
@@ -29,9 +26,9 @@ export const settle = Command.make("settle", {
   Command.withHandler(
     Effect.fn(function* ({ baseUrl, payload, stdin, yes }) {
       if (stdin && !yes) return yield* new StdinConfirmationRequiredError()
-      const input = yield* Input.read(payload, stdin, "payment-payload-json")
+      const input = yield* Input.read(payload, stdin, "payload")
       const decoded = yield* S.decodeEffect(S.fromJsonString(S.toCodecJson(Payload.Payload)))(input).pipe(
-        Effect.mapError((cause) => new CliError.UserError({ cause })),
+        Effect.mapError((cause) => new Input.InvalidError({ name: "payload", cause })),
       )
       if (!yes && !(yield* Prompt.confirm({ message: "Settle this payment?" }))) {
         yield* Console.error("Operation cancelled.")

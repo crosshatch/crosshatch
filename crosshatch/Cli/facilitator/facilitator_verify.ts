@@ -1,5 +1,5 @@
 import { Console, Effect, Option, Schema as S } from "effect"
-import { Argument, CliError, Command, Flag } from "effect/unstable/cli"
+import { Argument, Command, Flag } from "effect/unstable/cli"
 
 import * as FacilitatorService from "../../Facilitator.ts"
 import { VerifyResponse } from "../../FacilitatorApi/VerifyEndpoint.ts"
@@ -7,10 +7,7 @@ import * as Payload from "../../Payload.ts"
 import * as Input from "../Input.ts"
 
 export const verify = Command.make("verify", {
-  payload: Argument.string("payment-payload-json").pipe(
-    Argument.withDescription("Payment Payload JSON"),
-    Argument.optional,
-  ),
+  payload: Argument.string("payload").pipe(Argument.withDescription("Payment Payload JSON"), Argument.optional),
   stdin: Flag.boolean("stdin").pipe(Flag.withDescription("Read Payment Payload JSON from standard input")),
   baseUrl: Flag.string("url").pipe(
     Flag.withDescription("Facilitator base URL"),
@@ -22,9 +19,9 @@ export const verify = Command.make("verify", {
   Command.withHandler(
     Effect.fn(({ baseUrl, payload, stdin }) =>
       Effect.gen(function* () {
-        const input = yield* Input.read(payload, stdin, "payment-payload-json")
+        const input = yield* Input.read(payload, stdin, "payload")
         const decoded = yield* S.decodeEffect(S.fromJsonString(S.toCodecJson(Payload.Payload)))(input).pipe(
-          Effect.mapError((cause) => new CliError.UserError({ cause })),
+          Effect.mapError((cause) => new Input.InvalidError({ name: "payload", cause })),
         )
         const response = yield* FacilitatorService.verify({ payload: decoded })
         const json = yield* S.encodeEffect(S.fromJsonString(S.toCodecJson(VerifyResponse)))(response)
