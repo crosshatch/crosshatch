@@ -4,7 +4,6 @@ import { Argument, Command, Flag, Prompt } from "effect/unstable/cli"
 import * as FacilitatorService from "../../Facilitator.ts"
 import { SettleResponseJsonString } from "../../FacilitatorApi/SettleEndpoint.ts"
 import * as Payload from "../../Payload.ts"
-import { orUndefined } from "../CliUtil.ts"
 import * as Input from "../Input.ts"
 
 export class StdinConfirmationRequiredError extends Data.TaggedError("StdinConfirmationRequiredError") {
@@ -16,7 +15,7 @@ export class StdinConfirmationRequiredError extends Data.TaggedError("StdinConfi
 export const settle = Command.make("settle", {
   payload: Argument.string("payload").pipe(Argument.withDescription("Payment Payload JSON"), Argument.optional),
   stdin: Flag.boolean("stdin").pipe(Flag.withDescription("Read Payment Payload JSON from standard input")),
-  baseUrl: Flag.string("url").pipe(orUndefined, Flag.withDescription("Facilitator base URL")),
+  baseUrl: Flag.string("url").pipe(Flag.withDefault(undefined), Flag.withDescription("Facilitator base URL")),
   yes: Flag.boolean("yes").pipe(Flag.withAlias("y")),
 }).pipe(
   Command.withDescription("Settle a payment payload"),

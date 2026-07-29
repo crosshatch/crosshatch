@@ -4,13 +4,12 @@ import { Command, Argument, Flag, Prompt } from "effect/unstable/cli"
 import * as Mnemonic from "../../Mnemonic.ts"
 import { MnemonicStore } from "../../MnemonicStore.ts"
 import * as DerivedAddresses from "../../Unified/DerivedAddresses.ts"
-import { orUndefined } from "../CliUtil.ts"
 import * as Input from "./../Input.ts"
 
 export const mnemonicImport = Command.make("import", {
   name: Argument.string("name").pipe(Argument.withDefault("default")),
   stdin: Flag.boolean("stdin").pipe(Flag.withDescription("Read the mnemonic from standard input instead of prompting")),
-  description: Flag.string("description").pipe(orUndefined),
+  description: Flag.string("description").pipe(Flag.withDefault(undefined)),
 }).pipe(
   Command.withDescription("Import and store a mnemonic"),
   Command.withHandler(
