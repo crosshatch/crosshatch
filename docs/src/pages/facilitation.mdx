@@ -108,30 +108,6 @@ The service must implement the `FacilitatorApi` exported from
 `GET /facilitator/supported`. The supported-network schema accepts both CAIP-2
 `ChainId` values and legacy network strings.
 
-## Facilitator CLI
-
-Inspect support, or verify and settle a Payment Payload by passing its JSON
-directly or using the explicit `--stdin` flag:
-
-```sh
-crosshatch facilitator supported
-crosshatch facilitator supported --url https://facilitator.example.com
-
-crosshatch facilitator verify "$PAYMENT_PAYLOAD_JSON"
-printf '%s' "$PAYMENT_PAYLOAD_JSON" | crosshatch facilitator verify --stdin --url https://facilitator.example.com
-
-crosshatch facilitator settle "$PAYMENT_PAYLOAD_JSON"
-printf '%s' "$PAYMENT_PAYLOAD_JSON" | crosshatch facilitator settle --stdin --yes
-```
-
-`supported` emits the facilitator's supported kinds as JSON. `--url` overrides
-the facilitator base URL for all three commands. The positional JSON argument
-and `--stdin` are mutually exclusive. Settlement asks for confirmation unless
-`--yes` or `-y` is passed. Settlement from stdin requires `--yes` because stdin
-carries the payload and cannot also answer the prompt. These commands accept the
-Payment Payload itself; they derive the facilitator HTTP request's payment
-requirements from the payload rather than accepting the HTTP request envelope.
-
 ## Implementing a Facilitator
 
 The Effect HTTP API definition is exported from its own package subpath:

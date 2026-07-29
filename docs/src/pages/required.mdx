@@ -54,6 +54,19 @@ const makeRequired = Effect.gen(function* () {
 The description is passed first. It should be written for the client or wallet
 that may show the payment request to a user.
 
+## JSON Encoding
+
+`RequiredJson` converts between a `Required` value and its JSON representation.
+`RequiredJsonString` additionally parses and serializes the JSON string.
+
+```ts
+import { Required } from "crosshatch"
+import { Schema } from "effect"
+
+const decodeRequired = Schema.decodeEffect(Required.RequiredJsonString)
+const encodeRequired = Schema.encodeEffect(Required.RequiredJsonString)
+```
+
 ## Requirements Groups
 
 `Requirements.logical` turns one logical asset's namespace map into acceptable

@@ -56,7 +56,7 @@ import {
   Payload,
   Requirements,
   ChxHttp,
-  KnownAssets,
+  Known,
 } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
 import * as Cloudflare from "alchemy/Cloudflare"
@@ -74,7 +74,7 @@ export default class Merchant extends Cloudflare.Worker<Merchant>()(
       "/paid",
       Effect.gen(function* () {
         const payload = yield* Payload.Payload
-        const accepted = yield* Requirements.denomination(KnownAssets.Usd, {
+        const accepted = yield* Requirements.denomination(Known.USD, {
           amount: 0.01,
           recipients: { eip155: { 8453: yield* recipient } },
         })
@@ -124,7 +124,7 @@ single mnemonic `MNEMONIC` in the environment variables.
 `PayerLive.ts`
 
 ```ts
-import { Accept, KnownAssets, Mnemonic, Payer } from "crosshatch"
+import { Accept, Known, Mnemonic, Payer } from "crosshatch"
 import { Erc3009Scheme, Eip155Signer, Permit2Scheme } from "crosshatch/Eip155"
 import { SolanaState, SolanaScheme, SolanaSigner } from "crosshatch/Solana"
 import { Config, Layer } from "effect"
@@ -134,22 +134,19 @@ const SolanaStateLive = Config.string("SOLANA_RPC_URL").pipe(
   Layer.unwrap,
 )
 
-export const PayerLive = Payer.layer.pipe(
-  Layer.provide(
-    Accept.layer(KnownAssets.Usd).pipe(
-      Layer.provide(
-        Layer.mergeAll(
-          Layer.mergeAll(Erc3009Scheme.layer, Permit2Scheme.layer).pipe(
-            Layer.provide(Eip155Signer.layerMnemonic),
-          ),
-          SolanaScheme.layer.pipe(
-            Layer.provide([SolanaSigner.layerMnemonic, SolanaStateLive]),
-          ),
-        ).pipe(Layer.provide(Mnemonic.layerEnv)),
-      ),
-    ),
+const SchemesLive = Layer.mergeAll(
+  Layer.mergeAll(Erc3009Scheme.layer, Permit2Scheme.layer).pipe(
+    Layer.provide(Eip155Signer.layerMnemonic),
+  ),
+  SolanaScheme.layer.pipe(
+    Layer.provide([SolanaSigner.layerMnemonic, SolanaStateLive]),
   ),
 )
+
+export const PayerLive = Payer.layerLocal({
+  accept: Accept.first(Known),
+  schemes: SchemesLive,
+}).pipe(Layer.provide(Mnemonic.layerEnv))
 ```
 
 ## Contributing

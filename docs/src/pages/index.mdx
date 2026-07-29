@@ -243,15 +243,19 @@ LanguageModel.generateText({
     <div className="crosshatch-code-block">
 
 ```ts
-import { Accept, Known, Payer } from "crosshatch"
-import { UnifiedSchemes } from "crosshatch/Unified"
-import { HostMnemonic } from "crosshatch/Host"
+import { Accept, Known, Mnemonic, Payer } from "crosshatch"
+import { Eip155Signer, Erc3009Scheme, Permit2Scheme } from "crosshatch/Eip155"
 import { Layer } from "effect"
+
+const SchemesLive = Layer.mergeAll(
+  Erc3009Scheme.layer,
+  Permit2Scheme.layer,
+).pipe(Layer.provide(Eip155Signer.layerMnemonic))
 
 export const PayerLive = Payer.layerLocal({
   accept: Accept.first(Known),
-  schemes: UnifiedSchemes.layer,
-}).pipe(Layer.provide(HostMnemonic.layer()))
+  schemes: SchemesLive,
+}).pipe(Layer.provide(Mnemonic.layerEnv))
 ```
 
     </div>

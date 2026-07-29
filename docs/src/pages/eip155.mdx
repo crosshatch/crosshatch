@@ -54,6 +54,20 @@ const Eip155SignerLive = Eip155Signer.layerMnemonic.pipe(
 
 See [Mnemonic](/mnemonic) for mnemonic sources.
 
+To derive the corresponding address directly, use `Eip155Address.fromMnemonic`.
+Derivation returns an Effect.
+
+```ts
+import { Mnemonic } from "crosshatch"
+import { Eip155Address } from "crosshatch/Eip155"
+import { Effect } from "effect"
+
+const address = Effect.gen(function* () {
+  const mnemonic = yield* Mnemonic.env
+  return yield* Eip155Address.fromMnemonic(mnemonic)
+})
+```
+
 ## EIP-3009
 
 `Erc3009Scheme.layer` provides the `Erc3009Scheme.Erc3009Scheme`. It creates a
@@ -93,4 +107,4 @@ Use this scheme for physical assets that settle through the exact Permit2 proxy.
 
 Most EIP-155 clients provide both schemes and use `Accept.first` to choose the
 one matching the selected asset deployment. See [Payer Service](/payer) for
-`Payer.layerLocal` and `UnifiedSchemes.layer` composition.
+`Payer.layerLocal` composition.

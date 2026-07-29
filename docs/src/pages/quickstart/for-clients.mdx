@@ -76,25 +76,38 @@ const program = Effect.gen(function* () {
 }).pipe(Effect.provide(ChxHttp.layerClient.pipe(Layer.provide(PayerLive))))
 ```
 
-`PayerLive` wires the payer to supported assets and signers. The default payer
+`PayerLive` wires the payer to supported assets and signers. This example
 includes known USD assets, EIP-3009, Permit2, and Solana support:
 
 ```ts
-import { Accept, Known, Payer } from "crosshatch"
-import { UnifiedSchemes } from "crosshatch/Unified"
-import { HostMnemonic } from "crosshatch/Host"
-import { Layer } from "effect"
+import { Accept, Known, Mnemonic, Payer } from "crosshatch"
+import { Eip155Signer, Erc3009Scheme, Permit2Scheme } from "crosshatch/Eip155"
+import { SolanaScheme, SolanaSigner, SolanaState } from "crosshatch/Solana"
+import { Config, Layer } from "effect"
+
+const SolanaStateLive = Config.string("SOLANA_RPC_URL").pipe(
+  Config.map(SolanaState.layer),
+  Layer.unwrap,
+)
+
+const SchemesLive = Layer.mergeAll(
+  Layer.mergeAll(Erc3009Scheme.layer, Permit2Scheme.layer).pipe(
+    Layer.provide(Eip155Signer.layerMnemonic),
+  ),
+  SolanaScheme.layer.pipe(
+    Layer.provide([SolanaSigner.layerMnemonic, SolanaStateLive]),
+  ),
+)
 
 export const PayerLive = Payer.layerLocal({
   accept: Accept.first(Known),
-  schemes: UnifiedSchemes.layer,
-}).pipe(Layer.provide(HostMnemonic.layer()))
+  schemes: SchemesLive,
+}).pipe(Layer.provide(Mnemonic.layerEnv))
 ```
 
-Create the default stored mnemonic with `crosshatch mnemonic add`, or import one
-with `crosshatch mnemonic import`. Set `SOLANA_RPC_URL` because the default
-payer uses it to obtain recent blockhashes for Solana payments. See
-[Payer](/payer) for custom asset, policy, and scheme composition.
+Set `MNEMONIC` for the signer keys and `SOLANA_RPC_URL` for recent Solana
+blockhashes. See [Payer](/payer) for custom asset, policy, and scheme
+composition.
 
 ## Delegate Payment Creation
 

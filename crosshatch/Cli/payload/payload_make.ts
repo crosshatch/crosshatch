@@ -1,4 +1,4 @@
-import { Console, Effect, Layer, Schema as S } from "effect"
+import { Config, Console, Effect, Layer, Schema as S } from "effect"
 import { Argument, Command, Flag } from "effect/unstable/cli"
 
 import * as Accept from "../../Accept.ts"
@@ -34,7 +34,9 @@ export const payloadMake = Command.make("make", {
           effect,
           Payer.layerLocal({
             accept: Accept.first(Known),
-            schemes: UnifiedSchemes.layer,
+            schemes: UnifiedSchemes.layer({
+              solana: { rpc: Config.string("SOLANA_RPC_URL") },
+            }),
           }).pipe(Layer.provide(HostMnemonic.layer(mnemonic))),
         ),
     ),

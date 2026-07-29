@@ -112,16 +112,18 @@ export const layer = Layer.effect(
       function* (from: string, to: string) {
         const mnemonic = yield* getEntry(from)
         const mnemonics = yield* config.get.pipe(Effect.map((v) => v?.mnemonics))
-        const secret = yield* Keychain.get(to)
-        if (mnemonics?.[to] || !secret) {
+        if (mnemonics?.[to] || (yield* Keychain.get(to))) {
           return yield* new NameAlreadyTakenError({ name: to })
         }
+        const secret = yield* Keychain.get(from).pipe(Effect.flatMap(Effect.fromNullishOr))
         yield* Keychain.set(to, secret)
-        yield* config.update((current) => {
-          const { [from]: _removed, ...mnemonics } = current.mnemonics
-          return { ...current, mnemonics: { ...mnemonics, [to]: mnemonic } }
-        })
-        yield* Keychain.remove(to)
+        yield* config
+          .update((current) => {
+            const { [from]: _removed, ...mnemonics } = current.mnemonics
+            return { ...current, mnemonics: { ...mnemonics, [to]: mnemonic } }
+          })
+          .pipe(Effect.tapError(() => Keychain.remove(to)))
+        yield* Keychain.remove(from)
       },
       Effect.mapError((cause) => new MnemonicRenameError({ cause })),
     )
