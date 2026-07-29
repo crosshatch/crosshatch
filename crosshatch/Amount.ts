@@ -33,7 +33,7 @@ export const from = Effect.fnUntraced(function* (input: Input) {
   return Amount.make(v, { disableChecks: true })
 })
 
-export const parse = (input: string): Effect.Effect<typeof Amount.Type, InvalidAmountError> => {
+export const parse = (input: string): Effect.Effect<Amount, InvalidAmountError> => {
   const trimmed = input.trim()
   return trimmed === ""
     ? new InvalidAmountError({ input })
@@ -53,7 +53,7 @@ export interface AtomicUnit {
   readonly rounding?: BigDecimal.RoundingMode | undefined
 }
 
-export const toAtomic = (amount: typeof Amount.Type, unit: AtomicUnit): typeof Atomic.Type => {
+export const toAtomic = (amount: Amount, unit: AtomicUnit): Atomic => {
   const rounded = BigDecimal.normalize(
     BigDecimal.round(amount, {
       scale: unit.decimals,
@@ -63,7 +63,7 @@ export const toAtomic = (amount: typeof Amount.Type, unit: AtomicUnit): typeof A
   return Atomic.make((rounded.value * 10n ** BigInt(unit.decimals - rounded.scale)).toString(), { disableChecks: true })
 }
 
-export const fromAtomic = (atomic: typeof Atomic.Type, unit: AtomicUnit): typeof Amount.Type =>
+export const fromAtomic = (atomic: Atomic, unit: AtomicUnit): Amount =>
   Amount.make(BigDecimal.make(BigInt(atomic), unit.decimals), { disableChecks: true })
 
 export const atomic = (unit: AtomicUnit) =>
@@ -74,9 +74,9 @@ export const atomic = (unit: AtomicUnit) =>
     }),
   )
 
-export const format = (amount: typeof Amount.Type): string => BigDecimal.format(BigDecimal.normalize(amount))
+export const format = (amount: Amount): string => BigDecimal.format(BigDecimal.normalize(amount))
 
-export const display = (amount: typeof Amount.Type, decimals: number): string => {
+export const display = (amount: Amount, decimals: number): string => {
   const rounded = BigDecimal.normalize(BigDecimal.round(amount, { scale: decimals, mode: "floor" }))
   const units = rounded.value * 10n ** BigInt(decimals - rounded.scale)
   const scale = 10n ** BigInt(decimals)

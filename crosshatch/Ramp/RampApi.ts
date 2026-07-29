@@ -1,4 +1,4 @@
-import { Schema as S } from "effect"
+import { BigDecimal, Schema as S } from "effect"
 import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "effect/unstable/httpapi"
 
 import { Amount } from "../Amount.ts"
@@ -13,7 +13,7 @@ export class RampApiGroup extends HttpApiGroup.make("ramp")
     HttpApiEndpoint.post("onramp", "/onramp", {
       payload: S.Struct({
         provider: Provider,
-        amount: Amount,
+        amount: Amount.check(S.isGreaterThanBigDecimal(BigDecimal.fromBigInt(0n))),
         recipient: CaAccountId,
       }),
       success: S.Struct({
