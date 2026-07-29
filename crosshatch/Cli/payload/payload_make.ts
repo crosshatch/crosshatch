@@ -26,6 +26,7 @@ export const payloadMake = Command.make("make", {
           Effect.flatMap(S.decodeEffect(Required.RequiredJsonString)),
           Effect.flatMap((required) => payer.createPayload({ required })),
           Effect.flatMap(({ payload }) => S.encodeEffect(Payload.PayloadJson)(payload)),
+          Effect.map((v) => JSON.stringify(v, null, 2)),
           Effect.andThen(Console.log),
         )
       },
@@ -35,7 +36,7 @@ export const payloadMake = Command.make("make", {
           Payer.layerLocal({
             accept: Accept.first(Known),
             schemes: UnifiedSchemes.layer({
-              solana: { rpc: Config.string("SOLANA_RPC_URL") },
+              solana: { rpc: Config.string("SOLANA_RPC_URL").pipe(Config.withDefault(undefined)) },
             }),
           }).pipe(Layer.provide(HostMnemonic.layer(mnemonic))),
         ),

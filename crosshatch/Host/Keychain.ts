@@ -1,18 +1,17 @@
 import { Entry } from "@napi-rs/keyring"
 import { Data, Effect } from "effect"
 
-import * as PrintableError from "../PrintableError.ts"
-
 export type KeychainOperation = "read" | "write" | "remove"
 
-export class KeychainError extends PrintableError.make(
-  Data.TaggedError("MnemonicKeychainError")<{
-    readonly operation: KeychainOperation
-    readonly name: string
-    readonly cause: unknown
-  }>,
-  ({ operation, name }) => `Could not ${operation} the keychain secret for "${name}".`,
-) {}
+export class KeychainError extends Data.TaggedError("MnemonicKeychainError")<{
+  readonly operation: KeychainOperation
+  readonly name: string
+  readonly cause: unknown
+}> {
+  override get message() {
+    return `Could not ${this.operation} the keychain secret for "${this.name}".`
+  }
+}
 
 const f = <A>(name: string, operation: KeychainOperation, evaluate: (entry: Entry) => A) =>
   Effect.try({

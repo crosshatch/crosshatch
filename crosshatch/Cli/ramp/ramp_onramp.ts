@@ -1,19 +1,19 @@
 import { Console, Effect, Schema as S } from "effect"
 import { Command, Flag } from "effect/unstable/cli"
 
-import { ChainId } from "../../ChainId.ts"
 import { Eip155Address } from "../../Eip155/Eip155.ts"
 import * as HostMnemonic from "../../Host/HostMnemonic.ts"
 import * as Mnemonic from "../../Mnemonic.ts"
 import { CaAccountId } from "../../Ramp/CaAccountId.ts"
 import * as Ramp from "../../Ramp/onramp.ts"
 import { Providers } from "../../Ramp/RampApi.ts"
+import { Reference } from "../../Reference.ts"
 
 export const onramp = Command.make("onramp", {
   mnemonic: Flag.string("mnemonic").pipe(Flag.withDefault(undefined), Flag.withDescription("Stored mnemonic name")),
   chain: Flag.string("chain").pipe(
     Flag.withDefault(undefined),
-    Flag.withDescription("CAIP-2 chain ID used with a stored mnemonic"),
+    Flag.withDescription("EIP-155 chain reference (e.g., 8453 for Base)"),
   ),
   amount: Flag.integer("amount").pipe(Flag.withDescription("Positive integer fiat amount")),
   provider: Flag.choice("provider", Providers).pipe(Flag.withDefault("Coinbase")),
@@ -22,10 +22,8 @@ export const onramp = Command.make("onramp", {
   Command.withHandler(
     Effect.fn(
       function* ({ amount, chain, provider }) {
-        const chainId =
-          chain === undefined
-            ? ChainId.make("eip155:8453", { disableChecks: true })
-            : yield* S.decodeUnknownEffect(ChainId)(chain)
+        const chainRef = chain === undefined ? Reference.make("8453") : yield* S.decodeUnknownEffect(Reference)(chain)
+        const chainId = `eip155:${chainRef}`
         const mnemonic = yield* Mnemonic.Mnemonic
         const address = yield* Eip155Address.fromMnemonic(mnemonic)
         const accountId = yield* S.decodeUnknownEffect(CaAccountId)(`${chainId}:${address}`)

@@ -6,6 +6,6 @@ import { Config, Layer } from "effect"
 export const PayerLive = Payer.layerLocal({
   accept: Accept.first(Known),
   schemes: UnifiedSchemes.layer({
-    solana: { rpc: Config.string("SOLANA_RPC_URL") },
+    solana: { rpc: Config.string("SOLANA_RPC_URL").pipe(Config.withDefault(undefined)) },
   }).pipe(Layer.provide(HostMnemonic.layer())),
 })
