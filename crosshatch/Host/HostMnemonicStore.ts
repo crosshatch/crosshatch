@@ -67,10 +67,7 @@ export const layer = Layer.effect(
           .pipe(Effect.tapError(() => Keychain.remove(name)))
         return entry
       },
-      Effect.catchIf(
-        (v) => v._tag !== "NameAlreadyTakenError",
-        (cause) => new MnemonicAddError({ cause }),
-      ),
+      Effect.mapError((cause) => new MnemonicAddError({ cause })),
     )
 
     const get = Effect.fnUntraced(
@@ -81,10 +78,7 @@ export const layer = Layer.effect(
         const encoded = yield* X25519PrivateKey.decrypt(privateKey, envelope)
         return yield* S.decodeUnknownEffect(Mnemonic.Mnemonic)(Redacted.make(new TextDecoder().decode(encoded)))
       },
-      Effect.catchIf(
-        (v) => v._tag !== "MnemonicNotFoundError",
-        (cause) => new MnemonicGetError({ cause }),
-      ),
+      Effect.mapError((cause) => new MnemonicGetError({ cause })),
     )
 
     const describe = Effect.fnUntraced(
@@ -99,10 +93,7 @@ export const layer = Layer.effect(
           },
         }))
       },
-      Effect.catchIf(
-        (v) => v._tag !== "MnemonicNotFoundError",
-        (cause) => new MnemonicDescribeError({ cause }),
-      ),
+      Effect.mapError((cause) => new MnemonicDescribeError({ cause })),
     )
 
     const remove = Effect.fnUntraced(
@@ -114,10 +105,7 @@ export const layer = Layer.effect(
         })
         yield* Keychain.remove(name)
       },
-      Effect.catchIf(
-        (v) => v._tag !== "MnemonicNotFoundError",
-        (cause) => new MnemonicRemoveError({ cause }),
-      ),
+      Effect.mapError((cause) => new MnemonicRemoveError({ cause })),
     )
 
     const rename = Effect.fnUntraced(
@@ -135,10 +123,7 @@ export const layer = Layer.effect(
         })
         yield* Keychain.remove(to)
       },
-      Effect.catchIf(
-        (v) => v._tag !== "MnemonicNotFoundError",
-        (cause) => new MnemonicRenameError({ cause }),
-      ),
+      Effect.mapError((cause) => new MnemonicRenameError({ cause })),
     )
 
     return { add, get, list, describe, remove, rename }

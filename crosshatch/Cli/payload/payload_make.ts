@@ -21,14 +21,13 @@ export const payloadMake = Command.make("make", {
   Command.withHandler(
     Effect.fn(
       function* ({ required, stdin }) {
-        const input = yield* Input.read(required, stdin, "required")
-        const decoded = yield* S.decodeEffect(S.fromJsonString(S.toCodecJson(Required.Required)))(input).pipe(
-          Effect.mapError((cause) => new Input.InvalidError({ name: "required", cause })),
-        )
         const payer = yield* Payer.Payer
-        const { payload } = yield* payer.createPayload({ required: decoded })
-        const json = yield* S.encodeEffect(S.fromJsonString(S.toCodecJson(Payload.Payload)))(payload)
-        yield* Console.log(json)
+        yield* Input.read(required, stdin, "required").pipe(
+          Effect.flatMap(S.decodeEffect(Required.RequiredJsonString)),
+          Effect.flatMap((required) => payer.createPayload({ required })),
+          Effect.flatMap(({ payload }) => S.encodeEffect(Payload.PayloadJson)(payload)),
+          Effect.andThen(Console.log),
+        )
       },
       (effect, { mnemonic }) =>
         Effect.provide(

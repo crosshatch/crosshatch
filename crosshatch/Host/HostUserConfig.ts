@@ -20,10 +20,9 @@ export const layer = Layer.effect(
 
     const get = fs.readFileString(configPath).pipe(
       Effect.flatMap(S.decodeUnknownEffect(UserConfigJsonString)),
-      Effect.catchIf(
-        (error) => error._tag === "PlatformError" && error.reason._tag === "NotFound",
-        () => Effect.succeed(undefined),
-      ),
+      Effect.catchReasons("PlatformError", {
+        NotFound: () => Effect.undefined,
+      }),
       Effect.mapError((cause) => new GetUserConfigError({ cause })),
     )
 

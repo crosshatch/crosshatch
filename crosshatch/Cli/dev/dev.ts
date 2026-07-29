@@ -2,10 +2,11 @@ import { Config, Effect, flow, Option, Schema, Struct } from "effect"
 import { Command, Flag } from "effect/unstable/cli"
 
 import * as Dev from "../../Dev/Dev.ts"
+import { orUndefined } from "../CliUtil.ts"
 
 export const dev = Command.make("dev", {
-  hostname: Flag.string("hostname").pipe(Flag.optional, Flag.map(Option.getOrUndefined)),
-  port: Flag.integer("port").pipe(Flag.withSchema(Config.Port), Flag.optional, Flag.map(Option.getOrUndefined)),
+  hostname: Flag.string("hostname").pipe(orUndefined),
+  port: Flag.integer("port").pipe(Flag.withSchema(Config.Port), orUndefined),
   otelEndpoint: Flag.string("otel-endpoint").pipe(
     Flag.withSchema(Schema.URLFromString),
     Flag.optional,

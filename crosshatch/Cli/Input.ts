@@ -1,26 +1,18 @@
 import { Data, Effect, Option, Stdio, Stream, String } from "effect"
 
-import * as PrintableError from "../PrintableError.ts"
+export class ConflictingSourcesError extends Data.TaggedError("ConflictingInputSourcesError")<{
+  readonly name: string
+}> {
+  override get message() {
+    return `The ${this.name} argument cannot be combined with --stdin.`
+  }
+}
 
-export class StdinReadError extends PrintableError.make(
-  Data.TaggedError("StdinReadError")<{ readonly cause: unknown }>,
-  ({ cause }) => `Could not read standard input: ${globalThis.String(cause)}`,
-) {}
-
-export class ConflictingSourcesError extends PrintableError.make(
-  Data.TaggedError("ConflictingInputSourcesError")<{ readonly name: string }>,
-  ({ name }) => `The ${name} argument cannot be combined with --stdin.`,
-) {}
-
-export class MissingError extends PrintableError.make(
-  Data.TaggedError("MissingInputError")<{ readonly name: string }>,
-  ({ name }) => `The ${name} argument or --stdin is required.`,
-) {}
-
-export class InvalidError extends PrintableError.make(
-  Data.TaggedError("InvalidInputError")<{ readonly name: string; readonly cause: unknown }>,
-  ({ name, cause }) => `Invalid ${name}: ${globalThis.String(cause)}`,
-) {}
+export class MissingError extends Data.TaggedError("MissingInputError")<{ readonly name: string }> {
+  override get message() {
+    return `The ${this.name} argument or --stdin is required.`
+  }
+}
 
 export const stdin = Effect.gen(function* () {
   const stdio = yield* Stdio.Stdio
@@ -31,7 +23,6 @@ export const stdin = Effect.gen(function* () {
       (all, chunk) => all + chunk,
     ),
     Effect.map(String.trim),
-    Effect.mapError((cause) => new StdinReadError({ cause })),
   )
 })
 

@@ -1,4 +1,4 @@
-import { Console, Effect, Option, Schema as S } from "effect"
+import { Console, Effect, Schema as S } from "effect"
 import { Command, Flag } from "effect/unstable/cli"
 
 import { ChainId } from "../../ChainId.ts"
@@ -8,18 +8,11 @@ import * as Mnemonic from "../../Mnemonic.ts"
 import { CaAccountId } from "../../Ramp/CaAccountId.ts"
 import * as Ramp from "../../Ramp/onramp.ts"
 import { Providers } from "../../Ramp/RampApi.ts"
+import { orUndefined } from "../CliUtil.ts"
 
 export const onramp = Command.make("onramp", {
-  mnemonic: Flag.string("mnemonic").pipe(
-    Flag.withDescription("Stored mnemonic name"),
-    Flag.optional,
-    Flag.map(Option.getOrUndefined),
-  ),
-  chain: Flag.string("chain").pipe(
-    Flag.withDescription("CAIP-2 chain ID used with a stored mnemonic"),
-    Flag.optional,
-    Flag.map(Option.getOrUndefined),
-  ),
+  mnemonic: Flag.string("mnemonic").pipe(orUndefined, Flag.withDescription("Stored mnemonic name")),
+  chain: Flag.string("chain").pipe(orUndefined, Flag.withDescription("CAIP-2 chain ID used with a stored mnemonic")),
   amount: Flag.integer("amount").pipe(Flag.withDescription("Positive integer fiat amount")),
   provider: Flag.choice("provider", Providers).pipe(Flag.withDefault("Coinbase")),
 }).pipe(

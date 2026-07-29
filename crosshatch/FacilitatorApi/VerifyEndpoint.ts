@@ -28,6 +28,8 @@ export const VerifyResponse = S.Union([
     }),
   ),
 )
+export const VerifyResponseJson = S.toCodecJson(VerifyResponse)
+export const VerifyResponseJsonString = S.fromJsonString(VerifyResponseJson)
 
 export const VerifyEndpoint = HttpApiEndpoint.post("verify", "/verify", {
   payload: VerifyPayload,
