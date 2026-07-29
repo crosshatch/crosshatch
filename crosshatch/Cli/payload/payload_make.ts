@@ -2,7 +2,7 @@ import { Console, Effect, Layer, Schema as S } from "effect"
 import { Argument, Command, Flag } from "effect/unstable/cli"
 
 import * as Accept from "../../Accept.ts"
-import { DefaultScheme } from "../../Defaults/Defaults.ts"
+import { DefaultSchemes } from "../../Defaults/Defaults.ts"
 import * as HostMnemonic from "../../Host/HostMnemonic.ts"
 import * as Known from "../../Known/Known.ts"
 import * as Payer from "../../Payer.ts"
@@ -35,7 +35,7 @@ export const payloadMake = Command.make("make", {
           effect,
           Payer.layerLocal({
             accept: Accept.first(Known),
-            schemes: DefaultScheme.layer,
+            schemes: DefaultSchemes.layer,
           }).pipe(Layer.provide(HostMnemonic.layer(mnemonic))),
         ),
     ),

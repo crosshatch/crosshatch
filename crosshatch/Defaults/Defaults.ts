@@ -1,1 +1,1 @@
-export * as DefaultScheme from "./DefaultScheme.ts"
+export * as DefaultSchemes from "./DefaultSchemes.ts"
