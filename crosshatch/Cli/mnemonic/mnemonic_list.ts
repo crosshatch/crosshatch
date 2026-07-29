@@ -10,9 +10,9 @@ export const mnemonicList = Command.make("list").pipe(
       const mnemonics = yield* MnemonicStore.list
       yield* Console.log(
         JSON.stringify(
-          Object.entries(mnemonics).map(([name, { address, dateAdded, description }]) => ({
+          Object.entries(mnemonics).map(([name, { addresses, dateAdded, description }]) => ({
             name,
-            address,
+            addresses,
             ...(dateAdded && { dateAdded: dateAdded.toISOString() }),
             ...(description && { description }),
           })),

@@ -8,6 +8,6 @@
     { "path": "./examples" },
     { "path": "./konfik" },
     { "path": "./scratchpad" },
-    { "path": "./tools" }
+    { "path": "./tasks" }
   ]
 }

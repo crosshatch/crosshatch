@@ -22,34 +22,32 @@
     ".": "./index.ts",
     "./*": "./*.ts",
     "./Browser": "./Browser/Browser.ts",
-    "./Host": "./Host/Host.ts",
     "./Crypto": "./Crypto/Crypto.ts",
-    "./Defaults": "./Defaults/Defaults.ts",
-    "./Derivations": "./Derivations.ts",
     "./Eip155": "./Eip155/Eip155.ts",
     "./Extensions": "./Extensions/Extensions.ts",
     "./Facade": "./Browser/Facade/Facade.ts",
     "./FacilitatorApi": "./FacilitatorApi/FacilitatorApi.ts",
+    "./Host": "./Host/Host.ts",
+    "./package.json": "./package.json",
     "./Ramp": "./Ramp/Ramp.ts",
     "./Solana": "./Solana/Solana.ts",
-    "./package.json": "./package.json"
+    "./Unified": "./Unified/Unified.ts"
   },
   "publishConfig": {
     "exports": {
       ".": "./dist/index.js",
       "./*": "./dist/*.js",
       "./Browser": "./dist/Browser/Browser.js",
-      "./Host": "./dist/Host/Host.js",
       "./Crypto": "./dist/Crypto/Crypto.js",
-      "./Defaults": "./dist/Defaults/Defaults.js",
-      "./Derivations": "./dist/Derivations.js",
       "./Eip155": "./dist/Eip155/Eip155.js",
       "./Extensions": "./dist/Extensions/Extensions.js",
       "./Facade": "./dist/Browser/Facade/Facade.js",
       "./FacilitatorApi": "./dist/FacilitatorApi/FacilitatorApi.js",
+      "./Host": "./dist/Host/Host.js",
+      "./package.json": "./package.json",
       "./Ramp": "./dist/Ramp/Ramp.js",
       "./Solana": "./dist/Solana/Solana.js",
-      "./package.json": "./package.json"
+      "./Unified": "./dist/Unified/Unified.js"
     }
   },
   "scripts": {

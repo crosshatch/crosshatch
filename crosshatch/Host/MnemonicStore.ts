@@ -3,9 +3,9 @@ import { Data, Effect, Redacted, Schema as S } from "effect"
 import * as X25519Pair from "../Crypto/X25519Pair.ts"
 import * as X25519PrivateKey from "../Crypto/X25519PrivateKey.ts"
 import * as X25519PublicKey from "../Crypto/X25519PublicKey.ts"
-import * as Eip155Address from "../Eip155/Eip155Address.ts"
 import * as Mnemonic from "../Mnemonic.ts"
 import * as PrintableError from "../PrintableError.ts"
+import * as DerivedAddresses from "../Unified/DerivedAddresses.ts"
 import * as UserConfig from "../UserConfig.ts"
 import * as Keychain from "./Keychain.ts"
 
@@ -54,7 +54,7 @@ export const add = Effect.fn(function* ({
   yield* Keychain.set(name, secret)
   const envelope = yield* X25519PublicKey.encrypt(publicKey, new TextEncoder().encode(Redacted.value(mnemonic)))
   const entry = {
-    address: Eip155Address.fromMnemonic(mnemonic),
+    addresses: yield* DerivedAddresses.fromMnemonic(mnemonic),
     mnemonic: envelope,
     dateAdded: new Date(),
     ...(description && { description }),

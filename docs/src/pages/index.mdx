@@ -244,13 +244,13 @@ LanguageModel.generateText({
 
 ```ts
 import { Accept, Known, Payer } from "crosshatch"
-import { DefaultScheme } from "crosshatch/Defaults"
+import { UnifiedSchemes } from "crosshatch/Unified"
 import { HostMnemonic } from "crosshatch/Host"
 import { Layer } from "effect"
 
 export const PayerLive = Payer.layerLocal({
   accept: Accept.first(Known),
-  schemes: DefaultScheme.layer,
+  schemes: UnifiedSchemes.layer,
 }).pipe(Layer.provide(HostMnemonic.layer()))
 ```
 

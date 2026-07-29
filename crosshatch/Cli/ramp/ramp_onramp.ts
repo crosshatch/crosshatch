@@ -2,7 +2,7 @@ import { Console, Effect, Option, Schema as S } from "effect"
 import { Command, Flag } from "effect/unstable/cli"
 
 import { ChainId } from "../../ChainId.ts"
-import { fromMnemonic } from "../../Eip155/Eip155Address.ts"
+import { Eip155Address } from "../../Eip155/Eip155.ts"
 import * as HostMnemonic from "../../Host/HostMnemonic.ts"
 import * as Mnemonic from "../../Mnemonic.ts"
 import { CaAccountId } from "../../Ramp/CaAccountId.ts"
@@ -32,7 +32,7 @@ export const onramp = Command.make("onramp", {
             ? ChainId.make("eip155:8453", { disableChecks: true })
             : yield* S.decodeUnknownEffect(ChainId)(chain)
         const mnemonic = yield* Mnemonic.Mnemonic
-        const address = fromMnemonic(mnemonic)
+        const address = yield* Eip155Address.fromMnemonic(mnemonic)
         const accountId = yield* S.decodeUnknownEffect(CaAccountId)(`${chainId}:${address}`)
         const { onrampUrl } = yield* Ramp.onramp({ amount, provider, recipient: accountId })
         yield* Console.log(onrampUrl)

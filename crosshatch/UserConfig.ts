@@ -3,15 +3,15 @@ import Path from "node:path"
 
 import { Effect, FileSystem, Schema as S } from "effect"
 
-import { Address } from "./Address.ts"
 import { Asymmetric } from "./Crypto/Envelope.ts"
+import * as DerivedAddresses from "./Unified/DerivedAddresses.ts"
 
 export type UserConfig = typeof UserConfig.Type
 export const UserConfig = S.Struct({
   mnemonics: S.Record(
     S.String,
     S.Struct({
-      address: Address,
+      addresses: DerivedAddresses.DerivedAddresses,
       mnemonic: Asymmetric,
       dateAdded: S.optionalKey(S.DateFromString),
       description: S.optionalKey(S.String),

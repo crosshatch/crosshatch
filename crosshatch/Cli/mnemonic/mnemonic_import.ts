@@ -1,9 +1,9 @@
 import { Effect, Console, Redacted, Option } from "effect"
 import { Command, Argument, Flag, Prompt } from "effect/unstable/cli"
 
-import * as Derivations from "../../Derivations.ts"
 import * as MnemonicStore from "../../Host/MnemonicStore.ts"
 import * as Mnemonic from "../../Mnemonic.ts"
+import * as DerivedAddresses from "../../Unified/DerivedAddresses.ts"
 import * as Input from "./../Input.ts"
 
 export const mnemonicImport = Command.make("import", {
@@ -20,7 +20,7 @@ export const mnemonicImport = Command.make("import", {
             Effect.map((mnemonic) => Mnemonic.fromText(Redacted.value(mnemonic))),
           )
       yield* MnemonicStore.add({ name, mnemonic, description })
-      const addresses = yield* Derivations.make(mnemonic)
+      const addresses = yield* DerivedAddresses.fromMnemonic(mnemonic)
       yield* Console.log(JSON.stringify({ name, addresses }))
     }),
   ),

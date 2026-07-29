@@ -15,17 +15,17 @@ For a payer with Crosshatch's known assets and default schemes, compose
 
 ```ts
 import { Accept, Known, Payer } from "crosshatch"
-import { DefaultScheme } from "crosshatch/Defaults"
+import { UnifiedSchemes } from "crosshatch/Unified"
 import { HostMnemonic } from "crosshatch/Host"
 import { Layer } from "effect"
 
 const PayerLive = Payer.layerLocal({
   accept: Accept.first(Known),
-  schemes: DefaultScheme.layer,
+  schemes: UnifiedSchemes.layer,
 }).pipe(Layer.provide(HostMnemonic.layer("default")))
 ```
 
-`DefaultScheme.layer` includes EIP-3009, Permit2, Solana, and mnemonic-backed
+`UnifiedSchemes.layer` includes EIP-3009, Permit2, Solana, and mnemonic-backed
 EIP-155 and Solana signers. Solana signing requires `SOLANA_RPC_URL` so it can
 obtain a recent blockhash. `HostMnemonic.layer()` reads the `default` entry from
 the CLI mnemonic store; pass a name to select another entry.

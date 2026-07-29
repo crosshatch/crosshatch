@@ -71,7 +71,7 @@ crosshatch payload make --mnemonic personal "$PAYMENT_REQUIRED_JSON"
 The positional JSON argument and `--stdin` are mutually exclusive. The CLI does
 not infer piped input when `--stdin` is omitted. `--mnemonic` selects a stored
 mnemonic and defaults to `default`. The command selects from `Known` with
-`Accept.first`, uses `DefaultScheme.layer`, emits Payment Payload JSON to
+`Accept.first`, uses `UnifiedSchemes.layer`, emits Payment Payload JSON to
 stdout, and reads `SOLANA_RPC_URL` for Solana support.
 
 ## Checking A Payload
