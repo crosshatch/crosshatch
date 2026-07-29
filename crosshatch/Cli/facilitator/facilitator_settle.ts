@@ -8,7 +8,7 @@ import * as PrintableError from "../../PrintableError.ts"
 import * as Input from "../Input.ts"
 
 export class StdinConfirmationRequiredError extends PrintableError.make(
-  Data.TaggedError("StdinConfirmationRequiredError")<{}>,
+  Data.TaggedError("StdinConfirmationRequiredError"),
   () => "The --stdin flag must be combined with --yes when settling a payment.",
 ) {}
 

@@ -16,9 +16,9 @@ export const Required = S.Struct({
   extensions: JsonRecord.pipe(S.optional),
 })
 
-export const RequiredFromBase64JsonString = S.StringFromBase64.pipe(
-  S.decodeTo(S.fromJsonString(S.toCodecJson(Required))),
-)
+export const RequiredJson = S.toCodecJson(Required)
+export const RequiredJsonString = S.fromJsonString(RequiredJson)
+export const RequiredFromBase64JsonString = S.StringFromBase64.pipe(S.decodeTo(RequiredJsonString))
 
 export class RequiredUrl extends Context.Reference<string | undefined>("crosshatch/RequiredUrl", {
   defaultValue: () => undefined,

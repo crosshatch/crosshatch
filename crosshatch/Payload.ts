@@ -24,7 +24,9 @@ export const Payload = Object.assign(Context.Service<Payload, Payload | undefine
 export type Acceptable = typeof Acceptable.Type
 export const Acceptable = Payload.pipe(S.brand("crosshatch/Acceptable"))
 
-export const PayloadFromBase64JsonString = S.StringFromBase64.pipe(S.decodeTo(S.fromJsonString(S.toCodecJson(Payload))))
+export const PayloadJson = S.toCodecJson(Payload)
+export const PayloadJsonString = S.fromJsonString(PayloadJson)
+export const PayloadFromBase64JsonString = S.StringFromBase64.pipe(S.decodeTo(PayloadJsonString))
 
 export const make = ({ required }: { readonly required: Required }) =>
   Effect.flatMap(Payer, ({ createPayload }) => createPayload({ required }))

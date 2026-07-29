@@ -1,7 +1,7 @@
 import { Console, Effect } from "effect"
 import { Argument, Command, Flag, Prompt } from "effect/unstable/cli"
 
-import * as MnemonicStore from "../../Host/MnemonicStore.ts"
+import { MnemonicStore } from "../../MnemonicStore.ts"
 
 export const mnemonicRemove = Command.make("remove", {
   name: Argument.string("name").pipe(Argument.withDefault("default")),
@@ -14,7 +14,8 @@ export const mnemonicRemove = Command.make("remove", {
         yield* Console.log("Operation cancelled.")
         return
       }
-      yield* MnemonicStore.remove(name)
+      const store = yield* MnemonicStore
+      yield* store.remove(name)
     }),
   ),
 )

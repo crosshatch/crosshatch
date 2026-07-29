@@ -1,13 +1,14 @@
 import { Console, Effect } from "effect"
 import { Command } from "effect/unstable/cli"
 
-import * as MnemonicStore from "../../Host/MnemonicStore.ts"
+import { MnemonicStore } from "../../MnemonicStore.ts"
 
 export const mnemonicList = Command.make("list").pipe(
   Command.withDescription("List stored mnemonics"),
   Command.withHandler(
     Effect.fn(function* () {
-      const mnemonics = yield* MnemonicStore.list
+      const store = yield* MnemonicStore
+      const mnemonics = yield* store.list
       yield* Console.log(
         JSON.stringify(
           Object.entries(mnemonics).map(([name, { addresses, dateAdded, description }]) => ({

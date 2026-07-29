@@ -1,7 +1,7 @@
 import { Console, Effect } from "effect"
 import { Argument, Command, Flag, Prompt } from "effect/unstable/cli"
 
-import * as MnemonicStore from "../../Host/MnemonicStore.ts"
+import { MnemonicStore } from "../../MnemonicStore.ts"
 
 export const mnemonicRename = Command.make("rename", {
   name: Argument.string("name"),
@@ -15,7 +15,8 @@ export const mnemonicRename = Command.make("rename", {
         yield* Console.log("Operation cancelled.")
         return
       }
-      yield* MnemonicStore.rename(name, newName)
+      const store = yield* MnemonicStore
+      yield* store.rename(name, newName)
     }),
   ),
 )

@@ -1,8 +1,8 @@
 import { Effect, Console, Option } from "effect"
 import { Command, Argument, Flag } from "effect/unstable/cli"
 
-import * as MnemonicStore from "../../Host/MnemonicStore.ts"
 import * as Mnemonic from "../../Mnemonic.ts"
+import { MnemonicStore } from "../../MnemonicStore.ts"
 import * as DerivedAddresses from "../../Unified/DerivedAddresses.ts"
 
 export const mnemonicAdd = Command.make("add", {
@@ -13,7 +13,8 @@ export const mnemonicAdd = Command.make("add", {
   Command.withHandler(
     Effect.fn(function* ({ name, description }) {
       const mnemonic = yield* Mnemonic.random
-      yield* MnemonicStore.add({ name, mnemonic, description })
+      const store = yield* MnemonicStore
+      yield* store.add({ name, mnemonic, description })
       const addresses = yield* DerivedAddresses.fromMnemonic(mnemonic)
       yield* Console.log(JSON.stringify({ name, addresses }))
     }),

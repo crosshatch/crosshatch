@@ -4,6 +4,8 @@ import { NodeRuntime, NodeServices, NodeHttpClient } from "@effect/platform-node
 import { Console, Effect, Layer } from "effect"
 import { Command } from "effect/unstable/cli"
 
+import * as HostMnemonicStore from "../Host/HostMnemonicStore.ts"
+import * as HostUserConfig from "../Host/HostUserConfig.ts"
 import PackageJson from "../package.json" with { type: "json" }
 import * as PrintableError from "../PrintableError.ts"
 import { RampClient } from "../Ramp/Ramp.ts"
@@ -18,6 +20,10 @@ Command.make("crosshatch").pipe(
   Command.run({ version: PackageJson.version }),
   Effect.catchIf(PrintableError.is, (cause) => Console.error(cause.message).pipe(Effect.andThen(Effect.fail(cause)))),
   Effect.scoped,
-  Effect.provide([RampClient.layer.pipe(Layer.provideMerge(NodeHttpClient.layerFetch)), NodeServices.layer]),
+  Effect.provide([
+    RampClient.layer.pipe(Layer.provideMerge(NodeHttpClient.layerFetch)),
+    HostMnemonicStore.layer.pipe(Layer.provide(HostUserConfig.layer)),
+  ]),
+  Effect.provide(NodeServices.layer),
   NodeRuntime.runMain,
 )
