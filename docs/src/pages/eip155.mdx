@@ -91,6 +91,6 @@ Use this scheme for physical assets that settle through the exact Permit2 proxy.
 
 ## Payer Composition
 
-Most EIP-155 clients provide both schemes and use `Accept.firstKnown` to choose
-the one matching the selected asset deployment. See [Payer Service](/payer) for
-`Payer.layerLocal` and the preassembled `DefaultPayer.layer`.
+Most EIP-155 clients provide both schemes and use `Accept.first` to choose the
+one matching the selected asset deployment. See [Payer Service](/payer) for
+`Payer.layerLocal` and `DefaultScheme.layer` composition.

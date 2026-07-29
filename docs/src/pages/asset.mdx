@@ -7,9 +7,9 @@ description:
 
 # Assets
 
-Crosshatch uses three related asset concepts: `Asset`, `PhysicalAsset`, and
-`Denomination`. A logical asset is represented by an `Asset.LogicalAsset`
-lookup.
+Crosshatch uses four related asset concepts: `Asset`, `PhysicalAsset`,
+`Denomination`, and `Denominations`. A logical asset is represented by an
+`Asset.LogicalAsset` lookup.
 
 ## `Asset`
 
@@ -59,6 +59,18 @@ bridged USDC.e, and other USD-like assets, each represented by its own
 import { Known, type Asset } from "crosshatch"
 
 const usd: Asset.Denomination = Known.USD
+```
+
+## `Denominations`
+
+`Denominations` groups denominations by their identifier. Selection policies
+such as `Accept.first` receive this shape so they can search across units of
+account.
+
+```ts
+import { Known, type Asset } from "crosshatch"
+
+const denominations: Asset.Denominations = Known
 ```
 
 ## Why "Physical?"

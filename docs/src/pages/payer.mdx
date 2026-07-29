@@ -10,27 +10,27 @@ description:
 `Payer` is the service that turns a `Required` value into a signed x402
 `Payload`.
 
-For the built-in payer, provide a stored mnemonic from the host and use
-`DefaultPayer.layer`:
+For a payer with Crosshatch's known assets and default schemes, compose
+`Payer.layerLocal` with a stored mnemonic from the host:
 
 ```ts
-import { NodeServices } from "@effect/platform-node"
-import * as DefaultPayer from "crosshatch/DefaultPayer"
+import { Accept, Known, Payer } from "crosshatch"
+import { DefaultScheme } from "crosshatch/Defaults"
 import { HostMnemonic } from "crosshatch/Host"
 import { Layer } from "effect"
 
-const PayerLive = DefaultPayer.layer.pipe(
-  Layer.provide(
-    HostMnemonic.layer("default").pipe(Layer.provide(NodeServices.layer)),
-  ),
-)
+const PayerLive = Payer.layerLocal({
+  accept: Accept.first(Known),
+  schemes: DefaultScheme.layer,
+}).pipe(Layer.provide(HostMnemonic.layer("default")))
 ```
 
-`DefaultPayer.layer` includes `Known.USD`, `Accept.firstKnown`, EIP-3009,
-Permit2, Solana, and mnemonic-backed EIP-155 and Solana signers. Solana signing
-requires `SOLANA_RPC_URL` so it can obtain a recent blockhash.
+`DefaultScheme.layer` includes EIP-3009, Permit2, Solana, and mnemonic-backed
+EIP-155 and Solana signers. Solana signing requires `SOLANA_RPC_URL` so it can
+obtain a recent blockhash. `HostMnemonic.layer()` reads the `default` entry from
+the CLI mnemonic store; pass a name to select another entry.
 
-Use `Payer.layerLocal` when you need to customize the accepted assets, selection
+Use `Payer.layerLocal` when you need to customize the denominations, selection
 policy, or schemes:
 
 ```ts
@@ -44,8 +44,7 @@ const SchemesLive = Layer.mergeAll(
 ).pipe(Layer.provide(Eip155Signer.layerMnemonic))
 
 const PayerLive = Payer.layerLocal({
-  assets: Known.USD,
-  accept: Accept.firstKnown,
+  accept: Accept.first({ USD: Known.USD }),
   schemes: SchemesLive,
 })
 ```
@@ -59,17 +58,18 @@ Given a `Required` invoice, it chooses one compatible entry from
 `required.accepts`, finds the matching physical asset, and returns the scheme
 effect that can create the chain-specific payment payload.
 
-`Accept.firstKnown` is the built-in policy. It searches the configured assets,
-the invoice's accepted options, and each physical asset's schemes in order,
-returning the first usable combination. `Known.USD` is the built-in USD
-denomination.
+`Accept.first(denominations)` creates the built-in first-match policy. It
+searches the configured denominations, the invoice's accepted options, and each
+physical asset's schemes in order, returning the first usable combination.
+`Known` contains the built-in denominations; pass all of it or select a subset
+such as `{ USD: Known.USD }`.
 
 `Accept` compares the invoice's accepted payment options against the configured
-denomination. A payment option is usable when its network and asset match a
+denominations. A payment option is usable when its network and asset match a
 configured physical asset, and one of that asset's schemes is available in the
 current Effect context.
 
-Most applications pass `Accept.firstKnown` to `Payer.layerLocal`, then call
+Most applications pass `Accept.first(Known)` to `Payer.layerLocal`, then call
 `Payer.createPayload`. A custom `Accept.Accept` function can implement a
 different selection policy.
 

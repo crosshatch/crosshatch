@@ -243,14 +243,15 @@ LanguageModel.generateText({
     <div className="crosshatch-code-block">
 
 ```ts
-import { NodeServices } from "@effect/platform-node"
-import * as DefaultPayer from "crosshatch/DefaultPayer"
+import { Accept, Known, Payer } from "crosshatch"
+import { DefaultScheme } from "crosshatch/Defaults"
 import { HostMnemonic } from "crosshatch/Host"
 import { Layer } from "effect"
 
-export const PayerLive = DefaultPayer.layer.pipe(
-  Layer.provide(HostMnemonic.layer().pipe(Layer.provide(NodeServices.layer))),
-)
+export const PayerLive = Payer.layerLocal({
+  accept: Accept.first(Known),
+  schemes: DefaultScheme.layer,
+}).pipe(Layer.provide(HostMnemonic.layer()))
 ```
 
     </div>

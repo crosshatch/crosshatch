@@ -17,10 +17,10 @@ authorization, or a Solana transaction.
 
 ## How Schemes Are Selected
 
-The configured `Accept.Accept` policy selects schemes from the payer's assets.
+The configured `Accept.Accept` policy selects schemes from its denominations.
 
 Each `PhysicalAsset` lists the scheme tags it supports. During payment creation,
-`Accept.firstKnown` looks for a `required.accepts` entry whose network and asset
+`Accept.first` looks for a `required.accepts` entry whose network and asset
 match a configured physical asset, then uses the first listed scheme that is
 available in the current Effect context.
 
