@@ -1,6 +1,7 @@
 import { Schema as S } from "effect"
 import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "effect/unstable/httpapi"
 
+import { Amount } from "../Amount.ts"
 import { CaAccountId } from "./CaAccountId.ts"
 
 export const Providers = ["ApplePay", "Stripe", "Coinbase"] as const
@@ -12,7 +13,7 @@ export class RampApiGroup extends HttpApiGroup.make("ramp")
     HttpApiEndpoint.post("onramp", "/onramp", {
       payload: S.Struct({
         provider: Provider,
-        amount: S.Int.check(S.isGreaterThan(0)),
+        amount: Amount,
         recipient: CaAccountId,
       }),
       success: S.Struct({

@@ -42,7 +42,7 @@ export class SolanaScheme extends Scheme.Service<SolanaScheme, typeof Known.Type
 
 export const layer = SolanaScheme.layer(
   { known: Known, extra: Extra },
-  ({ known: { tokenProgramId }, extra: { feePayer, memo } }) =>
+  ({ known: { tokenProgramId }, extra: { memo } }) =>
     Effect.fnUntraced(
       function* ({ physical, accepted }) {
         const signer = yield* SolanaSigner
@@ -65,7 +65,7 @@ export const layer = SolanaScheme.layer(
 
         const message = solanaPipe(
           createTransactionMessage({ version: 0 }),
-          (v) => setTransactionMessageFeePayer(address(feePayer), v),
+          (v) => setTransactionMessageFeePayer(signer.address, v),
           (v) => setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, v),
           (v) =>
             appendTransactionMessageInstructions(

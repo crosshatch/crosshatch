@@ -1,7 +1,9 @@
 import { BigDecimal, Data, Effect, Option, Schema as S, SchemaGetter } from "effect"
 
+export type Atomic = typeof Atomic.Type
 export const Atomic = S.String.check(S.isPattern(/^(?:0|[1-9]\d*)$/u)).pipe(S.brand("crosshatch/Atomic"))
 
+export type Amount = typeof Amount.Type
 export const Amount = S.BigDecimal.check(S.isGreaterThanOrEqualToBigDecimal(BigDecimal.fromBigInt(0n))).pipe(
   S.brand("crosshatch/Amount"),
 )

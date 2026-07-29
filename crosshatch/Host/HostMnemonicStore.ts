@@ -1,4 +1,4 @@
-import { Effect, Layer, Redacted, Schema as S } from "effect"
+import { Effect, Exit, Layer, Redacted, Schema as S } from "effect"
 
 import * as X25519Pair from "../Crypto/X25519Pair.ts"
 import * as X25519PrivateKey from "../Crypto/X25519PrivateKey.ts"
@@ -51,7 +51,6 @@ export const layer = Layer.effect(
         }
         const { privateKey, publicKey } = yield* X25519Pair.random({ extractable: true })
         const secret = yield* X25519PrivateKey.toPkcs8(privateKey)
-        yield* Keychain.set(name, secret)
         const envelope = yield* X25519PublicKey.encrypt(publicKey, new TextEncoder().encode(Redacted.value(mnemonic)))
         const entry = {
           addresses: yield* DerivedAddresses.fromMnemonic(mnemonic),
@@ -59,12 +58,15 @@ export const layer = Layer.effect(
           dateAdded: new Date(),
           ...(description && { description }),
         }
-        yield* config
-          .update((current) => ({
-            ...current,
-            mnemonics: { ...current.mnemonics, [name]: entry },
-          }))
-          .pipe(Effect.tapError(() => Keychain.remove(name)))
+        yield* Effect.acquireUseRelease(
+          Keychain.set(name, secret),
+          () =>
+            config.update((current) => ({
+              ...current,
+              mnemonics: { ...current.mnemonics, [name]: entry },
+            })),
+          (_, exit) => (Exit.isFailure(exit) ? Keychain.remove(name) : Effect.void),
+        )
         return entry
       },
       Effect.mapError((cause) => new MnemonicAddError({ cause })),
@@ -99,11 +101,14 @@ export const layer = Layer.effect(
     const remove = Effect.fnUntraced(
       function* (name: string) {
         yield* getEntry(name)
-        yield* config.update((config) => {
-          const { [name]: _removed, ...mnemonics } = config.mnemonics
-          return { ...config, mnemonics }
-        })
-        yield* Keychain.remove(name)
+        yield* Keychain.remove(name).pipe(
+          Effect.andThen(
+            config.update((config) => {
+              const { [name]: _removed, ...mnemonics } = config.mnemonics
+              return { ...config, mnemonics }
+            }),
+          ),
+        )
       },
       Effect.mapError((cause) => new MnemonicRemoveError({ cause })),
     )

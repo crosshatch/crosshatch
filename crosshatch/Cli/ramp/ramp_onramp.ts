@@ -1,12 +1,13 @@
-import { Console, Effect, Schema as S } from "effect"
+import { Console, Effect, flow, Schema as S, Struct } from "effect"
 import { Command, Flag } from "effect/unstable/cli"
 
+import * as Amount from "../../Amount.ts"
 import { Eip155Address } from "../../Eip155/Eip155.ts"
 import * as HostMnemonic from "../../Host/HostMnemonic.ts"
 import * as Mnemonic from "../../Mnemonic.ts"
 import { CaAccountId } from "../../Ramp/CaAccountId.ts"
-import * as Ramp from "../../Ramp/onramp.ts"
 import { Providers } from "../../Ramp/RampApi.ts"
+import { RampClient } from "../../Ramp/RampClient.ts"
 import { Reference } from "../../Reference.ts"
 
 export const onramp = Command.make("onramp", {
@@ -21,14 +22,17 @@ export const onramp = Command.make("onramp", {
   Command.withDescription("Create an onramp URL for a stored mnemonic"),
   Command.withHandler(
     Effect.fn(
-      function* ({ amount, chain, provider }) {
+      function* ({ amount: amount_, chain, provider }) {
+        const amount = yield* Amount.from(amount_)
         const chainRef = chain === undefined ? Reference.make("8453") : yield* S.decodeUnknownEffect(Reference)(chain)
         const chainId = `eip155:${chainRef}`
         const mnemonic = yield* Mnemonic.Mnemonic
         const address = yield* Eip155Address.fromMnemonic(mnemonic)
-        const accountId = yield* S.decodeUnknownEffect(CaAccountId)(`${chainId}:${address}`)
-        const { onrampUrl } = yield* Ramp.onramp({ amount, provider, recipient: accountId })
-        yield* Console.log(onrampUrl)
+        const recipient = yield* S.decodeUnknownEffect(CaAccountId)(`${chainId}:${address}`)
+        const ramp = yield* RampClient
+        yield* ramp
+          .onramp({ payload: { amount, provider, recipient } })
+          .pipe(Effect.flatMap(flow(Struct.get("onrampUrl"), Console.log)))
       },
       (effect, { mnemonic }) => Effect.provide(effect, HostMnemonic.layer(mnemonic)),
     ),

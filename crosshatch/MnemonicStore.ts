@@ -3,7 +3,7 @@ import { Context, Effect, Data } from "effect"
 import * as Mnemonic from "./Mnemonic.ts"
 import { MnemonicEntry } from "./UserConfig.ts"
 
-export class NoSuchMnemonicError extends Data.TaggedError("MnemonicNotFoundError")<{ readonly name: string }> {
+export class NoSuchMnemonicError extends Data.TaggedError("NoSuchMnemonicError")<{ readonly name: string }> {
   override get message() {
     return `Mnemonic "${this.name}" was not found.`
   }

@@ -98,7 +98,7 @@ describe(import.meta.url, () => {
     }),
   )
 
-  it(
+  it.effect(
     "scales grouped requirements by physical asset decimals",
     Effect.fn(function* () {
       const payTo = Address.Address.make("0x0000000000000000000000000000000000000001")

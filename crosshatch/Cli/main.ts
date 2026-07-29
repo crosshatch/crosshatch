@@ -17,7 +17,6 @@ import { ramp } from "./ramp/ramp.ts"
 Command.make("crosshatch").pipe(
   Command.withSubcommands([dev, payload, facilitator, mnemonic, ramp]),
   Command.run({ version: PackageJson.version }),
-  Effect.catchCause(Effect.logError),
   Effect.scoped,
   Effect.provide([
     RampClient.layer.pipe(Layer.provideMerge(NodeHttpClient.layerFetch)),

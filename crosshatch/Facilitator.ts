@@ -14,18 +14,20 @@ export const layer = (config?: { readonly baseUrl?: string | undefined }) =>
   Layer.effect(
     Facilitator,
     Effect.gen(function* () {
-      const baseUrl = yield* Config.all({
-        host: Config.string("CROSSHATCH_DEV_HOST").pipe(Config.withDefault("localhost")),
-        port: Config.port("CROSSHATCH_DEV_PORT"),
-      }).pipe(
-        Effect.option,
-        Effect.map(
-          Option.match({
-            onSome: ({ host, port }) => `http://${host.includes(":") ? `[${host}]` : host}:${port}`,
-            onNone: () => config?.baseUrl ?? "https://cirque.sh/facilitator",
-          }),
-        ),
-      )
+      const baseUrl =
+        config?.baseUrl ??
+        (yield* Config.all({
+          host: Config.string("CROSSHATCH_DEV_HOST").pipe(Config.withDefault("localhost")),
+          port: Config.port("CROSSHATCH_DEV_PORT"),
+        }).pipe(
+          Effect.option,
+          Effect.map(
+            Option.match({
+              onSome: ({ host, port }) => `http://${host.includes(":") ? `[${host}]` : host}:${port}`,
+              onNone: () => config?.baseUrl ?? "https://cirque.sh/facilitator",
+            }),
+          ),
+        ))
       const { facilitator } = yield* HttpApiClient.make(FacilitatorApi, { baseUrl })
       return facilitator
     }),
