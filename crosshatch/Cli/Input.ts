@@ -27,7 +27,7 @@ export const stdin = Effect.gen(function* () {
 })
 
 export const read = Effect.fn(function* (input: Option.Option<string>, fromStdin: boolean, name: string) {
-  if (fromStdin && Option.isSome(input)) {
+  if (fromStdin && input._tag === "Some") {
     return yield* new ConflictingSourcesError({ name })
   }
   if (fromStdin) return yield* stdin

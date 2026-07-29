@@ -1,3 +1,4 @@
+import { openBrowser } from "@crosshatch/widget/openBrowser"
 import { Effect, flow, Schema as S, Struct } from "effect"
 import { Command, Flag } from "effect/unstable/cli"
 
@@ -8,7 +9,6 @@ import * as Mnemonic from "../../Mnemonic.ts"
 import { CaAccountId } from "../../Ramp/CaAccountId.ts"
 import { Providers } from "../../Ramp/RampApi.ts"
 import { RampClient } from "../../Ramp/RampClient.ts"
-import { openBrowser } from "@crosshatch/widget/openBrowser"
 import { Reference } from "../../Reference.ts"
 
 export const onramp = Command.make("onramp", {

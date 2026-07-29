@@ -20,10 +20,12 @@ import * as SolanaAsset from "./SolanaAsset.ts"
 import { SolanaSigner } from "./SolanaSigner.ts"
 import { SolanaState } from "./SolanaState.ts"
 
+export type Known = typeof Known.Type
 export const Known = S.Struct({
   tokenProgramId: SolanaAddress.SolanaAddress,
 })
 
+export type Extra = typeof Extra.Type
 export const Extra = S.Struct({
   feePayer: SolanaAddress.SolanaAddress,
   memo: S.String.pipe(
@@ -36,9 +38,7 @@ export const Extra = S.Struct({
   ),
 })
 
-export class SolanaScheme extends Scheme.Service<SolanaScheme, typeof Known.Type, typeof Extra.Type>()(
-  "@crosshatch/Solana/SolanaScheme",
-) {}
+export class SolanaScheme extends Scheme.Service<SolanaScheme, Known, Extra>()("@crosshatch/Solana/SolanaScheme") {}
 
 export const layer = SolanaScheme.layer(
   { known: Known, extra: Extra },

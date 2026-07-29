@@ -1,4 +1,4 @@
-import { Console, Effect, Redacted } from "effect"
+import { Console, Effect, flow, Redacted } from "effect"
 import { Argument, Command, Flag, Prompt } from "effect/unstable/cli"
 
 import { MnemonicStore } from "../../MnemonicStore.ts"
@@ -18,8 +18,7 @@ export const mnemonicReveal = Command.make("reveal", {
         return
       }
       const store = yield* MnemonicStore
-      const mnemonic = yield* store.get(name)
-      yield* Console.log(Redacted.value(mnemonic))
+      yield* store.get(name).pipe(Effect.flatMap(flow(Redacted.value, Console.log)))
     }),
   ),
 )

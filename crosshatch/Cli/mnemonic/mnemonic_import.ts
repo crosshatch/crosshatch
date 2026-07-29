@@ -1,4 +1,4 @@
-import { Effect, Console, Redacted } from "effect"
+import { Effect, Console, Redacted, flow } from "effect"
 import { Command, Argument, Flag, Prompt } from "effect/unstable/cli"
 
 import * as Mnemonic from "../../Mnemonic.ts"
@@ -17,7 +17,7 @@ export const mnemonicImport = Command.make("import", {
       const mnemonic = stdin
         ? yield* Input.stdin.pipe(Effect.map(Mnemonic.fromText))
         : yield* Prompt.password({ message: "Enter the mnemonic:" }).pipe(
-            Effect.map((mnemonic) => Mnemonic.fromText(Redacted.value(mnemonic))),
+            Effect.map(flow(Redacted.value, Mnemonic.fromText)),
           )
       const store = yield* MnemonicStore
       yield* store.add({ name, mnemonic, description })

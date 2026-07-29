@@ -1,7 +1,7 @@
 import { Context, Effect, Data } from "effect"
 
 import * as Mnemonic from "./Mnemonic.ts"
-import { MnemonicEntry } from "./UserConfig.ts"
+import { MnemonicConfig } from "./UserConfig.ts"
 
 export class NoSuchMnemonicError extends Data.TaggedError("NoSuchMnemonicError")<{ readonly name: string }> {
   override get message() {
@@ -9,9 +9,19 @@ export class NoSuchMnemonicError extends Data.TaggedError("NoSuchMnemonicError")
   }
 }
 
-export class NameAlreadyTakenError extends Data.TaggedError("NameAlreadyTakenError")<{ readonly name: string }> {
+export class MnemonicConfigNameAlreadyTakenError extends Data.TaggedError("MnemonicConfigNameAlreadyTakenError")<{
+  readonly name: string
+}> {
   override get message() {
-    return `A mnemonic with the name "${this.name}" already exists.`
+    return `A mnemonic with the name "${this.name}" already exists in your Crosshatch user config.`
+  }
+}
+
+export class KeychainNameAlreadyTakenError extends Data.TaggedError("KeychainNameAlreadyTakenError")<{
+  readonly name: string
+}> {
+  override get message() {
+    return `A mnemonic-decryption secret with the name "${this.name}" already exists in your keychain.`
   }
 }
 
@@ -30,7 +40,7 @@ export class MnemonicRenameError extends Data.TaggedError("MnemonicRenameError")
 export class MnemonicStore extends Context.Service<
   MnemonicStore,
   {
-    readonly list: Effect.Effect<Record<string, MnemonicEntry>, MnemonicListError>
+    readonly list: Effect.Effect<Record<string, MnemonicConfig>, MnemonicListError>
 
     readonly add: (config: {
       readonly name: string
@@ -44,6 +54,6 @@ export class MnemonicStore extends Context.Service<
 
     readonly remove: (name: string) => Effect.Effect<void, MnemonicRemoveError>
 
-    readonly rename: (from: string, to: string) => Effect.Effect<undefined, MnemonicRenameError>
+    readonly rename: (from: string, to: string) => Effect.Effect<void, MnemonicRenameError>
   }
 >()("crosshatch/MnemonicStore") {}

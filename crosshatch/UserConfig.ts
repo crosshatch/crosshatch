@@ -3,16 +3,19 @@ import { Context, Effect, Schema as S, Data } from "effect"
 import { Asymmetric } from "./Crypto/Envelope.ts"
 import * as DerivedAddresses from "./Unified/DerivedAddresses.ts"
 
-export type MnemonicEntry = typeof MnemonicEntry.Type
-export const MnemonicEntry = S.Struct({
+export type MnemonicConfig = typeof MnemonicConfig.Type
+export const MnemonicConfig = S.Struct({
   addresses: DerivedAddresses.DerivedAddresses,
-  mnemonic: Asymmetric,
-  dateAdded: S.optionalKey(S.DateFromString),
-  description: S.optionalKey(S.String),
+  envelope: Asymmetric,
+  dateAdded: S.DateFromString.pipe(S.optional),
+  description: S.String.pipe(S.optional),
 })
 
+export type MnemonicConfigs = typeof MnemonicConfigs.Type
+export const MnemonicConfigs = S.Record(S.String, MnemonicConfig)
+
 export interface UserConfig {
-  readonly mnemonics: Record<string, MnemonicEntry>
+  readonly mnemonics: MnemonicConfigs
 }
 
 export class GetUserConfigError extends Data.TaggedError("GetUserConfigError")<{ readonly cause?: unknown }> {}
@@ -23,7 +26,7 @@ export const UserConfig = Object.assign(
   Context.Service<
     UserConfig,
     {
-      readonly get: Effect.Effect<UserConfig | undefined, GetUserConfigError>
+      readonly get: Effect.Effect<UserConfig, GetUserConfigError>
       readonly set: (config: UserConfig) => Effect.Effect<void, SetUserConfigError>
       readonly update: (
         setter: (config: UserConfig) => UserConfig,
@@ -31,7 +34,7 @@ export const UserConfig = Object.assign(
     }
   >()("crosshatch/UserConfig"),
   S.Struct({
-    mnemonics: S.Record(S.String, MnemonicEntry),
+    mnemonics: S.Record(S.String, MnemonicConfig),
   }),
 )
 
