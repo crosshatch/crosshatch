@@ -1,5 +1,33 @@
 # crosshatch
 
+## 0.0.15
+
+### Patch Changes
+
+- [#140](https://github.com/crosshatch/crosshatch/pull/140)
+  [`31d054b`](https://github.com/crosshatch/crosshatch/commit/31d054bde1102781637320be4d1e9a2c85b76ef7)
+  Thanks @harrysolovay! - Continue fleshing out CLI. Add various commands and
+  improve mnemonic storage.
+
+- [#140](https://github.com/crosshatch/crosshatch/pull/140)
+  [`31d054b`](https://github.com/crosshatch/crosshatch/commit/31d054bde1102781637320be4d1e9a2c85b76ef7)
+  Thanks @harrysolovay! - Refactor payer composition around `Payer.layerLocal`,
+  requirement-selection functions such as `Accept.first`, and denomination
+  groups. Rename the built-in asset namespace from `KnownAssets.Usd` to
+  `Known.USD`.
+
+- [#152](https://github.com/crosshatch/crosshatch/pull/152)
+  [`a12889d`](https://github.com/crosshatch/crosshatch/commit/a12889d053fe5df4c2cc06072583d828d507d80a)
+  Thanks @harrysolovay! - Add EURC, JPYC, and XSGD currency support, improve
+  Permit2 authorization generation, and standardize layer naming across the API,
+  documentation, and examples.
+- Updated dependencies
+  [[`31d054b`](https://github.com/crosshatch/crosshatch/commit/31d054bde1102781637320be4d1e9a2c85b76ef7),
+  [`31d054b`](https://github.com/crosshatch/crosshatch/commit/31d054bde1102781637320be4d1e9a2c85b76ef7),
+  [`a12889d`](https://github.com/crosshatch/crosshatch/commit/a12889d053fe5df4c2cc06072583d828d507d80a)]:
+  - @crosshatch/widget@0.0.7
+  - @crosshatch/util@0.0.2
+
 ## 0.0.14
 
 ### Patch Changes

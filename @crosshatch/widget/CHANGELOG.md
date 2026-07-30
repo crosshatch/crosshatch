@@ -1,5 +1,20 @@
 # @crosshatch/widget
 
+## 0.0.7
+
+### Patch Changes
+
+- [#140](https://github.com/crosshatch/crosshatch/pull/140)
+  [`31d054b`](https://github.com/crosshatch/crosshatch/commit/31d054bde1102781637320be4d1e9a2c85b76ef7)
+  Thanks @harrysolovay! - Continue fleshing out CLI. Add various commands and
+  improve mnemonic storage.
+
+- [#152](https://github.com/crosshatch/crosshatch/pull/152)
+  [`a12889d`](https://github.com/crosshatch/crosshatch/commit/a12889d053fe5df4c2cc06072583d828d507d80a)
+  Thanks @harrysolovay! - Add EURC, JPYC, and XSGD currency support, improve
+  Permit2 authorization generation, and standardize layer naming across the API,
+  documentation, and examples.
+
 ## 0.0.6
 
 ### Patch Changes
