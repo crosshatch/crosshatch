@@ -33,11 +33,11 @@ export const layerMiddleware = <X extends ReadonlyArray<Extension.Extension.Any>
           Option.flatMap(S.decodeUnknownOption(PayloadFromBase64JsonString)),
           Option.getOrUndefined,
         )
-        const Live = Layer.mergeAll(
+        const layerRequestServices = Layer.mergeAll(
           Layer.succeed(Payload, payload),
-          ...(config?.extensions?.map((v) => Extension.layerPayload(v, payload)) ?? []),
+          ...(config?.extensions?.map((v) => Extension.layerFromPayload(v, payload)) ?? []),
         ) as Layer.Layer<X[number] | Payload, S.SchemaError>
-        return yield* Effect.provide(effect, Live)
+        return yield* Effect.provide(effect, layerRequestServices)
       }),
     { global: true },
   )

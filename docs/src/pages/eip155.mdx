@@ -47,8 +47,8 @@ import { Mnemonic } from "crosshatch"
 import { Eip155Signer } from "crosshatch/Eip155"
 import { Layer } from "effect"
 
-const Eip155SignerLive = Eip155Signer.layerMnemonic.pipe(
-  Layer.provide(Mnemonic.layerEnv),
+const layerEip155SignerFromMnemonic = Eip155Signer.layerFromMnemonic.pipe(
+  Layer.provide(Mnemonic.layerFromEnv),
 )
 ```
 
@@ -63,7 +63,7 @@ import { Eip155Address } from "crosshatch/Eip155"
 import { Effect } from "effect"
 
 const address = Effect.gen(function* () {
-  const mnemonic = yield* Mnemonic.env
+  const mnemonic = yield* Mnemonic.fromEnv
   return yield* Eip155Address.fromMnemonic(mnemonic)
 })
 ```
@@ -78,8 +78,8 @@ const address = Effect.gen(function* () {
 import { Eip155Signer, Erc3009Scheme } from "crosshatch/Eip155"
 import { Layer } from "effect"
 
-const Erc3009Live = Erc3009Scheme.layer.pipe(
-  Layer.provide(Eip155Signer.layerMnemonic),
+const layerErc3009Scheme = Erc3009Scheme.layer.pipe(
+  Layer.provide(Eip155Signer.layerFromMnemonic),
 )
 ```
 
@@ -96,8 +96,8 @@ data with the `Eip155Signer` service.
 import { Eip155Signer, Permit2Scheme } from "crosshatch/Eip155"
 import { Layer } from "effect"
 
-const Permit2Live = Permit2Scheme.layer.pipe(
-  Layer.provide(Eip155Signer.layerMnemonic),
+const layerPermit2Scheme = Permit2Scheme.layer.pipe(
+  Layer.provide(Eip155Signer.layerFromMnemonic),
 )
 ```
 

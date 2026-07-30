@@ -3,14 +3,14 @@ import { ChxHttp } from "crosshatch"
 import { Console, Effect, Layer } from "effect"
 import { LanguageModel } from "effect/unstable/ai"
 
-import { PayerLive } from "./PayerLive.ts"
+import { layerPayerLocal } from "./layerPayerLocal.ts"
 
-const BlockrunLive = OpenAiLanguageModel.layer({
+const layerLanguageModelBlockrun = OpenAiLanguageModel.layer({
   model: "deepseek/deepseek-chat",
 }).pipe(
   Layer.provide(
     OpenAiClient.layer({ apiUrl: "https://blockrun.ai/api/v1" }).pipe(
-      Layer.provide(ChxHttp.layerClient.pipe(Layer.provide(PayerLive))),
+      Layer.provide(ChxHttp.layerClient.pipe(Layer.provide(layerPayerLocal))),
     ),
   ),
 )
@@ -19,7 +19,7 @@ LanguageModel.generateText({
   prompt: "Hello from Crosshatch.",
 }).pipe(
   Effect.tap(({ text }) => Console.log(text)),
-  Effect.provide(BlockrunLive),
+  Effect.provide(layerLanguageModelBlockrun),
   Effect.onError(Effect.logError),
   Effect.runFork,
 )

@@ -41,7 +41,7 @@ const app = RpcServer.toHttpEffect(Api).pipe(
 
 ## Use It As A Payer
 
-Provide `Payer.layerBridge` with `ChxRpc.layer` wherever code should create
+Provide `Payer.layerFromBridge` with `ChxRpc.layer` wherever code should create
 payment payloads through the RPC bridge.
 
 ```ts
@@ -50,9 +50,13 @@ import { Effect, Layer } from "effect"
 
 declare const required: Required.Required
 
-const payerLayer = Payer.layerBridge.pipe(Layer.provideMerge(ChxRpc.layer))
+const layerPayerFromBridge = Payer.layerFromBridge.pipe(
+  Layer.provideMerge(ChxRpc.layer),
+)
 
-const program = Payload.make({ required }).pipe(Effect.provide(payerLayer))
+const program = Payload.make({ required }).pipe(
+  Effect.provide(layerPayerFromBridge),
+)
 ```
 
 When `Payload.make` calls the bridge, `ChxRpc.layer` publishes a `Propose` event

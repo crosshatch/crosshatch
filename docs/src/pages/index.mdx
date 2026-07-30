@@ -97,7 +97,7 @@ import { ChxHttp, Payer } from "crosshatch"
 import { Console, Effect, Layer } from "effect"
 import { HttpClient, HttpClientRequest } from "effect/unstable/http"
 
-declare const PayerLive: Layer.Layer<Payer.Payer>
+declare const layerPayerLocal: Layer.Layer<Payer.Payer>
 
 Effect.gen(function* () {
   const client = yield* HttpClient.HttpClient
@@ -107,7 +107,7 @@ Effect.gen(function* () {
   const body = yield* response.text
   yield* Console.log(body)
 }).pipe(
-  Effect.provide(ChxHttp.layerClient.pipe(Layer.provide(PayerLive))),
+  Effect.provide(ChxHttp.layerClient.pipe(Layer.provide(layerPayerLocal))),
   Effect.runFork,
 )
 ```
@@ -201,9 +201,9 @@ import { ChxHttp, Payer } from "crosshatch"
 import { Console, Effect, Layer } from "effect"
 import { LanguageModel } from "effect/unstable/ai"
 
-declare const PayerLive: Layer.Layer<Payer.Payer>
+declare const layerPayerLocal: Layer.Layer<Payer.Payer>
 
-const BlockrunLive = OpenAiLanguageModel.layer({
+const layerLanguageModelBlockrun = OpenAiLanguageModel.layer({
   model: "deepseek/deepseek-chat",
 }).pipe(
   Layer.provide(OpenAiClient.layer({ apiUrl: "https://blockrun.ai/api/v1" })),
@@ -214,8 +214,8 @@ LanguageModel.generateText({
 }).pipe(
   Effect.tap(({ text }) => Console.log(text)),
   Effect.provide(
-    BlockrunLive.pipe(
-      Layer.provide(ChxHttp.layerClient.pipe(Layer.provide(PayerLive))),
+    layerLanguageModelBlockrun.pipe(
+      Layer.provide(ChxHttp.layerClient.pipe(Layer.provide(layerPayerLocal))),
     ),
   ),
   Effect.runFork,
@@ -247,15 +247,15 @@ import { Accept, Known, Mnemonic, Payer } from "crosshatch"
 import { Eip155Signer, Erc3009Scheme, Permit2Scheme } from "crosshatch/Eip155"
 import { Layer } from "effect"
 
-const SchemesLive = Layer.mergeAll(
+const layerSchemes = Layer.mergeAll(
   Erc3009Scheme.layer,
   Permit2Scheme.layer,
-).pipe(Layer.provide(Eip155Signer.layerMnemonic))
+).pipe(Layer.provide(Eip155Signer.layerFromMnemonic))
 
-export const PayerLive = Payer.layerLocal({
+export const layerPayerLocal = Payer.layerLocal({
   accept: Accept.first(Known),
-  schemes: SchemesLive,
-}).pipe(Layer.provide(Mnemonic.layerEnv))
+  schemes: layerSchemes,
+}).pipe(Layer.provide(Mnemonic.layerFromEnv))
 ```
 
     </div>

@@ -11,7 +11,7 @@ export class SolanaSigner extends Context.Service<SolanaSigner, TransactionParti
   "crosshatch/Solana/SolanaSigner",
 ) {}
 
-export const layerMnemonic = Layer.effect(
+export const layerFromMnemonic = Layer.effect(
   SolanaSigner,
   Effect.gen(function* () {
     const mnemonic = yield* Mnemonic.Mnemonic

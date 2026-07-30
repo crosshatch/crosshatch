@@ -18,15 +18,15 @@ import { Accept, Known, Mnemonic, Payer } from "crosshatch"
 import { Eip155Signer, Erc3009Scheme, Permit2Scheme } from "crosshatch/Eip155"
 import { Layer } from "effect"
 
-const SchemesLive = Layer.mergeAll(
+const layerSchemes = Layer.mergeAll(
   Erc3009Scheme.layer,
   Permit2Scheme.layer,
-).pipe(Layer.provide(Eip155Signer.layerMnemonic))
+).pipe(Layer.provide(Eip155Signer.layerFromMnemonic))
 
-const PayerLive = Payer.layerLocal({
+const layerPayerLocal = Payer.layerLocal({
   accept: Accept.first({ USD: Known.USD }),
-  schemes: SchemesLive,
-}).pipe(Layer.provide(Mnemonic.layerEnv))
+  schemes: layerSchemes,
+}).pipe(Layer.provide(Mnemonic.layerFromEnv))
 ```
 
 This example reads `MNEMONIC` from the environment. Other `Mnemonic` layers can
@@ -73,6 +73,6 @@ Unknown extensions and extension values that fail schema decoding are skipped.
 ## Bridge Payer
 
 If payment creation should be delegated to another agent, provide
-`Payer.layerBridge` with a `Bridge` implementation. That keeps HTTP and
+`Payer.layerFromBridge` with a `Bridge` implementation. That keeps HTTP and
 `Payload.make` integrations Payer-based while allowing signing and user approval
 to live elsewhere.

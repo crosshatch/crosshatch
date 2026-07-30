@@ -7,7 +7,9 @@ import { Eip155Signer } from "./Eip155Signer.ts"
 
 export type Extra = typeof Extra.Type
 export const Extra = S.Struct({
-  assetTransferMethod: S.Never.pipe(S.optional),
+  assetTransferMethod: S.Literal("permit2"),
+  name: S.String.pipe(S.optional),
+  version: S.String.pipe(S.optional),
 })
 
 export class Permit2Scheme extends Scheme.Service<Permit2Scheme, void, Extra>()("crosshatch/Eip155/Permit2Scheme") {}
@@ -26,15 +28,14 @@ export interface Permit2 {
     readonly witness: {
       readonly to: string
       readonly validAfter: string
-      readonly extra?: string
     }
   }
 }
 
-const PERMIT2_ADDRESS = "0x000000000022D473030F116dDEE9F6B43aC78BA3"
-const EXACT_PERMIT2_PROXY = "0x4020615294c913F045dc10f0a5cdEbd86c280001"
+export const PERMIT2_ADDRESS = "0x000000000022D473030F116dDEE9F6B43aC78BA3"
+export const EXACT_PERMIT2_PROXY = "0x402085c248EeA27D92E8b30b2C58ed07f9E20001"
 
-const PERMIT2_ABI_TYPES = {
+export const PERMIT2_ABI_TYPES = {
   PermitWitnessTransferFrom: [
     { name: "permitted", type: "TokenPermissions" },
     { name: "spender", type: "address" },
@@ -49,7 +50,6 @@ const PERMIT2_ABI_TYPES = {
   Witness: [
     { name: "to", type: "address" },
     { name: "validAfter", type: "uint256" },
-    { name: "extra", type: "bytes" },
   ],
 } as const
 
@@ -64,15 +64,14 @@ export const layer = Permit2Scheme.layer({ known: S.Void, extra: Extra }, () =>
     const spender = Address.from(EXACT_PERMIT2_PROXY)
     const deadline = (now + accepted.maxTimeoutSeconds).toString()
     const to = Address.from(accepted.payTo, { checksum: true })
-    const validAfter = (now - 600).toString()
-    const extra = "0x"
+    const validAfter = "0"
     const permit2Authorization: Permit2["permit2Authorization"] = {
       from: signer.address,
       permitted: { token, amount },
       spender,
       nonce,
       deadline,
-      witness: { to, validAfter, extra },
+      witness: { to, validAfter },
     }
     const signature = signer.signTypedData({
       domain: {
@@ -93,7 +92,6 @@ export const layer = Permit2Scheme.layer({ known: S.Void, extra: Extra }, () =>
         witness: {
           to,
           validAfter: BigInt(validAfter),
-          extra,
         },
       },
     })

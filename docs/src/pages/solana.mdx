@@ -38,8 +38,8 @@ import { Mnemonic } from "crosshatch"
 import { SolanaSigner } from "crosshatch/Solana"
 import { Layer } from "effect"
 
-const SolanaSignerLive = SolanaSigner.layerMnemonic.pipe(
-  Layer.provide(Mnemonic.layerEnv),
+const layerSolanaSignerFromMnemonic = SolanaSigner.layerFromMnemonic.pipe(
+  Layer.provide(Mnemonic.layerFromEnv),
 )
 ```
 
@@ -54,7 +54,7 @@ Provide `SolanaState` anywhere you provide `SolanaScheme.layer`.
 import { Config, Layer } from "effect"
 import { SolanaState } from "crosshatch/Solana"
 
-const SolanaStateLive = Config.string("SOLANA_RPC_URL").pipe(
+const layerSolanaStateFromConfig = Config.string("SOLANA_RPC_URL").pipe(
   Config.map(SolanaState.layer),
   Layer.unwrap,
 )
@@ -73,13 +73,13 @@ include a memo.
 import { SolanaScheme, SolanaSigner, SolanaState } from "crosshatch/Solana"
 import { Config, Layer } from "effect"
 
-const SolanaStateLive = Config.string("SOLANA_RPC_URL").pipe(
+const layerSolanaStateFromConfig = Config.string("SOLANA_RPC_URL").pipe(
   Config.map(SolanaState.layer),
   Layer.unwrap,
 )
 
-const SolanaLive = SolanaScheme.layer.pipe(
-  Layer.provide([SolanaSigner.layerMnemonic, SolanaStateLive]),
+const layerSolanaScheme = SolanaScheme.layer.pipe(
+  Layer.provide([SolanaSigner.layerFromMnemonic, layerSolanaStateFromConfig]),
 )
 ```
 

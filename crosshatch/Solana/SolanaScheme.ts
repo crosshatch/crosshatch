@@ -61,7 +61,9 @@ export const layer = SolanaScheme.layer(
               mint,
             }),
           )
-        const [[sourceAta], [destAta]] = yield* Effect.all([ata(signer.address), ata(address(accepted.payTo))])
+        const [[sourceAta], [destAta]] = yield* Effect.all([ata(signer.address), ata(address(accepted.payTo))], {
+          concurrency: "unbounded",
+        })
 
         const message = solanaPipe(
           createTransactionMessage({ version: 0 }),

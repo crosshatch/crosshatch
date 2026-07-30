@@ -3,7 +3,7 @@ import { Effect, Layer } from "effect"
 import { Hash, TypedData } from "ox"
 
 import * as Mnemonic from "../Mnemonic.ts"
-import { Eip155Signer, layerMnemonic } from "./Eip155Signer.ts"
+import { Eip155Signer, layerFromMnemonic } from "./Eip155Signer.ts"
 
 const mnemonicText = "test test test test test test test test test test test junk"
 
@@ -37,7 +37,7 @@ describe(import.meta.url, () => {
     "signs typed data with a recoverable deterministic signature",
     Effect.fn(function* () {
       const signer = yield* Eip155Signer.pipe(
-        Effect.provide(layerMnemonic.pipe(Layer.provide(Mnemonic.layerText(mnemonicText)))),
+        Effect.provide(layerFromMnemonic.pipe(Layer.provide(Mnemonic.layerFromText(mnemonicText)))),
       )
       expect(Hash.keccak256(TypedData.encode(typedData))).toBe(expectedHash)
       expect(signer.address).toBe(expectedAddress)

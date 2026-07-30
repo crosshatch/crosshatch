@@ -13,13 +13,13 @@ export interface UnifiedSchemesConfig {
 
 export const layer = (config?: UnifiedSchemesConfig) => {
   return Layer.mergeAll(
-    Layer.mergeAll(Erc3009Scheme.layer, Permit2Scheme.layer).pipe(Layer.provide(Eip155Signer.layerMnemonic)),
+    Layer.mergeAll(Erc3009Scheme.layer, Permit2Scheme.layer).pipe(Layer.provide(Eip155Signer.layerFromMnemonic)),
     config?.solana
       ? (Config.isConfig(config.solana.rpc) ? config.solana.rpc : Config.succeed(config.solana.rpc)).pipe(
           Effect.map(
             UndefinedOr.match({
               onDefined: (v) =>
-                SolanaScheme.layer.pipe(Layer.provide([SolanaSigner.layerMnemonic, SolanaState.layer(v)])),
+                SolanaScheme.layer.pipe(Layer.provide([SolanaSigner.layerFromMnemonic, SolanaState.layer(v)])),
               onUndefined: () => Layer.empty,
             }),
           ),

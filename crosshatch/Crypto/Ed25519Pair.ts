@@ -35,17 +35,20 @@ export const random = (config?: { readonly extractable?: boolean | undefined }) 
   ).pipe(Effect.map(fromNative))
 
 export const fromSeed = (bytes: Uint8Array) =>
-  Effect.all({
-    publicKey: Ed25519PrivateKey.fromSeed(bytes, { extractable: true }).pipe(
-      Effect.flatMap((v) => Effect.promise(() => crypto.subtle.exportKey("jwk", v))),
-      Effect.flatMap(({ x }) =>
-        Effect.promise(() =>
-          crypto.subtle.importKey("jwk", { crv: "Ed25519", kty: "OKP", ...(x && { x }) }, { name: "Ed25519" }, true, [
-            "verify",
-          ]),
+  Effect.all(
+    {
+      publicKey: Ed25519PrivateKey.fromSeed(bytes, { extractable: true }).pipe(
+        Effect.flatMap((v) => Effect.promise(() => crypto.subtle.exportKey("jwk", v))),
+        Effect.flatMap(({ x }) =>
+          Effect.promise(() =>
+            crypto.subtle.importKey("jwk", { crv: "Ed25519", kty: "OKP", ...(x && { x }) }, { name: "Ed25519" }, true, [
+              "verify",
+            ]),
+          ),
         ),
+        Effect.map((v) => Ed25519PublicKey.Ed25519PublicKey.make(v, { disableChecks: true })),
       ),
-      Effect.map((v) => Ed25519PublicKey.Ed25519PublicKey.make(v, { disableChecks: true })),
-    ),
-    privateKey: Ed25519PrivateKey.fromSeed(bytes),
-  }).pipe(Effect.map((v) => Ed25519Pair.make(v, { disableChecks: true })))
+      privateKey: Ed25519PrivateKey.fromSeed(bytes),
+    },
+    { concurrency: "unbounded" },
+  ).pipe(Effect.map((v) => Ed25519Pair.make(v, { disableChecks: true })))

@@ -20,10 +20,10 @@ import { Eip155Signer } from "crosshatch/Eip155"
 import { SolanaSigner } from "crosshatch/Solana"
 import { Layer } from "effect"
 
-const SignersLive = Layer.mergeAll(
-  Eip155Signer.layerMnemonic,
-  SolanaSigner.layerMnemonic,
-).pipe(Layer.provide(Mnemonic.layerEnv))
+const layerSignersFromMnemonic = Layer.mergeAll(
+  Eip155Signer.layerFromMnemonic,
+  SolanaSigner.layerFromMnemonic,
+).pipe(Layer.provide(Mnemonic.layerFromEnv))
 ```
 
 ## From Text
@@ -41,26 +41,28 @@ const mnemonic = Mnemonic.fromText(
 )
 ```
 
-Use `layerText` to provide that phrase as the `Mnemonic` service.
+Use `layerFromText` to provide that phrase as the `Mnemonic` service.
 
 ```ts
 import { Mnemonic } from "crosshatch"
 
-const MnemonicLive = Mnemonic.layerText(
+const layerMnemonicFromText = Mnemonic.layerFromText(
   "test test test test test test test test test test test junk",
 )
 ```
 
 ## From Config
 
-Use `fromConfig` and `layerConfig` when the phrase comes from an Effect config
-source.
+Use `fromConfig` and `layerFromConfig` when the phrase comes from an Effect
+config source.
 
 ```ts
 import { Config } from "effect"
 import { Mnemonic } from "crosshatch"
 
-const MnemonicLive = Mnemonic.layerConfig(Config.string("BUYER_MNEMONIC"))
+const layerMnemonicFromConfig = Mnemonic.layerFromConfig(
+  Config.string("BUYER_MNEMONIC"),
+)
 ```
 
 The default environment variable helpers read `MNEMONIC`.
@@ -70,10 +72,10 @@ import { Mnemonic } from "crosshatch"
 import { Effect } from "effect"
 
 const program = Effect.gen(function* () {
-  return yield* Mnemonic.env
+  return yield* Mnemonic.fromEnv
 })
 
-const MnemonicLive = Mnemonic.layerEnv
+const layerMnemonicFromEnv = Mnemonic.layerFromEnv
 ```
 
 ## Random Mnemonics
@@ -91,5 +93,5 @@ const program = Effect.gen(function* () {
 ```
 
 Use random mnemonics for tests or disposable local flows. For real payer
-clients, persist the mnemonic securely and provide it with `layerEnv`,
-`layerConfig`, or your own layer.
+clients, persist the mnemonic securely and provide it with `layerFromEnv`,
+`layerFromConfig`, or your own layer.
