@@ -26,8 +26,9 @@ signed payment payload for it.
 
 ```ts
 import { Config, Effect } from "effect"
-import { Known, Payload, Required, Requirements } from "crosshatch"
+import { Payload, Required, Requirements } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
+import * as Known from "crosshatch/Known"
 
 const program = Effect.gen(function* () {
   const required = yield* Required.make`Access to the paid resource.`.pipe(

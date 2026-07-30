@@ -16,7 +16,9 @@ export class Keychain extends Context.Service<
   Keychain,
   {
     readonly set: (name: string, secret: Uint8Array) => Effect.Effect<void, KeychainError>
+
     readonly get: (name: string) => Effect.Effect<Uint8Array<ArrayBuffer> | undefined, KeychainError>
+
     readonly remove: (name: string) => Effect.Effect<boolean, KeychainError>
   }
 >()("crosshatch/Keychain") {}

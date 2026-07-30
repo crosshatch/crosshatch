@@ -58,10 +58,9 @@ export class MnemonicStore extends Context.Service<
   }
 >()("crosshatch/MnemonicStore") {}
 
-export const get = (name?: string) =>
-  Effect.gen(function* () {
-    const store = yield* MnemonicStore
-    return yield* store.get(name ?? "default")
-  })
+export const get = Effect.fnUntraced(function* (name?: string) {
+  const store = yield* MnemonicStore
+  return yield* store.get(name ?? "default")
+})
 
 export const layerMnemonicFromName = flow(get, Layer.effect(Mnemonic.Mnemonic))

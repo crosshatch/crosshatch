@@ -23,9 +23,10 @@ previous entries. `Required.extend` adds x402 extension payloads.
 
 ```ts
 import { Config, Effect } from "effect"
-import { Known, Required, Requirements } from "crosshatch"
+import { Required, Requirements } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
 import { PaymentId } from "crosshatch/Extensions"
+import * as Known from "crosshatch/Known"
 
 const makeRequired = Effect.gen(function* () {
   const recipient = yield* Config.schema(
@@ -75,8 +76,9 @@ EIP-155 chains. The `recipients` object chooses which deployments this invoice
 accepts and where payment should be sent on each chain.
 
 ```ts
-import { Known, Requirements } from "crosshatch"
+import { Requirements } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
+import * as Known from "crosshatch/Known"
 
 declare const payToOnBase: typeof Eip155Address.Eip155Address.Type
 
