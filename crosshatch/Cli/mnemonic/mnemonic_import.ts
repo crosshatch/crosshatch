@@ -3,7 +3,7 @@ import { Command, Argument, Flag, Prompt } from "effect/unstable/cli"
 
 import * as Mnemonic from "../../Mnemonic.ts"
 import { MnemonicStore } from "../../MnemonicStore.ts"
-import * as DerivedAddresses from "../../Unified/DerivedAddresses.ts"
+import { DerivedAddresses } from "../../Unified/Unified.ts"
 import * as Input from "./../Input.ts"
 
 export const mnemonicImport = Command.make("import", {

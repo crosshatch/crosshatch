@@ -1,6 +1,6 @@
 import { Schema as S } from "effect"
 
-import * as Extension from "../Extension.ts"
+import { Extension } from "../index.ts"
 
 export const PaymentId = S.String.check(S.isLengthBetween(16, 128), S.isPattern(/^[a-zA-Z0-9_-]+$/u)).pipe(
   S.brand("crosshatch/PaymentId"),

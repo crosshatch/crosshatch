@@ -1,12 +1,12 @@
 import { Context, Effect, Schema as S, Data } from "effect"
 
-import { Asymmetric } from "./Crypto/Envelope.ts"
-import * as DerivedAddresses from "./Unified/DerivedAddresses.ts"
+import { Envelope } from "./Crypto/Crypto.ts"
+import { DerivedAddresses } from "./Unified/Unified.ts"
 
 export type MnemonicConfig = typeof MnemonicConfig.Type
 export const MnemonicConfig = S.Struct({
   addresses: DerivedAddresses.DerivedAddresses,
-  envelope: Asymmetric,
+  envelope: Envelope.Asymmetric,
   dateAdded: S.DateFromString.pipe(S.optional),
   description: S.String.pipe(S.optional),
 })

@@ -1,8 +1,8 @@
 import { Effect, Schema as S, Encoding } from "effect"
 import { Address } from "ox"
 
-import * as Random from "../Crypto/Random.ts"
-import * as Scheme from "../Scheme.ts"
+import { Random } from "../Crypto/Crypto.ts"
+import { Scheme } from "../index.ts"
 import { Eip155Signer } from "./Eip155Signer.ts"
 
 export type Extra = typeof Extra.Type

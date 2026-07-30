@@ -4,7 +4,7 @@ import { partiallySignTransaction } from "@solana/transactions"
 import { Context, Effect, Layer } from "effect"
 
 import { Ed25519Pair, Slip10 } from "../Crypto/Crypto.ts"
-import * as Mnemonic from "../Mnemonic.ts"
+import { Mnemonic } from "../index.ts"
 import * as SolanaAddress from "./SolanaAddress.ts"
 
 export class SolanaSigner extends Context.Service<SolanaSigner, TransactionPartialSigner>()(

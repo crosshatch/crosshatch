@@ -1,0 +1,44 @@
+## Enforce Package Import Boundaries
+
+The `@crosshatch` package exposes two kinds of public entry points:
+
+- The root barrel: `@crosshatch/index.ts`
+- Manually specified (in the `crosshatch/package.json`) entry points:
+  `<Directory>/<Directory>.ts`, such as `Eip155/Eip155.ts`
+
+Imports must follow these conventions:
+
+1. **Import root modules through the root barrel.**
+
+   Files inside package-exported directories must not import individual root
+   modules directly.
+
+   ```ts
+   // Incorrect
+   import * as Requirements from "../Requirements.ts"
+
+   // Correct: Eip155/Foo.ts
+   import { Requirements } from "../index.ts"
+   ```
+
+2. Import package-exported directories through their entry points. Code outside
+   a directory must not import its internal modules directly.
+
+```ts
+// Correct import
+ { Something } from "../Eip155/Eip155.ts"
+
+// Incorrect import { Something } from "../Eip155/InternalModule.ts"
+```
+
+3. Use the target directory's entry point for cross-directory imports. For
+   example, code in `Solana/` that imports from `Eip155/` must use
+   `Eip155/Eip155.ts`, not an individual module inside `Eip155/`.
+4. Allow direct imports only within the same module boundary. Files belonging to
+   the same package-exported directory may import one another directly, unless
+   that directory defines a separate internal barrel convention.
+
+In short: Cross a package boundary through its public entry point. Use direct
+imports only within that boundary. This keeps dependencies explicit, prevents
+modules from relying on another directory's implementation details, and ensures
+internal imports match the package's public export structure.

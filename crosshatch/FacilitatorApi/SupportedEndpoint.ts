@@ -1,17 +1,17 @@
 import { Schema as S, String } from "effect"
 import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 
-import { JsonRecord } from "../_util.ts"
-import { ChainId } from "../ChainId.ts"
-import { Version } from "../Version.ts"
+import { ChainId, Util, Version } from "../index.ts"
 
+export type SupportedKind = typeof SupportedKind.Type
 export const SupportedKind = S.Struct({
-  x402Version: Version,
+  x402Version: Version.Version,
   scheme: S.String,
-  network: S.Union([S.String.pipe(S.brand("crosshatch/LegacyChainId")), ChainId]),
-  extra: JsonRecord.pipe(S.optional),
+  network: S.Union([S.String.pipe(S.brand("crosshatch/LegacyChainId")), ChainId.ChainId]),
+  extra: Util.JsonRecord.pipe(S.optional),
 })
 
+export type SupportedResponse = typeof SupportedResponse.Type
 export const SupportedResponse = S.Struct({
   kinds: S.Array(SupportedKind),
   extensions: S.Array(S.String),

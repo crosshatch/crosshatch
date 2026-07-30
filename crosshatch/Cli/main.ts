@@ -4,8 +4,7 @@ import { NodeRuntime, NodeServices, NodeHttpClient } from "@effect/platform-node
 import { Effect, Layer } from "effect"
 import { Command } from "effect/unstable/cli"
 
-import * as HostMnemonicStore from "../Host/HostMnemonicStore.ts"
-import * as HostUserConfig from "../Host/HostUserConfig.ts"
+import { HostMnemonicStore, HostUserConfig } from "../Host/Host.ts"
 import PackageJson from "../package.json" with { type: "json" }
 import { RampClient } from "../Ramp/Ramp.ts"
 import { dev } from "./dev/dev.ts"

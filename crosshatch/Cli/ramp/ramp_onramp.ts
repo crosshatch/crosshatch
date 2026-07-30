@@ -4,11 +4,9 @@ import { Command, Flag } from "effect/unstable/cli"
 
 import * as Amount from "../../Amount.ts"
 import { Eip155Address } from "../../Eip155/Eip155.ts"
-import * as HostMnemonic from "../../Host/HostMnemonic.ts"
+import { HostMnemonic } from "../../Host/Host.ts"
 import * as Mnemonic from "../../Mnemonic.ts"
-import { CaAccountId } from "../../Ramp/CaAccountId.ts"
-import { Providers } from "../../Ramp/RampApi.ts"
-import { RampClient } from "../../Ramp/RampClient.ts"
+import { CaAccountId, Providers, RampClient } from "../../Ramp/Ramp.ts"
 import { Reference } from "../../Reference.ts"
 
 export const onramp = Command.make("onramp", {
@@ -28,7 +26,7 @@ export const onramp = Command.make("onramp", {
         const mnemonic = yield* Mnemonic.Mnemonic
         const address = yield* Eip155Address.fromMnemonic(mnemonic)
         const ramp = yield* RampClient
-        const recipient = CaAccountId.make(`eip155:${chainRef}:${address}`, { disableChecks: true })
+        const recipient = CaAccountId.CaAccountId.make(`eip155:${chainRef}:${address}`, { disableChecks: true })
         yield* ramp
           .onramp({
             payload: {

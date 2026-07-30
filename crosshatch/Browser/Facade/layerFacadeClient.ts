@@ -3,7 +3,7 @@ import { Effect, Stream, Layer, SubscriptionRef, Deferred, Semaphore, flow } fro
 import { FacadeClient } from "./FacadeClient.ts"
 import { FacadeState } from "./FacadeState.ts"
 
-const layerFacadeState = Layer.effect(
+export const layerFacadeClient = Layer.effect(
   FacadeState,
   Effect.gen(function* () {
     const task = yield* Semaphore.make(1).pipe(Effect.map((v) => Semaphore.withPermits(v, 1)))
@@ -26,6 +26,4 @@ const layerFacadeState = Layer.effect(
     const ref = yield* SubscriptionRef.make(initial)
     return ref
   }),
-)
-
-export const layer = layerFacadeState.pipe(Layer.provideMerge(FacadeClient.layer))
+).pipe(Layer.provideMerge(FacadeClient.layer))

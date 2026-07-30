@@ -1,16 +1,15 @@
 import { NodeServices } from "@effect/platform-node"
 import { Effect, Layer } from "effect"
 
-import { Mnemonic } from "../Mnemonic.ts"
-import { MnemonicStore } from "../MnemonicStore.ts"
+import { Mnemonic, MnemonicStore } from "../index.ts"
 import * as HostMnemonicStore from "./HostMnemonicStore.ts"
 import * as HostUserConfig from "./HostUserConfig.ts"
 
 export const layer = (name?: string) =>
   Layer.effect(
-    Mnemonic,
+    Mnemonic.Mnemonic,
     Effect.gen(function* () {
-      const store = yield* MnemonicStore
+      const store = yield* MnemonicStore.MnemonicStore
       return yield* store.get(name ?? "default")
     }),
   ).pipe(

@@ -3,7 +3,7 @@ import { Headers, HttpRouter, HttpServerRequest, HttpServerResponse } from "effe
 
 import { TraceId } from "../Bridge.ts"
 import * as Extension from "../Extension.ts"
-import { SettleResponse, SettleResponseFromBase64JsonString } from "../FacilitatorApi/SettleEndpoint.ts"
+import { SettleResponseFromBase64JsonString, type SettleResponse } from "../FacilitatorApi/FacilitatorApi.ts"
 import { Payload, PayloadFromBase64JsonString } from "../Payload.ts"
 import { Required, RequiredFromBase64JsonString } from "../Required.ts"
 import { PAYMENT_REQUIRED, CROSSHATCH_TRACE_ID, PAYMENT_SIGNATURE, PAYMENT_RESPONSE } from "./constants.ts"
@@ -19,7 +19,7 @@ export const require = Effect.fnUntraced(function* ({ required }: { readonly req
   })
 })
 
-export const addResponseHeader = (settlement: typeof SettleResponse.Type) =>
+export const addResponseHeader = (settlement: SettleResponse) =>
   HttpServerResponse.setHeader(PAYMENT_RESPONSE, S.encodeSync(SettleResponseFromBase64JsonString)(settlement))
 
 export const layerMiddleware = <X extends ReadonlyArray<Extension.Extension.Any> = []>(

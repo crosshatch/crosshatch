@@ -2,7 +2,7 @@ import { describe, expect, it } from "@effect/vitest"
 import { Effect, Layer } from "effect"
 import { Hash, TypedData } from "ox"
 
-import * as Mnemonic from "../Mnemonic.ts"
+import { Mnemonic } from "../index.ts"
 import { Eip155Signer, layerFromMnemonic } from "./Eip155Signer.ts"
 
 const mnemonicText = "test test test test test test test test test test test junk"

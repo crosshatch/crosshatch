@@ -2,7 +2,7 @@ import { Console, Effect, Schema as S } from "effect"
 import { Argument, Command, Flag } from "effect/unstable/cli"
 
 import * as FacilitatorService from "../../Facilitator.ts"
-import { VerifyResponseJsonString } from "../../FacilitatorApi/VerifyEndpoint.ts"
+import { VerifyResponseJsonString } from "../../FacilitatorApi/FacilitatorApi.ts"
 import * as Payload from "../../Payload.ts"
 import * as Input from "../Input.ts"
 
