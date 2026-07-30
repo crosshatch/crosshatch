@@ -2,7 +2,7 @@ import { Config, Console, Effect, Layer, Schema as S } from "effect"
 import { Argument, Command, Flag } from "effect/unstable/cli"
 
 import * as Accept from "../../Accept.ts"
-import { HostMnemonic } from "../../Host/Host.ts"
+import { MnemonicStore } from "../../index.ts"
 import * as Known from "../../Known/Known.ts"
 import * as Payer from "../../Payer.ts"
 import * as Payload from "../../Payload.ts"
@@ -38,7 +38,7 @@ export const payloadMake = Command.make("make", {
             schemes: UnifiedSchemes.layer({
               solana: { rpc: Config.string("SOLANA_RPC_URL").pipe(Config.withDefault(undefined)) },
             }),
-          }).pipe(Layer.provide(HostMnemonic.layer(mnemonic))),
+          }).pipe(Layer.provide(MnemonicStore.layerMnemonicFromName(mnemonic))),
         ),
     ),
   ),

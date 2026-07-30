@@ -3,7 +3,7 @@ import { Eip155Address } from "crosshatch/Eip155"
 import { Config, Effect, Layer, Console } from "effect"
 import { FetchHttpClient } from "effect/unstable/http"
 
-import { layerPayerLocal } from "./layerPayerLocal.ts"
+import { Prelude } from "./Prelude.ts"
 
 Effect.gen(function* () {
   const recipient = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
@@ -24,7 +24,7 @@ Effect.gen(function* () {
   const settlement = yield* Facilitator.settle({ payload })
   yield* Console.log(settlement)
 }).pipe(
-  Effect.provide([Facilitator.layer().pipe(Layer.provide(FetchHttpClient.layer)), layerPayerLocal]),
+  Effect.provide([Facilitator.layer().pipe(Layer.provide(FetchHttpClient.layer)), Prelude]),
   Effect.onError(Effect.logError),
   Effect.runFork,
 )

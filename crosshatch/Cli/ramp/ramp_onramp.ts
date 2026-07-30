@@ -4,7 +4,7 @@ import { Command, Flag } from "effect/unstable/cli"
 
 import * as Amount from "../../Amount.ts"
 import { Eip155Address } from "../../Eip155/Eip155.ts"
-import { HostMnemonic } from "../../Host/Host.ts"
+import { MnemonicStore } from "../../index.ts"
 import * as Mnemonic from "../../Mnemonic.ts"
 import { CaAccountId, Providers, RampClient } from "../../Ramp/Ramp.ts"
 import { Reference } from "../../Reference.ts"
@@ -37,7 +37,7 @@ export const onramp = Command.make("onramp", {
           })
           .pipe(Effect.flatMap(flow(Struct.get("onrampUrl"), openBrowser)))
       },
-      (effect, { mnemonic }) => Effect.provide(effect, HostMnemonic.layer(mnemonic)),
+      (effect, { mnemonic }) => Effect.provide(effect, MnemonicStore.layerMnemonicFromName(mnemonic)),
     ),
   ),
 )
