@@ -1,5 +1,14 @@
 # @crosshatch/widget
 
+## 0.0.7
+
+### Patch Changes
+
+- [#140](https://github.com/crosshatch/crosshatch/pull/140)
+  [`31d054b`](https://github.com/crosshatch/crosshatch/commit/31d054bde1102781637320be4d1e9a2c85b76ef7)
+  Thanks @harrysolovay! - Continue fleshing out CLI. Add various commands and
+  improve mnemonic storage.
+
 ## 0.0.6
 
 ### Patch Changes
