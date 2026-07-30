@@ -33,9 +33,9 @@ import { ChxHttp, Payer } from "crosshatch"
 import { Console, Effect, Layer } from "effect"
 import { LanguageModel } from "effect/unstable/ai"
 
-declare const PayerLive: Layer.Layer<Payer.Payer>
+declare const layerPayerLocal: Layer.Layer<Payer.Payer>
 
-const BlockrunLive = OpenAiLanguageModel.layer({
+const layerLanguageModelBlockrun = OpenAiLanguageModel.layer({
   model: "deepseek/deepseek-chat",
 }).pipe(
   Layer.provide(OpenAiClient.layer({ apiUrl: "https://blockrun.ai/api/v1" })),
@@ -46,8 +46,8 @@ LanguageModel.generateText({
 }).pipe(
   Effect.tap(({ text }) => Console.log(text)),
   Effect.provide(
-    BlockrunLive.pipe(
-      Layer.provide(ChxHttp.layerClient.pipe(Layer.provide(PayerLive))),
+    layerLanguageModelBlockrun.pipe(
+      Layer.provide(ChxHttp.layerClient.pipe(Layer.provide(layerPayerLocal))),
     ),
   ),
   Effect.runFork,
@@ -57,15 +57,15 @@ LanguageModel.generateText({
 ## Fetch a Paid Resource
 
 The same layer also works with ordinary Effect HTTP requests. If the first
-response is `402`, Crosshatch reads the payment requirement, asks `PayerLive`
-for a payload, and retries once with the payment header attached.
+response is `402`, Crosshatch reads the payment requirement, asks the `Payer`
+service for a payload, and retries once with the payment header attached.
 
 ```ts
 import { ChxHttp, Payer } from "crosshatch"
 import { Effect, Layer } from "effect"
 import { HttpClient, HttpClientRequest } from "effect/unstable/http"
 
-declare const PayerLive: Layer.Layer<Payer.Payer>
+declare const layerPayerLocal: Layer.Layer<Payer.Payer>
 
 const program = Effect.gen(function* () {
   const client = yield* HttpClient.HttpClient
@@ -73,10 +73,12 @@ const program = Effect.gen(function* () {
     "https://example.com/paid",
   ).pipe(client.execute)
   return yield* response.text
-}).pipe(Effect.provide(ChxHttp.layerClient.pipe(Layer.provide(PayerLive))))
+}).pipe(
+  Effect.provide(ChxHttp.layerClient.pipe(Layer.provide(layerPayerLocal))),
+)
 ```
 
-`PayerLive` wires the payer to supported assets and signers. This example
+`layerPayerLocal` wires the payer to supported assets and signers. This example
 includes known USD assets, EIP-3009, Permit2, and Solana support:
 
 ```ts
@@ -85,24 +87,24 @@ import { Eip155Signer, Erc3009Scheme, Permit2Scheme } from "crosshatch/Eip155"
 import { SolanaScheme, SolanaSigner, SolanaState } from "crosshatch/Solana"
 import { Config, Layer } from "effect"
 
-const SolanaStateLive = Config.string("SOLANA_RPC_URL").pipe(
+const layerSolanaStateFromConfig = Config.string("SOLANA_RPC_URL").pipe(
   Config.map(SolanaState.layer),
   Layer.unwrap,
 )
 
-const SchemesLive = Layer.mergeAll(
+const layerSchemes = Layer.mergeAll(
   Layer.mergeAll(Erc3009Scheme.layer, Permit2Scheme.layer).pipe(
-    Layer.provide(Eip155Signer.layerMnemonic),
+    Layer.provide(Eip155Signer.layerFromMnemonic),
   ),
   SolanaScheme.layer.pipe(
-    Layer.provide([SolanaSigner.layerMnemonic, SolanaStateLive]),
+    Layer.provide([SolanaSigner.layerFromMnemonic, layerSolanaStateFromConfig]),
   ),
 )
 
-export const PayerLive = Payer.layerLocal({
+export const layerPayerLocal = Payer.layerLocal({
   accept: Accept.first(Known),
-  schemes: SchemesLive,
-}).pipe(Layer.provide(Mnemonic.layerEnv))
+  schemes: layerSchemes,
+}).pipe(Layer.provide(Mnemonic.layerFromEnv))
 ```
 
 Set `MNEMONIC` for the signer keys and `SOLANA_RPC_URL` for recent Solana

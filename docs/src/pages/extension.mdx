@@ -128,7 +128,10 @@ import { PaymentId } from "crosshatch/Extensions"
 
 declare const payload: Payload.Payload
 
-const ExtensionLive = Extension.layerPayload(PaymentId.FromMerchant, payload)
+const layerExtensionFromPayload = Extension.layerFromPayload(
+  PaymentId.FromMerchant,
+  payload,
+)
 ```
 
 At the wire-envelope level, extension maps are JSON records keyed by extension

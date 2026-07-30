@@ -16,7 +16,7 @@ export class Eip155Signer extends Context.Service<
   }
 >()("crosshatch/Eip155/Eip155Signer") {}
 
-export const layerMnemonic = Layer.effect(
+export const layerFromMnemonic = Layer.effect(
   Eip155Signer,
   Effect.gen(function* () {
     const mnemonic = yield* Mnemonic.Mnemonic

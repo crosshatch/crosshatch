@@ -6,7 +6,7 @@ import { FacadeClient } from "./Facade/FacadeClient.ts"
 import * as FacadePrelude from "./Facade/FacadePrelude.ts"
 import { PrerequisitesWidget } from "./Widgets.ts"
 
-const BridgeLive = Layer.effect(
+const layerBridge = Layer.effect(
   Bridge,
   Effect.gen(function* () {
     const facade = yield* FacadeClient
@@ -31,4 +31,7 @@ const BridgeLive = Layer.effect(
   }),
 )
 
-export const layer = Payer.layerBridge.pipe(Layer.provideMerge(BridgeLive), Layer.provideMerge(FacadePrelude.layer))
+export const layer = Payer.layerFromBridge.pipe(
+  Layer.provideMerge(layerBridge),
+  Layer.provideMerge(FacadePrelude.layer),
+)

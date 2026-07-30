@@ -19,15 +19,15 @@ export const fromText = (text: string) => Redacted.make(MnemonicText.make(text))
 
 export const toSeed = (mnemonic: Mnemonic) => mnemonicToSeedSync(Redacted.value(mnemonic))
 
-export const layerText = flow(fromText, Layer.succeed(Mnemonic))
+export const layerFromText = flow(fromText, Layer.succeed(Mnemonic))
 
 export const fromConfig = (config: Config.Config<string>) => Config.map(config, fromText)
 
-export const layerConfig = flow(fromConfig, Layer.effect(Mnemonic))
+export const layerFromConfig = flow(fromConfig, Layer.effect(Mnemonic))
 
-export const env = fromConfig(Config.string("MNEMONIC"))
+export const fromEnv = fromConfig(Config.string("MNEMONIC"))
 
-export const layerEnv = Layer.effect(Mnemonic, env)
+export const layerFromEnv = Layer.effect(Mnemonic, fromEnv)
 
 export const random = Effect.sync(() =>
   Redacted.make(MnemonicText.make(generateMnemonic(wordlist), { disableChecks: true })),

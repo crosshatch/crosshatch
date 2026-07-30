@@ -71,7 +71,7 @@ export const layerLocal = <ROut, E, RIn>({
     }),
   )
 
-export const layerBridge = Effect.map(Bridge, ({ propose }) => ({
+export const layerFromBridge = Effect.map(Bridge, ({ propose }) => ({
   createPayload: flow(
     propose,
     Effect.catchTags({

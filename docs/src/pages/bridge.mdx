@@ -14,7 +14,7 @@ user-controlled approval surface.
 `Payer` is still the service that `Payload.make` and the HTTP client use to
 obtain a concrete x402 payload. The new split is that a `Payer` can either sign
 locally with a chain implementation, or be backed by a `Bridge` via
-`Payer.layerBridge`.
+`Payer.layerFromBridge`.
 
 ## Propose A Payment
 
@@ -48,14 +48,16 @@ declare const askWalletToPay: (
   proposal: Bridge.Proposal,
 ) => Effect.Effect<{ readonly payload: Payload.Payload }, Bridge.ProposeError>
 
-const BridgeLive = Layer.succeed(Bridge.Bridge, {
+const layerBridge = Layer.succeed(Bridge.Bridge, {
   propose: ({ required, traceId }) =>
     Effect.gen(function* () {
       return yield* askWalletToPay({ required, traceId })
     }),
 })
 
-const payerLayer = Payer.layerBridge.pipe(Layer.provide(BridgeLive))
+const layerPayerFromBridge = Payer.layerFromBridge.pipe(
+  Layer.provide(layerBridge),
+)
 ```
 
 Use this when the code consuming paid resources should not directly hold signing

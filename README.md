@@ -19,14 +19,14 @@ import { ChxHttp } from "crosshatch"
 import { Console, Effect, Layer } from "effect"
 import { LanguageModel } from "effect/unstable/ai"
 
-import { PayerLive } from "./PayerLive.ts"
+import { layerPayer } from "./layerPayer.ts"
 
-const BlockrunLive = OpenAiLanguageModel.layer({
+const layerLanguageModelBlockrun = OpenAiLanguageModel.layer({
   model: "deepseek/deepseek-chat",
 }).pipe(
   Layer.provide(
     OpenAiClient.layer({ apiUrl: "https://blockrun.ai/api/v1" }).pipe(
-      Layer.provide(ChxHttp.layerClient.pipe(Layer.provide(PayerLive))),
+      Layer.provide(ChxHttp.layerClient.pipe(Layer.provide(layerPayer))),
     ),
   ),
 )
@@ -35,12 +35,12 @@ LanguageModel.generateText({
   prompt: "Hello from Crosshatch.",
 }).pipe(
   Effect.tap(({ text }) => Console.log(text)),
-  Effect.provide(BlockrunLive),
+  Effect.provide(layerLanguageModelBlockrun),
   Effect.runFork,
 )
 ```
 
-> Payment capability––`PayerLive`--detailed below.
+> Payment capability––`layerPayer`--detailed below.
 
 ## Example Merchant
 
@@ -121,7 +121,7 @@ The following allows the signing payment payloads for various USD-denominated
 stablecoins across EVM and Solana chains. Payment capability derived from a
 single mnemonic `MNEMONIC` in the environment variables.
 
-`PayerLive.ts`
+`layerPayer.ts`
 
 ```ts
 import { Accept, Known, Mnemonic, Payer } from "crosshatch"
@@ -129,24 +129,24 @@ import { Erc3009Scheme, Eip155Signer, Permit2Scheme } from "crosshatch/Eip155"
 import { SolanaState, SolanaScheme, SolanaSigner } from "crosshatch/Solana"
 import { Config, Layer } from "effect"
 
-const SolanaStateLive = Config.string("SOLANA_RPC_URL").pipe(
+const layerSolanaStateFromConfig = Config.string("SOLANA_RPC_URL").pipe(
   Config.map(SolanaState.layer),
   Layer.unwrap,
 )
 
-const SchemesLive = Layer.mergeAll(
+const layerSchemes = Layer.mergeAll(
   Layer.mergeAll(Erc3009Scheme.layer, Permit2Scheme.layer).pipe(
-    Layer.provide(Eip155Signer.layerMnemonic),
+    Layer.provide(Eip155Signer.layerFromMnemonic),
   ),
   SolanaScheme.layer.pipe(
-    Layer.provide([SolanaSigner.layerMnemonic, SolanaStateLive]),
+    Layer.provide([SolanaSigner.layerFromMnemonic, layerSolanaStateFromConfig]),
   ),
 )
 
-export const PayerLive = Payer.layerLocal({
+export const layerPayer = Payer.layerLocal({
   accept: Accept.first(Known),
-  schemes: SchemesLive,
-}).pipe(Layer.provide(Mnemonic.layerEnv))
+  schemes: layerSchemes,
+}).pipe(Layer.provide(Mnemonic.layerFromEnv))
 ```
 
 ## Contributing

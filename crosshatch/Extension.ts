@@ -76,7 +76,7 @@ export const Service =
     })
   }
 
-export const layerPayload = <
+export const layerFromPayload = <
   Self,
   Id extends string,
   Identifier extends string,

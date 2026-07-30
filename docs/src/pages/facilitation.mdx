@@ -24,7 +24,7 @@ import { Facilitator } from "crosshatch"
 import { Layer } from "effect"
 import { FetchHttpClient } from "effect/unstable/http"
 
-const FacilitatorLive = Facilitator.layer().pipe(
+const layerFacilitator = Facilitator.layer().pipe(
   Layer.provide(FetchHttpClient.layer),
 )
 ```
