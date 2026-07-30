@@ -1,7 +1,8 @@
 import * as Cloudflare from "alchemy/Cloudflare"
-import { ChxRpc, Facilitator, Known, Payer, Payload, Required, Requirements } from "crosshatch"
+import { ChxRpc, Facilitator, Payer, Payload, Required, Requirements } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
 import { PaymentId } from "crosshatch/Extensions"
+import { USD } from "crosshatch/Known"
 import { Config, Effect, Layer, Schema as S } from "effect"
 import { Rpc, RpcGroup, RpcSerialization, RpcServer } from "effect/unstable/rpc"
 
@@ -46,7 +47,7 @@ export default class ExampleEffectRpc extends Cloudflare.RpcWorker<ExampleEffect
                   id: PaymentId.random(),
                 }),
                 Required.accept(
-                  Requirements.denomination(Known.USD, {
+                  Requirements.denomination(USD, {
                     amount: 0.01,
                     recipients: { eip155: { 8453: recipient } },
                   }),

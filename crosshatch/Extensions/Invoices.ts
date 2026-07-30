@@ -1,17 +1,17 @@
 import { type Cause, Context, Data, Deferred, Effect, Layer } from "effect"
 
 import * as Payload from "../Payload.ts"
-import type * as Requirements from "../Requirements.ts"
+import type { Requirements } from "../Requirements.ts"
 import type { PaymentId } from "./PaymentId.ts"
 
 export class PayloadUnacceptableError extends Data.TaggedError("PayloadUnacceptableError")<{
-  readonly accepts: ReadonlyArray<Requirements.Requirements>
+  readonly accepts: ReadonlyArray<Requirements>
 }> {}
 
 export class Invoices extends Context.Service<
   Invoices,
   {
-    readonly add: (accepts: ReadonlyArray<Requirements.Requirements>, id: typeof PaymentId.Type) => Effect.Effect<void>
+    readonly add: (accepts: ReadonlyArray<Requirements>, id: typeof PaymentId.Type) => Effect.Effect<void>
 
     readonly await: (id: typeof PaymentId.Type) => Effect.Effect<Payload.Payload, Cause.NoSuchElementError>
 
@@ -20,7 +20,7 @@ export class Invoices extends Context.Service<
       payload: Payload.Payload,
     ) => Effect.Effect<void, Cause.NoSuchElementError | PayloadUnacceptableError>
   }
->()("crosshatch/ChxRpc/Invoices") {}
+>()("crosshatch/Extensions/Invoices") {}
 
 export const layerMemory = Layer.effect(
   Invoices,
@@ -28,7 +28,7 @@ export const layerMemory = Layer.effect(
     const invoices: Record<
       typeof PaymentId.Type,
       {
-        readonly accepts: ReadonlyArray<Requirements.Requirements>
+        readonly accepts: ReadonlyArray<Requirements>
         readonly deferred: Deferred.Deferred<Payload.Payload>
       }
     > = {}

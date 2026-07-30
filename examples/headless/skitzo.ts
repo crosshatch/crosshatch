@@ -1,6 +1,7 @@
-import { Known, Facilitator, Required, Requirements, Payload } from "crosshatch"
+import { Facilitator, Required, Requirements, Payload } from "crosshatch"
 import { BrowserServices } from "crosshatch/Browser"
 import { Eip155Address } from "crosshatch/Eip155"
+import * as Known from "crosshatch/Known"
 import { Config, Effect, Layer, Console } from "effect"
 import { FetchHttpClient } from "effect/unstable/http"
 

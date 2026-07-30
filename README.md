@@ -124,7 +124,8 @@ single mnemonic `MNEMONIC` in the environment variables.
 `layerPayer.ts`
 
 ```ts
-import { Accept, Known, Mnemonic, Payer } from "crosshatch"
+import { Accept, Mnemonic, Payer } from "crosshatch"
+import * as Known from "crosshatch/Known"
 import { Erc3009Scheme, Eip155Signer, Permit2Scheme } from "crosshatch/Eip155"
 import { SolanaState, SolanaScheme, SolanaSigner } from "crosshatch/Solana"
 import { Config, Layer } from "effect"

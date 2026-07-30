@@ -1,6 +1,7 @@
 import { NodeServices } from "@effect/platform-node"
-import { Accept, Known, Payer, MnemonicStore } from "crosshatch"
+import { Accept, Payer, MnemonicStore } from "crosshatch"
 import * as ChxNodeServices from "crosshatch/ChxNodeServices"
+import * as Known from "crosshatch/Known"
 import { UnifiedSchemes } from "crosshatch/Unified"
 import { Config, Layer } from "effect"
 

@@ -2,8 +2,7 @@ import { getAddressFromPublicKey } from "@solana/addresses"
 import { Effect, Schema as S } from "effect"
 
 import * as Address from "../Address.ts"
-import * as Ed25519Pair from "../Crypto/Ed25519Pair.ts"
-import * as Slip10 from "../Crypto/Slip10.ts"
+import { Ed25519Pair, Slip10 } from "../Crypto/Crypto.ts"
 import * as Mnemonic from "../Mnemonic.ts"
 import { brand } from "./_common.ts"
 

@@ -1,6 +1,7 @@
-import { Known, Required, Requirements, Payload, Extension, Facilitator } from "crosshatch"
+import { Required, Requirements, Payload, Extension, Facilitator } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
 import { PaymentId } from "crosshatch/Extensions"
+import * as Known from "crosshatch/Known"
 import { Config, Effect, Layer, Console } from "effect"
 import { FetchHttpClient } from "effect/unstable/http"
 

@@ -1,5 +1,6 @@
-import { Known, Required, Requirements, Payload, Facilitator } from "crosshatch"
+import { Required, Requirements, Payload, Facilitator } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
+import { USD } from "crosshatch/Known"
 import { Config, Effect, Layer, Console } from "effect"
 import { FetchHttpClient } from "effect/unstable/http"
 
@@ -13,7 +14,7 @@ Effect.gen(function* () {
   |
   `.pipe(
     Required.accept(
-      Requirements.denomination(Known.USD, {
+      Requirements.denomination(USD, {
         amount: 0.01,
         recipients: { eip155: { 8453: recipient } },
         ttl: "1 minutes",

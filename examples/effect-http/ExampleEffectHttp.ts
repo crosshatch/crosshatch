@@ -1,7 +1,8 @@
 import * as Cloudflare from "alchemy/Cloudflare"
-import { Required, Requirements, ChxHttp, Known, Payload, Facilitator } from "crosshatch"
+import { Required, Requirements, ChxHttp, Payload, Facilitator } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
 import { PaymentId } from "crosshatch/Extensions"
+import * as Known from "crosshatch/Known"
 import { Layer, Effect, Config } from "effect"
 import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
 
