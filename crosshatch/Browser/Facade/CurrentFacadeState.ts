@@ -1,11 +1,10 @@
-import { Effect, Stream, Layer, SubscriptionRef, Deferred, Semaphore, flow } from "effect"
+import { Context, Deferred, Effect, flow, Layer, Semaphore, Stream, SubscriptionRef } from "effect"
 
 import { FacadeClient } from "./FacadeClient.ts"
-import { FacadeState } from "./FacadeState.ts"
+import type { FacadeState } from "./FacadeState.ts"
 
-export const layerFacadeClient = Layer.effect(
-  FacadeState,
-  Effect.gen(function* () {
+export class CurrentFacadeState extends Context.Service<CurrentFacadeState>()("crosshatch/Browser/FacadeState", {
+  make: Effect.gen(function* () {
     const task = yield* Semaphore.make(1).pipe(Effect.map((v) => Semaphore.withPermits(v, 1)))
     const initialDeferred = yield* Deferred.make<FacadeState>()
     const facade = yield* FacadeClient
@@ -26,4 +25,6 @@ export const layerFacadeClient = Layer.effect(
     const ref = yield* SubscriptionRef.make(initial)
     return ref
   }),
-).pipe(Layer.provideMerge(FacadeClient.layer))
+}) {
+  static readonly layer = Layer.effect(this, this.make)
+}

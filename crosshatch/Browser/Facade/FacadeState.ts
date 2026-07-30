@@ -1,9 +1,9 @@
-import { Context, Schema as S, type SubscriptionRef } from "effect"
+import { Schema as S } from "effect"
 
 import { LinkChallengeId } from "../Browser.ts"
 
-type FacadeState_ = typeof FacadeState_.Type
-const FacadeState_ = S.Struct({
+export type FacadeState = typeof FacadeState.Type
+export const FacadeState = S.Struct({
   session: S.TaggedUnion({
     Challenged: { challengeId: LinkChallengeId },
     Linked: {
@@ -14,11 +14,3 @@ const FacadeState_ = S.Struct({
     Rescinded: {},
   }),
 })
-
-// oxlint-disable-next-line typescript/no-empty-interface
-export interface FacadeState extends FacadeState_ {}
-
-export const FacadeState = Object.assign(
-  Context.Service<FacadeState, SubscriptionRef.SubscriptionRef<FacadeState>>()("crosshatch/Browser/FacadeState"),
-  FacadeState_,
-)

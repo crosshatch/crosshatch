@@ -4,13 +4,13 @@ import { Atom } from "effect/unstable/reactivity"
 
 import { Amount, type Bridge, ChxEnv } from "../index.ts"
 import * as BrowserServices from "./BrowserServices.ts"
-import { FacadeClient, FacadeState } from "./Facade/Facade.ts"
+import { CurrentFacadeState, FacadeClient } from "./Facade/Facade.ts"
 import { ActivityWidget, IdWidget, LinkWidget } from "./Widgets.ts"
 
 const runtime = Atom.runtime(BrowserServices.layer)
 
 export const stateAtom = runtime
-  .subscriptionRef(() => FacadeState)
+  .subscriptionRef(() => CurrentFacadeState)
   .pipe(Atom.mapResult(Struct.get("session")), Atom.keepAlive)
 
 export const isLinkedAtom = stateAtom.pipe(Atom.mapResult((v) => v._tag === "Linked"))
