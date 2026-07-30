@@ -14,7 +14,7 @@ export const fromPublicKey = (publicKey: CryptoKey) =>
     Effect.map((value) => SolanaAddress.make(value, { disableChecks: true })),
   )
 
-export const fromMnemonic = (mnemonic: Mnemonic.Mnemonic): Effect.Effect<SolanaAddress, S.SchemaError, never> =>
+export const fromMnemonic = (mnemonic: Mnemonic.Mnemonic): Effect.Effect<SolanaAddress, S.SchemaError> =>
   Slip10.derive(Mnemonic.toSeed(mnemonic), [44, 501, 0, 0]).pipe(
     Effect.flatMap(({ privateKeySeed }) => Ed25519Pair.fromSeed(privateKeySeed)),
     Effect.flatMap(({ publicKey }) => fromPublicKey(publicKey)),

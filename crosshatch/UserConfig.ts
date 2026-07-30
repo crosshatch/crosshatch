@@ -14,13 +14,13 @@ export const MnemonicConfig = S.Struct({
 export type MnemonicConfigs = typeof MnemonicConfigs.Type
 export const MnemonicConfigs = S.Record(S.String, MnemonicConfig)
 
-export interface UserConfig {
-  readonly mnemonics: MnemonicConfigs
-}
-
 export class GetUserConfigError extends Data.TaggedError("GetUserConfigError")<{ readonly cause?: unknown }> {}
 
 export class SetUserConfigError extends Data.TaggedError("SetUserConfigError")<{ readonly cause?: unknown }> {}
+
+export interface UserConfig {
+  readonly mnemonics: MnemonicConfigs
+}
 
 export const UserConfig = Object.assign(
   Context.Service<

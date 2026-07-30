@@ -39,12 +39,7 @@ export const layer = Layer.effect(
       Effect.mapError((cause) => new SetUserConfigError({ cause })),
     )
 
-    const update = Effect.fn(function* (f: (config: UserConfig) => UserConfig) {
-      const config = (yield* get) ?? { mnemonics: {} }
-      const updated = f(config)
-      yield* set(updated)
-      return updated
-    })
+    const update = (f: (config: UserConfig) => UserConfig) => get.pipe(Effect.map(f), Effect.andThen(set))
 
     return { get, set, update }
   }),
