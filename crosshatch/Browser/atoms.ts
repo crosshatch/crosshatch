@@ -2,18 +2,16 @@ import * as Boundary from "@crosshatch/util/Boundary"
 import { Effect, Match, Cause, Struct } from "effect"
 import { Atom } from "effect/unstable/reactivity"
 
-import * as Amount from "../Amount.ts"
-import { Proposal } from "../Bridge.ts"
-import { ChxEnv } from "../ChxEnv.ts"
+import { Amount, type Bridge, ChxEnv } from "../index.ts"
 import * as BrowserServices from "./BrowserServices.ts"
-import { FacadeClient } from "./Facade/Facade.ts"
-import { FacadeState } from "./Facade/FacadeState.ts"
+import { CurrentFacadeState } from "./CurrentFacadeState.ts"
+import { FacadeClient } from "./FacadeClient.ts"
 import { ActivityWidget, IdWidget, LinkWidget } from "./Widgets.ts"
 
 const runtime = Atom.runtime(BrowserServices.layer)
 
 export const stateAtom = runtime
-  .subscriptionRef(() => FacadeState)
+  .subscriptionRef(() => CurrentFacadeState)
   .pipe(Atom.mapResult(Struct.get("session")), Atom.keepAlive)
 
 export const isLinkedAtom = stateAtom.pipe(Atom.mapResult((v) => v._tag === "Linked"))
@@ -34,7 +32,7 @@ export const rescindAtom = runtime.fn<void>()(
   }),
 )
 
-export const proposeAtom = runtime.fn<Proposal>()(
+export const proposeAtom = runtime.fn<Bridge.Proposal>()(
   Effect.fnUntraced(function* (proposal) {
     const facade = yield* FacadeClient
     yield* facade.Propose(proposal)
@@ -45,7 +43,7 @@ export const openAtom = runtime.fn<void>()(
   Effect.fnUntraced(function* (_, get) {
     const state = yield* get.result(stateAtom)
     const common = { referrer: location.href }
-    const { url } = yield* ChxEnv
+    const { url } = yield* ChxEnv.ChxEnv
     const internal = origin.startsWith(url({ sub: "link" }))
     const amount = yield* Amount.from(10)
     yield* Match.valueTags(state, {

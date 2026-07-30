@@ -1,19 +1,18 @@
 import { Effect, Layer, flow } from "effect"
 
-import { Bridge, CreateTraceError, ProposeError } from "../Bridge.ts"
-import * as Payer from "../Payer.ts"
-import { FacadeClient } from "./Facade/FacadeClient.ts"
-import * as FacadePrelude from "./Facade/FacadePrelude.ts"
+import { Bridge, Payer } from "../index.ts"
+import { CurrentFacadeState } from "./CurrentFacadeState.ts"
+import { FacadeClient } from "./FacadeClient.ts"
 import { PrerequisitesWidget } from "./Widgets.ts"
 
 const layerBridge = Layer.effect(
-  Bridge,
+  Bridge.Bridge,
   Effect.gen(function* () {
     const facade = yield* FacadeClient
     return {
       createTrace: flow(
         facade.CreateTrace,
-        Effect.mapError((cause) => new CreateTraceError({ cause })),
+        Effect.mapError((cause) => new Bridge.CreateTraceError({ cause })),
       ),
       propose: Effect.fnUntraced(
         function* ({ traceId, required }) {
@@ -25,13 +24,14 @@ const layerBridge = Layer.effect(
           )
           return { payload }
         },
-        Effect.mapError((cause) => new ProposeError({ cause })),
+        Effect.mapError((cause) => new Bridge.ProposeError({ cause })),
       ),
     }
   }),
 )
 
 export const layer = Payer.layerFromBridge.pipe(
-  Layer.provideMerge(layerBridge),
-  Layer.provideMerge(FacadePrelude.layer),
+  Layer.provideMerge(
+    layerBridge.pipe(Layer.provideMerge(CurrentFacadeState.layer.pipe(Layer.provideMerge(FacadeClient.layer)))),
+  ),
 )

@@ -4,8 +4,7 @@ import { NodeRuntime, NodeServices, NodeHttpClient } from "@effect/platform-node
 import { Effect, Layer } from "effect"
 import { Command } from "effect/unstable/cli"
 
-import * as HostMnemonicStore from "../Host/HostMnemonicStore.ts"
-import * as HostUserConfig from "../Host/HostUserConfig.ts"
+import * as ChxNodeServices from "../ChxNodeServices/ChxNodeServices.ts"
 import PackageJson from "../package.json" with { type: "json" }
 import { RampClient } from "../Ramp/Ramp.ts"
 import { dev } from "./dev/dev.ts"
@@ -18,10 +17,11 @@ Command.make("crosshatch").pipe(
   Command.withSubcommands([dev, payload, facilitator, mnemonic, ramp]),
   Command.run({ version: PackageJson.version }),
   Effect.scoped,
-  Effect.provide([
-    RampClient.layer.pipe(Layer.provideMerge(NodeHttpClient.layerFetch)),
-    HostMnemonicStore.layer.pipe(Layer.provide(HostUserConfig.layer)),
-  ]),
-  Effect.provide(NodeServices.layer),
+  Effect.provide(
+    Layer.mergeAll(
+      RampClient.layer.pipe(Layer.provideMerge(NodeHttpClient.layerFetch)),
+      ChxNodeServices.layer.pipe(Layer.provideMerge(NodeServices.layer)),
+    ),
+  ),
   NodeRuntime.runMain,
 )

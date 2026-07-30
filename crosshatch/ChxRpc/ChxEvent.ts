@@ -1,4 +1,4 @@
-import { Schema as S, Context, PubSub } from "effect"
+import { Schema as S, Context, type PubSub } from "effect"
 
 import { Proposal, TraceConfig } from "../Bridge.ts"
 

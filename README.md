@@ -56,9 +56,9 @@ import {
   Payload,
   Requirements,
   ChxHttp,
-  Known,
 } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
+import * as Known from "crosshatch/Known"
 import * as Cloudflare from "alchemy/Cloudflare"
 import { Effect, Config, Layer } from "effect"
 import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
@@ -124,30 +124,31 @@ single mnemonic `MNEMONIC` in the environment variables.
 `layerPayer.ts`
 
 ```ts
-import { Accept, Known, Mnemonic, Payer } from "crosshatch"
-import { Erc3009Scheme, Eip155Signer, Permit2Scheme } from "crosshatch/Eip155"
-import { SolanaState, SolanaScheme, SolanaSigner } from "crosshatch/Solana"
+import { NodeServices } from "@effect/platform-node"
+import { Accept, MnemonicStore, Payer } from "crosshatch"
+import * as ChxNodeServices from "crosshatch/ChxNodeServices"
+import * as Known from "crosshatch/Known"
+import { UnifiedSchemes } from "crosshatch/Unified"
 import { Config, Layer } from "effect"
-
-const layerSolanaStateFromConfig = Config.string("SOLANA_RPC_URL").pipe(
-  Config.map(SolanaState.layer),
-  Layer.unwrap,
-)
-
-const layerSchemes = Layer.mergeAll(
-  Layer.mergeAll(Erc3009Scheme.layer, Permit2Scheme.layer).pipe(
-    Layer.provide(Eip155Signer.layerFromMnemonic),
-  ),
-  SolanaScheme.layer.pipe(
-    Layer.provide([SolanaSigner.layerFromMnemonic, layerSolanaStateFromConfig]),
-  ),
-)
 
 export const layerPayer = Payer.layerLocal({
   accept: Accept.first(Known),
-  schemes: layerSchemes,
-}).pipe(Layer.provide(Mnemonic.layerFromEnv))
+  schemes: UnifiedSchemes.layer({
+    solana: {
+      rpc: Config.string("SOLANA_RPC_URL").pipe(Config.withDefault(undefined)),
+    },
+  }).pipe(
+    Layer.provide(
+      MnemonicStore.layerMnemonicFromName().pipe(
+        Layer.provide(ChxNodeServices.layer),
+      ),
+    ),
+  ),
+}).pipe(Layer.provideMerge(NodeServices.layer))
 ```
+
+The default mnemonic is encrypted at rest; its encryption key is kept in the
+operating system keychain. Create it with `pnpm crosshatch mnemonic add`.
 
 ## Contributing
 

@@ -5,6 +5,7 @@ import { JsonRecord } from "../_util.ts"
 import { ChainId } from "../ChainId.ts"
 import { Version } from "../Version.ts"
 
+export type SupportedKind = typeof SupportedKind.Type
 export const SupportedKind = S.Struct({
   x402Version: Version,
   scheme: S.String,
@@ -12,6 +13,7 @@ export const SupportedKind = S.Struct({
   extra: JsonRecord.pipe(S.optional),
 })
 
+export type SupportedResponse = typeof SupportedResponse.Type
 export const SupportedResponse = S.Struct({
   kinds: S.Array(SupportedKind),
   extensions: S.Array(S.String),

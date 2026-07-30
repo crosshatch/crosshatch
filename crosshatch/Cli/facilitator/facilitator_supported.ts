@@ -2,7 +2,7 @@ import { Console, Effect, Schema as S } from "effect"
 import { Command, Flag } from "effect/unstable/cli"
 
 import * as FacilitatorService from "../../Facilitator.ts"
-import { SupportedResponseJsonString } from "../../FacilitatorApi/SupportedEndpoint.ts"
+import { SupportedResponseJsonString } from "../../FacilitatorApi/FacilitatorApi.ts"
 
 export const supported = Command.make("supported", {
   baseUrl: Flag.string("url").pipe(Flag.withDefault(undefined), Flag.withDescription("Facilitator base URL")),

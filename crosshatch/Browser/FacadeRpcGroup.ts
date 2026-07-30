@@ -1,9 +1,8 @@
 import { Schema as S } from "effect"
 import { Rpc, RpcGroup } from "effect/unstable/rpc"
 
-import { Proposal, TraceConfig } from "../../Bridge.ts"
-import { Payload } from "../../Payload.ts"
-import { BrowserProposeError } from "../BrowserProposeError.ts"
+import { Bridge, Payload } from "../index.ts"
+import { BrowserProposeError } from "./BrowserProposeError.ts"
 import { FacadeState } from "./FacadeState.ts"
 
 export class FacadeRpcGroup extends RpcGroup.make(
@@ -13,12 +12,12 @@ export class FacadeRpcGroup extends RpcGroup.make(
   }),
   Rpc.make("Rescind", {}),
   Rpc.make("CreateTrace", {
-    payload: TraceConfig,
+    payload: Bridge.TraceConfig,
   }),
   Rpc.make("Propose", {
-    payload: Proposal,
+    payload: Bridge.Proposal,
     success: S.Struct({
-      payload: Payload,
+      payload: Payload.Payload,
     }),
     error: BrowserProposeError,
   }),

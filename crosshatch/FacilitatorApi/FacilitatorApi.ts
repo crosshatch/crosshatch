@@ -4,6 +4,10 @@ import { SettleEndpoint } from "./SettleEndpoint.ts"
 import { SupportedEndpoint } from "./SupportedEndpoint.ts"
 import { VerifyEndpoint } from "./VerifyEndpoint.ts"
 
+export * from "./VerifyEndpoint.ts"
+export * from "./SettleEndpoint.ts"
+export * from "./SupportedEndpoint.ts"
+
 export class FacilitatorApiGroup extends HttpApiGroup.make("facilitator")
   .add(VerifyEndpoint)
   .add(SettleEndpoint)

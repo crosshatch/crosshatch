@@ -1,4 +1,4 @@
-import { Context, Data, Effect } from "effect"
+import { Context, Data, type Effect } from "effect"
 
 export class GetLatestBlockhashError extends Data.TaggedError("GetLatestBlockhashError")<{
   readonly cause?: unknown

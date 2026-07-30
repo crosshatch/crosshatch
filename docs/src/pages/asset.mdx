@@ -18,7 +18,8 @@ typically the token contract address. It answers the narrow question: "which
 asset identifier should we use for this deployment?"
 
 ```ts
-import { Known, type Asset } from "crosshatch"
+import type { Asset } from "crosshatch"
+import * as Known from "crosshatch/Known"
 
 const baseUsdcAsset: typeof Asset.Asset.Type = Known.USD.USDC.eip155[8453].asset
 ```
@@ -30,7 +31,8 @@ deployment metadata Crosshatch needs to build and validate payments for a single
 namespace/reference pair, such as one EIP-155 chain id.
 
 ```ts
-import { Known, type Asset } from "crosshatch"
+import type { Asset } from "crosshatch"
+import * as Known from "crosshatch/Known"
 
 const baseUsdc: Asset.PhysicalAsset = Known.USD.USDC.eip155[8453]
 const polygonUsdc: Asset.PhysicalAsset = Known.USD.USDC.eip155[137]
@@ -43,7 +45,8 @@ deployments that should be treated as the same asset across namespaces and
 references.
 
 ```ts
-import { Known, type Asset } from "crosshatch"
+import type { Asset } from "crosshatch"
+import * as Known from "crosshatch/Known"
 
 const usdc: Asset.LogicalAsset = Known.USD.USDC
 ```
@@ -56,7 +59,8 @@ bridged USDC.e, and other USD-like assets, each represented by its own
 `Asset.LogicalAsset` lookup.
 
 ```ts
-import { Known, type Asset } from "crosshatch"
+import type { Asset } from "crosshatch"
+import * as Known from "crosshatch/Known"
 
 const usd: Asset.Denomination = Known.USD
 ```
@@ -68,7 +72,8 @@ such as `Accept.first` receive this shape so they can search across units of
 account.
 
 ```ts
-import { Known, type Asset } from "crosshatch"
+import type { Asset } from "crosshatch"
+import * as Known from "crosshatch/Known"
 
 const denominations: Asset.Denominations = Known
 ```
@@ -92,7 +97,7 @@ Crosshatch ships known asset definitions. These are ready-to-use denominations
 for common units of account.
 
 ```ts
-import { Known } from "crosshatch"
+import * as Known from "crosshatch/Known"
 
 const { MEGAUSDC, MUSD, SBC, USDC, USDCE, USDT0 } = Known.USD
 ```
@@ -101,7 +106,7 @@ Each export is a namespace lookup for one logical asset. For example, `USDC`
 contains multiple EIP-155 physical assets under the `eip155` namespace:
 
 ```ts
-import { Known } from "crosshatch"
+import * as Known from "crosshatch/Known"
 
 const baseUsdc = Known.USD.USDC.eip155[8453]
 const polygonUsdc = Known.USD.USDC.eip155[137]

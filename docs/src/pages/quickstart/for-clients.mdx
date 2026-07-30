@@ -78,38 +78,40 @@ const program = Effect.gen(function* () {
 )
 ```
 
-`layerPayerLocal` wires the payer to supported assets and signers. This example
-includes known USD assets, EIP-3009, Permit2, and Solana support:
+`layerPayerLocal` wires the payer to supported assets and signers. In Node.js,
+the built-in services load a named mnemonic encrypted at rest, with its
+encryption key kept in the operating system keychain. This example uses the
+`default` mnemonic and includes known USD assets, EIP-3009, Permit2, and
+optional Solana support:
 
 ```ts
-import { Accept, Known, Mnemonic, Payer } from "crosshatch"
-import { Eip155Signer, Erc3009Scheme, Permit2Scheme } from "crosshatch/Eip155"
-import { SolanaScheme, SolanaSigner, SolanaState } from "crosshatch/Solana"
+import { NodeServices } from "@effect/platform-node"
+import { Accept, MnemonicStore, Payer } from "crosshatch"
+import * as ChxNodeServices from "crosshatch/ChxNodeServices"
+import * as Known from "crosshatch/Known"
+import { UnifiedSchemes } from "crosshatch/Unified"
 import { Config, Layer } from "effect"
-
-const layerSolanaStateFromConfig = Config.string("SOLANA_RPC_URL").pipe(
-  Config.map(SolanaState.layer),
-  Layer.unwrap,
-)
-
-const layerSchemes = Layer.mergeAll(
-  Layer.mergeAll(Erc3009Scheme.layer, Permit2Scheme.layer).pipe(
-    Layer.provide(Eip155Signer.layerFromMnemonic),
-  ),
-  SolanaScheme.layer.pipe(
-    Layer.provide([SolanaSigner.layerFromMnemonic, layerSolanaStateFromConfig]),
-  ),
-)
 
 export const layerPayerLocal = Payer.layerLocal({
   accept: Accept.first(Known),
-  schemes: layerSchemes,
-}).pipe(Layer.provide(Mnemonic.layerFromEnv))
+  schemes: UnifiedSchemes.layer({
+    solana: {
+      rpc: Config.string("SOLANA_RPC_URL").pipe(Config.withDefault(undefined)),
+    },
+  }).pipe(
+    Layer.provide(
+      MnemonicStore.layerMnemonicFromName().pipe(
+        Layer.provide(ChxNodeServices.layer),
+      ),
+    ),
+  ),
+}).pipe(Layer.provideMerge(NodeServices.layer))
 ```
 
-Set `MNEMONIC` for the signer keys and `SOLANA_RPC_URL` for recent Solana
-blockhashes. See [Payer](/payer) for custom asset, policy, and scheme
-composition.
+Create the default mnemonic with `pnpm crosshatch mnemonic add`. Pass a name to
+both the command and `MnemonicStore.layerMnemonicFromName(name)` to use another
+account. Set `SOLANA_RPC_URL` to enable Solana payments. See [Payer](/payer) for
+custom asset, policy, and scheme composition.
 
 ## Delegate Payment Creation
 

@@ -1,8 +1,8 @@
 import { Effect, Schema as S } from "effect"
 
-import * as Eip155Address from "../Eip155/Eip155Address.ts"
-import type * as Mnemonic from "../Mnemonic.ts"
-import * as SolanaAddress from "../Solana/SolanaAddress.ts"
+import { Eip155Address } from "../Eip155/Eip155.ts"
+import type { Mnemonic } from "../index.ts"
+import { SolanaAddress } from "../Solana/Solana.ts"
 
 export type DerivedAddresses = typeof DerivedAddresses.Type
 export const DerivedAddresses = S.Struct({

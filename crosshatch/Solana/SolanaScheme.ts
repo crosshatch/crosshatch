@@ -13,7 +13,7 @@ import {
 } from "@solana/kit"
 import { Effect, Encoding, Schema as S } from "effect"
 
-import { Random } from "../Crypto/Crypto.ts"
+import * as Random from "../Crypto/Random.ts"
 import * as Scheme from "../Scheme.ts"
 import * as SolanaAddress from "./SolanaAddress.ts"
 import * as SolanaAsset from "./SolanaAsset.ts"

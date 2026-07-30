@@ -1,4 +1,4 @@
-import { Cause, Context, Data, Deferred, Effect, Layer } from "effect"
+import { type Cause, Context, Data, Deferred, Effect, Layer } from "effect"
 
 import * as Payload from "../Payload.ts"
 import type { Requirements } from "../Requirements.ts"
@@ -20,7 +20,7 @@ export class Invoices extends Context.Service<
       payload: Payload.Payload,
     ) => Effect.Effect<void, Cause.NoSuchElementError | PayloadUnacceptableError>
   }
->()("crosshatch/ChxRpc/Invoices") {}
+>()("crosshatch/Extensions/Invoices") {}
 
 export const layerMemory = Layer.effect(
   Invoices,

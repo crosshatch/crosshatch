@@ -1,9 +1,7 @@
 import { Layer, Config, Effect, UndefinedOr } from "effect"
 
 import { Erc3009Scheme, Eip155Signer, Permit2Scheme } from "../Eip155/Eip155.ts"
-import * as SolanaScheme from "../Solana/SolanaScheme.ts"
-import * as SolanaSigner from "../Solana/SolanaSigner.ts"
-import * as SolanaState from "../Solana/SolanaState.ts"
+import { SolanaScheme, SolanaSigner, SolanaState } from "../Solana/Solana.ts"
 
 export interface UnifiedSchemesConfig {
   readonly solana?: {

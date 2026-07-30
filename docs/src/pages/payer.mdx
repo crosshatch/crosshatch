@@ -14,8 +14,9 @@ Use `Payer.layerLocal` when you need to customize the denominations, selection
 policy, or schemes:
 
 ```ts
-import { Accept, Known, Mnemonic, Payer } from "crosshatch"
+import { Accept, Mnemonic, Payer } from "crosshatch"
 import { Eip155Signer, Erc3009Scheme, Permit2Scheme } from "crosshatch/Eip155"
+import * as Known from "crosshatch/Known"
 import { Layer } from "effect"
 
 const layerSchemes = Layer.mergeAll(

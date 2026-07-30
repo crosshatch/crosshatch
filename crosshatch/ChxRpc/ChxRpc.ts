@@ -2,8 +2,7 @@ import { Schema as S, Stream, PubSub, Layer, Effect } from "effect"
 import { Rpc, RpcGroup } from "effect/unstable/rpc"
 
 import { Bridge } from "../Bridge.ts"
-import * as Invoices from "../Extensions/Invoices.ts"
-import { FromMerchant } from "../Extensions/PaymentId.ts"
+import { Invoices, PaymentId } from "../Extensions/Extensions.ts"
 import { Payload } from "../Payload.ts"
 import { ChxEvent, ChxEvents } from "./ChxEvent.ts"
 
@@ -31,7 +30,7 @@ export const layer = Layer.mergeAll(
       return {
         createTrace: (config) => PubSub.publish(events, { _tag: "CreateTrace", config }),
         propose: Effect.fnUntraced(function* (proposal) {
-          const { id } = yield* FromMerchant.decodeRequired(proposal.required)
+          const { id } = yield* PaymentId.FromMerchant.decodeRequired(proposal.required)
           yield* invoices.add(proposal.required.accepts, id)
           yield* PubSub.publish(events, { _tag: "Propose", proposal })
           const payload = yield* invoices.await(id)
@@ -44,7 +43,9 @@ export const layer = Layer.mergeAll(
     crosshatch_StreamEvents: () => ChxEvents.pipe(Effect.map(Stream.fromPubSub), Stream.unwrap),
     crosshatch_SendPayment: Effect.fnUntraced(function* ({ payload }) {
       const invoices = yield* Invoices.Invoices
-      const id = yield* FromMerchant.decodePayload(payload).pipe(Effect.flatMap(({ id }) => Effect.fromNullishOr(id)))
+      const id = yield* PaymentId.FromMerchant.decodePayload(payload).pipe(
+        Effect.flatMap(({ id }) => Effect.fromNullishOr(id)),
+      )
       yield* invoices.resolve(id, payload)
     }, Effect.orDie),
   }),

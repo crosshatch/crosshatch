@@ -1,6 +1,6 @@
 import { generateMnemonic, mnemonicToSeedSync, validateMnemonic } from "@scure/bip39"
 import { wordlist } from "@scure/bip39/wordlists/english.js"
-import { Layer, Redacted, Effect, Schema as S, Config, Context, Brand, flow } from "effect"
+import { Layer, Redacted, Effect, Schema as S, Config, Context, type Brand, flow } from "effect"
 
 export const MnemonicText = S.String.check(
   S.makeFilter((text: string) => validateMnemonic(text, wordlist), {

@@ -5,7 +5,7 @@ import type { StandardSchemaV1 } from "@standard-schema/spec"
 import { Data, Effect, pipe, Schema as S, SchemaGetter, Stream } from "effect"
 import { Url, UrlParams } from "effect/unstable/http"
 
-import { ChxEnv } from "../ChxEnv.ts"
+import { ChxEnv } from "../index.ts"
 import { Allowance } from "./Allowance.ts"
 import { LinkChallengeId } from "./LinkChallengeId.ts"
 import { PrerequisitesUnmetError } from "./Prerequisite.ts"
@@ -44,7 +44,7 @@ const widget = <Payload extends S.Codec<any, any>, Item extends S.Codec<any, any
       S.encodeEffect(Payload),
       Effect.flatMap(
         Effect.fn(function* (x) {
-          const { url } = yield* ChxEnv
+          const { url } = yield* ChxEnv.ChxEnv
           const { href: src } = yield* Url.make(
             url({ sub: "link", pathname }),
             UrlParams.make([["x", x]]),

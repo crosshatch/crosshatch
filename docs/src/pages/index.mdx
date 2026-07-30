@@ -137,12 +137,12 @@ Effect.gen(function* () {
 import {
   Facilitator,
   ChxHttp,
-  Known,
   Payload,
   Required,
   Requirements,
 } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
+import * as Known from "crosshatch/Known"
 import { Config, Effect, Layer } from "effect"
 import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
 
@@ -243,8 +243,9 @@ LanguageModel.generateText({
     <div className="crosshatch-code-block">
 
 ```ts
-import { Accept, Known, Mnemonic, Payer } from "crosshatch"
+import { Accept, Mnemonic, Payer } from "crosshatch"
 import { Eip155Signer, Erc3009Scheme, Permit2Scheme } from "crosshatch/Eip155"
+import * as Known from "crosshatch/Known"
 import { Layer } from "effect"
 
 const layerSchemes = Layer.mergeAll(

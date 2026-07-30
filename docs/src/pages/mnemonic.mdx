@@ -26,6 +26,38 @@ const layerSignersFromMnemonic = Layer.mergeAll(
 ).pipe(Layer.provide(Mnemonic.layerFromEnv))
 ```
 
+## Secure Node Storage
+
+Node.js applications can load a named mnemonic from `MnemonicStore` instead of
+keeping the phrase in an environment variable. `ChxNodeServices.layer` stores
+the encrypted mnemonic metadata under `~/.config/crosshatch` and keeps the
+encryption key in the operating system keychain.
+
+```ts
+import { NodeServices } from "@effect/platform-node"
+import { MnemonicStore } from "crosshatch"
+import * as ChxNodeServices from "crosshatch/ChxNodeServices"
+import { Layer } from "effect"
+
+const layerMnemonic = MnemonicStore.layerMnemonicFromName().pipe(
+  Layer.provide(ChxNodeServices.layer),
+  Layer.provideMerge(NodeServices.layer),
+)
+```
+
+With no argument, `layerMnemonicFromName` loads the `default` mnemonic. Create
+it with:
+
+```sh
+pnpm crosshatch mnemonic add
+```
+
+Use `pnpm crosshatch mnemonic add work` and
+`MnemonicStore.layerMnemonicFromName("work")` for a named mnemonic. The
+`MnemonicStore.MnemonicStore` service also exposes `add`, `get`, `list`,
+`describe`, `remove`, and `rename` for applications that manage accounts
+programmatically.
+
 ## From Text
 
 Use `fromText` when you already have the phrase in memory.
@@ -92,6 +124,7 @@ const program = Effect.gen(function* () {
 })
 ```
 
-Use random mnemonics for tests or disposable local flows. For real payer
-clients, persist the mnemonic securely and provide it with `layerFromEnv`,
-`layerFromConfig`, or your own layer.
+Use random mnemonics for tests or disposable local flows. For Node.js payer
+clients, prefer the encrypted `ChxNodeServices` store. Other runtimes can
+provide a mnemonic with `layerFromEnv`, `layerFromConfig`, or a custom layer
+appropriate to their secret-storage platform.

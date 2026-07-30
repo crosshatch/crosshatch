@@ -26,8 +26,9 @@ example uses HTTP, but Crosshatch is not limited to HTTP; route protection is
 just one integration path.
 
 ```ts
-import { ChxHttp, Payload, Required, Requirements, Known } from "crosshatch"
+import { ChxHttp, Payload, Required, Requirements } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
+import * as Known from "crosshatch/Known"
 import { Config, Effect } from "effect"
 import { HttpServerResponse } from "effect/unstable/http"
 
@@ -113,8 +114,9 @@ match one of the route's accepted requirements, build a `Required` value and
 return `ChxHttp.require({ required })` with its status set to `402`.
 
 ```ts
-import { ChxHttp, Known, Payload, Required, Requirements } from "crosshatch"
+import { ChxHttp, Payload, Required, Requirements } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
+import * as Known from "crosshatch/Known"
 import { Config, Effect } from "effect"
 import { HttpServerResponse } from "effect/unstable/http"
 

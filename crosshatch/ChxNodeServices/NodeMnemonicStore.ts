@@ -1,45 +1,35 @@
 import { Effect, Layer, Predicate, Redacted, Schema as S, Struct, UndefinedOr } from "effect"
 
-import * as X25519Pair from "../Crypto/X25519Pair.ts"
-import * as X25519PrivateKey from "../Crypto/X25519PrivateKey.ts"
-import * as X25519PublicKey from "../Crypto/X25519PublicKey.ts"
-import * as Mnemonic from "../Mnemonic.ts"
-import {
-  MnemonicStore,
-  MnemonicAddError,
-  MnemonicDescribeError,
-  MnemonicGetError,
-  MnemonicListError,
-  MnemonicRemoveError,
-  MnemonicRenameError,
-  MnemonicConfigNameAlreadyTakenError,
-  NoSuchMnemonicError,
-  KeychainNameAlreadyTakenError,
-} from "../MnemonicStore.ts"
-import * as DerivedAddresses from "../Unified/DerivedAddresses.ts"
-import { MnemonicConfig, UserConfig } from "../UserConfig.ts"
-import * as Keychain from "./Keychain.ts"
+import { X25519Pair, X25519PrivateKey, X25519PublicKey } from "../Crypto/Crypto.ts"
+import { Mnemonic, MnemonicStore, UserConfig, Keychain } from "../index.ts"
+import { DerivedAddresses } from "../Unified/Unified.ts"
 
 export const layer = Layer.effect(
-  MnemonicStore,
+  MnemonicStore.MnemonicStore,
   Effect.gen(function* () {
-    const config = yield* UserConfig
+    const keychain = yield* Keychain.Keychain
+    const config = yield* UserConfig.UserConfig
     const mnemonicConfigs = config.get.pipe(Effect.map(Struct.get("mnemonics")))
     const mnemonicConfig = Effect.fnUntraced(function* (name: string) {
       const mnemonic = yield* mnemonicConfigs.pipe(Effect.map(Struct.get(name)))
-      if (!mnemonic) return yield* new NoSuchMnemonicError({ name })
+      if (!mnemonic) return yield* new MnemonicStore.NoSuchMnemonicError({ name })
       return mnemonic
     })
 
-    const list = mnemonicConfigs.pipe(Effect.mapError((cause) => new MnemonicListError({ cause })))
+    const list = mnemonicConfigs.pipe(Effect.mapError((cause) => new MnemonicStore.MnemonicListError({ cause })))
 
     const ensureAvailability = Effect.fnUntraced(function* (name: string) {
       yield* mnemonicConfigs.pipe(
-        Effect.filterOrFail(Predicate.hasProperty(name), () => new MnemonicConfigNameAlreadyTakenError({ name })),
+        Effect.filterOrFail(
+          Predicate.hasProperty(name),
+          () => new MnemonicStore.MnemonicConfigNameAlreadyTakenError({ name }),
+        ),
       )
-      yield* Keychain.get(name).pipe(
-        Effect.filterOrFail(Predicate.isUndefined, () => new KeychainNameAlreadyTakenError({ name })),
-      )
+      yield* keychain
+        .get(name)
+        .pipe(
+          Effect.filterOrFail(Predicate.isUndefined, () => new MnemonicStore.KeychainNameAlreadyTakenError({ name })),
+        )
     })
 
     const add = Effect.fnUntraced(
@@ -56,28 +46,28 @@ export const layer = Layer.effect(
         const { privateKey, publicKey } = yield* X25519Pair.random({ extractable: true })
         const secret = yield* X25519PrivateKey.toPkcs8(privateKey)
         const envelope = yield* X25519PublicKey.encrypt(publicKey, new TextEncoder().encode(Redacted.value(mnemonic)))
-        const mnemonicConfig: MnemonicConfig = {
+        const mnemonicConfig: UserConfig.MnemonicConfig = {
           addresses: yield* DerivedAddresses.fromMnemonic(mnemonic),
           envelope,
           dateAdded: new Date(),
           ...(description && { description }),
         }
-        yield* Keychain.set(name, secret).pipe(
-          Effect.andThen(config.update(Struct.evolve({ mnemonics: Struct.assign({ [name]: mnemonicConfig }) }))),
-        )
+        yield* keychain
+          .set(name, secret)
+          .pipe(Effect.andThen(config.update(Struct.evolve({ mnemonics: Struct.assign({ [name]: mnemonicConfig }) }))))
         return mnemonicConfig
       },
-      Effect.mapError((cause) => new MnemonicAddError({ cause })),
+      Effect.mapError((cause) => new MnemonicStore.MnemonicAddError({ cause })),
     )
 
     const get = Effect.fnUntraced(
       function* (name: string) {
         const { envelope } = yield* mnemonicConfig(name)
-        const privateKey = yield* Keychain.get(name).pipe(
+        const privateKey = yield* keychain.get(name).pipe(
           Effect.flatMap(
             UndefinedOr.match({
               onDefined: Effect.succeed,
-              onUndefined: () => new NoSuchMnemonicError({ name }),
+              onUndefined: () => new MnemonicStore.NoSuchMnemonicError({ name }),
             }),
           ),
           Effect.flatMap(X25519PrivateKey.fromPkcs8),
@@ -87,7 +77,7 @@ export const layer = Layer.effect(
           Effect.flatMap(S.decodeUnknownEffect(Mnemonic.Mnemonic)),
         )
       },
-      Effect.mapError((cause) => new MnemonicGetError({ cause })),
+      Effect.mapError((cause) => new MnemonicStore.MnemonicGetError({ cause })),
     )
 
     const describe = (name: string, description: string | undefined) =>
@@ -101,30 +91,30 @@ export const layer = Layer.effect(
                 }),
           }),
         )
-        .pipe(Effect.mapError((cause) => new MnemonicDescribeError({ cause })))
+        .pipe(Effect.mapError((cause) => new MnemonicStore.MnemonicDescribeError({ cause })))
 
     const remove = Effect.fnUntraced(
       function* (name: string) {
         yield* mnemonicConfig(name)
-        yield* Keychain.remove(name).pipe(
-          Effect.andThen(config.update(Struct.evolve({ mnemonics: Struct.omit([name]) }))),
-        )
+        yield* keychain
+          .remove(name)
+          .pipe(Effect.andThen(config.update(Struct.evolve({ mnemonics: Struct.omit([name]) }))))
       },
-      Effect.mapError((cause) => new MnemonicRemoveError({ cause })),
+      Effect.mapError((cause) => new MnemonicStore.MnemonicRemoveError({ cause })),
     )
 
     const rename = Effect.fnUntraced(
       function* (from: string, to: string) {
         yield* mnemonicConfig(from)
         yield* ensureAvailability(to)
-        const secret = yield* Keychain.get(from).pipe(Effect.flatMap(Effect.fromNullishOr))
-        yield* Keychain.set(to, secret)
+        const secret = yield* keychain.get(from).pipe(Effect.flatMap(Effect.fromNullishOr))
+        yield* keychain.set(to, secret)
         yield* config
           .update(Struct.evolve({ mnemonics: Struct.renameKeys({ [from]: to }) }))
-          .pipe(Effect.tapError(() => Keychain.remove(to)))
-        yield* Keychain.remove(from)
+          .pipe(Effect.tapError(() => keychain.remove(to)))
+        yield* keychain.remove(from)
       },
-      Effect.mapError((cause) => new MnemonicRenameError({ cause })),
+      Effect.mapError((cause) => new MnemonicStore.MnemonicRenameError({ cause })),
     )
 
     return { add, get, list, describe, remove, rename }

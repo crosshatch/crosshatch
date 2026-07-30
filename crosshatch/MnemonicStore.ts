@@ -1,7 +1,7 @@
-import { Context, Effect, Data } from "effect"
+import { Context, Effect, Data, flow, Layer } from "effect"
 
 import * as Mnemonic from "./Mnemonic.ts"
-import { MnemonicConfig } from "./UserConfig.ts"
+import type { MnemonicConfig } from "./UserConfig.ts"
 
 export class NoSuchMnemonicError extends Data.TaggedError("NoSuchMnemonicError")<{ readonly name: string }> {
   override get message() {
@@ -57,3 +57,10 @@ export class MnemonicStore extends Context.Service<
     readonly rename: (from: string, to: string) => Effect.Effect<void, MnemonicRenameError>
   }
 >()("crosshatch/MnemonicStore") {}
+
+export const get = Effect.fnUntraced(function* (name?: string) {
+  const store = yield* MnemonicStore
+  return yield* store.get(name ?? "default")
+})
+
+export const layerMnemonicFromName = flow(get, Layer.effect(Mnemonic.Mnemonic))

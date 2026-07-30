@@ -1,9 +1,10 @@
-import { Known, Required, Requirements, Payload, Facilitator } from "crosshatch"
+import { Required, Requirements, Payload, Facilitator } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
+import { USD } from "crosshatch/Known"
 import { Config, Effect, Layer, Console } from "effect"
 import { FetchHttpClient } from "effect/unstable/http"
 
-import { layerPayerLocal } from "./layerPayerLocal.ts"
+import { Prelude } from "./Prelude.ts"
 
 Effect.gen(function* () {
   const recipient = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
@@ -13,7 +14,7 @@ Effect.gen(function* () {
   |
   `.pipe(
     Required.accept(
-      Requirements.denomination(Known.USD, {
+      Requirements.denomination(USD, {
         amount: 0.01,
         recipients: { eip155: { 8453: recipient } },
         ttl: "1 minutes",
@@ -24,7 +25,7 @@ Effect.gen(function* () {
   const settlement = yield* Facilitator.settle({ payload })
   yield* Console.log(settlement)
 }).pipe(
-  Effect.provide([Facilitator.layer().pipe(Layer.provide(FetchHttpClient.layer)), layerPayerLocal]),
+  Effect.provide([Facilitator.layer().pipe(Layer.provide(FetchHttpClient.layer)), Prelude]),
   Effect.onError(Effect.logError),
   Effect.runFork,
 )

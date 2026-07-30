@@ -3,7 +3,8 @@ import type { TransactionPartialSigner } from "@solana/kit"
 import { partiallySignTransaction } from "@solana/transactions"
 import { Context, Effect, Layer } from "effect"
 
-import { Ed25519Pair, Slip10 } from "../Crypto/Crypto.ts"
+import * as Ed25519Pair from "../Crypto/Ed25519Pair.ts"
+import * as Slip10 from "../Crypto/Slip10.ts"
 import * as Mnemonic from "../Mnemonic.ts"
 import * as SolanaAddress from "./SolanaAddress.ts"
 

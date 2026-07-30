@@ -1,4 +1,4 @@
-import { Schema as S, Context, Layer, Effect, Scope, flow } from "effect"
+import { Schema as S, Context, Layer, Effect, type Scope, flow } from "effect"
 
 import type { Payload } from "./Payload.ts"
 import type { Required } from "./Required.ts"

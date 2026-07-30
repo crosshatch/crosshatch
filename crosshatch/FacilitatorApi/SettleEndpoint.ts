@@ -6,11 +6,13 @@ import { ChainId } from "../ChainId.ts"
 import { Payload } from "../Payload.ts"
 import { Requirements } from "../Requirements.ts"
 
+export type SettlePayload = typeof SettlePayload.Type
 export const SettlePayload = S.Struct({
   paymentPayload: Payload,
   paymentRequirements: Requirements,
 })
 
+export type SettleResponse = typeof SettleResponse.Type
 export const SettleResponse = S.Union([
   S.Struct({
     success: S.tag(true),

@@ -1,7 +1,7 @@
 import { Effect, Schema as S } from "effect"
 
 import * as CryptoKey from "./CryptoKey.ts"
-import { Symmetric } from "./Envelope.ts"
+import type { Symmetric } from "./Envelope.ts"
 import * as Random from "./Random.ts"
 
 const AES_GCM = "AES-GCM"
