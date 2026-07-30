@@ -1,4 +1,4 @@
-import { flow, Types, Array, Effect, Schema as S, Record, Duration, UndefinedOr } from "effect"
+import { flow, type Types, Array, Effect, Schema as S, Record, Duration, UndefinedOr } from "effect"
 
 import { Address } from "./Address.ts"
 import * as Amount from "./Amount.ts"

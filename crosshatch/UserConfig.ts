@@ -1,4 +1,4 @@
-import { Context, Effect, Schema as S, Data } from "effect"
+import { Context, type Effect, Schema as S, Data } from "effect"
 
 import { Envelope } from "./Crypto/Crypto.ts"
 import { DerivedAddresses } from "./Unified/Unified.ts"

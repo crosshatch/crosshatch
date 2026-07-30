@@ -5,7 +5,7 @@ import { TraceId } from "../Bridge.ts"
 import * as Extension from "../Extension.ts"
 import { SettleResponseFromBase64JsonString, type SettleResponse } from "../FacilitatorApi/FacilitatorApi.ts"
 import { Payload, PayloadFromBase64JsonString } from "../Payload.ts"
-import { Required, RequiredFromBase64JsonString } from "../Required.ts"
+import { type Required, RequiredFromBase64JsonString } from "../Required.ts"
 import { PAYMENT_REQUIRED, CROSSHATCH_TRACE_ID, PAYMENT_SIGNATURE, PAYMENT_RESPONSE } from "./constants.ts"
 
 export const require = Effect.fnUntraced(function* ({ required }: { readonly required: Required }) {

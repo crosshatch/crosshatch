@@ -1,8 +1,8 @@
 import { Config, Context, Effect, Layer, Schema as S, Option } from "effect"
 import { HttpApiClient } from "effect/unstable/httpapi"
 
-import { FacilitatorApiGroup, FacilitatorApi } from "./FacilitatorApi/FacilitatorApi.ts"
-import { Payload } from "./Payload.ts"
+import { type FacilitatorApiGroup, FacilitatorApi } from "./FacilitatorApi/FacilitatorApi.ts"
+import type { Payload } from "./Payload.ts"
 
 /** @effect-expect-leaking [Mode] extends ["response-only"] ? never : never */
 export class Facilitator extends Context.Service<

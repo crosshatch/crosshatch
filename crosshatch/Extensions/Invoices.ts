@@ -1,4 +1,4 @@
-import { Cause, Context, Data, Deferred, Effect, Layer } from "effect"
+import { type Cause, Context, Data, Deferred, Effect, Layer } from "effect"
 
 import { Payload, type Requirements } from "../index.ts"
 import type { PaymentId } from "./PaymentId.ts"

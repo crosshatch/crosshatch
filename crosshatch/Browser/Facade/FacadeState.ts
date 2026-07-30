@@ -1,4 +1,4 @@
-import { Context, Schema as S, SubscriptionRef } from "effect"
+import { Context, Schema as S, type SubscriptionRef } from "effect"
 
 import { LinkChallengeId } from "../Browser.ts"
 

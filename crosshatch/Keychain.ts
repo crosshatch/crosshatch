@@ -1,4 +1,4 @@
-import { Context, Data, Effect } from "effect"
+import { Context, Data, type Effect } from "effect"
 
 export type KeychainOperation = "read" | "write" | "remove"
 

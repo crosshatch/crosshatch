@@ -1,4 +1,4 @@
-import { Context, Data, Effect, flow, Layer, Schema as S, Scope } from "effect"
+import { Context, Data, Effect, flow, Layer, Schema as S, type Scope } from "effect"
 
 import type { PhysicalAsset } from "./Asset.ts"
 import type { Requirements } from "./Requirements.ts"
@@ -14,6 +14,16 @@ export interface SchemeConfig {
   readonly physical: PhysicalAsset
 }
 
+export interface SchemeMetadata<T extends S.Top, T2 extends S.Top> {
+  readonly known: T
+  readonly extra: T2
+}
+
+export interface SchemeMetadataResolved<T extends S.Top, T2 extends S.Top> {
+  readonly known: T["Type"]
+  readonly extra: T2["Type"]
+}
+
 export type Service = ({ accepted, physical }: SchemeConfig) => Effect.Effect<Adapt<never>, S.SchemaError>
 
 const TypeId = "~crosshatch/Scheme" as const
@@ -24,20 +34,8 @@ export interface Scheme<Self, Id extends string, Known, Extra> extends Context.S
   readonly [TypeId]: typeof TypeId
 
   readonly layer: <T extends S.Top & { readonly Type: Known }, T2 extends S.Top & { readonly Type: Extra }, R>(
-    {
-      known,
-      extra,
-    }: {
-      readonly known: T
-      readonly extra: T2
-    },
-    f: ({
-      known,
-      extra,
-    }: {
-      readonly known: T["Type"]
-      readonly extra: T2["Type"]
-    }) => (config: SchemeConfig) => Adapt<R>,
+    metadata: SchemeMetadata<T, T2>,
+    f: (metadata: SchemeMetadataResolved<T, T2>) => (config: SchemeConfig) => Adapt<R>,
   ) => Layer.Layer<Self, never, Exclude<T2["DecodingServices"] | R, Scope.Scope>>
 }
 
@@ -50,22 +48,11 @@ export const Service =
   <Id extends string>(id: Id): Scheme<Self, Id, Known, Extra> => {
     const tag = Context.Service<Self, Service>()(id)
     const layer = <T extends S.Top & { readonly Type: Known }, T2 extends S.Top & { readonly Type: Extra }, R>(
-      {
-        known,
-        extra,
-      }: {
-        readonly known: T
-        readonly extra: T2
-      },
-      f: ({
-        known,
-        extra,
-      }: {
-        readonly known: T["Type"]
-        readonly extra: T2["Type"]
-      }) => (config: SchemeConfig) => Adapt<R>,
-    ): Layer.Layer<Self, never, Exclude<T2["DecodingServices"] | R, Scope.Scope>> =>
-      Layer.effect(
+      metadata: SchemeMetadata<T, T2>,
+      f: (metadata: SchemeMetadataResolved<T, T2>) => (config: SchemeConfig) => Adapt<R>,
+    ): Layer.Layer<Self, never, Exclude<T2["DecodingServices"] | R, Scope.Scope>> => {
+      const { known, extra } = metadata
+      return Layer.effect(
         tag,
         Effect.gen(function* () {
           const context = yield* Effect.context<Exclude<T2["DecodingServices"] | R, Scope.Scope>>()
@@ -88,5 +75,6 @@ export const Service =
           }, bound)
         }),
       )
+    }
     return Object.assign(tag, { [TypeId]: TypeId, layer })
   }

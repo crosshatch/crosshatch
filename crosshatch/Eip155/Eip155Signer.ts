@@ -1,5 +1,5 @@
 import { Redacted, Context, Layer, Effect } from "effect"
-import { Address, Hash, Hex, Mnemonic as OxMnemonic, Secp256k1, Signature, TypedData } from "ox"
+import { Address, Hash, type Hex, Mnemonic as OxMnemonic, Secp256k1, Signature, TypedData } from "ox"
 
 import { Mnemonic } from "../index.ts"
 

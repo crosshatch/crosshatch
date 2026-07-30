@@ -1,7 +1,7 @@
 import { Schema as S, Effect, Context } from "effect"
 
 import { JsonRecord, stringRaw } from "./_util.ts"
-import { InvalidAmountError } from "./Amount.ts"
+import type { InvalidAmountError } from "./Amount.ts"
 import type { Extension } from "./Extension.ts"
 import { Requirements, type RequirementsLike } from "./Requirements.ts"
 import { ResourceInfo } from "./ResourceInfo.ts"

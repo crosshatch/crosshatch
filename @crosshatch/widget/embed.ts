@@ -1,5 +1,5 @@
 import { BrowserStream } from "@effect/platform-browser"
-import { Cause, Effect, Queue, Record, Schema as S, Stream } from "effect"
+import { type Cause, Effect, Queue, Record, Schema as S, Stream } from "effect"
 
 import type { WidgetConfig } from "./self.ts"
 

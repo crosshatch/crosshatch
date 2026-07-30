@@ -11,6 +11,5 @@ export default defineConfig({
   rules: {
     ...restConfig.rules,
     "custom/crosshatch-enforce-package-import-boundaries": "error",
-    "import/no-cycle": "off",
   },
 })

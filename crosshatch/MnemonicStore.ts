@@ -1,7 +1,7 @@
 import { Context, Effect, Data, flow, Layer } from "effect"
 
 import * as Mnemonic from "./Mnemonic.ts"
-import { MnemonicConfig } from "./UserConfig.ts"
+import type { MnemonicConfig } from "./UserConfig.ts"
 
 export class NoSuchMnemonicError extends Data.TaggedError("NoSuchMnemonicError")<{ readonly name: string }> {
   override get message() {

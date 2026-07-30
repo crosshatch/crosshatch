@@ -1,4 +1,4 @@
-import { Effect, Layer, References, Struct, Tracer } from "effect"
+import { Effect, Layer, References, Struct, type Tracer } from "effect"
 
 export const layer =
   (boundary: string, source: string) =>

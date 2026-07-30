@@ -2,7 +2,7 @@ import * as Boundary from "@crosshatch/util/Boundary"
 import { Effect, Match, Cause, Struct } from "effect"
 import { Atom } from "effect/unstable/reactivity"
 
-import { Amount, Bridge, ChxEnv } from "../index.ts"
+import { Amount, type Bridge, ChxEnv } from "../index.ts"
 import * as BrowserServices from "./BrowserServices.ts"
 import { FacadeClient, FacadeState } from "./Facade/Facade.ts"
 import { ActivityWidget, IdWidget, LinkWidget } from "./Widgets.ts"

@@ -1,5 +1,5 @@
 import { Effect, Schema as S, Encoding } from "effect"
-import { Address, Hex } from "ox"
+import { Address, type Hex } from "ox"
 
 import { Random } from "../Crypto/Crypto.ts"
 import { Scheme } from "../index.ts"
