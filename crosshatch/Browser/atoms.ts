@@ -4,7 +4,8 @@ import { Atom } from "effect/unstable/reactivity"
 
 import { Amount, type Bridge, ChxEnv } from "../index.ts"
 import * as BrowserServices from "./BrowserServices.ts"
-import { CurrentFacadeState, FacadeClient } from "./Facade/Facade.ts"
+import { CurrentFacadeState } from "./CurrentFacadeState.ts"
+import { FacadeClient } from "./FacadeClient.ts"
 import { ActivityWidget, IdWidget, LinkWidget } from "./Widgets.ts"
 
 const runtime = Atom.runtime(BrowserServices.layer)

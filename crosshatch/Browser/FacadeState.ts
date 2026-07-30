@@ -1,6 +1,6 @@
 import { Schema as S } from "effect"
 
-import { LinkChallengeId } from "../Browser.ts"
+import { LinkChallengeId } from "./LinkChallengeId.ts"
 
 export type FacadeState = typeof FacadeState.Type
 export const FacadeState = S.Struct({

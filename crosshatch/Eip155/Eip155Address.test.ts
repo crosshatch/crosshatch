@@ -1,7 +1,7 @@
 import { describe, expect, it } from "@effect/vitest"
 import { Effect } from "effect"
 
-import { Mnemonic } from "../index.ts"
+import * as Mnemonic from "../Mnemonic.ts"
 import * as Eip155Address from "./Eip155Address.ts"
 
 describe(import.meta.url, () => {

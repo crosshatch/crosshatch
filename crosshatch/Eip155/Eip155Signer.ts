@@ -1,7 +1,7 @@
 import { Redacted, Context, Layer, Effect } from "effect"
 import { Address, Hash, type Hex, Mnemonic as OxMnemonic, Secp256k1, Signature, TypedData } from "ox"
 
-import { Mnemonic } from "../index.ts"
+import * as Mnemonic from "../Mnemonic.ts"
 
 export class Eip155Signer extends Context.Service<
   Eip155Signer,

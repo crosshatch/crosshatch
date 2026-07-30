@@ -1,4 +1,4 @@
-import { Asset } from "../index.ts"
+import * as Asset from "../Asset.ts"
 import { SolanaAddress } from "./SolanaAddress.ts"
 
 export type SolanaAsset = typeof SolanaAsset.Type

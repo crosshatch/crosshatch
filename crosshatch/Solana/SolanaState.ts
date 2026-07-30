@@ -1,7 +1,7 @@
 import { type Blockhash, createSolanaRpc } from "@solana/kit"
 import { Effect, Layer, Struct } from "effect"
 
-import { State } from "../index.ts"
+import * as State from "../State.ts"
 
 export class SolanaState extends State.Service<SolanaState, Blockhash>()("crosshatch/Solana/SolanaState") {}
 

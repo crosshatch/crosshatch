@@ -1,4 +1,3 @@
-export * as Util from "./_util.ts"
 export * as State from "./State.ts"
 export * as Keychain from "./Keychain.ts"
 export * as Amount from "./Amount.ts"

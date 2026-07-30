@@ -1,6 +1,7 @@
 import { type Cause, Context, Data, Deferred, Effect, Layer } from "effect"
 
-import { Payload, type Requirements } from "../index.ts"
+import * as Payload from "../Payload.ts"
+import type * as Requirements from "../Requirements.ts"
 import type { PaymentId } from "./PaymentId.ts"
 
 export class PayloadUnacceptableError extends Data.TaggedError("PayloadUnacceptableError")<{

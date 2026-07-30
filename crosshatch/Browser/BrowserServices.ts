@@ -1,7 +1,8 @@
 import { Effect, Layer, flow } from "effect"
 
 import { Bridge, Payer } from "../index.ts"
-import { FacadeClient, CurrentFacadeState } from "./Facade/Facade.ts"
+import { CurrentFacadeState } from "./CurrentFacadeState.ts"
+import { FacadeClient } from "./FacadeClient.ts"
 import { PrerequisitesWidget } from "./Widgets.ts"
 
 const layerBridge = Layer.effect(

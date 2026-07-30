@@ -1,12 +1,15 @@
 import { Schema as S, String, Tuple } from "effect"
 import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 
-import { ChainId, Payload, Requirements, Util } from "../index.ts"
+import { JsonRecord } from "../_util.ts"
+import { ChainId } from "../ChainId.ts"
+import { Payload } from "../Payload.ts"
+import { Requirements } from "../Requirements.ts"
 
 export type SettlePayload = typeof SettlePayload.Type
 export const SettlePayload = S.Struct({
-  paymentPayload: Payload.Payload,
-  paymentRequirements: Requirements.Requirements,
+  paymentPayload: Payload,
+  paymentRequirements: Requirements,
 })
 
 export type SettleResponse = typeof SettleResponse.Type
@@ -15,8 +18,8 @@ export const SettleResponse = S.Union([
     success: S.tag(true),
     payer: S.String.pipe(S.optional),
     transaction: S.String,
-    network: ChainId.ChainId,
-    extensions: Util.JsonRecord.pipe(S.optional),
+    network: ChainId,
+    extensions: JsonRecord.pipe(S.optional),
   }),
   S.Struct({
     success: S.tag(false),
@@ -26,7 +29,7 @@ export const SettleResponse = S.Union([
 ]).mapMembers(
   Tuple.map(
     S.fieldsAssign({
-      extra: Util.JsonRecord.pipe(S.optional),
+      extra: JsonRecord.pipe(S.optional),
     }),
   ),
 )

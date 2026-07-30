@@ -1,4 +1,5 @@
-import { Address, Asset } from "../index.ts"
+import * as Address from "../Address.ts"
+import * as Asset from "../Asset.ts"
 import { brand } from "./_common.ts"
 import { Eip155Address } from "./Eip155Address.ts"
 

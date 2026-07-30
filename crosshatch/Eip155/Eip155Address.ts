@@ -1,7 +1,8 @@
 import { Schema as S, Effect } from "effect"
 import { Address as OxAddress, HdKey, Secp256k1 } from "ox"
 
-import { Address, Mnemonic } from "../index.ts"
+import * as Address from "../Address.ts"
+import * as Mnemonic from "../Mnemonic.ts"
 import { brand } from "./_common.ts"
 
 /** EIP155 account address — `0x` followed by 20 bytes of hex. */

@@ -1,8 +1,8 @@
 import { Schema as S } from "effect"
 import { Rpc, RpcGroup } from "effect/unstable/rpc"
 
-import { Bridge, Payload } from "../../index.ts"
-import { BrowserProposeError } from "../Browser.ts"
+import { Bridge, Payload } from "../index.ts"
+import { BrowserProposeError } from "./BrowserProposeError.ts"
 import { FacadeState } from "./FacadeState.ts"
 
 export class FacadeRpcGroup extends RpcGroup.make(

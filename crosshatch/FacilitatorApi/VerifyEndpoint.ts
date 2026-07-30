@@ -1,18 +1,20 @@
 import { Schema as S, String, Tuple } from "effect"
 import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 
-import { Payload, Requirements, Util } from "../index.ts"
+import { JsonRecord } from "../_util.ts"
+import { Payload } from "../Payload.ts"
+import { Requirements } from "../Requirements.ts"
 
 export const VerifyPayload = S.Struct({
-  paymentPayload: Payload.Payload,
-  paymentRequirements: Requirements.Requirements,
+  paymentPayload: Payload,
+  paymentRequirements: Requirements,
 })
 
 export const VerifyResponse = S.Union([
   S.Struct({
     isValid: S.tag(true),
     payer: S.String.pipe(S.optional),
-    extensions: Util.JsonRecord.pipe(S.optional),
+    extensions: JsonRecord.pipe(S.optional),
   }),
   S.Struct({
     isValid: S.tag(false),
@@ -22,7 +24,7 @@ export const VerifyResponse = S.Union([
 ]).mapMembers(
   Tuple.map(
     S.fieldsAssign({
-      extra: Util.JsonRecord.pipe(S.optional),
+      extra: JsonRecord.pipe(S.optional),
     }),
   ),
 )

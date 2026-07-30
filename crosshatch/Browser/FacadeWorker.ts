@@ -3,7 +3,7 @@ import * as Host from "@crosshatch/widget/Host"
 import { BrowserWorker, BrowserStream } from "@effect/platform-browser"
 import { Effect, Fiber, Layer, Stream, Schema as S, Schedule, Data, Record } from "effect"
 
-import { ChxEnv } from "../../index.ts"
+import { ChxEnv } from "../index.ts"
 import { FacadeIntroduction, RequestFacadeIntroduction } from "./handshake.ts"
 
 export class FacadeWorkerError extends Data.TaggedError("FacadeWorkerError")<{
