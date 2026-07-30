@@ -7,9 +7,9 @@ import { RequiredFromBase64JsonString } from "../Required.ts"
 import { runtime } from "../runtime.ts"
 import { CROSSHATCH_TRACE_ID, PAYMENT_REQUIRED, PAYMENT_SIGNATURE } from "./constants.ts"
 
-export class PaymentAlreadyAttemptedError extends Data.TaggedError("PaymentAlreadyAttemptedError")<{}> {}
+export class PaymentAlreadyAttemptedError extends Data.TaggedError("PaymentAlreadyAttemptedError") {}
 
-export class NoSuchRequiredError extends Data.TaggedError("NoSuchRequiredError")<{}> {}
+export class NoSuchRequiredError extends Data.TaggedError("NoSuchRequiredError") {}
 
 export const layerFetch = Layer.effect(
   FetchHttpClient.Fetch,

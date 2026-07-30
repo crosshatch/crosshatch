@@ -31,10 +31,9 @@ export const SettleResponse = S.Union([
     }),
   ),
 )
-
-export const SettleResponseFromBase64JsonString = S.StringFromBase64.pipe(
-  S.decodeTo(S.fromJsonString(S.toCodecJson(SettleResponse))),
-)
+export const SettleResponseJson = S.toCodecJson(SettleResponse)
+export const SettleResponseJsonString = S.fromJsonString(SettleResponseJson)
+export const SettleResponseFromBase64JsonString = S.StringFromBase64.pipe(S.decodeTo(SettleResponseJsonString))
 
 export const SettleEndpoint = HttpApiEndpoint.post("settle", "/settle", {
   payload: SettlePayload,

@@ -2,7 +2,7 @@ import * as GitHub from "alchemy/GitHub"
 import * as Output from "alchemy/Output"
 import { Data, Effect, String } from "effect"
 
-export class NotInPrError extends Data.TaggedError("NotInPrError")<{}> {}
+export class NotInPrError extends Data.TaggedError("NotInPrError") {}
 
 export const PrComment =
   (resourceId: string) =>

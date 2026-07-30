@@ -30,6 +30,9 @@ const SignersLive = Layer.mergeAll(
 
 Use `fromText` when you already have the phrase in memory.
 
+The text must be a valid English BIP-39 mnemonic, including a valid checksum. An
+arbitrary string with a supported word count is rejected.
+
 ```ts
 import { Mnemonic } from "crosshatch"
 

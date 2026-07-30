@@ -1,5 +1,5 @@
 name: Checkout Crosshatch
-description: Initialize the konfik submodule after the repo has been checked out.
+description: Checkout Crosshatch and initialize the konfik submodule.
 runs:
   using: composite
   steps:

@@ -7,10 +7,15 @@ export const Stage = S.Union([
   S.Literal("prod"),
 ])
 
+export interface UrlConfig {
+  readonly sub?: string | undefined
+  readonly pathname?: string | undefined
+}
+
 export class ChxEnv extends Context.Reference<{
   readonly stage: Stage
-  readonly domain: (sub?: string, pathname?: string) => string
-  readonly url: (sub?: string, pathname?: string) => string
+  readonly domain: (config?: UrlConfig) => string
+  readonly url: (config?: UrlConfig) => string
 }>("crosshatch/ChxEnv", {
   defaultValue: () =>
     Effect.gen(function* () {
@@ -25,9 +30,11 @@ export class ChxEnv extends Context.Reference<{
           }),
         ))
       const stage = yield* S.decodeUnknownEffect(Stage)(raw).pipe(Effect.orElseSucceed(() => "prod" as const))
-      const domain = (sub?: string, pathname?: string) =>
-        `${stage.startsWith("staging-") ? `${stage}.` : ""}${sub ? `${sub}.` : ""}crosshatch.dev${stage.startsWith("dev_") ? ".localhost" : ""}${pathname ? `/${pathname}` : ""}`
-      const url = (sub?: string, pathname?: string) => `https://${domain(sub, pathname)}`
+      const domain = (config?: UrlConfig) => {
+        const { sub, pathname } = config ?? {}
+        return `${stage.startsWith("staging-") ? `${stage}.` : ""}${sub ? `${sub}.` : ""}crosshatch.dev${stage.startsWith("dev_") ? ".localhost" : ""}${pathname ? `/${pathname}` : ""}`
+      }
+      const url = (config?: UrlConfig) => `https://${domain(config)}`
       return { stage, domain, url }
     }).pipe(Effect.runSync),
 }) {}

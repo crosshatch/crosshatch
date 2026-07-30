@@ -45,7 +45,7 @@ export const TraceId = Effect.serviceOption(Trace).pipe(
   Effect.map(flow(Option.map(Struct.get("traceId")), Option.getOrUndefined)),
 )
 
-export class NoSurroundingTraceError extends Data.TaggedError("NoSurroundingTraceError")<{}> {}
+export class NoSurroundingTraceError extends Data.TaggedError("NoSurroundingTraceError") {}
 
 export const traced =
   (name: string) =>

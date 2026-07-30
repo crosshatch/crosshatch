@@ -76,38 +76,38 @@ const program = Effect.gen(function* () {
 }).pipe(Effect.provide(ChxHttp.layerClient.pipe(Layer.provide(PayerLive))))
 ```
 
-`PayerLive` wires the payer to supported assets and signers. The headless
-example includes EIP-155 and Solana support:
+`PayerLive` wires the payer to supported assets and signers. This example
+includes known USD assets, EIP-3009, Permit2, and Solana support:
 
 ```ts
-import { Accept, KnownAssets, Mnemonic, Payer } from "crosshatch"
+import { Accept, Known, Mnemonic, Payer } from "crosshatch"
 import { Eip155Signer, Erc3009Scheme, Permit2Scheme } from "crosshatch/Eip155"
 import { SolanaScheme, SolanaSigner, SolanaState } from "crosshatch/Solana"
 import { Config, Layer } from "effect"
 
-export const PayerLive = Payer.layer.pipe(
-  Layer.provide(
-    Accept.layer(KnownAssets.Usd).pipe(
-      Layer.provide(
-        Layer.mergeAll(
-          Layer.mergeAll(Erc3009Scheme.layer, Permit2Scheme.layer).pipe(
-            Layer.provide(Eip155Signer.layerMnemonic),
-          ),
-          SolanaScheme.layer.pipe(
-            Layer.provide([
-              SolanaSigner.layerMnemonic,
-              Config.string("SOLANA_RPC_URL").pipe(
-                Config.map(SolanaState.layer),
-                Layer.unwrap,
-              ),
-            ]),
-          ),
-        ).pipe(Layer.provide(Mnemonic.layerEnv)),
-      ),
-    ),
+const SolanaStateLive = Config.string("SOLANA_RPC_URL").pipe(
+  Config.map(SolanaState.layer),
+  Layer.unwrap,
+)
+
+const SchemesLive = Layer.mergeAll(
+  Layer.mergeAll(Erc3009Scheme.layer, Permit2Scheme.layer).pipe(
+    Layer.provide(Eip155Signer.layerMnemonic),
+  ),
+  SolanaScheme.layer.pipe(
+    Layer.provide([SolanaSigner.layerMnemonic, SolanaStateLive]),
   ),
 )
+
+export const PayerLive = Payer.layerLocal({
+  accept: Accept.first(Known),
+  schemes: SchemesLive,
+}).pipe(Layer.provide(Mnemonic.layerEnv))
 ```
+
+Set `MNEMONIC` for the signer keys and `SOLANA_RPC_URL` for recent Solana
+blockhashes. See [Payer](/payer) for custom asset, policy, and scheme
+composition.
 
 ## Delegate Payment Creation
 

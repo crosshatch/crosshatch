@@ -4,11 +4,11 @@ import { handler } from "../_util.ts"
 import type { Denomination } from "../Asset.ts"
 import { ChainId } from "../ChainId.ts"
 import { FacilitatorApi } from "../FacilitatorApi/FacilitatorApi.ts"
-import * as KnownAssets from "../KnownAssets/KnownAssets.ts"
+import * as Known from "../Known/Known.ts"
 
 export const supported = handler(FacilitatorApi, "facilitator", "supported", () =>
   Effect.succeed({
-    kinds: Record.values(KnownAssets).flatMap((denomination: Denomination) =>
+    kinds: Record.values(Known).flatMap((denomination: Denomination) =>
       Record.values(denomination).flatMap((logicalAsset) =>
         Record.toEntries(logicalAsset).flatMap(([namespace, references]) =>
           Record.toEntries(references).map(([reference, physical]) => ({

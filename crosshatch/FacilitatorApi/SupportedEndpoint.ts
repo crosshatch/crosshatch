@@ -17,6 +17,8 @@ export const SupportedResponse = S.Struct({
   extensions: S.Array(S.String),
   signers: S.Record(S.String, S.Array(S.String)),
 })
+export const SupportedResponseJson = S.toCodecJson(SupportedResponse)
+export const SupportedResponseJsonString = S.fromJsonString(SupportedResponseJson)
 
 export const SupportedEndpoint = HttpApiEndpoint.get("supported", "/supported", {
   success: SupportedResponse,

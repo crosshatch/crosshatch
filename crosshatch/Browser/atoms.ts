@@ -46,7 +46,7 @@ export const openAtom = runtime.fn<void>()(
     const state = yield* get.result(stateAtom)
     const common = { referrer: location.href }
     const { url } = yield* ChxEnv
-    const internal = origin.startsWith(url("link"))
+    const internal = origin.startsWith(url({ sub: "link" }))
     const amount = yield* Amount.from(10)
     yield* Match.valueTags(state, {
       Challenged: ({ challengeId }) =>

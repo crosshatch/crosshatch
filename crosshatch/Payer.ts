@@ -1,6 +1,6 @@
 import { Array, Schema as S, Context, Effect, Layer, Record, Predicate, flow } from "effect"
 
-import { Accept, type AcceptError } from "./Accept.ts"
+import type { Accept, AcceptError } from "./Accept.ts"
 import { Bridge } from "./Bridge.ts"
 import { ExtensionRegistry } from "./Extension.ts"
 import type { Payload } from "./Payload.ts"
@@ -17,44 +17,59 @@ export class Payer extends Context.Service<
   }
 >()("crosshatch/Payer") {}
 
-export const layer = Layer.effect(
-  Payer,
-  Effect.gen(function* () {
-    const accept = yield* Accept
-    const registry = yield* ExtensionRegistry
-    return {
-      createPayload: Effect.fnUntraced(function* ({ required }) {
-        const { accepted, adapt } = yield* accept({ required })
-        const { extensions: infos = {} } = required
-        const payload = yield* adapt
-        const extensions = yield* Effect.forEach(
-          Record.toEntries(infos),
-          Effect.fnUntraced(
-            function* ([identifier, infoJson]) {
-              const extension = registry.entries().find(([extension]) => extension.identifier === identifier)
-              if (!extension) {
-                return
-              }
-              const [{ info: Info, enrichment: Enrichment }, f] = extension
-              const info = yield* S.decodeUnknownEffect(S.toCodecJson(Info))(infoJson)
-              const enrichment = yield* f({ accepted, info, payload, required }).pipe(
-                Effect.flatMap(S.encodeEffect(S.toCodecJson(Enrichment))),
-              )
-              return [identifier, enrichment] as const
+export const layerLocal = <ROut, E, RIn>({
+  accept,
+  schemes,
+}: {
+  readonly schemes: Layer.Layer<ROut, E, RIn>
+  readonly accept: Accept
+}) =>
+  Layer.effect(
+    Payer,
+    Effect.gen(function* () {
+      const registry = yield* ExtensionRegistry
+      const context = yield* Effect.context<RIn>()
+      const schemesContext = yield* Layer.build(schemes)
+      return {
+        createPayload: Effect.fnUntraced(function* ({ required }) {
+          const { accepted, adapt } = yield* accept({ required }).pipe(
+            Effect.provideContext(Context.mergeAll(context, schemesContext)),
+          )
+          const { extensions: infos = {} } = required
+          const payload = yield* adapt
+          const extensions = yield* Effect.forEach(
+            Record.toEntries(infos),
+            Effect.fnUntraced(
+              function* ([identifier, infoJson]) {
+                const extension = registry.entries().find(([extension]) => extension.identifier === identifier)
+                if (!extension) {
+                  return
+                }
+                const [{ info: Info, enrichment: Enrichment }, f] = extension
+                const info = yield* S.decodeUnknownEffect(S.toCodecJson(Info))(infoJson)
+                const enrichment = yield* f({ accepted, info, payload, required }).pipe(
+                  Effect.flatMap(S.encodeEffect(S.toCodecJson(Enrichment))),
+                )
+                return [identifier, enrichment] as const
+              },
+              Effect.catchTags({
+                SchemaError: () => Effect.undefined,
+              }),
+            ),
+            { concurrency: "unbounded" },
+          ).pipe(Effect.map(flow(Array.filter(Predicate.isNotUndefined), Record.fromEntries)))
+          return {
+            payload: {
+              x402Version: 2 as const,
+              payload,
+              accepted,
+              extensions,
             },
-            Effect.catchTags({
-              SchemaError: () => Effect.undefined,
-            }),
-          ),
-          { concurrency: "unbounded" },
-        ).pipe(Effect.map(flow(Array.filter(Predicate.isNotUndefined), Record.fromEntries)))
-        return {
-          payload: { x402Version: 2, payload, accepted, extensions },
-        }
-      }),
-    }
-  }),
-)
+          }
+        }),
+      }
+    }),
+  )
 
 export const layerBridge = Effect.map(Bridge, ({ propose }) => ({
   createPayload: flow(

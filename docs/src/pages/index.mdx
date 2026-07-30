@@ -137,7 +137,7 @@ Effect.gen(function* () {
 import {
   Facilitator,
   ChxHttp,
-  KnownAssets,
+  Known,
   Payload,
   Required,
   Requirements,
@@ -153,7 +153,7 @@ const router = HttpRouter.add(
   "/paid",
   Effect.gen(function* () {
     const payload = yield* Payload.Payload
-    const accepted = yield* Requirements.logical(KnownAssets.Usd.USDC, {
+    const accepted = yield* Requirements.logical(Known.USD.USDC, {
       amount: 0.01,
       recipients: { eip155: { 8453: yield* recipient } },
     })
@@ -243,23 +243,19 @@ LanguageModel.generateText({
     <div className="crosshatch-code-block">
 
 ```ts
-import { Accept, KnownAssets, Mnemonic, Payer } from "crosshatch"
-import { Erc3009Scheme, Eip155Signer, Permit2Scheme } from "crosshatch/Eip155"
+import { Accept, Known, Mnemonic, Payer } from "crosshatch"
+import { Eip155Signer, Erc3009Scheme, Permit2Scheme } from "crosshatch/Eip155"
 import { Layer } from "effect"
 
-export const PayerLive = Payer.layer.pipe(
-  Layer.provide(
-    Accept.layer(KnownAssets.Usd).pipe(
-      Layer.provide(
-        Layer.mergeAll(Erc3009Scheme.layer, Permit2Scheme.layer).pipe(
-          Layer.provide(
-            Eip155Signer.layerMnemonic.pipe(Layer.provide(Mnemonic.layerEnv)),
-          ),
-        ),
-      ),
-    ),
-  ),
-)
+const SchemesLive = Layer.mergeAll(
+  Erc3009Scheme.layer,
+  Permit2Scheme.layer,
+).pipe(Layer.provide(Eip155Signer.layerMnemonic))
+
+export const PayerLive = Payer.layerLocal({
+  accept: Accept.first(Known),
+  schemes: SchemesLive,
+}).pipe(Layer.provide(Mnemonic.layerEnv))
 ```
 
     </div>

@@ -106,7 +106,7 @@ const paymentIdHandler = Extension.layerHandler(
 )
 ```
 
-Provide the handler alongside `Payer.layer`. When `Payer.layer` creates a
+Provide the handler alongside `Payer.layerLocal`. When the local payer creates a
 payload, it reads `required.extensions`, decodes any extension requests that
 have registered handlers, and stores each handler's enrichment in
 `payload.extensions`.

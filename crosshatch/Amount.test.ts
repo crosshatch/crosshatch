@@ -1,9 +1,9 @@
 import { assert, describe, it } from "@effect/vitest"
 import { BigDecimal, Effect, Schema as S } from "effect"
 
-import { Address, Amount, KnownAssets, Requirements } from "./index.ts"
+import { Address, Amount, Known, Requirements } from "./index.ts"
 
-const assertAmount = (actual: typeof Amount.Amount.Type, expected: string) =>
+const assertAmount = (actual: Amount.Amount, expected: string) =>
   assert.isTrue(
     BigDecimal.equals(actual, BigDecimal.fromStringUnsafe(expected)),
     `expected ${BigDecimal.format(actual)} to equal ${expected}`,
@@ -98,16 +98,16 @@ describe(import.meta.url, () => {
     }),
   )
 
-  it(
+  it.effect(
     "scales grouped requirements by physical asset decimals",
     Effect.fn(function* () {
       const payTo = Address.Address.make("0x0000000000000000000000000000000000000001")
-      const [sixDecimals] = yield* Requirements.denomination(KnownAssets.Usd, {
+      const [sixDecimals] = yield* Requirements.denomination(Known.USD, {
         amount: 0.01,
         recipients: { eip155: { 8453: payTo } },
       })
       assert.strictEqual(sixDecimals!.amount, "10000")
-      const [eighteenDecimals] = yield* Requirements.denomination(KnownAssets.Usd, {
+      const [eighteenDecimals] = yield* Requirements.denomination(Known.USD, {
         amount: 0.01,
         recipients: { eip155: { 31612: payTo } },
       })

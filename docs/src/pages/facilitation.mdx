@@ -16,7 +16,8 @@ Use `Facilitator.layer()` for the public Crosshatch facilitator, or
 
 ## Crosshatch Facilitator
 
-`layer()` uses the hosted facilitator at `https://cirque.sh` by default.
+`layer()` uses the hosted facilitator at `https://cirque.sh/facilitator` by
+default.
 
 ```ts
 import { Facilitator } from "crosshatch"
@@ -139,5 +140,6 @@ CROSSHATCH_DEV_PORT=4647 your-dev-command
 
 `CROSSHATCH_DEV_HOST` is also reserved and defaults to `localhost`. When
 `CROSSHATCH_DEV_PORT` is set, these variables take precedence over `baseUrl` and
-the hosted facilitator. Match `--host` and `CROSSHATCH_DEV_HOST` when the server
-is not local.
+the hosted facilitator. Match `--hostname` and `CROSSHATCH_DEV_HOST` when the
+server is not local. Use `--otel-endpoint` to export development-server logs and
+traces to an OTLP/HTTP endpoint.

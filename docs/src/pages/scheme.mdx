@@ -7,7 +7,8 @@ description:
 
 # Scheme
 
-Schemes are the chain-specific payment payload builders used by `Payer.layer`.
+Schemes are the chain-specific payment payload builders used by
+`Payer.layerLocal`.
 
 A `Required` value describes acceptable payment options in a chain-agnostic
 shape. A scheme turns one accepted option into the concrete JSON payload needed
@@ -16,10 +17,10 @@ authorization, or a Solana transaction.
 
 ## How Schemes Are Selected
 
-`Accept.layer` selects schemes from the configured denomination.
+The configured `Accept.Accept` policy selects schemes from its denominations.
 
 Each `PhysicalAsset` lists the scheme tags it supports. During payment creation,
-`Accept.layer` looks for a `required.accepts` entry whose network and asset
+`Accept.first` looks for a `required.accepts` entry whose network and asset
 match a configured physical asset, then uses the first listed scheme that is
 available in the current Effect context.
 

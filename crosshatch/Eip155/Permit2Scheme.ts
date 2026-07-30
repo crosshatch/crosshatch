@@ -5,13 +5,12 @@ import * as Random from "../Crypto/Random.ts"
 import * as Scheme from "../Scheme.ts"
 import { Eip155Signer } from "./Eip155Signer.ts"
 
+export type Extra = typeof Extra.Type
 export const Extra = S.Struct({
   assetTransferMethod: S.Never.pipe(S.optional),
 })
 
-export class Permit2Scheme extends Scheme.Service<Permit2Scheme, void, typeof Extra.Type>()(
-  "crosshatch/Eip155/Permit2Scheme",
-) {}
+export class Permit2Scheme extends Scheme.Service<Permit2Scheme, void, Extra>()("crosshatch/Eip155/Permit2Scheme") {}
 
 export interface Permit2 {
   readonly signature: string

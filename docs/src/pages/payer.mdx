@@ -10,48 +10,51 @@ description:
 `Payer` is the service that turns a `Required` value into a signed x402
 `Payload`.
 
-Local clients usually provide it with `Payer.layer`, asset metadata for
-requirement selection, and the supported signing schemes:
+Use `Payer.layerLocal` when you need to customize the denominations, selection
+policy, or schemes:
 
 ```ts
-import { Accept, KnownAssets, Mnemonic, Payer } from "crosshatch"
+import { Accept, Known, Mnemonic, Payer } from "crosshatch"
 import { Eip155Signer, Erc3009Scheme, Permit2Scheme } from "crosshatch/Eip155"
 import { Layer } from "effect"
 
-const PayerLive = Payer.layer.pipe(
-  Layer.provide(
-    Accept.layer(KnownAssets.Usd).pipe(
-      Layer.provide(
-        Layer.mergeAll(Erc3009Scheme.layer, Permit2Scheme.layer).pipe(
-          Layer.provide(
-            Eip155Signer.layerMnemonic.pipe(Layer.provide(Mnemonic.layerEnv)),
-          ),
-        ),
-      ),
-    ),
-  ),
-)
+const SchemesLive = Layer.mergeAll(
+  Erc3009Scheme.layer,
+  Permit2Scheme.layer,
+).pipe(Layer.provide(Eip155Signer.layerMnemonic))
+
+const PayerLive = Payer.layerLocal({
+  accept: Accept.first({ USD: Known.USD }),
+  schemes: SchemesLive,
+}).pipe(Layer.provide(Mnemonic.layerEnv))
 ```
+
+This example reads `MNEMONIC` from the environment. Other `Mnemonic` layers can
+provide the same signer dependency.
 
 ## Requirement Selection
 
-`Accept` is the requirement-selection service used by `Payer.layer`.
+`Accept.Accept` is the requirement-selection function used by
+`Payer.layerLocal`.
 
 Given a `Required` invoice, it chooses one compatible entry from
 `required.accepts`, finds the matching physical asset, and returns the scheme
 effect that can create the chain-specific payment payload.
 
-`Accept.layer(denomination)` receives a denomination config. `KnownAssets.Usd`
-is the built-in USD denomination Crosshatch ships. Provide it to `Payer.layer`
-together with the signing schemes your client supports.
+`Accept.first(denominations)` creates the built-in first-match policy. It
+searches the configured denominations, the invoice's accepted options, and each
+physical asset's schemes in order, returning the first usable combination.
+`Known` contains the built-in denominations; pass all of it or select a subset
+such as `{ USD: Known.USD }`.
 
 `Accept` compares the invoice's accepted payment options against the configured
-denomination. A payment option is usable when its network and asset match a
+denominations. A payment option is usable when its network and asset match a
 configured physical asset, and one of that asset's schemes is available in the
 current Effect context.
 
-Most applications do not call `Accept` directly. They provide `Accept.layer` to
-`Payer.layer`, then call `Payer.createPayload`.
+Most applications pass `Accept.first(Known)` to `Payer.layerLocal`, then call
+`Payer.createPayload`. A custom `Accept.Accept` function can implement a
+different selection policy.
 
 If no configured asset and scheme can satisfy the invoice, payment creation
 fails. This usually means the client does not support the merchant's requested
