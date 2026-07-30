@@ -63,7 +63,7 @@ import { Eip155Address } from "crosshatch/Eip155"
 import { Effect } from "effect"
 
 const address = Effect.gen(function* () {
-  const mnemonic = yield* Mnemonic.env
+  const mnemonic = yield* Mnemonic.fromEnv
   return yield* Eip155Address.fromMnemonic(mnemonic)
 })
 ```

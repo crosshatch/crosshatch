@@ -72,7 +72,7 @@ import { Mnemonic } from "crosshatch"
 import { Effect } from "effect"
 
 const program = Effect.gen(function* () {
-  return yield* Mnemonic.env
+  return yield* Mnemonic.fromEnv
 })
 
 const layerMnemonicFromEnv = Mnemonic.layerFromEnv
