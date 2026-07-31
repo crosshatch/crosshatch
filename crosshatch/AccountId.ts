@@ -5,4 +5,4 @@ import { ChainId } from "./ChainId.ts"
 
 /** Encoded CAIP-10 account id — `chain_id:account_address`. */
 export type AccountId = typeof AccountId
-export const AccountId = S.TemplateLiteral([ChainId, ":", Address]).pipe(S.brand("crosshatch/CaAccountId"))
+export const AccountId = S.TemplateLiteral([ChainId, ":", Address]).pipe(S.brand("crosshatch/AccountId"))
