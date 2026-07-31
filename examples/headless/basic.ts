@@ -4,7 +4,7 @@ import { USD } from "crosshatch/Known"
 import { Config, Effect, Layer, Console } from "effect"
 import { FetchHttpClient } from "effect/unstable/http"
 
-import { Prelude } from "./Prelude.ts"
+import * as Prelude from "./Prelude.ts"
 
 Effect.gen(function* () {
   const recipient = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
@@ -25,7 +25,7 @@ Effect.gen(function* () {
   const settlement = yield* Facilitator.settle({ payload })
   yield* Console.log(settlement)
 }).pipe(
-  Effect.provide([Facilitator.layer().pipe(Layer.provide(FetchHttpClient.layer)), Prelude]),
+  Effect.provide([Facilitator.layer().pipe(Layer.provide(FetchHttpClient.layer)), Prelude.layer]),
   Effect.onError(Effect.logError),
   Effect.runFork,
 )

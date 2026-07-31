@@ -1,10 +1,19 @@
-import { Context, Layer } from "effect"
+import { Context, Effect, Layer } from "effect"
 import { HttpApiClient } from "effect/unstable/httpapi"
 
+import { Env } from "../Env.ts"
 import { CirqueApi } from "./CirqueApi.ts"
 
-export class CirqueClient extends Context.Service<CirqueClient>()("crosshatch/CirqueClient", {
-  make: HttpApiClient.make(CirqueApi, { baseUrl: "https://cirque.sh" }),
-}) {
-  static readonly layer = Layer.effect(this, this.make)
-}
+export class CirqueClient extends Context.Service<CirqueClient, HttpApiClient.ForApi<typeof CirqueApi>>()(
+  "crosshatch/CirqueClient",
+) {}
+
+export const layer = Layer.effect(
+  CirqueClient,
+  Effect.gen(function* () {
+    const { stage } = yield* Env
+    return yield* HttpApiClient.make(CirqueApi, {
+      baseUrl: `https://cirque.sh${stage.startsWith("dev_") ? ".localhost" : ""}`,
+    })
+  }),
+)

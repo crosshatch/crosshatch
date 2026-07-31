@@ -1,4 +1,4 @@
-import { openBrowser } from "@crosshatch/widget/openBrowser"
+import { browse } from "@crosshatch/widget"
 import { Effect, flow, Schema as S, Struct } from "effect"
 import { Command, Flag } from "effect/unstable/cli"
 
@@ -26,7 +26,7 @@ export const onramp = Command.make("onramp", {
         const chainRef = chain === undefined ? Reference.make("8453") : yield* S.decodeUnknownEffect(Reference)(chain)
         const mnemonic = yield* Mnemonic.Mnemonic
         const address = yield* Eip155Address.fromMnemonic(mnemonic)
-        const ramp = yield* CirqueClient
+        const ramp = yield* CirqueClient.CirqueClient
         const recipient = AccountId.make(`eip155:${chainRef}:${address}`, { disableChecks: true })
         yield* ramp.ramp
           .onramp({
@@ -36,7 +36,7 @@ export const onramp = Command.make("onramp", {
               recipient,
             },
           })
-          .pipe(Effect.flatMap(flow(Struct.get("onrampUrl"), openBrowser)))
+          .pipe(Effect.flatMap(flow(Struct.get("onrampUrl"), browse)))
       },
       (effect, { mnemonic }) => Effect.provide(effect, MnemonicStore.layerMnemonicFromName(mnemonic)),
     ),

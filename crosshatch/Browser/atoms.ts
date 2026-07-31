@@ -2,7 +2,7 @@ import * as Boundary from "@crosshatch/util/Boundary"
 import { Effect, Match, Cause, Struct } from "effect"
 import { Atom } from "effect/unstable/reactivity"
 
-import { Amount, type Bridge, ChxEnv } from "../index.ts"
+import { Amount, type Bridge, Env } from "../index.ts"
 import * as BrowserServices from "./BrowserServices.ts"
 import { CurrentFacadeState } from "./CurrentFacadeState.ts"
 import { FacadeClient } from "./FacadeClient.ts"
@@ -43,7 +43,7 @@ export const openAtom = runtime.fn<void>()(
   Effect.fnUntraced(function* (_, get) {
     const state = yield* get.result(stateAtom)
     const common = { referrer: location.href }
-    const { url } = yield* ChxEnv.ChxEnv
+    const { url } = yield* Env.Env
     const internal = origin.startsWith(url({ sub: "link" }))
     const amount = yield* Amount.from(10)
     yield* Match.valueTags(state, {

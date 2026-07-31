@@ -5,7 +5,7 @@ import { ChildProcess, ChildProcessSpawner } from "effect/unstable/process"
 
 export class NoSuchBrowserOpenCommandError extends Data.TaggedError("NoSuchBrowserOpenCommandError") {}
 
-export const openBrowser = Effect.fnUntraced(function* (url: string) {
+export const browse = Effect.fnUntraced(function* (url: string) {
   const spawner = yield* ChildProcessSpawner.ChildProcessSpawner
   const command =
     platform === "darwin"

@@ -1,5 +1,6 @@
 import { Effect, Layer, flow } from "effect"
 
+import * as Env from "../Env.ts"
 import { Bridge, Payer } from "../index.ts"
 import { CurrentFacadeState } from "./CurrentFacadeState.ts"
 import { FacadeClient } from "./FacadeClient.ts"
@@ -32,6 +33,12 @@ const layerBridge = Layer.effect(
 
 export const layer = Payer.layerFromBridge.pipe(
   Layer.provideMerge(
-    layerBridge.pipe(Layer.provideMerge(CurrentFacadeState.layer.pipe(Layer.provideMerge(FacadeClient.layer)))),
+    layerBridge.pipe(
+      Layer.provideMerge(
+        CurrentFacadeState.layer.pipe(
+          Layer.provideMerge(FacadeClient.layer.pipe(Layer.provideMerge(Env.layerFromHostname("crosshatch.dev")))),
+        ),
+      ),
+    ),
   ),
 )

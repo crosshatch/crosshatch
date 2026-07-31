@@ -66,7 +66,6 @@
     "@solana/addresses": "catalog:",
     "@solana/kit": "catalog:",
     "@solana/transactions": "catalog:",
-    "@standard-schema/spec": "catalog:",
     "effect": "catalog:",
     "ox": "catalog:"
   }

@@ -5,7 +5,7 @@ import * as Known from "crosshatch/Known"
 import { UnifiedSchemes } from "crosshatch/Unified"
 import { Config, Layer } from "effect"
 
-export const Prelude = Payer.layerLocal({
+export const layer = Payer.layerLocal({
   accept: Accept.first(Known),
   schemes: UnifiedSchemes.layer({
     solana: { rpc: Config.string("SOLANA_RPC_URL").pipe(Config.withDefault(undefined)) },
