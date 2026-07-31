@@ -1,5 +1,5 @@
 import * as Boundary from "@crosshatch/util/Boundary"
-import * as Host from "@crosshatch/widget/Host"
+import { Host } from "@crosshatch/widget"
 import { BrowserWorker, BrowserStream } from "@effect/platform-browser"
 import { Effect, Fiber, Layer, Stream, Schema as S, Schedule, Data, Record } from "effect"
 

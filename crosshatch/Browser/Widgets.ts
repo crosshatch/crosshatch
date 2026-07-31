@@ -1,38 +1,40 @@
-import {} from "@crosshatch/widget/Widget"
+import { Widget } from "@crosshatch/widget"
 import { Schema as S } from "effect"
 
 import { Allowance } from "./Allowance.ts"
 import { LinkChallengeId } from "./LinkChallengeId.ts"
-import { PrerequisitesUnmetError } from "./Prerequisite.ts"
+import { Prerequisites } from "./Prerequisite.ts"
 
-const Common = S.Struct({
-  referrer: S.String.pipe(S.optional),
-})
+const commonFields = {
+  referrer: S.String.pipe(S.NullOr),
+}
 
-export const ActivityWidget = widget({
+export const activity = Widget.make({
   pathname: "activity",
-  payload: Common,
+  payload: S.Struct(commonFields),
   item: S.Never,
 })
 
-export const LinkWidget = widget({
+export const link = Widget.make({
   pathname: "link",
   payload: S.Struct({
     challengeId: LinkChallengeId,
     allowance: Allowance,
-    ...Common.fields,
+    ...commonFields,
   }),
   item: S.Never,
 })
 
-export const PrerequisitesWidget = widget({
+export const prerequisites = Widget.make({
   pathname: "prerequisites",
-  payload: PrerequisitesUnmetError,
+  payload: S.Struct({
+    prerequisites: Prerequisites,
+  }),
   item: S.Never,
 })
 
-export const IdWidget = widget({
+export const id = Widget.make({
   pathname: "id",
-  payload: Common,
+  payload: S.Struct(commonFields),
   item: S.Never,
 })

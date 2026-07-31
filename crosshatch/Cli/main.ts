@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
+import * as Env from "@crosshatch/util/env"
 import { NodeRuntime, NodeServices, NodeHttpClient } from "@effect/platform-node"
 import { Effect, Layer } from "effect"
 import { Command } from "effect/unstable/cli"
 
 import * as ChxNodeServices from "../ChxNodeServices/ChxNodeServices.ts"
 import { CirqueClient } from "../Cirque/Cirque.ts"
-import * as Env from "../Env.ts"
 import PackageJson from "../package.json" with { type: "json" }
 import { dev } from "./dev/dev.ts"
 import { facilitator } from "./facilitator/facilitator.ts"

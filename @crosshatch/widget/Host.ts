@@ -1,7 +1,7 @@
 import { BrowserStream } from "@effect/platform-browser"
 import { Exit, Schema as S, Context, Stream, Effect, Scope, Deferred, Layer } from "effect"
 
-import { parent } from "./self.ts"
+import { parent } from "./Self.ts"
 
 export class Host extends Context.Service<Host, string>()("@crosshatch/widget/Host") {}
 

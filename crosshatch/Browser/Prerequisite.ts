@@ -1,5 +1,6 @@
 import { Schema as S } from "effect"
 
+export type Prerequisite = typeof Prerequisite.Type
 export const Prerequisite = S.TaggedUnion({
   Deposit: {},
   RaiseAllowance: {},
@@ -8,6 +9,7 @@ export const Prerequisite = S.TaggedUnion({
   ThawAccount: {},
 })
 
+export type Prerequisites = typeof Prerequisites.Type
 export const Prerequisites = S.NonEmptyArray(Prerequisite)
 
 export class PrerequisitesUnmetError extends S.TaggedErrorClass<PrerequisitesUnmetError>()("PrerequisitesUnmetError", {

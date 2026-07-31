@@ -1,10 +1,10 @@
+import * as Env from "@crosshatch/util/Env"
 import { Effect, Layer, flow } from "effect"
 
-import * as Env from "../Env.ts"
 import { Bridge, Payer } from "../index.ts"
 import { CurrentFacadeState } from "./CurrentFacadeState.ts"
 import { FacadeClient } from "./FacadeClient.ts"
-import { PrerequisitesWidget } from "./Widgets.ts"
+import { prerequisites } from "./Widgets.ts"
 
 const layerBridge = Layer.effect(
   Bridge.Bridge,
@@ -20,7 +20,7 @@ const layerBridge = Layer.effect(
           const propose = facade.Propose({ traceId, required })
           const { payload } = yield* propose.pipe(
             Effect.catchTags({
-              PrerequisitesUnmetError: flow(PrerequisitesWidget.host, Effect.andThen(propose)),
+              PrerequisitesUnmetError: flow(prerequisites.host, Effect.andThen(propose)),
             }),
           )
           return { payload }

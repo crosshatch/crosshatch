@@ -6,7 +6,7 @@ import { Amount, type Bridge, Env } from "../index.ts"
 import * as BrowserServices from "./BrowserServices.ts"
 import { CurrentFacadeState } from "./CurrentFacadeState.ts"
 import { FacadeClient } from "./FacadeClient.ts"
-import { ActivityWidget, IdWidget, LinkWidget } from "./Widgets.ts"
+import { activity, id, link } from "./Widgets.ts"
 
 const runtime = Atom.runtime(BrowserServices.layer)
 
@@ -49,8 +49,8 @@ export const openAtom = runtime.fn<void>()(
     yield* Match.valueTags(state, {
       Challenged: ({ challengeId }) =>
         internal
-          ? IdWidget.host(common)
-          : LinkWidget.host({
+          ? id.host(common)
+          : link.host({
               challengeId,
               allowance: {
                 amount,
@@ -58,7 +58,7 @@ export const openAtom = runtime.fn<void>()(
               },
               ...common,
             }),
-      Linked: () => ActivityWidget.host(common),
+      Linked: () => activity.host(common),
       Rescinded: Effect.die,
     }).pipe(
       Boundary.span("open", import.meta.url, {

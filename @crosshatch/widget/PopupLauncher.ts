@@ -1,6 +1,6 @@
 import { Queue, Effect, Schema as S, Stream } from "effect"
 
-import type { WidgetConfig } from "./self.ts"
+import type { WidgetConfig } from "./Self.ts"
 
 // TODO: revamp
 export const popup = <Item extends S.Codec<any, any>>({ src, item }: WidgetConfig<Item>) =>
