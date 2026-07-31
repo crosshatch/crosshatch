@@ -5,8 +5,8 @@ import { Effect, Layer } from "effect"
 import { Command } from "effect/unstable/cli"
 
 import * as ChxNodeServices from "../ChxNodeServices/ChxNodeServices.ts"
+import { CirqueClient } from "../Cirque/Cirque.ts"
 import PackageJson from "../package.json" with { type: "json" }
-import { RampClient } from "../Ramp/Ramp.ts"
 import { dev } from "./dev/dev.ts"
 import { facilitator } from "./facilitator/facilitator.ts"
 import { mnemonic } from "./mnemonic/mnemonic.ts"
@@ -19,7 +19,7 @@ Command.make("crosshatch").pipe(
   Effect.scoped,
   Effect.provide(
     Layer.mergeAll(
-      RampClient.layer.pipe(Layer.provideMerge(NodeHttpClient.layerFetch)),
+      CirqueClient.layer.pipe(Layer.provideMerge(NodeHttpClient.layerFetch)),
       ChxNodeServices.layer.pipe(Layer.provideMerge(NodeServices.layer)),
     ),
   ),

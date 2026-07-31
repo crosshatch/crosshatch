@@ -1,7 +1,7 @@
 {
   "name": "@crosshatch/alchemy",
   "version": "0.0.12",
-  "private": true,
+  "private": false,
   "description": "Crosshatch Alchemy utilities.",
   "homepage": "https://crosshatch.dev",
   "bugs": {
@@ -16,11 +16,13 @@
   "type": "module",
   "sideEffects": false,
   "exports": {
-    ".": "./index.ts"
+    ".": "./index.ts",
+    "./*": "./*.ts"
   },
   "publishConfig": {
     "exports": {
-      ".": "./dist/index.js"
+      ".": "./dist/index.js",
+      "./*": "./dist/*.js"
     }
   },
   "dependencies": {

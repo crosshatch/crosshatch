@@ -1,4 +1,5 @@
 export * as State from "./State.ts"
+export * as AccountId from "./AccountId.ts"
 export * as Keychain from "./Keychain.ts"
 export * as Amount from "./Amount.ts"
 export * as Payer from "./Payer.ts"
