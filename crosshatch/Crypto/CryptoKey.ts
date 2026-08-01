@@ -5,4 +5,6 @@ export const toBytes = (key: CryptoKey) =>
 
 export const encodeHex = flow(toBytes, Effect.map(Encoding.encodeHex))
 
-export const CryptoKey = S.instanceOf(globalThis.CryptoKey).annotate({ identifier: "CryptoKey" })
+export const CryptoKey = S.instanceOf(globalThis.CryptoKey)
+  .annotate({ identifier: "CryptoKey" })
+  .pipe(S.brand("crosshatch/Crypto/CryptoKey"))

@@ -8,7 +8,8 @@ const AES_GCM = "AES-GCM"
 const AES_KEY_BITS = 256
 const GCM_TAG_BITS = 128
 
-export const Cek = CryptoKey.CryptoKey.pipe(S.brand("crosshatch/Cek"))
+export type Cek = typeof Cek.Type
+export const Cek = CryptoKey.CryptoKey.pipe(S.brand("crosshatch/Crypto/Cek"))
 
 export const fromBytes = (bytes: Uint8Array, config?: { readonly extractable?: boolean | undefined }) =>
   Effect.promise(() =>
@@ -18,7 +19,7 @@ export const fromBytes = (bytes: Uint8Array, config?: { readonly extractable?: b
     ]),
   ).pipe(Effect.map((v) => Cek.make(v, { disableChecks: true })))
 
-export const toBytes = (cek: typeof Cek.Type) => CryptoKey.toBytes(cek)
+export const toBytes = (cek: Cek) => CryptoKey.toBytes(cek)
 
 export const random = (config?: { readonly extractable?: boolean | undefined }) =>
   Effect.sync(() => Random.bytes(32)).pipe(Effect.flatMap((v) => fromBytes(v, config)))
@@ -48,7 +49,7 @@ export const fromPrf = Effect.fnUntraced(function* (
   ).pipe(Effect.map((v) => Cek.make(v, { disableChecks: true })))
 })
 
-export const encrypt = Effect.fnUntraced(function* (cek: typeof Cek.Type, value: Uint8Array) {
+export const encrypt = Effect.fnUntraced(function* (cek: Cek, value: Uint8Array) {
   const iv = Random.bytes(12)
   const cv = yield* Effect.promise(() =>
     crypto.subtle.encrypt(
@@ -64,7 +65,7 @@ export const encrypt = Effect.fnUntraced(function* (cek: typeof Cek.Type, value:
   return { cv, iv }
 })
 
-export const decrypt = (cek: typeof Cek.Type, { cv, iv }: typeof Symmetric.Type) =>
+export const decrypt = (cek: Cek, { cv, iv }: Symmetric) =>
   Effect.promise(() =>
     crypto.subtle.decrypt(
       {

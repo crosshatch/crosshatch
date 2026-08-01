@@ -67,6 +67,7 @@
     "@solana/kit": "catalog:",
     "@solana/transactions": "catalog:",
     "effect": "catalog:",
+    "http-message-sig": "catalog:",
     "ox": "catalog:"
   }
 }

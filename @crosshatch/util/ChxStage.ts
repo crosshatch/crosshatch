@@ -19,5 +19,5 @@ export const layer = Layer.effect(
     ).env?.VITE_PUBLIC_CHX_INTERNAL_STAGE
     stage ??= yield* Config.string("CHX_INTERNAL_STAGE")
     return yield* S.decodeUnknownEffect(Stage)(stage)
-  }).pipe(Effect.catch(() => Effect.succeed("prod" as const))),
+  }).pipe(Effect.orElseSucceed(() => "prod" as const)),
 )

@@ -1,6 +1,5 @@
 import { BrowserStream } from "@effect/platform-browser"
 import { Effect, Queue, Record, Schema as S, Stream, Layer } from "effect"
-import type { Url } from "effect/unstable/http"
 
 import { Launcher, LaunchError, type LauncherConfig } from "./Launcher.ts"
 import { type Widget, type WidgetPayload, makeUrl } from "./Widget.ts"
@@ -15,12 +14,12 @@ export const layer = (config?: EmbedLauncherConfig) =>
     Effect.gen(function* () {
       const { className, url } = config ?? {}
       return {
-        launch: <Payload extends WidgetPayload, Item extends S.Top, E extends S.Top>(
-          widget: Widget<Payload, Item, E>,
+        launch: <Payload extends WidgetPayload, A extends S.Top, E extends S.Top>(
+          widget: Widget<Payload, A, E>,
           payload: Payload["Type"],
         ) => {
           const { item } = widget
-          return Stream.callback<Item["Type"], Url.UrlError | S.SchemaError | E, Payload["EncodingServices"]>(
+          return Stream.callback<A["Type"], Launcher.Error<E>, Payload["EncodingServices"]>(
             Effect.fn(function* (queue) {
               yield* BrowserStream.fromEventListenerWindow("message").pipe(
                 Stream.runForEach(
@@ -36,11 +35,7 @@ export const layer = (config?: EmbedLauncherConfig) =>
                 Effect.forkScoped,
               )
               const iframe = document.createElement("iframe")
-              yield* Effect.addFinalizer(() =>
-                Effect.sync(() => {
-                  document.body.removeChild(iframe)
-                }),
-              )
+              yield* Effect.addFinalizer(() => Effect.sync(() => iframe.remove()))
               const origin = url ? new URL(url).origin : globalThis.origin
               const allow = [
                 "payment",

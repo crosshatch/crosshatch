@@ -17,20 +17,24 @@ export class Launcher extends Context.Service<
     readonly launch: <Payload extends WidgetPayload, A extends S.Top, E extends S.Top>(
       widget: Widget<Payload, A, E>,
       payload: Payload["Type"],
-    ) => Stream.Stream<A["Type"], Url.UrlError | S.SchemaError | E, Payload["EncodingServices"]>
+    ) => Stream.Stream<A["Type"], Launcher.Error<E>, Payload["EncodingServices"]>
   }
 >()("@crosshatch/widget/Launcher") {}
+
+export declare namespace Launcher {
+  export type Error<E extends S.Top> = LaunchError | Url.UrlError | S.SchemaError | E["Type"]
+}
 
 export const launch = Function.dual<
   <Payload extends WidgetPayload>(
     payload: Payload["Type"],
   ) => <A extends S.Top, E extends S.Top>(
     widget: Widget<Payload, A, E>,
-  ) => Stream.Stream<A["Type"], Url.UrlError | S.SchemaError | E, Payload["EncodingServices"]>,
+  ) => Stream.Stream<A["Type"], Launcher.Error<E>, Payload["EncodingServices"]>,
   <Payload extends WidgetPayload, A extends S.Top, E extends S.Top>(
     widget: Widget<Payload, A, E>,
     payload: Payload["Type"],
-  ) => Stream.Stream<A["Type"], Url.UrlError | S.SchemaError | E, Payload["EncodingServices"]>
+  ) => Stream.Stream<A["Type"], Launcher.Error<E>, Payload["EncodingServices"]>
 >(
   2,
   <Payload extends WidgetPayload, A extends S.Top, E extends S.Top>(

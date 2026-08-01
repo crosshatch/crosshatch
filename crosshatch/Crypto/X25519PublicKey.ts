@@ -3,9 +3,10 @@ import { Effect, Schema as S } from "effect"
 import * as CryptoKey from "./CryptoKey.ts"
 import * as Random from "./Random.ts"
 
-export const X25519PublicKey = CryptoKey.CryptoKey.pipe(S.brand("crosshatch/X25519PublicKey"))
+export type X25519PublicKey = typeof X25519PublicKey.Type
+export const X25519PublicKey = CryptoKey.CryptoKey.pipe(S.brand("crosshatch/Crypto/X25519PublicKey"))
 
-export const encrypt = Effect.fnUntraced(function* (publicKey: typeof X25519PublicKey.Type, value: Uint8Array) {
+export const encrypt = Effect.fnUntraced(function* (publicKey: X25519PublicKey, value: Uint8Array) {
   const eph = yield* Effect.promise(
     () => crypto.subtle.generateKey({ name: "X25519" }, false, ["deriveKey", "deriveBits"]) as Promise<CryptoKeyPair>,
   )

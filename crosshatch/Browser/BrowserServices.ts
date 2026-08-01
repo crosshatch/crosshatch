@@ -1,9 +1,9 @@
 import * as ChxDomain from "@crosshatch/util/ChxDomain"
+import * as ChxStage from "@crosshatch/util/ChxStage"
 import { Launcher, EmbedLauncher } from "@crosshatch/widget"
 import { Stream, Effect, Layer, flow } from "effect"
 
 import { Bridge, Payer } from "../index.ts"
-import * as Stage from "../Stage.ts"
 import { CurrentFacadeState } from "./CurrentFacadeState.ts"
 import { FacadeClient } from "./FacadeClient.ts"
 import { PrerequisitesWidget } from "./Widgets.ts"
@@ -43,7 +43,7 @@ export const layer = Payer.layerFromBridge.pipe(
         CurrentFacadeState.layer.pipe(
           Layer.provideMerge(
             FacadeClient.layer.pipe(
-              Layer.provideMerge(ChxDomain.layer("link.crosshatch.dev").pipe(Layer.provideMerge(Stage.layer))),
+              Layer.provideMerge(ChxDomain.layer("link.crosshatch.dev").pipe(Layer.provideMerge(ChxStage.layer))),
             ),
           ),
         ),

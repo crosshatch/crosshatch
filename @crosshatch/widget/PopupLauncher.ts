@@ -1,41 +1,37 @@
-import { Queue, Effect, Schema as S, Stream } from "effect"
+import { BrowserStream } from "@effect/platform-browser"
+import { Effect, Layer, Queue, Schema as S, Stream } from "effect"
 
-import type { WidgetConfig } from "./Self.ts"
+import { Launcher, type LauncherConfig, LaunchError } from "./Launcher.ts"
+import { type Widget, type WidgetPayload, makeUrl } from "./Widget.ts"
 
-// TODO: revamp
-export const popup = <Item extends S.Codec<any, any>>({ src, item }: WidgetConfig<Item>) =>
-  Stream.callback<Item["Type"]>(
-    Effect.fn(function* (queue) {
-      const { origin: expectedOrigin } = new URL(src)
-      const decodeOption = S.decodeUnknownOption(item)
-      const controller = new AbortController()
-      const { signal } = controller
-      const timeout = setInterval(async () => {
-        if (context?.closed) {
-          controller.abort()
-          Queue.endUnsafe(queue)
-          clearTimeout(timeout) // TODO
-        }
-      }, 1)
-      addEventListener(
-        "message",
-        async ({ data, origin }) => {
-          if (origin === expectedOrigin) {
-            const option = decodeOption(data)
-            if (option._tag === "Some") {
-              const { value } = option
-              Queue.offerUnsafe(queue, value)
-            }
-          }
+export const layer = (config?: LauncherConfig) =>
+  Layer.effect(
+    Launcher,
+    Effect.gen(function* () {
+      const { url } = config ?? {}
+      return {
+        launch: <Payload extends WidgetPayload, A extends S.Top, E extends S.Top>(
+          widget: Widget<Payload, A, E>,
+          payload: Payload["Type"],
+        ) => {
+          const { item } = widget
+          return Stream.callback<A["Type"], Launcher.Error<E>, Payload["EncodingServices"]>(
+            Effect.fn(function* (queue) {
+              let context: WindowProxy | null = null
+              yield* BrowserStream.fromEventListenerWindow("message").pipe(
+                Stream.runForEach(({ data, source }) =>
+                  source === context && S.is(item)(data) ? Queue.offer(queue, data) : Effect.void,
+                ),
+                Effect.forkScoped,
+              )
+              context = yield* makeUrl({ baseUrl: url, widget, payload }).pipe(Effect.map(open))
+              if (!context) {
+                return yield* new LaunchError({})
+              }
+              yield* Effect.addFinalizer(() => Effect.sync(() => context.close()))
+            }),
+          )
         },
-        { signal },
-      )
-      const context = open(src)
-      return Effect.addFinalizer(() =>
-        Effect.sync(() => {
-          controller.abort()
-          context?.close()
-        }),
-      )
+      }
     }),
   )

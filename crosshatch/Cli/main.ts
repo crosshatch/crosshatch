@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import * as Env from "@crosshatch/util/env"
+import * as ChxStage from "@crosshatch/util/ChxStage"
 import { NodeRuntime, NodeServices, NodeHttpClient } from "@effect/platform-node"
 import { Effect, Layer } from "effect"
 import { Command } from "effect/unstable/cli"
@@ -20,7 +20,7 @@ Command.make("crosshatch").pipe(
   Effect.scoped,
   Effect.provide(
     Layer.mergeAll(
-      CirqueClient.layer.pipe(Layer.provideMerge([NodeHttpClient.layerFetch, Env.layerFromHostname("crosshatch.dev")])),
+      CirqueClient.layer.pipe(Layer.provideMerge([NodeHttpClient.layerFetch, ChxStage.layer])),
       ChxNodeServices.layer.pipe(Layer.provideMerge(NodeServices.layer)),
     ),
   ),
