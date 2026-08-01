@@ -3,8 +3,8 @@ import { Effect, Record, Struct } from "effect"
 import { handler } from "../_util.ts"
 import type { Denomination } from "../Asset.ts"
 import { ChainId } from "../ChainId.ts"
-import { FacilitatorApi } from "../FacilitatorApi/FacilitatorApi.ts"
-import * as Known from "../Known/Known.ts"
+import { FacilitatorApi } from "../FacilitatorApi/index.ts"
+import * as Known from "../Known/index.ts"
 
 export const supported = handler(FacilitatorApi, "facilitator", "supported", () =>
   Effect.succeed({

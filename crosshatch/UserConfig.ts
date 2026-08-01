@@ -1,7 +1,7 @@
 import { Context, type Effect, Schema as S, Data } from "effect"
 
-import { Envelope } from "./Crypto/Crypto.ts"
-import { DerivedAddresses } from "./Unified/Unified.ts"
+import { Envelope } from "./Crypto/index.ts"
+import { DerivedAddresses } from "./Unified/index.ts"
 
 export type MnemonicConfig = typeof MnemonicConfig.Type
 export const MnemonicConfig = S.Struct({

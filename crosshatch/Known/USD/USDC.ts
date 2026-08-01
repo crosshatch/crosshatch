@@ -1,6 +1,6 @@
 import type { References } from "../../Asset.ts"
-import { Eip155Asset, Erc3009Scheme, Permit2Scheme } from "../../Eip155/Eip155.ts"
-import { SolanaAsset, SolanaScheme, SolanaAddress } from "../../Solana/Solana.ts"
+import { Eip155Asset, Erc3009Scheme, Permit2Scheme } from "../../Eip155/index.ts"
+import { SolanaAsset, SolanaScheme, SolanaAddress } from "../../Solana/index.ts"
 
 export const eip155 = {
   50: {

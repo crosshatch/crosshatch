@@ -6,7 +6,7 @@ import { HttpRouter, HttpServer, HttpServerResponse } from "effect/unstable/http
 import { HttpApiBuilder, HttpApiScalar } from "effect/unstable/httpapi"
 import { OtlpLogger, OtlpSerialization, OtlpTracer } from "effect/unstable/observability"
 
-import { FacilitatorApi } from "../FacilitatorApi/FacilitatorApi.ts"
+import { FacilitatorApi } from "../FacilitatorApi/index.ts"
 import * as PackageJson from "../package.json" with { type: "json" }
 import { settle } from "./settle.ts"
 import { supported } from "./supported.ts"

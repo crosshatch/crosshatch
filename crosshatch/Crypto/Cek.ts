@@ -1,8 +1,10 @@
-import { Effect, Schema as S } from "effect"
+import { Effect, Ref, Schema as S, Context, Layer } from "effect"
 
 import * as CryptoKey from "./CryptoKey.ts"
-import type { Symmetric } from "./Envelope.ts"
+import type * as Envelope from "./Envelope.ts"
 import * as Random from "./Random.ts"
+import * as X25519Pair from "./X25519Pair.ts"
+import * as X25519PrivateKey from "./X25519PrivateKey.ts"
 
 const AES_GCM = "AES-GCM"
 const AES_KEY_BITS = 256
@@ -10,6 +12,23 @@ const GCM_TAG_BITS = 128
 
 export type Cek = typeof Cek.Type
 export const Cek = CryptoKey.CryptoKey.pipe(S.brand("crosshatch/Crypto/Cek"))
+
+export class CurrentCek extends Context.Service<CurrentCek, Ref.Ref<Cek | undefined>>()(
+  "crosshatch/Crypto/CurrentCek",
+) {}
+
+export const value = CurrentCek.pipe(Effect.flatMap(Ref.get))
+
+export const set = (value: Cek | undefined) => CurrentCek.pipe(Effect.flatMap(Ref.set(value)))
+
+export const layer = Layer.effect(CurrentCek, Ref.make<Cek | undefined>(undefined))
+
+export const hydrate = Effect.fnUntraced(function* (envelope: Envelope.Asymmetric) {
+  const { privateKey } = yield* X25519Pair.CurrentX25519Pair.pipe(Effect.flatMap(Ref.get))
+  const cekBytes = yield* X25519PrivateKey.decrypt(privateKey, envelope)
+  const cek = yield* fromBytes(cekBytes)
+  yield* set(cek)
+})
 
 export const fromBytes = (bytes: Uint8Array, config?: { readonly extractable?: boolean | undefined }) =>
   Effect.promise(() =>
@@ -65,7 +84,7 @@ export const encrypt = Effect.fnUntraced(function* (cek: Cek, value: Uint8Array)
   return { cv, iv }
 })
 
-export const decrypt = (cek: Cek, { cv, iv }: Symmetric) =>
+export const decrypt = (cek: Cek, { cv, iv }: Envelope.Symmetric) =>
   Effect.promise(() =>
     crypto.subtle.decrypt(
       {

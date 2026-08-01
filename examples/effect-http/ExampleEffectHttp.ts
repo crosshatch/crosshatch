@@ -1,5 +1,6 @@
 import * as Cloudflare from "alchemy/Cloudflare"
-import { Required, Requirements, ChxHttp, Payload, Facilitator } from "crosshatch"
+import { Required, Requirements, Payload, Facilitator } from "crosshatch"
+import * as ChxHttp from "crosshatch/ChxHttp"
 import { Eip155Address } from "crosshatch/Eip155"
 import { PaymentId } from "crosshatch/Extensions"
 import * as Known from "crosshatch/Known"

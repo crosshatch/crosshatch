@@ -16,11 +16,13 @@
   "type": "module",
   "sideEffects": false,
   "exports": {
-    ".": "./index.ts"
+    ".": "./index.ts",
+    "./BrowserLauncher": "./BrowserLauncher.ts"
   },
   "publishConfig": {
     "exports": {
-      ".": "./dist/index.js"
+      ".": "./dist/index.js",
+      "./BrowserLauncher": "./dist/BrowserLauncher.js"
     }
   },
   "peerDependencies": {

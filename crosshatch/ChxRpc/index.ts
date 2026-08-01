@@ -2,7 +2,7 @@ import { Schema as S, Stream, PubSub, Layer, Effect } from "effect"
 import { Rpc, RpcGroup } from "effect/unstable/rpc"
 
 import { Bridge } from "../Bridge.ts"
-import { Invoices, PaymentId } from "../Extensions/Extensions.ts"
+import { Invoices, PaymentId } from "../Extensions/index.ts"
 import { Payload } from "../Payload.ts"
 import { ChxEvent, ChxEvents } from "./ChxEvent.ts"
 

@@ -1,7 +1,7 @@
 import { Config, Effect, flow, Option, Schema, Struct } from "effect"
 import { Command, Flag } from "effect/unstable/cli"
 
-import * as Dev from "../../Dev/Dev.ts"
+import * as Dev from "../../Dev/index.ts"
 
 export const dev = Command.make("dev", {
   hostname: Flag.string("hostname").pipe(Flag.withDefault(undefined)),

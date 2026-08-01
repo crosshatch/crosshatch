@@ -1,6 +1,6 @@
 import { Effect } from "effect"
 
-export type Hash = "SHA-256" | "SHA-384" | "SHA-512"
+import type { Hash } from "./Hash.ts"
 
 export const digest = (key: Uint8Array, data: Uint8Array, hash: Hash) =>
   Effect.promise(() => crypto.subtle.importKey("raw", key.slice(), { name: "HMAC", hash }, false, ["sign"])).pipe(

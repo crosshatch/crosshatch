@@ -1,5 +1,5 @@
 import type { References } from "../../Asset.ts"
-import { Eip155Asset, Permit2Scheme } from "../../Eip155/Eip155.ts"
+import { Eip155Asset, Permit2Scheme } from "../../Eip155/index.ts"
 
 export const eip155 = {
   1: {

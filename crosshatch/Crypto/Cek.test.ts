@@ -1,7 +1,7 @@
 import { describe, expect, it } from "@effect/vitest"
 import { Effect } from "effect"
 
-import { Cek } from "./Crypto.ts"
+import { Cek } from "./index.ts"
 
 describe(import.meta.url, () => {
   it.effect(

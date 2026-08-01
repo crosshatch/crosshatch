@@ -2,7 +2,7 @@ import { assert, describe, it } from "@effect/vitest"
 import { BigDecimal, Effect, Schema as S } from "effect"
 
 import { Address, Amount, Requirements } from "./index.ts"
-import * as Known from "./Known/Known.ts"
+import * as Known from "./Known/index.ts"
 
 const assertAmount = (actual: Amount.Amount, expected: string) =>
   assert.isTrue(
