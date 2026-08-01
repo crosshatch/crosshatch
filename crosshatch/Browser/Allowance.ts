@@ -1,10 +1,14 @@
-import { Schema as S } from "effect"
+import { Schema as S, Context } from "effect"
 
 import { Amount } from "../index.ts"
 
+export type AllowanceWindow = typeof AllowanceWindow.Type
 export const AllowanceWindow = S.Literals(["Day", "Week", "Month", "Year", "Ever"])
 
+export type Allowance = typeof Allowance.Type
 export const Allowance = S.Struct({
   amount: Amount.Amount,
   window: AllowanceWindow,
 })
+
+export class CurrentAllowance extends Context.Service<CurrentAllowance, Allowance>()("crosshatch/CurrentAllowance") {}

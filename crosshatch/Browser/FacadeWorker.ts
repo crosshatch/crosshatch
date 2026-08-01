@@ -1,22 +1,20 @@
 import * as Boundary from "@crosshatch/util/Boundary"
+import { ChxDomain } from "@crosshatch/util/ChxDomain"
 import { Host } from "@crosshatch/widget"
 import { BrowserWorker, BrowserStream } from "@effect/platform-browser"
-import { Effect, Fiber, Layer, Stream, Schema as S, Schedule, Data, Record } from "effect"
+import { type Cause, Effect, Fiber, Layer, Stream, Schema as S, Schedule, Data, Record } from "effect"
 
-import { Env } from "../index.ts"
 import { FacadeIntroduction, RequestFacadeIntroduction } from "./handshake.ts"
 
 export class FacadeWorkerError extends Data.TaggedError("FacadeWorkerError")<{
-  readonly cause: unknown
+  readonly cause: Cause.NoSuchElementError
 }> {}
 
 export const layer = Effect.gen(function* () {
   yield* Host.hostListener.pipe(Effect.forkScoped)
-  const { url } = yield* Env.Env
+  const { url } = yield* ChxDomain
   const fiber = yield* BrowserStream.fromEventListenerWindow("message").pipe(
-    Stream.filter(
-      ({ data, origin }) => origin.startsWith(url({ sub: "link" })) && S.is(RequestFacadeIntroduction)(data),
-    ),
+    Stream.filter(({ data, origin }) => origin.startsWith(url) && S.is(RequestFacadeIntroduction)(data)),
     Stream.take(1),
     Stream.runDrain,
     Effect.forkScoped,
@@ -26,10 +24,7 @@ export const layer = Effect.gen(function* () {
     id: "crosshatch-enclave",
     height: 1,
     sandbox: "allow-scripts allow-same-origin",
-    src: url({
-      sub: "link",
-      pathname: "enclave",
-    }),
+    src: `${url}/enclave`,
     width: 1,
   })
   Object.assign(iframe.style, { cssText })
@@ -39,7 +34,7 @@ export const layer = Effect.gen(function* () {
     Effect.mapError((cause) => new FacadeWorkerError({ cause })),
   )
   const { port1, port2 } = new MessageChannel()
-  context.postMessage(FacadeIntroduction.make({}), url({ sub: "link" }), [port2])
+  context.postMessage(FacadeIntroduction.make({}), url, [port2])
   yield* Effect.addFinalizer(() => Effect.sync(() => iframe.remove()))
   return BrowserWorker.layer(() => port1)
 }).pipe(

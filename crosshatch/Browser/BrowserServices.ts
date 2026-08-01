@@ -1,15 +1,18 @@
-import * as Env from "@crosshatch/util/Env"
-import { Effect, Layer, flow } from "effect"
+import * as ChxDomain from "@crosshatch/util/ChxDomain"
+import { Launcher, EmbedLauncher } from "@crosshatch/widget"
+import { Stream, Effect, Layer, flow } from "effect"
 
 import { Bridge, Payer } from "../index.ts"
+import * as Stage from "../Stage.ts"
 import { CurrentFacadeState } from "./CurrentFacadeState.ts"
 import { FacadeClient } from "./FacadeClient.ts"
-import { prerequisites } from "./Widgets.ts"
+import { PrerequisitesWidget } from "./Widgets.ts"
 
 const layerBridge = Layer.effect(
   Bridge.Bridge,
   Effect.gen(function* () {
     const facade = yield* FacadeClient
+    const { launch } = yield* Launcher.Launcher
     return {
       createTrace: flow(
         facade.CreateTrace,
@@ -20,7 +23,8 @@ const layerBridge = Layer.effect(
           const propose = facade.Propose({ traceId, required })
           const { payload } = yield* propose.pipe(
             Effect.catchTags({
-              PrerequisitesUnmetError: flow(prerequisites.host, Effect.andThen(propose)),
+              PrerequisitesUnmetError: ({ prerequisites }) =>
+                launch(PrerequisitesWidget, { prerequisites }).pipe(Stream.runDrain, Effect.andThen(propose)),
             }),
           )
           return { payload }
@@ -32,13 +36,18 @@ const layerBridge = Layer.effect(
 )
 
 export const layer = Payer.layerFromBridge.pipe(
-  Layer.provideMerge(
+  Layer.provideMerge([
     layerBridge.pipe(
-      Layer.provideMerge(
+      Layer.provideMerge([
+        EmbedLauncher.layer({ url: "link.crosshatch.dev" }),
         CurrentFacadeState.layer.pipe(
-          Layer.provideMerge(FacadeClient.layer.pipe(Layer.provideMerge(Env.layerFromHostname("crosshatch.dev")))),
+          Layer.provideMerge(
+            FacadeClient.layer.pipe(
+              Layer.provideMerge(ChxDomain.layer("link.crosshatch.dev").pipe(Layer.provideMerge(Stage.layer))),
+            ),
+          ),
         ),
-      ),
+      ]),
     ),
-  ),
+  ]),
 )

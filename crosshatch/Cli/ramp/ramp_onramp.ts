@@ -1,10 +1,10 @@
-import { browse } from "@crosshatch/widget"
-import { Effect, flow, Schema as S, Struct } from "effect"
+import { BrowserLauncher } from "@crosshatch/widget"
+import { Effect, Schema as S, Struct } from "effect"
 import { Command, Flag } from "effect/unstable/cli"
 
 import { AccountId } from "../../AccountId.ts"
 import * as Amount from "../../Amount.ts"
-import { Providers, CirqueClient } from "../../Cirque/Cirque.ts"
+import { CirqueClient, Providers } from "../../Cirque/Cirque.ts"
 import { Eip155Address } from "../../Eip155/Eip155.ts"
 import { MnemonicStore } from "../../index.ts"
 import * as Mnemonic from "../../Mnemonic.ts"
@@ -22,21 +22,21 @@ export const onramp = Command.make("onramp", {
   Command.withDescription("Create an onramp URL for a stored mnemonic"),
   Command.withHandler(
     Effect.fn(
-      function* ({ amount, chain, provider }) {
+      function* ({ amount, chain }) {
         const chainRef = chain === undefined ? Reference.make("8453") : yield* S.decodeUnknownEffect(Reference)(chain)
         const mnemonic = yield* Mnemonic.Mnemonic
         const address = yield* Eip155Address.fromMnemonic(mnemonic)
-        const ramp = yield* CirqueClient.CirqueClient
         const recipient = AccountId.make(`eip155:${chainRef}:${address}`, { disableChecks: true })
-        yield* ramp.ramp
+        const cirque = yield* CirqueClient.CirqueClient
+        yield* cirque.ramp
           .onramp({
             payload: {
-              provider,
+              provider: "Coinbase",
               amount: yield* Amount.from(amount),
               recipient,
             },
           })
-          .pipe(Effect.flatMap(flow(Struct.get("onrampUrl"), browse)))
+          .pipe(Effect.map(Struct.get("url")), Effect.flatMap(BrowserLauncher.open))
       },
       (effect, { mnemonic }) => Effect.provide(effect, MnemonicStore.layerMnemonicFromName(mnemonic)),
     ),

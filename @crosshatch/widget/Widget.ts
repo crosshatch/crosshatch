@@ -8,21 +8,21 @@ export type WidgetPayload = S.Constraint & {
   readonly DecodingServices: never
 }
 
-export interface WidgetConfig<Payload extends WidgetPayload, Item extends S.Top> {
-  readonly baseUrl?: string | undefined
+export interface WidgetConfig<Payload extends WidgetPayload, A extends S.Top, E extends S.Top> {
   readonly pathname?: string | undefined
   readonly payload: Payload
-  readonly item: Item
+  readonly item: A
+  readonly error: E
 }
 
-export interface Widget<Payload extends WidgetPayload, Item extends S.Top>
-  extends WidgetConfig<Payload, Item>, Pipeable.Pipeable, StandardSchemaV1<Payload["Encoded"], Payload["Type"]> {
+export interface Widget<Payload extends WidgetPayload, A extends S.Top, E extends S.Top>
+  extends WidgetConfig<Payload, A, E>, Pipeable.Pipeable, StandardSchemaV1<Payload["Encoded"], Payload["Type"]> {
   readonly [TypeId]: typeof TypeId
 }
 
-export const make = <Payload extends WidgetPayload, Item extends S.Top>(
-  config: WidgetConfig<Payload, Item>,
-): Widget<Payload, Item> => {
+export const make = <Payload extends WidgetPayload, A extends S.Top, E extends S.Top>(
+  config: WidgetConfig<Payload, A, E>,
+): Widget<Payload, A, E> => {
   const { payload } = config
   return {
     [TypeId]: TypeId,
@@ -34,11 +34,13 @@ export const make = <Payload extends WidgetPayload, Item extends S.Top>(
   }
 }
 
-export const makeUrl = <Payload extends WidgetPayload, Item extends S.Top>({
-  widget: { baseUrl, pathname, payload: Payload },
+export const makeUrl = <Payload extends WidgetPayload, A extends S.Top, E extends S.Top>({
+  baseUrl,
+  widget: { pathname, payload: Payload },
   payload,
 }: {
-  readonly widget: Widget<Payload, Item>
+  readonly baseUrl?: string | undefined
+  readonly widget: Widget<Payload, A, E>
   readonly payload: Payload["Type"]
 }) =>
   S.encodeEffect(S.fromURLSearchParams(Payload))(payload).pipe(

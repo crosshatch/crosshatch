@@ -1,7 +1,11 @@
-import { Context, Data, type Stream, type Schema as S } from "effect"
+import { Context, Data, Stream, type Schema as S, Effect, Function } from "effect"
 import type { Url } from "effect/unstable/http"
 
 import type { Widget, WidgetPayload } from "./Widget.ts"
+
+export interface LauncherConfig {
+  readonly url?: string | undefined
+}
 
 export class LaunchError extends Data.TaggedError("WidgetError")<{
   readonly cause?: unknown
@@ -10,10 +14,31 @@ export class LaunchError extends Data.TaggedError("WidgetError")<{
 export class Launcher extends Context.Service<
   Launcher,
   {
-    readonly launch: <Payload extends WidgetPayload>(
+    readonly launch: <Payload extends WidgetPayload, A extends S.Top, E extends S.Top>(
+      widget: Widget<Payload, A, E>,
       payload: Payload["Type"],
-    ) => <Item extends S.Top>(
-      widget: Widget<Payload, Item>,
-    ) => Stream.Stream<Item["Type"], Url.UrlError | S.SchemaError, Payload["EncodingServices"]>
+    ) => Stream.Stream<A["Type"], Url.UrlError | S.SchemaError | E, Payload["EncodingServices"]>
   }
 >()("@crosshatch/widget/Launcher") {}
+
+export const launch = Function.dual<
+  <Payload extends WidgetPayload>(
+    payload: Payload["Type"],
+  ) => <A extends S.Top, E extends S.Top>(
+    widget: Widget<Payload, A, E>,
+  ) => Stream.Stream<A["Type"], Url.UrlError | S.SchemaError | E, Payload["EncodingServices"]>,
+  <Payload extends WidgetPayload, A extends S.Top, E extends S.Top>(
+    widget: Widget<Payload, A, E>,
+    payload: Payload["Type"],
+  ) => Stream.Stream<A["Type"], Url.UrlError | S.SchemaError | E, Payload["EncodingServices"]>
+>(
+  2,
+  <Payload extends WidgetPayload, A extends S.Top, E extends S.Top>(
+    widget: Widget<Payload, A, E>,
+    payload: Payload["Type"],
+  ) =>
+    Launcher.pipe(
+      Effect.map(({ launch }) => launch(widget, payload)),
+      Stream.unwrap,
+    ),
+)
