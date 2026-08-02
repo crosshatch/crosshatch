@@ -3,7 +3,7 @@ import { FetchHttpClient } from "effect/unstable/http"
 import { signatureHeaders } from "http-message-sig"
 
 import * as CryptoKey from "../CryptoKey.ts"
-import { CurrentEd25519Pair } from "../Ed25519Pair.ts"
+import { Ed25519PairRef } from "../Ed25519Pair.ts"
 import * as Ed25519PrivateKey from "../Ed25519PrivateKey.ts"
 import * as Hash from "../Hash.ts"
 import { SignatureInputKey, SignatureKey } from "./constants.ts"
@@ -11,7 +11,7 @@ import { SignatureInputKey, SignatureKey } from "./constants.ts"
 export const layerFetch = Layer.effect(
   FetchHttpClient.Fetch,
   Effect.gen(function* () {
-    const ref = yield* CurrentEd25519Pair
+    const ref = yield* Ed25519PairRef
     const fetch = yield* Effect.serviceOption(FetchHttpClient.Fetch).pipe(
       Effect.map(Option.getOrElse(() => globalThis.fetch)),
     )

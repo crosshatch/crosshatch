@@ -11,4 +11,4 @@ export const Allowance = S.Struct({
   window: AllowanceWindow,
 })
 
-export class CurrentAllowance extends Context.Service<CurrentAllowance, Allowance>()("crosshatch/CurrentAllowance") {}
+export class AllowanceRef extends Context.Service<AllowanceRef, Allowance>()("crosshatch/AllowanceRef") {}

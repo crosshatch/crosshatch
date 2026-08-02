@@ -24,7 +24,7 @@ export const set = (value: Cek | undefined) => CurrentCek.pipe(Effect.flatMap(Re
 export const layer = Layer.effect(CurrentCek, Ref.make<Cek | undefined>(undefined))
 
 export const hydrate = Effect.fnUntraced(function* (envelope: Envelope.Asymmetric) {
-  const { privateKey } = yield* X25519Pair.CurrentX25519Pair.pipe(Effect.flatMap(Ref.get))
+  const { privateKey } = yield* X25519Pair.X25519PairRef.pipe(Effect.flatMap(Ref.get))
   const cekBytes = yield* X25519PrivateKey.decrypt(privateKey, envelope)
   const cek = yield* fromBytes(cekBytes)
   yield* set(cek)

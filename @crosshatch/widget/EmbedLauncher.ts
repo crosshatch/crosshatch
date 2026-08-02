@@ -2,7 +2,7 @@ import { BrowserStream } from "@effect/platform-browser"
 import { Effect, Queue, Record, Schema as S, Stream, Layer } from "effect"
 
 import { Launcher, LaunchError, type LauncherConfig } from "./Launcher.ts"
-import { type Widget, type WidgetPayload, makeUrl } from "./Widget.ts"
+import * as Widget from "./Widget.ts"
 
 export interface EmbedLauncherConfig extends LauncherConfig {
   readonly className?: string | undefined
@@ -14,8 +14,8 @@ export const layer = (config?: EmbedLauncherConfig) =>
     Effect.gen(function* () {
       const { className, url } = config ?? {}
       return {
-        launch: <Payload extends WidgetPayload, A extends S.Top, E extends S.Top>(
-          widget: Widget<Payload, A, E>,
+        launch: <Payload extends Widget.WidgetPayload, A extends S.Top, E extends S.Top>(
+          widget: Widget.Widget<Payload, A, E>,
           payload: Payload["Type"],
         ) => {
           const { item } = widget
@@ -36,7 +36,7 @@ export const layer = (config?: EmbedLauncherConfig) =>
               )
               const iframe = document.createElement("iframe")
               yield* Effect.addFinalizer(() => Effect.sync(() => iframe.remove()))
-              const origin = url ? new URL(url).origin : globalThis.origin
+              const { origin } = url ? new URL(url) : globalThis
               const allow = [
                 "payment",
                 "clipboard-write",
@@ -48,7 +48,7 @@ export const layer = (config?: EmbedLauncherConfig) =>
               Object.assign(iframe, {
                 sandbox: "allow-scripts allow-same-origin allow-popups allow-forms",
                 allow,
-                src: yield* makeUrl({ widget, payload }),
+                src: yield* Widget.makeUrl({ widget, payload }),
                 referrerPolicy: "no-referrer",
                 ...(className && { className }),
               })

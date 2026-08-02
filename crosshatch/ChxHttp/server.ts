@@ -1,5 +1,5 @@
-import { Schema as S, Effect, Option, Layer } from "effect"
-import { Headers, HttpRouter, HttpServerRequest, HttpServerResponse } from "effect/unstable/http"
+import { Schema as S, Effect, Option, Layer, Data, ErrorReporter } from "effect"
+import { Headers, HttpRouter, HttpServerRequest, HttpServerResponse, HttpServerRespondable } from "effect/unstable/http"
 
 import { TraceId } from "../Bridge.ts"
 import * as Extension from "../Extension.ts"
@@ -8,15 +8,41 @@ import { Payload, PayloadFromBase64JsonString } from "../Payload.ts"
 import { type Required, RequiredFromBase64JsonString } from "../Required.ts"
 import { PAYMENT_REQUIRED, CROSSHATCH_TRACE_ID, PAYMENT_SIGNATURE, PAYMENT_RESPONSE } from "./constants.ts"
 
+export class PaymentRequired
+  extends Data.TaggedError("PaymentRequired")<{
+    readonly required: Required
+    readonly request: HttpServerRequest.HttpServerRequest
+  }>
+  implements HttpServerRespondable.Respondable
+{
+  [HttpServerRespondable.symbol]() {
+    return Effect.gen({ self: this }, function* () {
+      const traceId = yield* TraceId
+      const paymentRequired = yield* S.encodeEffect(RequiredFromBase64JsonString)(this.required)
+      return HttpServerResponse.empty({
+        status: 404,
+        headers: {
+          [PAYMENT_REQUIRED]: paymentRequired,
+          ...(traceId && { [CROSSHATCH_TRACE_ID]: traceId }),
+        },
+      })
+    })
+  }
+
+  override readonly [ErrorReporter.ignore] = true
+
+  get methodAndUrl() {
+    return `${this.request.method} ${this.request.url}`
+  }
+
+  override get message() {
+    return `${this._tag} (${this.methodAndUrl}): retry with an attached x402 payment payload`
+  }
+}
+
 export const require = Effect.fnUntraced(function* ({ required }: { readonly required: Required }) {
-  const traceId = yield* TraceId
-  const paymentRequired = yield* S.encodeEffect(RequiredFromBase64JsonString)(required)
-  return HttpServerResponse.empty({
-    headers: {
-      [PAYMENT_REQUIRED]: paymentRequired,
-      ...(traceId && { [CROSSHATCH_TRACE_ID]: traceId }),
-    },
-  })
+  const request = yield* HttpServerRequest.HttpServerRequest
+  return yield* new PaymentRequired({ required, request })
 })
 
 export const addResponseHeader = (settlement: SettleResponse) =>

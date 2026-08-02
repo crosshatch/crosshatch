@@ -17,12 +17,12 @@
   "sideEffects": false,
   "exports": {
     ".": "./index.ts",
-    "./BrowserLauncher": "./BrowserLauncher.ts"
+    "./*": "./*.ts"
   },
   "publishConfig": {
     "exports": {
       ".": "./dist/index.js",
-      "./BrowserLauncher": "./dist/BrowserLauncher.js"
+      "./*": "./dist/*.js"
     }
   },
   "peerDependencies": {

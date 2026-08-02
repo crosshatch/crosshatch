@@ -7,7 +7,7 @@ export const Stage = S.Union([
   S.Literal("prod"),
 ])
 
-export class ChxStage extends Context.Service<ChxStage, Stage>()("crosshatch/CurrentStage") {}
+export class ChxStage extends Context.Service<ChxStage, Stage>()("@crosshatch/util/ChxStage") {}
 
 export const layer = Layer.effect(
   ChxStage,

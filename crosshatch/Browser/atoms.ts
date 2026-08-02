@@ -4,16 +4,16 @@ import { Atom } from "effect/unstable/reactivity"
 
 import * as Amount from "../Amount.ts"
 import type { Bridge } from "../index.ts"
-import { CurrentAllowance } from "./Allowance.ts"
+import { AllowanceRef } from "./Allowance.ts"
 import * as BrowserServices from "./BrowserServices.ts"
-import { CurrentFacadeState } from "./CurrentFacadeState.ts"
 import { FacadeClient } from "./FacadeClient.ts"
+import { FacadeStateRef } from "./FacadeStateRef.ts"
 import { ActivityWidget, LinkWidget } from "./Widgets.ts"
 
 const runtime = Atom.runtime(BrowserServices.layer)
 
 export const stateAtom = runtime
-  .subscriptionRef(() => CurrentFacadeState)
+  .subscriptionRef(() => FacadeStateRef)
   .pipe(Atom.mapResult(Struct.get("session")), Atom.keepAlive)
 
 export const isLinkedAtom = stateAtom.pipe(Atom.mapResult((v) => v._tag === "Linked"))
@@ -39,7 +39,7 @@ export const openAtom = runtime.fn<void>()(
       case "Challenged": {
         const { challengeId } = state
         const amount = yield* Amount.from(10)
-        const allowance = yield* Effect.serviceOption(CurrentAllowance).pipe(
+        const allowance = yield* Effect.serviceOption(AllowanceRef).pipe(
           Effect.map(
             Option.getOrElse(() => ({
               amount,

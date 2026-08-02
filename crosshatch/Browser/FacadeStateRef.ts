@@ -3,7 +3,7 @@ import { Context, Deferred, Effect, flow, Layer, Semaphore, Stream, Subscription
 import { FacadeClient } from "./FacadeClient.ts"
 import type { FacadeState } from "./FacadeState.ts"
 
-export class CurrentFacadeState extends Context.Service<CurrentFacadeState>()("crosshatch/Browser/FacadeState", {
+export class FacadeStateRef extends Context.Service<FacadeStateRef>()("crosshatch/Browser/FacadeStateRef", {
   make: Effect.gen(function* () {
     const task = yield* Semaphore.make(1).pipe(Effect.map((v) => Semaphore.withPermits(v, 1)))
     const initialDeferred = yield* Deferred.make<FacadeState>()

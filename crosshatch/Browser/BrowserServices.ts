@@ -4,8 +4,8 @@ import { Launcher, EmbedLauncher } from "@crosshatch/widget"
 import { Stream, Effect, Layer, flow } from "effect"
 
 import { Bridge, Payer } from "../index.ts"
-import { CurrentFacadeState } from "./CurrentFacadeState.ts"
 import { FacadeClient } from "./FacadeClient.ts"
+import { FacadeStateRef } from "./FacadeStateRef.ts"
 import { PrerequisitesWidget } from "./Widgets.ts"
 
 const layerBridge = Layer.effect(
@@ -40,7 +40,7 @@ export const layer = Payer.layerFromBridge.pipe(
     layerBridge.pipe(
       Layer.provideMerge([
         EmbedLauncher.layer({ url: "link.crosshatch.dev" }),
-        CurrentFacadeState.layer.pipe(
+        FacadeStateRef.layer.pipe(
           Layer.provideMerge(
             FacadeClient.layer.pipe(
               Layer.provideMerge(ChxDomain.layer("link.crosshatch.dev").pipe(Layer.provideMerge(ChxStage.layer))),

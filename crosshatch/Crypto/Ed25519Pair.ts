@@ -12,8 +12,8 @@ export const Ed25519Pair = S.Struct({
   publicKey: Ed25519PublicKey.Ed25519PublicKey,
 })
 
-export class CurrentEd25519Pair extends Context.Service<CurrentEd25519Pair, Ref.Ref<Ed25519Pair>>()(
-  "crosshatch/Crypto/CurrentEd25519Pair",
+export class Ed25519PairRef extends Context.Service<Ed25519PairRef, Ref.Ref<Ed25519Pair>>()(
+  "crosshatch/Crypto/Ed25519PairRef",
 ) {}
 
 export const fromNative = ({ privateKey, publicKey }: CryptoKeyPair) =>

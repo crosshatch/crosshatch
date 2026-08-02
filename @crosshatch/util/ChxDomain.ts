@@ -8,7 +8,7 @@ export class ChxDomain extends Context.Service<
     readonly name: string
     readonly url: string
   }
->()("crosshatch/ChxDomain") {}
+>()("@crosshatch/util/ChxDomain") {}
 
 export const layer = (hostname: string) =>
   Layer.effect(
