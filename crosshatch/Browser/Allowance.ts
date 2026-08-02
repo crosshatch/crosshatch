@@ -5,10 +5,15 @@ import { Amount } from "../index.ts"
 export type AllowanceWindow = typeof AllowanceWindow.Type
 export const AllowanceWindow = S.Literals(["Day", "Week", "Month", "Year", "Ever"])
 
-export type Allowance = typeof Allowance.Type
-export const Allowance = S.Struct({
-  amount: Amount.Amount,
-  window: AllowanceWindow,
-})
+export interface Allowance {
+  readonly amount: Amount.Amount
+  readonly window: AllowanceWindow
+}
 
-export class AllowanceRef extends Context.Service<AllowanceRef, Allowance>()("crosshatch/AllowanceRef") {}
+export const Allowance = Object.assign(
+  Context.Service<Allowance, Allowance>()("crosshatch/Browser/AllowanceRef"),
+  S.Struct({
+    amount: Amount.Amount,
+    window: AllowanceWindow,
+  }),
+)

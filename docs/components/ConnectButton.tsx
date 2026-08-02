@@ -1,10 +1,10 @@
 "use client"
 
 import { useAtomSet } from "@effect/atom-react"
-import { openAtom } from "crosshatch/Browser"
+import { ChxAtoms } from "crosshatch/Browser"
 
 export const ConnectButton = () => {
-  const open = useAtomSet(openAtom)
+  const open = useAtomSet(ChxAtoms.open)
 
   return (
     <button

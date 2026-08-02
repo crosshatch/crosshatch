@@ -1,4 +1,4 @@
-import { Widget, TerminatedError } from "@crosshatch/widget"
+import { Widget } from "@crosshatch/widget"
 import { Schema as S } from "effect"
 
 import { Allowance } from "./Allowance.ts"
@@ -19,7 +19,7 @@ export const LinkWidget = Widget.make({
     allowance: Allowance,
   }),
   item: S.Void,
-  error: TerminatedError,
+  error: S.Never,
 })
 
 export const PrerequisitesWidget = Widget.make({
@@ -28,12 +28,12 @@ export const PrerequisitesWidget = Widget.make({
     prerequisites: Prerequisites,
   }),
   item: S.Void,
-  error: TerminatedError,
+  error: S.Never,
 })
 
 export const IdWidget = Widget.make({
   pathname: "id",
   payload: S.Void,
   item: S.Void,
-  error: TerminatedError,
+  error: S.Never,
 })
