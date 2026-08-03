@@ -1,7 +1,6 @@
-import { Schema as S, Effect, Option, Layer, Data, ErrorReporter } from "effect"
+import { Struct, Schema as S, Effect, Option, Layer, Data, ErrorReporter } from "effect"
 import { Headers, HttpRouter, HttpServerRequest, HttpServerResponse, HttpServerRespondable } from "effect/unstable/http"
 
-import { TraceId } from "../Bridge.ts"
 import * as Extension from "../Extension.ts"
 import { SettleResponseFromBase64JsonString, type SettleResponse } from "../FacilitatorApi/index.ts"
 import { Payload, PayloadFromBase64JsonString } from "../Payload.ts"
@@ -17,13 +16,18 @@ export class PaymentRequired
 {
   [HttpServerRespondable.symbol]() {
     return Effect.gen({ self: this }, function* () {
-      const traceId = yield* TraceId
+      const traceId = yield* Effect.currentSpan.pipe(
+        Effect.map(Struct.get("traceId")),
+        Effect.catchTags({
+          NoSuchElementError: () => Effect.undefined,
+        }),
+      )
       const paymentRequired = yield* S.encodeEffect(RequiredFromBase64JsonString)(this.required)
       return HttpServerResponse.empty({
         status: 404,
         headers: {
-          [PAYMENT_REQUIRED]: paymentRequired,
           ...(traceId && { [CROSSHATCH_TRACE_ID]: traceId }),
+          [PAYMENT_REQUIRED]: paymentRequired,
         },
       })
     })
@@ -42,7 +46,7 @@ export class PaymentRequired
 
 export const require = Effect.fnUntraced(function* ({ required }: { readonly required: Required }) {
   const request = yield* HttpServerRequest.HttpServerRequest
-  return yield* new PaymentRequired({ required, request })
+  return yield* new PaymentRequired({ request, required })
 })
 
 export const addResponseHeader = (settlement: SettleResponse) =>

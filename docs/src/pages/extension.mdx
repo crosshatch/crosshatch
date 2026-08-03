@@ -52,7 +52,8 @@ Merchants request extension data with `Required.extend` and decode returned
 extension data by installing the extension in the HTTP middleware.
 
 ```ts
-import { ChxHttp, Required } from "crosshatch"
+import { Required } from "crosshatch"
+import * as ChxHttp from "crosshatch/ChxHttp"
 import { PaymentId } from "crosshatch/Extensions"
 import { Effect } from "effect"
 

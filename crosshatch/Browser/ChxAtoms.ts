@@ -41,12 +41,7 @@ export const open = runtime.fn<void>()((_, ctx) =>
           Effect.gen(function* () {
             const amount = yield* Amount.from(10)
             const allowance = yield* Effect.serviceOption(Allowance).pipe(
-              Effect.map(
-                Option.getOrElse(() => ({
-                  amount,
-                  window: "Week" as const,
-                })),
-              ),
+              Effect.map(Option.getOrElse(() => ({ amount, window: "Week" as const }))),
             )
             yield* Launcher.launch(LinkWidget, { challengeId, allowance }).pipe(Stream.runDrain)
           }),

@@ -1,0 +1,54 @@
+---
+title: Widget
+description:
+  Define typed hosted widgets and launch them in managed iframes or popup
+  windows.
+---
+
+# Widget
+
+`@crosshatch/widget` models hosted UI as a typed payload schema and a stream of
+typed results. Import its modules from the package root.
+
+## Define a Widget
+
+```ts
+import { Launcher, PopupLauncher, Widget } from "@crosshatch/widget"
+import { Effect, Schema as S, Stream } from "effect"
+
+const ApprovalWidget = Widget.make({
+  pathname: "/approve",
+  payload: S.Struct({ requestId: S.String }),
+  item: S.Struct({ approved: S.Boolean }),
+  error: S.Never,
+})
+
+const program = Launcher.launch(ApprovalWidget, {
+  requestId: "req_123",
+}).pipe(Stream.runCollect)
+
+program.pipe(
+  Effect.provide(PopupLauncher.layer({ url: "https://wallet.example" })),
+  Effect.runPromise,
+)
+```
+
+`Widget.make` records the payload, emitted-item, and error schemas. The
+resulting widget also implements Standard Schema. `Widget.makeUrl` encodes the
+payload as URL search parameters.
+
+## Launch a Widget
+
+`Launcher.launch(widget, payload)` returns a typed `Stream`. Provide either an
+iframe or popup launcher and consume as many results as the hosted widget emits.
+
+- `EmbedLauncher.layer` creates a full-viewport iframe and removes it with its
+  Effect scope.
+- `PopupLauncher.layer` opens a window and closes it with its Effect scope.
+- `BrowserLauncher.open` opens a URL in the operating system browser from Node.
+- `Host.layer` discovers the parent or opener origin inside hosted UI.
+- `Self.postFinished` sends the hosted widget's completion result.
+
+Launcher failures include `LaunchError`, URL and schema errors, and the widget's
+declared error type. The former deep entry points `@crosshatch/widget/embed`,
+`popup`, and `openBrowser` have been replaced by these root modules.

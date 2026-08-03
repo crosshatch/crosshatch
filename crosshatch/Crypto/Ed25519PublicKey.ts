@@ -13,7 +13,7 @@ export const fromBytes = (raw: Uint8Array) =>
 export const Ed25519PublicKeyFromUint8Array = S.Uint8Array.pipe(
   S.decodeTo(
     Ed25519PublicKey,
-    SchemaTransformation.transformOrFail<CryptoKey, Uint8Array<ArrayBufferLike>>({
+    SchemaTransformation.transformOrFail<CryptoKey, Uint8Array>({
       decode: fromBytes,
       encode: CryptoKey.toBytes,
     }),

@@ -5,7 +5,7 @@ import { HttpApiClient } from "effect/unstable/httpapi"
 import { CirqueApi } from "./CirqueApi.ts"
 
 export class CirqueClient extends Context.Service<CirqueClient, HttpApiClient.ForApi<typeof CirqueApi>>()(
-  "crosshatch/CirqueClient",
+  "crosshatch/cirque/CirqueClient",
 ) {}
 
 export const layer = Layer.effect(

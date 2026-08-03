@@ -1,6 +1,6 @@
 import { assert, describe, it } from "@effect/vitest"
 
-import { stringRaw } from "./_util.ts"
+import { stringRaw } from "./string.ts"
 
 const template = (template: TemplateStringsArray, ...substitutions: Array<unknown>) =>
   [template, substitutions] as const

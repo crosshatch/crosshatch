@@ -29,7 +29,8 @@ with Effect AI.
 
 ```ts
 import { OpenAiClient, OpenAiLanguageModel } from "@effect/ai-openai-compat"
-import { ChxHttp, Payer } from "crosshatch"
+import { Payer } from "crosshatch"
+import * as ChxHttp from "crosshatch/ChxHttp"
 import { Console, Effect, Layer } from "effect"
 import { LanguageModel } from "effect/unstable/ai"
 
@@ -61,7 +62,8 @@ response is `402`, Crosshatch reads the payment requirement, asks the `Payer`
 service for a payload, and retries once with the payment header attached.
 
 ```ts
-import { ChxHttp, Payer } from "crosshatch"
+import { Payer } from "crosshatch"
+import * as ChxHttp from "crosshatch/ChxHttp"
 import { Effect, Layer } from "effect"
 import { HttpClient, HttpClientRequest } from "effect/unstable/http"
 

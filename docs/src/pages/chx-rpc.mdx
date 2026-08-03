@@ -16,7 +16,7 @@ browser extension, hosted wallet, or separate agent runtime.
 Merge `ChxRpc.ChxRpcGroup` into your RPC API and provide `ChxRpc.layer`.
 
 ```ts
-import { ChxRpc } from "crosshatch"
+import * as ChxRpc from "crosshatch/ChxRpc"
 import { Rpc, RpcGroup, RpcSerialization, RpcServer } from "effect/unstable/rpc"
 import { Effect, Layer, Schema as S } from "effect"
 
@@ -45,7 +45,8 @@ Provide `Payer.layerFromBridge` with `ChxRpc.layer` wherever code should create
 payment payloads through the RPC bridge.
 
 ```ts
-import { ChxRpc, Payer, Payload, Required } from "crosshatch"
+import { Payer, Payload, Required } from "crosshatch"
+import * as ChxRpc from "crosshatch/ChxRpc"
 import { Effect, Layer } from "effect"
 
 declare const required: Required.Required

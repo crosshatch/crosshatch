@@ -1,5 +1,6 @@
+import { ensureRef } from "@crosshatch/util/ensureRef"
 import { CurrentSocketProtocols } from "@crosshatch/util/SocketProtocols"
-import { Array, Context, Effect, Schema as S, Layer, type Duration, Ref } from "effect"
+import { Array, Context, Effect, Schema as S, Layer, type Duration } from "effect"
 import { HttpApiError } from "effect/unstable/httpapi"
 import { Socket } from "effect/unstable/socket"
 
@@ -7,7 +8,7 @@ import * as Ed25519Pair from "./Ed25519Pair.ts"
 import * as Ed25519PrivateKey from "./Ed25519PrivateKey.ts"
 import * as Ed25519PublicKey from "./Ed25519PublicKey.ts"
 
-const TypeId = "~crosshatch/Crypto/SocketSigner/SignedPayload" as const
+const TypeId = "~crosshatch/Crypto/SocketSignature" as const
 
 export type Service<A extends S.Top> = [
   | undefined
@@ -19,7 +20,7 @@ export type Service<A extends S.Top> = [
     },
 ][0]
 
-export interface SignedPayload<Self, Id extends string, A extends S.Top> extends Context.Service<Self, Service<A>> {
+export interface Signature<Self, Id extends string, A extends S.Top> extends Context.Service<Self, Service<A>> {
   new (_: never): Context.ServiceClass.Shape<Id, Service<A>>
 
   readonly [TypeId]: typeof TypeId
@@ -29,12 +30,12 @@ export interface SignedPayload<Self, Id extends string, A extends S.Top> extends
 
 export const Service =
   <Self>() =>
-  <Id extends string, A extends S.Top>(id: Id, payload: A): SignedPayload<Self, Id, A> => {
+  <Id extends string, A extends S.Top>(id: Id, payload: A): Signature<Self, Id, A> => {
     const tag = Context.Service<Self, Service<A>>()(id)
     return Object.assign(tag, { [TypeId]: TypeId, payload })
   }
 
-export const SocketSignerProtocol = S.StringFromBase64.pipe(
+export const ProtocolFromBase64JsonString = S.StringFromBase64.pipe(
   S.decodeTo(
     S.Struct({
       signer: Ed25519PublicKey.Ed25519PublicKeyFromUint8Array,
@@ -44,7 +45,7 @@ export const SocketSignerProtocol = S.StringFromBase64.pipe(
   ),
 )
 
-export const layer = <Self, Id extends string, A extends S.Top>(signedPayload: SignedPayload<Self, Id, A>) =>
+export const layer = <Self, Id extends string, A extends S.Top>(signedPayload: Signature<Self, Id, A>) =>
   Layer.effect(
     signedPayload,
     Effect.gen(function* () {
@@ -53,7 +54,7 @@ export const layer = <Self, Id extends string, A extends S.Top>(signedPayload: S
       const protocolI = protocols.indexOf("crosshatch")
       const protocol = protocols[protocolI + 1]
       if (!protocol) return
-      const { signer, input, signature } = yield* S.decodeEffect(SocketSignerProtocol)(protocol)
+      const { signer, input, signature } = yield* S.decodeEffect(ProtocolFromBase64JsonString)(protocol)
       const verified = yield* Ed25519PublicKey.verify(signer, signature, new TextEncoder().encode(input))
       if (!verified) {
         return yield* new HttpApiError.Unauthorized()
@@ -65,7 +66,7 @@ export const layer = <Self, Id extends string, A extends S.Top>(signedPayload: S
 
 export const makeSocket = <Self, Id extends string, A extends S.Top>(
   url: string | Effect.Effect<string>,
-  signedPayload: SignedPayload<Self, Id, A>,
+  signedPayload: Signature<Self, Id, A>,
   payload: A["Type"],
   options?: {
     readonly closeCodeIsError?: ((code: number) => boolean) | undefined
@@ -75,10 +76,10 @@ export const makeSocket = <Self, Id extends string, A extends S.Top>(
 ) =>
   Effect.gen(function* () {
     const { closeCodeIsError, openTimeout, protocols } = options ?? {}
-    const { privateKey, publicKey: signer } = yield* Ed25519Pair.Ed25519PairRef.pipe(Effect.flatMap(Ref.get))
+    const { privateKey, publicKey: signer } = yield* Ed25519Pair.Ed25519PairRef.pipe(ensureRef)
     const input = yield* S.encodeEffect(S.fromJsonString(S.toCodecJson(signedPayload.payload)))(payload)
     const signature = yield* Ed25519PrivateKey.sign(privateKey, new TextEncoder().encode(input))
-    const protocol = yield* S.encodeEffect(SocketSignerProtocol)({ input, signature, signer })
+    const protocol = yield* S.encodeEffect(ProtocolFromBase64JsonString)({ input, signature, signer })
     return yield* Socket.makeWebSocket(url, {
       closeCodeIsError,
       openTimeout,

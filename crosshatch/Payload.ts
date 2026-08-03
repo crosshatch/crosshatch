@@ -1,6 +1,6 @@
+import { JsonRecord } from "@crosshatch/util/schema"
 import { Context, Effect, Equal, Schema as S } from "effect"
 
-import { JsonRecord } from "./_util.ts"
 import { Payer } from "./Payer.ts"
 import type { Required } from "./Required.ts"
 import { Requirements } from "./Requirements.ts"

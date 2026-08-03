@@ -1,6 +1,6 @@
+import { stringRaw } from "@crosshatch/util/string"
 import { Schema as S, Context, Option, Data, Effect, flow, Struct } from "effect"
 
-import { stringRaw } from "./_util.ts"
 import type { Payload } from "./Payload.ts"
 import { Required } from "./Required.ts"
 

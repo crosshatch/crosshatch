@@ -12,7 +12,7 @@ export const X25519Pair = S.Struct({
   publicKey: X25519PublicKey,
 })
 
-export class X25519PairRef extends Context.Service<X25519PairRef, Ref.Ref<X25519Pair>>()(
+export class X25519PairRef extends Context.Service<X25519PairRef, Ref.Ref<X25519Pair | undefined>>()(
   "crosshatch/Crypto/X25519PairRef",
 ) {}
 

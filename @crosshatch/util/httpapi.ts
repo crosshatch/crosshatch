@@ -1,15 +1,4 @@
-import { String, Schema as S } from "effect"
 import type { HttpApi, HttpApiEndpoint, HttpApiGroup } from "effect/unstable/httpapi"
-
-export type JsonRecord = typeof JsonRecord.Type
-export const JsonRecord = S.Record(S.String, S.Json)
-
-export const stringRaw = (template: TemplateStringsArray | string, substitutions: ReadonlyArray<unknown>) =>
-  typeof template === "string"
-    ? template.trim()
-    : String.stripMargin(
-        globalThis.String.raw(template, ...(substitutions ?? [])).replace(/(?<margin>^[ \t]*\|) /gmu, "$<margin>"),
-      ).trim()
 
 type GroupsOf<Api extends HttpApi.Constraint> = Api extends HttpApi.HttpApi<any, infer Groups> ? Groups : never
 type EndpointsOf<

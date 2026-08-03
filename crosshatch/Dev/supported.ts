@@ -1,6 +1,6 @@
+import { handler } from "@crosshatch/util/httpapi"
 import { Effect, Record, Struct } from "effect"
 
-import { handler } from "../_util.ts"
 import type { Denomination } from "../Asset.ts"
 import { ChainId } from "../ChainId.ts"
 import { FacilitatorApi } from "../FacilitatorApi/index.ts"

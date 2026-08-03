@@ -1,0 +1,43 @@
+---
+title: Alchemy
+description:
+  Deploy Crosshatch services and documentation with the public
+  @crosshatch/alchemy package.
+---
+
+# Alchemy
+
+Deployment helpers now live in `@crosshatch/alchemy`, rather than
+`@crosshatch/util/alchemicals`.
+
+## Documentation Site
+
+```ts
+import { docs } from "@crosshatch/alchemy/docs"
+import * as Alchemy from "alchemy"
+import * as Cloudflare from "alchemy/Cloudflare"
+import * as GitHub from "alchemy/GitHub"
+import { Effect, Layer } from "effect"
+
+export default Alchemy.Stack(
+  "crosshatch-docs",
+  {
+    state: Cloudflare.state(),
+    providers: Layer.mergeAll(Cloudflare.providers(), GitHub.providers()),
+  },
+  docs({ domain: "crosshatch.dev", devPort: 4382 }).pipe(Effect.asVoid),
+)
+```
+
+`docs` creates a Cloudflare static site, configures Vocs development and build
+commands, and posts the preview URL on pull requests.
+
+The package also exports:
+
+- `GithubDeployer`, which provisions a Cloudflare deploy token and writes the
+  account id and token to a GitHub repository.
+- `WorkerConfig`, which supplies shared Cloudflare Worker compatibility,
+  placement, domain, and asset settings.
+- `PrPreviewComment` from `@crosshatch/alchemy/PrComment`, for pull-request
+  deployment links.
+- `Mnemonic`, for Alchemy-backed mnemonic resources.

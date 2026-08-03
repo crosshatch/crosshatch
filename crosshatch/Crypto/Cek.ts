@@ -1,4 +1,4 @@
-import { Effect, Ref, Schema as S, Context, Layer } from "effect"
+import { Effect, Ref, Schema as S, Context, Layer, Predicate, Data } from "effect"
 
 import * as CryptoKey from "./CryptoKey.ts"
 import type * as Envelope from "./Envelope.ts"
@@ -13,18 +13,21 @@ const GCM_TAG_BITS = 128
 export type Cek = typeof Cek.Type
 export const Cek = CryptoKey.CryptoKey.pipe(S.brand("crosshatch/Crypto/Cek"))
 
-export class CurrentCek extends Context.Service<CurrentCek, Ref.Ref<Cek | undefined>>()(
-  "crosshatch/Crypto/CurrentCek",
-) {}
+export class CekRef extends Context.Service<CekRef, Ref.Ref<Cek | undefined>>()("crosshatch/Crypto/CurrentCek") {}
 
-export const value = CurrentCek.pipe(Effect.flatMap(Ref.get))
+export const value = CekRef.pipe(Effect.flatMap(Ref.get))
 
-export const set = (value: Cek | undefined) => CurrentCek.pipe(Effect.flatMap(Ref.set(value)))
+export const set = (value: Cek | undefined) => CekRef.pipe(Effect.flatMap(Ref.set(value)))
 
-export const layer = Layer.effect(CurrentCek, Ref.make<Cek | undefined>(undefined))
+export const layer = Layer.effect(CekRef, Ref.make<Cek | undefined>(undefined))
+
+export class HydrationError extends Data.TaggedClass("HydrationError") {}
 
 export const hydrate = Effect.fnUntraced(function* (envelope: Envelope.Asymmetric) {
-  const { privateKey } = yield* X25519Pair.X25519PairRef.pipe(Effect.flatMap(Ref.get))
+  const { privateKey } = yield* X25519Pair.X25519PairRef.pipe(
+    Effect.flatMap(Ref.get),
+    Effect.filterOrFail(Predicate.isNotUndefined, () => new HydrationError()),
+  )
   const cekBytes = yield* X25519PrivateKey.decrypt(privateKey, envelope)
   const cek = yield* fromBytes(cekBytes)
   yield* set(cek)

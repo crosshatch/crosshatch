@@ -1,0 +1,57 @@
+---
+title: Crypto
+description:
+  Use Crosshatch key schemas, hashing, content-encryption keys, and signed HTTP
+  or WebSocket transports.
+---
+
+# Crypto
+
+Import the crypto toolkit from `crosshatch/Crypto`.
+
+```ts
+import { Ed25519Pair, Hash } from "crosshatch/Crypto"
+import { Effect } from "effect"
+
+const program = Effect.gen(function* () {
+  const pair = yield* Ed25519Pair.random({ extractable: true })
+  const digest = yield* Hash.digest(
+    new TextEncoder().encode("crosshatch").buffer,
+    "SHA-256",
+  )
+  return { pair, digest }
+})
+```
+
+`Hash.digest` supports `SHA-256`, `SHA-384`, and `SHA-512` in direct and piped
+forms.
+
+## Key Services
+
+`Ed25519Pair.Ed25519Pair` and `X25519Pair.X25519Pair` are schemas. Effects that
+need mutable current keys consume `Ed25519Pair.Ed25519PairRef` or
+`X25519Pair.X25519PairRef`, each containing an Effect `Ref`.
+
+`Cek.layer` provides the current content-encryption key. Use `Cek.value` and
+`Cek.set` to read or replace it. `Cek.hydrate` decrypts an asymmetric envelope
+with the current `X25519PairRef`, imports the resulting CEK, and stores it.
+
+## HTTP Signing
+
+`HttpSigner.layerFetch` signs fetch requests with the current `Ed25519PairRef`.
+`HttpSigner.layerClient` provides an Effect HTTP client backed by that signed
+fetch implementation. Requests include `digest`, `Signature`, and
+`Signature-Input` headers.
+
+On a server, install `HttpSigner.layerMiddleware`. A valid signed request
+provides `HttpSigner.HttpSigner` as the signer's Ed25519 public key. Unsigned
+requests provide `undefined`; invalid signatures fail with
+`HttpSigner.SignatureError` or a decoding error.
+
+## Socket Signing
+
+`SocketSigner.Service(id, payloadSchema)` defines a request-scoped signed
+payload service. `SocketSigner.makeSocket` signs and serializes a payload into
+the WebSocket subprotocol list, while `SocketSigner.layer(service)` verifies and
+provides the signer, original input, decoded payload, and signature on the
+server.
