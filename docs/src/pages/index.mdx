@@ -93,7 +93,7 @@ import {
     <div className="crosshatch-code-block">
 
 ```ts
-import { ChxHttp, Payer } from "crosshatch"
+import { Payer, ChxHttp } from "crosshatch"
 import { Console, Effect, Layer } from "effect"
 import { HttpClient, HttpClientRequest } from "effect/unstable/http"
 
@@ -136,10 +136,10 @@ Effect.gen(function* () {
 ```ts
 import {
   Facilitator,
-  ChxHttp,
   Payload,
   Required,
   Requirements,
+  ChxHttp,
 } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
 import * as Known from "crosshatch/Known"
@@ -162,9 +162,7 @@ const router = HttpRouter.add(
         yield* Required.make`Description of the charge here.`.pipe(
           Required.accept(accepted),
         )
-      return yield* ChxHttp.require({ required }).pipe(
-        Effect.map(HttpServerResponse.setStatus(402)),
-      )
+      return yield* ChxHttp.require({ required })
     }
     const settlement = yield* Facilitator.settle({ payload })
     return HttpServerResponse.text("The paid resource.").pipe(
@@ -197,7 +195,7 @@ const router = HttpRouter.add(
 
 ```ts
 import { OpenAiClient, OpenAiLanguageModel } from "@effect/ai-openai-compat"
-import { ChxHttp, Payer } from "crosshatch"
+import { Payer, ChxHttp } from "crosshatch"
 import { Console, Effect, Layer } from "effect"
 import { LanguageModel } from "effect/unstable/ai"
 

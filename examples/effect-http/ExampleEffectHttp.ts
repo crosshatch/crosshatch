@@ -1,7 +1,6 @@
 import * as Cloudflare from "alchemy/Cloudflare"
-import { Required, Requirements, ChxHttp, Payload, Facilitator } from "crosshatch"
+import { Required, Requirements, Payload, Facilitator, ChxHttp, PaymentId } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
-import { PaymentId } from "crosshatch/Extensions"
 import * as Known from "crosshatch/Known"
 import { Layer, Effect, Config } from "effect"
 import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
@@ -62,7 +61,7 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
           allowedHeaders: ["*"],
           allowedMethods: ["*"],
           allowedOrigins: ["*"],
-          exposedHeaders: ChxHttp.HEADERS,
+          exposedHeaders: ChxHttp.exposedHeaders,
         }),
         ChxHttp.layerMiddleware({
           extensions: [PaymentId.FromMerchant],

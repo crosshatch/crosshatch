@@ -1,7 +1,7 @@
 import { describe, expect, it } from "@effect/vitest"
 import { Effect, Exit } from "effect"
 
-import { CryptoKey, Ed25519Pair, Ed25519PrivateKey, X25519Pair, X25519PrivateKey, X25519PublicKey } from "./Crypto.ts"
+import { CryptoKey, Ed25519Pair, Ed25519PrivateKey, X25519Pair, X25519PrivateKey, X25519PublicKey } from "./index.ts"
 
 describe(import.meta.url, () => {
   it.effect(

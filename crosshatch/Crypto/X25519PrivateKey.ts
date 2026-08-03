@@ -3,12 +3,10 @@ import { Effect, Schema as S } from "effect"
 import * as CryptoKey from "./CryptoKey.ts"
 import type { Asymmetric } from "./Envelope.ts"
 
-export const X25519PrivateKey = CryptoKey.CryptoKey.pipe(S.brand("crosshatch/X25519PrivateKey"))
+export type X25519PrivateKey = typeof X25519PrivateKey.Type
+export const X25519PrivateKey = CryptoKey.CryptoKey.pipe(S.brand("crosshatch/Crypto/X25519PrivateKey"))
 
-export const decrypt = Effect.fnUntraced(function* (
-  privateKey: typeof X25519PrivateKey.Type,
-  value: typeof Asymmetric.Type,
-) {
+export const decrypt = Effect.fnUntraced(function* (privateKey: X25519PrivateKey, value: Asymmetric) {
   const ephPublicKey = yield* Effect.promise(() =>
     crypto.subtle.importKey("raw", value.encrypter.slice(), { name: "X25519" }, false, []),
   )
@@ -26,7 +24,7 @@ export const decrypt = Effect.fnUntraced(function* (
   ).pipe(Effect.map((v) => new Uint8Array(v)))
 })
 
-export const toPkcs8 = (privateKey: typeof X25519PrivateKey.Type) =>
+export const toPkcs8 = (privateKey: X25519PrivateKey) =>
   Effect.promise(() => crypto.subtle.exportKey("pkcs8", privateKey)).pipe(Effect.map((v) => new Uint8Array(v)))
 
 export const fromPkcs8 = (value: Uint8Array) =>

@@ -1,8 +1,8 @@
 import { Effect, Layer, Predicate, Redacted, Schema as S, Struct, UndefinedOr } from "effect"
 
-import { X25519Pair, X25519PrivateKey, X25519PublicKey } from "../Crypto/Crypto.ts"
+import { X25519Pair, X25519PrivateKey, X25519PublicKey } from "../Crypto/index.ts"
 import { Mnemonic, MnemonicStore, UserConfig, Keychain } from "../index.ts"
-import { DerivedAddresses } from "../Unified/Unified.ts"
+import { DerivedAddresses } from "../Unified/index.ts"
 
 export const layer = Layer.effect(
   MnemonicStore.MnemonicStore,

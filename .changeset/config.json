@@ -1,6 +1,12 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@3.1.4/schema.json",
-  "changelog": ["@changesets/changelog-github", { "repo": "crosshatch/crosshatch" }],
+  "changelog": [
+    "@changesets/changelog-github",
+    {
+      "repo": "crosshatch/crosshatch",
+      "disableThanks": true
+    }
+  ],
   "commit": false,
   "linked": [],
   "access": "public",

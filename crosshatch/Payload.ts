@@ -1,6 +1,6 @@
+import { JsonRecord } from "@crosshatch/util/schema"
 import { Context, Effect, Equal, Schema as S } from "effect"
 
-import { JsonRecord } from "./_util.ts"
 import { Payer } from "./Payer.ts"
 import type { Required } from "./Required.ts"
 import { Requirements } from "./Requirements.ts"
@@ -25,8 +25,8 @@ export type Acceptable = typeof Acceptable.Type
 export const Acceptable = Payload.pipe(S.brand("crosshatch/Acceptable"))
 
 export const PayloadJson = S.toCodecJson(Payload)
-export const PayloadJsonString = S.fromJsonString(PayloadJson)
-export const PayloadFromBase64JsonString = S.StringFromBase64.pipe(S.decodeTo(PayloadJsonString))
+export const PayloadFromJsonString = S.fromJsonString(PayloadJson)
+export const PayloadFromBase64JsonString = S.StringFromBase64.pipe(S.decodeTo(PayloadFromJsonString))
 
 export const make = ({ required }: { readonly required: Required }) =>
   Effect.flatMap(Payer, ({ createPayload }) => createPayload({ required }))

@@ -1,5 +1,5 @@
 import { Facilitator, Required, Requirements, Payload } from "crosshatch"
-import { BrowserServices } from "crosshatch/Browser"
+import { ChxBrowserRuntime } from "crosshatch/Browser"
 import { Eip155Address } from "crosshatch/Eip155"
 import * as Known from "crosshatch/Known"
 import { Config, Effect, Layer, Console } from "effect"
@@ -24,7 +24,7 @@ Effect.gen(function* () {
   const settlement = yield* Facilitator.settle({ payload })
   yield* Console.log(settlement)
 }).pipe(
-  Effect.provide([BrowserServices.layer, Facilitator.layer().pipe(Layer.provide(FetchHttpClient.layer))]),
+  Effect.provide(Facilitator.layer().pipe(Layer.provide(FetchHttpClient.layer))),
   Effect.onError(Effect.logError),
-  Effect.runFork,
+  ChxBrowserRuntime.runFork,
 )

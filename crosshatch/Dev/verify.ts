@@ -1,6 +1,6 @@
+import { handler } from "@crosshatch/util/httpapi"
 import { Effect } from "effect"
 
-import { handler } from "../_util.ts"
-import { FacilitatorApi } from "../FacilitatorApi/FacilitatorApi.ts"
+import { FacilitatorApi } from "../FacilitatorApi/index.ts"
 
 export const verify = handler(FacilitatorApi, "facilitator", "verify", () => Effect.succeed({ isValid: true }))

@@ -101,7 +101,7 @@ export default class Merchant extends Cloudflare.Worker<Merchant>()(
           allowedHeaders: ["*"],
           allowedMethods: ["*"],
           allowedOrigins: ["*"],
-          exposedHeaders: ChxHttp.HEADERS,
+          exposedHeaders: ChxHttp.exposedHeaders,
         }),
         ChxHttp.layerMiddleware(),
         Facilitator.layer(),

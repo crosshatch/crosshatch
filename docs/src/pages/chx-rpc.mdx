@@ -45,7 +45,7 @@ Provide `Payer.layerFromBridge` with `ChxRpc.layer` wherever code should create
 payment payloads through the RPC bridge.
 
 ```ts
-import { ChxRpc, Payer, Payload, Required } from "crosshatch"
+import { Payer, Payload, Required, ChxRpc } from "crosshatch"
 import { Effect, Layer } from "effect"
 
 declare const required: Required.Required

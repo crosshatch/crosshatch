@@ -21,33 +21,33 @@
   "exports": {
     ".": "./index.ts",
     "./*": "./*.ts",
-    "./Browser": "./Browser/Browser.ts",
-    "./ChxNodeServices": "./ChxNodeServices/ChxNodeServices.ts",
-    "./Crypto": "./Crypto/Crypto.ts",
-    "./Eip155": "./Eip155/Eip155.ts",
-    "./Extensions": "./Extensions/Extensions.ts",
-    "./FacilitatorApi": "./FacilitatorApi/FacilitatorApi.ts",
-    "./Known": "./Known/Known.ts",
+    "./Browser": "./Browser/index.ts",
+    "./ChxNodeServices": "./ChxNodeServices/index.ts",
+    "./Cirque": "./Cirque/index.ts",
+    "./Crypto": "./Crypto/index.ts",
+    "./Dev": "./Dev/index.ts",
+    "./Eip155": "./Eip155/index.ts",
+    "./FacilitatorApi": "./FacilitatorApi/index.ts",
+    "./Known": "./Known/index.ts",
     "./package.json": "./package.json",
-    "./Ramp": "./Ramp/Ramp.ts",
-    "./Solana": "./Solana/Solana.ts",
-    "./Unified": "./Unified/Unified.ts"
+    "./Solana": "./Solana/index.ts",
+    "./Unified": "./Unified/index.ts"
   },
   "publishConfig": {
     "exports": {
       ".": "./dist/index.js",
       "./*": "./dist/*.js",
-      "./Browser": "./dist/Browser/Browser.js",
-      "./ChxNodeServices": "./dist/ChxNodeServices/ChxNodeServices.js",
-      "./Crypto": "./dist/Crypto/Crypto.js",
-      "./Eip155": "./dist/Eip155/Eip155.js",
-      "./Extensions": "./dist/Extensions/Extensions.js",
-      "./FacilitatorApi": "./dist/FacilitatorApi/FacilitatorApi.js",
-      "./Known": "./dist/Known/Known.ts",
+      "./Browser": "./dist/Browser/index.js",
+      "./ChxNodeServices": "./dist/ChxNodeServices/index.js",
+      "./Cirque": "./dist/Cirque/index.js",
+      "./Crypto": "./dist/Crypto/index.js",
+      "./Dev": "./dist/Dev/index.js",
+      "./Eip155": "./dist/Eip155/index.js",
+      "./FacilitatorApi": "./dist/FacilitatorApi/index.js",
+      "./Known": "./dist/Known/index.js",
       "./package.json": "./package.json",
-      "./Ramp": "./dist/Ramp/Ramp.js",
-      "./Solana": "./dist/Solana/Solana.js",
-      "./Unified": "./dist/Unified/Unified.js"
+      "./Solana": "./dist/Solana/index.js",
+      "./Unified": "./dist/Unified/index.js"
     }
   },
   "scripts": {
@@ -66,8 +66,8 @@
     "@solana/addresses": "catalog:",
     "@solana/kit": "catalog:",
     "@solana/transactions": "catalog:",
-    "@standard-schema/spec": "catalog:",
     "effect": "catalog:",
+    "http-message-sig": "catalog:",
     "ox": "catalog:"
   }
 }

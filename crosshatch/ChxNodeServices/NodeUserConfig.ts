@@ -13,7 +13,7 @@ export const layer = Layer.effect(
     const configPath = path.join(configDir, "crosshatch.json")
 
     const get = fs.readFileString(configPath).pipe(
-      Effect.flatMap(S.decodeUnknownEffect(UserConfig.UserConfigJsonString)),
+      Effect.flatMap(S.decodeUnknownEffect(UserConfig.UserConfigFromJsonString)),
       Effect.catchReasons("PlatformError", {
         NotFound: () => Effect.succeed({ mnemonics: {} } satisfies UserConfig.UserConfig),
       }),

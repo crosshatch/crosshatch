@@ -1,23 +1,24 @@
-import { Effect, Schema as S, Context } from "effect"
+import { Effect, Schema as S, Context, type Ref } from "effect"
 
 import * as Ed25519PrivateKey from "./Ed25519PrivateKey.ts"
 import * as Ed25519PublicKey from "./Ed25519PublicKey.ts"
 
-const TypeId = "crosshatch/Ed25519Pair" as const
+const Id = "crosshatch/Crypto/Ed25519Pair" as const
+const TypeId = `~${Id}`
 
-export interface Ed25519Pair {
-  readonly [TypeId]: typeof TypeId
-  readonly privateKey: typeof Ed25519PrivateKey.Ed25519PrivateKey.Type
-  readonly publicKey: typeof Ed25519PublicKey.Ed25519PublicKey.Type
-}
+type Ed25519Pair_ = typeof Ed25519Pair_.Type
+const Ed25519Pair_ = S.Struct({
+  [TypeId]: S.tag(TypeId),
+  privateKey: Ed25519PrivateKey.Ed25519PrivateKey,
+  publicKey: Ed25519PublicKey.Ed25519PublicKey,
+})
+
+// oxlint-disable-next-line typescript/no-empty-interface
+export interface Ed25519Pair extends Ed25519Pair_ {}
 
 export const Ed25519Pair = Object.assign(
-  Context.Service<Ed25519Pair, Ed25519Pair>()(TypeId),
-  S.Struct({
-    [TypeId]: S.tag(TypeId),
-    privateKey: Ed25519PrivateKey.Ed25519PrivateKey,
-    publicKey: Ed25519PublicKey.Ed25519PublicKey,
-  }),
+  Context.Service<Ed25519Pair, Ref.Ref<Ed25519Pair | undefined>>()(TypeId),
+  Ed25519Pair_,
 )
 
 export const fromNative = ({ privateKey, publicKey }: CryptoKeyPair) =>

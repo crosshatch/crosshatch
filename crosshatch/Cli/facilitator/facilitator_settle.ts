@@ -2,7 +2,7 @@ import { Console, Data, Effect, Schema as S } from "effect"
 import { Argument, Command, Flag, Prompt } from "effect/unstable/cli"
 
 import * as FacilitatorService from "../../Facilitator.ts"
-import { SettleResponseJsonString } from "../../FacilitatorApi/FacilitatorApi.ts"
+import { SettleResponseFromJsonString } from "../../FacilitatorApi/index.ts"
 import * as Payload from "../../Payload.ts"
 import * as Input from "../Input.ts"
 
@@ -28,9 +28,9 @@ export const settle = Command.make("settle", {
           return
         }
         yield* Input.read(payload, stdin, "payload").pipe(
-          Effect.flatMap(S.decodeEffect(S.fromJsonString(S.toCodecJson(Payload.Payload)))),
+          Effect.flatMap(S.decodeEffect(Payload.PayloadFromJsonString)),
           Effect.flatMap((payload) => FacilitatorService.settle({ payload })),
-          Effect.flatMap(S.encodeEffect(SettleResponseJsonString)),
+          Effect.flatMap(S.encodeEffect(SettleResponseFromJsonString)),
           Effect.andThen(Console.log),
         )
       },

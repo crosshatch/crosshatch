@@ -1,19 +1,20 @@
 import { generateMnemonic, mnemonicToSeedSync, validateMnemonic } from "@scure/bip39"
 import { wordlist } from "@scure/bip39/wordlists/english.js"
-import { Layer, Redacted, Effect, Schema as S, Config, Context, type Brand, flow } from "effect"
+import { Layer, Redacted, Effect, Schema as S, Config, Context, flow } from "effect"
 
 export const MnemonicText = S.String.check(
-  S.makeFilter((text: string) => validateMnemonic(text, wordlist), {
+  S.makeFilter((text) => validateMnemonic(text, wordlist), {
     expected: "a valid BIP-39 English mnemonic",
   }),
-).pipe(S.brand("crosshatch/Mnemonic"))
+).pipe(S.brand("crosshatch/MnemonicText"))
 
-const ID = "crosshatch/Mnemonic" as const
+type Mnemonic_ = typeof Mnemonic_.Type
+const Mnemonic_ = S.Redacted(MnemonicText)
 
 // oxlint-disable-next-line
-export interface Mnemonic extends Redacted.Redacted<string & Brand.Brand<typeof ID>> {}
+export interface Mnemonic extends Mnemonic_ {}
 
-export const Mnemonic = Object.assign(Context.Service<Mnemonic, Mnemonic>()(ID), S.Redacted(MnemonicText))
+export const Mnemonic = Object.assign(Context.Service<Mnemonic, Mnemonic>()("crosshatch/Mnemonic"), Mnemonic_)
 
 export const fromText = (text: string) => Redacted.make(MnemonicText.make(text))
 

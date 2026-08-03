@@ -60,14 +60,14 @@ sign typed data, and encode chain-specific payload fields.
 ## JSON Encoding
 
 `PayloadJson` converts between a `Payload` and its JSON representation.
-`PayloadJsonString` additionally parses and serializes the JSON string.
+`PayloadFromJsonString` additionally parses and serializes the JSON string.
 
 ```ts
 import { Payload } from "crosshatch"
 import { Schema } from "effect"
 
-const decodePayload = Schema.decodeEffect(Payload.PayloadJsonString)
-const encodePayload = Schema.encodeEffect(Payload.PayloadJsonString)
+const decodePayload = Schema.decodeEffect(Payload.PayloadFromJsonString)
+const encodePayload = Schema.encodeEffect(Payload.PayloadFromJsonString)
 ```
 
 ## Checking A Payload

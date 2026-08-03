@@ -1,11 +1,10 @@
-import { Required, Requirements, Payload, Extension, Facilitator } from "crosshatch"
+import { Required, Requirements, Payload, Extension, Facilitator, PaymentId } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
-import { PaymentId } from "crosshatch/Extensions"
 import * as Known from "crosshatch/Known"
 import { Config, Effect, Layer, Console } from "effect"
 import { FetchHttpClient } from "effect/unstable/http"
 
-import { Prelude } from "./Prelude.ts"
+import * as Prelude from "./Prelude.ts"
 
 // Merchants make the required with extension info.
 const makeRequired = Effect.gen(function* () {
@@ -35,7 +34,7 @@ Effect.gen(function* () {
 }).pipe(
   Effect.provide([
     Facilitator.layer().pipe(Layer.provideMerge(FetchHttpClient.layer)),
-    Prelude.pipe(
+    Prelude.layer.pipe(
       Layer.provide(
         Extension.layerHandler(
           PaymentId.FromMerchant,

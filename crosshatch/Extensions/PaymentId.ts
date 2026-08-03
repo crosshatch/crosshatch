@@ -2,6 +2,7 @@ import { Schema as S } from "effect"
 
 import * as Extension from "../Extension.ts"
 
+export type PaymentId = typeof PaymentId.Type
 export const PaymentId = S.String.check(S.isLengthBetween(16, 128), S.isPattern(/^[a-zA-Z0-9_-]+$/u)).pipe(
   S.brand("crosshatch/PaymentId"),
 )

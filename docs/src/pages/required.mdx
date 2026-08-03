@@ -23,9 +23,8 @@ previous entries. `Required.extend` adds x402 extension payloads.
 
 ```ts
 import { Config, Effect } from "effect"
-import { Required, Requirements } from "crosshatch"
+import { Required, Requirements, PaymentId } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
-import { PaymentId } from "crosshatch/Extensions"
 import * as Known from "crosshatch/Known"
 
 const makeRequired = Effect.gen(function* () {
@@ -58,14 +57,14 @@ that may show the payment request to a user.
 ## JSON Encoding
 
 `RequiredJson` converts between a `Required` value and its JSON representation.
-`RequiredJsonString` additionally parses and serializes the JSON string.
+`RequiredFromJsonString` additionally parses and serializes the JSON string.
 
 ```ts
 import { Required } from "crosshatch"
 import { Schema } from "effect"
 
-const decodeRequired = Schema.decodeEffect(Required.RequiredJsonString)
-const encodeRequired = Schema.encodeEffect(Required.RequiredJsonString)
+const decodeRequired = Schema.decodeEffect(Required.RequiredFromJsonString)
+const encodeRequired = Schema.encodeEffect(Required.RequiredFromJsonString)
 ```
 
 ## Requirements Groups

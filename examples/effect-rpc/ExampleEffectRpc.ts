@@ -1,7 +1,6 @@
 import * as Cloudflare from "alchemy/Cloudflare"
-import { ChxRpc, Facilitator, Payer, Payload, Required, Requirements } from "crosshatch"
+import { Facilitator, Payer, Payload, Required, Requirements, PaymentId, ChxRpc } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
-import { PaymentId } from "crosshatch/Extensions"
 import { USD } from "crosshatch/Known"
 import { Config, Effect, Layer, Schema as S } from "effect"
 import { Rpc, RpcGroup, RpcSerialization, RpcServer } from "effect/unstable/rpc"

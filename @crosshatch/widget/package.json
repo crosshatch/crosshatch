@@ -16,15 +16,18 @@
   "type": "module",
   "sideEffects": false,
   "exports": {
+    ".": "./index.ts",
     "./*": "./*.ts"
   },
   "publishConfig": {
     "exports": {
+      ".": "./dist/index.js",
       "./*": "./dist/*.js"
     }
   },
   "peerDependencies": {
     "@effect/platform-browser": "catalog:",
+    "@standard-schema/spec": "catalog:",
     "effect": "catalog:"
   }
 }

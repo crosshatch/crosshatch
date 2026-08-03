@@ -2,7 +2,8 @@ import { Effect, Schema as S } from "effect"
 
 import { CryptoKey } from "./CryptoKey.ts"
 
-export const Ed25519PrivateKey = CryptoKey.pipe(S.brand("crosshatch/Ed25519PrivateKey"))
+export type Ed25519PrivateKey = typeof Ed25519PrivateKey.Type
+export const Ed25519PrivateKey = CryptoKey.pipe(S.brand("crosshatch/Crypto/Ed25519PrivateKey"))
 
 /** PKCS#8 PrivateKeyInfo prefix for a raw 32-byte Ed25519 seed (RFC 8410). */
 const ED25519_PKCS8_PREFIX = new Uint8Array([
@@ -18,7 +19,7 @@ export const fromSeed = (bytes: Uint8Array, config?: { readonly extractable?: bo
   ).pipe(Effect.map((v) => Ed25519PrivateKey.make(v, { disableChecks: true })))
 }
 
-export const toPkcs8 = (privateKey: typeof Ed25519PrivateKey.Type) =>
+export const toPkcs8 = (privateKey: Ed25519PrivateKey) =>
   Effect.promise(() => crypto.subtle.exportKey("pkcs8", privateKey)).pipe(Effect.map((v) => new Uint8Array(v)))
 
 export const fromPkcs8 = (value: Uint8Array) =>
@@ -26,7 +27,7 @@ export const fromPkcs8 = (value: Uint8Array) =>
     Effect.map((v) => Ed25519PrivateKey.make(v, { disableChecks: true })),
   )
 
-export const sign = (privateKey: typeof Ed25519PrivateKey.Type, data: Uint8Array) =>
+export const sign = (privateKey: Ed25519PrivateKey, data: Uint8Array) =>
   Effect.promise(() => crypto.subtle.sign({ name: "Ed25519" }, privateKey, data.slice())).pipe(
     Effect.map((v) => new Uint8Array(v)),
   )

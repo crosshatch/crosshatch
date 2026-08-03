@@ -1,102 +1,39 @@
-import * as Boundary from "@crosshatch/util/Boundary"
-import { embed } from "@crosshatch/widget/embed"
-import { Finished } from "@crosshatch/widget/self"
-import type { StandardSchemaV1 } from "@standard-schema/spec"
-import { Data, Effect, pipe, Schema as S, SchemaGetter, Stream } from "effect"
-import { Url, UrlParams } from "effect/unstable/http"
+import { Widget } from "@crosshatch/widget"
+import { Schema as S } from "effect"
 
-import { ChxEnv } from "../index.ts"
 import { Allowance } from "./Allowance.ts"
 import { LinkChallengeId } from "./LinkChallengeId.ts"
-import { PrerequisitesUnmetError } from "./Prerequisite.ts"
+import { Prerequisites } from "./Prerequisite.ts"
 
-export type Widget<Payload extends S.Codec<any, any>> = {
-  readonly Payload: Payload["Type"]
-  readonly standard: StandardSchemaV1<{ readonly x: string }, Payload["Type"]>
-  readonly host: (input: Payload["Type"]) => Effect.Effect<void, WidgetError>
-}
-
-export class WidgetError extends Data.TaggedError("WidgetError")<{
-  readonly cause: unknown
-}> {}
-
-const widget = <Payload extends S.Codec<any, any>, Item extends S.Codec<any, any>>({
-  pathname,
-  payload,
-  item,
-}: {
-  readonly pathname: string
-  readonly payload: Payload
-  readonly item: Item
-}): Widget<Payload> => {
-  const Payload = S.StringFromBase64Url.pipe(S.decodeTo(S.fromJsonString(S.toCodecJson(payload))))
-  const standard = S.toStandardSchemaV1(
-    S.Struct({ x: Payload }).pipe(
-      S.decodeTo(S.toType(payload), {
-        decode: SchemaGetter.transform((input) => (input as { readonly x: Payload["Type"] }).x), // TODO
-        encode: SchemaGetter.transform((x) => ({ x })),
-      }),
-    ),
-  )
-  const host = (payload: Payload["Type"]) =>
-    pipe(
-      payload,
-      S.encodeEffect(Payload),
-      Effect.flatMap(
-        Effect.fn(function* (x) {
-          const { url } = yield* ChxEnv.ChxEnv
-          const { href: src } = yield* Url.make(
-            url({ sub: "link", pathname }),
-            UrlParams.make([["x", x]]),
-            undefined,
-          ).pipe(Effect.fromResult)
-          return embed({
-            item: S.Union([item, Finished]),
-            src,
-            className: "crosshatch-widget",
-          })
-        }),
-      ),
-      Stream.unwrap,
-      Stream.filter(S.is(Finished)),
-      Stream.take(1),
-      Stream.runDrain,
-      Effect.mapError((cause) => new WidgetError({ cause })),
-      Boundary.span("stream-host", import.meta.url, {
-        attributes: { pathname },
-      }),
-    )
-  return { Payload, standard, host }
-}
-
-const Common = S.Struct({
-  referrer: S.String.pipe(S.optional),
-})
-
-export const ActivityWidget = widget({
+export const ActivityWidget = Widget.make({
   pathname: "activity",
-  payload: Common,
-  item: S.Never,
+  payload: S.Void,
+  item: S.Void,
+  error: S.Never,
 })
 
-export const LinkWidget = widget({
+export const LinkWidget = Widget.make({
   pathname: "link",
   payload: S.Struct({
     challengeId: LinkChallengeId,
     allowance: Allowance,
-    ...Common.fields,
   }),
-  item: S.Never,
+  item: S.Void,
+  error: S.Never,
 })
 
-export const PrerequisitesWidget = widget({
+export const PrerequisitesWidget = Widget.make({
   pathname: "prerequisites",
-  payload: PrerequisitesUnmetError,
-  item: S.Never,
+  payload: S.Struct({
+    prerequisites: Prerequisites,
+  }),
+  item: S.Void,
+  error: S.Never,
 })
 
-export const IdWidget = widget({
+export const IdWidget = Widget.make({
   pathname: "id",
-  payload: Common,
-  item: S.Never,
+  payload: S.Void,
+  item: S.Void,
+  error: S.Never,
 })

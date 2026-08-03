@@ -26,11 +26,10 @@ example uses HTTP, but Crosshatch is not limited to HTTP; route protection is
 just one integration path.
 
 ```ts
-import { ChxHttp, Payload, Required, Requirements } from "crosshatch"
+import { Payload, Required, Requirements, ChxHttp } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
 import * as Known from "crosshatch/Known"
 import { Config, Effect } from "effect"
-import { HttpServerResponse } from "effect/unstable/http"
 
 const route = Effect.gen(function* () {
   const recipient = yield* Config.schema(
@@ -50,9 +49,7 @@ const route = Effect.gen(function* () {
       Required.accept(accepted),
     )
 
-    return yield* ChxHttp.require({ required }).pipe(
-      Effect.map(HttpServerResponse.setStatus(402)),
-    )
+    return yield* ChxHttp.require({ required })
   }
 
   return payload
@@ -111,10 +108,11 @@ using `Payload.isAcceptable` before verification or settlement.
 
 Inside the route, read the parsed payload service. If it is absent or does not
 match one of the route's accepted requirements, build a `Required` value and
-return `ChxHttp.require({ required })` with its status set to `402`.
+fail with `ChxHttp.require({ required })`. The HTTP server renders the failure
+as the payment-required response.
 
 ```ts
-import { ChxHttp, Payload, Required, Requirements } from "crosshatch"
+import { Payload, Required, Requirements, ChxHttp } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
 import * as Known from "crosshatch/Known"
 import { Config, Effect } from "effect"
@@ -139,19 +137,19 @@ const paidRoute = Effect.gen(function* () {
       Required.accept(accepted),
     )
 
-    return yield* ChxHttp.require({ required }).pipe(
-      Effect.map(HttpServerResponse.setStatus(402)),
-    )
+    return yield* ChxHttp.require({ required })
   }
 
   return HttpServerResponse.text("The paid resource.")
 })
 ```
 
-`ChxHttp.require` returns an empty HTTP response with the encoded requirement in
-the `payment-required` header. It does not set the response status, so the empty
-response defaults to `204`; set it to `402` as shown above. If a Crosshatch
-trace id is available, the response also includes `x-crosshatch-trace-id`.
+`ChxHttp.require` fails with `ChxHttp.PaymentRequired`. The error implements
+`HttpServerRespondable`, so Effect HTTP converts it to an empty response with
+the encoded requirement in the `payment-required` header. If a Crosshatch trace
+id is available, the response also includes `x-crosshatch-trace-id`. Because
+this is an error effect, response transformations must not be applied with
+`Effect.map`.
 
 ### Settle Before Delivery
 
@@ -159,7 +157,7 @@ Most merchant routes should settle the payload before returning the paid
 resource.
 
 ```ts
-import { Facilitator, ChxHttp, Payload, Required } from "crosshatch"
+import { Facilitator, Payload, Required, ChxHttp } from "crosshatch"
 import { Effect } from "effect"
 import { HttpServerResponse } from "effect/unstable/http"
 
@@ -169,9 +167,7 @@ const paidRoute = Effect.gen(function* () {
   const payload = yield* Payload.Payload
 
   if (!Payload.isAcceptable(required.accepts, payload)) {
-    return yield* ChxHttp.require({ required }).pipe(
-      Effect.map(HttpServerResponse.setStatus(402)),
-    )
+    return yield* ChxHttp.require({ required })
   }
 
   const settlement = yield* Facilitator.settle({ payload })
@@ -194,7 +190,7 @@ To avoid blocking the resource delivery, you can fork a scope-bound fiber from
 the settlement effect.
 
 ```ts
-import { Facilitator, ChxHttp, Payload, Required } from "crosshatch"
+import { Facilitator, Payload, Required, ChxHttp } from "crosshatch"
 import { Effect } from "effect"
 import { HttpServerResponse } from "effect/unstable/http"
 
@@ -204,9 +200,7 @@ const paidRoute = Effect.gen(function* () {
   const payload = yield* Payload.Payload
 
   if (!Payload.isAcceptable(required.accepts, payload)) {
-    return yield* ChxHttp.require({ required }).pipe(
-      Effect.map(HttpServerResponse.setStatus(402)),
-    )
+    return yield* ChxHttp.require({ required })
   }
 
   yield* Facilitator.settle({ payload }).pipe(Effect.forkScoped) // [!code focus]
@@ -219,7 +213,7 @@ const paidRoute = Effect.gen(function* () {
 
 Browser clients need access to the `payment-required` response header so they
 can read the invoice and retry with a payment payload. Crosshatch exports
-`ChxHttp.HEADERS` for the headers used by the HTTP integration.
+`ChxHttp.exposedHeaders` for the response headers used by the HTTP integration.
 
 ```ts
 import { ChxHttp } from "crosshatch"
@@ -234,7 +228,7 @@ const app = router.pipe(
       allowedHeaders: ["*"],
       allowedMethods: ["*"],
       allowedOrigins: ["*"],
-      exposedHeaders: ChxHttp.HEADERS,
+      exposedHeaders: ChxHttp.exposedHeaders,
     }),
     ChxHttp.layerMiddleware(),
   ]),

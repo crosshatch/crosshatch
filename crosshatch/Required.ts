@@ -1,6 +1,7 @@
+import { JsonRecord } from "@crosshatch/util/schema"
+import { stringRaw } from "@crosshatch/util/string"
 import { Schema as S, Effect, Context } from "effect"
 
-import { JsonRecord, stringRaw } from "./_util.ts"
 import type { InvalidAmountError } from "./Amount.ts"
 import type { Extension } from "./Extension.ts"
 import { Requirements, type RequirementsLike } from "./Requirements.ts"
@@ -17,8 +18,8 @@ export const Required = S.Struct({
 })
 
 export const RequiredJson = S.toCodecJson(Required)
-export const RequiredJsonString = S.fromJsonString(RequiredJson)
-export const RequiredFromBase64JsonString = S.StringFromBase64.pipe(S.decodeTo(RequiredJsonString))
+export const RequiredFromJsonString = S.fromJsonString(RequiredJson)
+export const RequiredFromBase64JsonString = S.StringFromBase64.pipe(S.decodeTo(RequiredFromJsonString))
 
 export class RequiredUrl extends Context.Reference<string | undefined>("crosshatch/RequiredUrl", {
   defaultValue: () => undefined,
