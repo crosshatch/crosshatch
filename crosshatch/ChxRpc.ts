@@ -6,14 +6,13 @@ import { PaymentId } from "./Extensions/index.ts"
 import * as Invoices from "./Invoices.ts"
 import { Payload } from "./Payload.ts"
 
+export type ChxEvent = typeof ChxEvent.Type
 export const ChxEvent = S.TaggedUnion({
   CreateTrace: { config: Bridge.TraceConfig },
   Propose: { proposal: Bridge.Proposal },
 })
 
-export class ChxEvents extends Context.Service<ChxEvents, PubSub.PubSub<typeof ChxEvent.Type>>()(
-  "crosshatch/ChxRpc/ChxEvents",
-) {}
+export class ChxEvents extends Context.Service<ChxEvents, PubSub.PubSub<ChxEvent>>()("crosshatch/ChxRpc/ChxEvents") {}
 
 export class ChxRpcGroup extends RpcGroup.make(
   Rpc.make("crosshatch_StreamEvents", {
