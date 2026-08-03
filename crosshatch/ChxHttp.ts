@@ -1,4 +1,4 @@
-import { Struct, Schema as S, Effect, Option, Layer, Data, ErrorReporter } from "effect"
+import { Struct, Schema as S, Effect, Option, Layer, Data, ErrorReporter, flow } from "effect"
 import {
   Headers,
   HttpRouter,
@@ -33,24 +33,23 @@ export class PaymentRequired
   [HttpServerRespondable.symbol]() {
     return Effect.gen({ self: this }, function* () {
       const traceInfo = yield* Effect.currentSpan.pipe(
-        Effect.map(Struct.pick(["traceId", "spanId"])),
         Effect.map(
-          Struct.renameKeys({
-            traceId: CROSSHATCH_TRACE_ID,
-            spanId: CROSSHATCH_SPAN_ID,
-          }),
+          flow(
+            Struct.pick(["traceId", "spanId"]),
+            Struct.renameKeys({
+              traceId: CROSSHATCH_TRACE_ID,
+              spanId: CROSSHATCH_SPAN_ID,
+            }),
+          ),
         ),
         Effect.catchTags({
           NoSuchElementError: () => Effect.undefined,
         }),
       )
-      const paymentRequired = yield* S.encodeEffect(RequiredFromBase64JsonString)(this.required)
+      const required = yield* S.encodeEffect(RequiredFromBase64JsonString)(this.required)
       return HttpServerResponse.empty({
         status: 402,
-        headers: {
-          [PAYMENT_REQUIRED]: paymentRequired,
-          ...traceInfo,
-        },
+        headers: { [PAYMENT_REQUIRED]: required, ...traceInfo },
       })
     })
   }

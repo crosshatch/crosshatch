@@ -2,7 +2,8 @@ import { Schema as S, Stream, Context, PubSub, Layer, Effect } from "effect"
 import { Rpc, RpcGroup } from "effect/unstable/rpc"
 
 import * as Bridge from "./Bridge.ts"
-import { Invoices, PaymentId } from "./Extensions/index.ts"
+import { PaymentId } from "./Extensions/index.ts"
+import * as Invoices from "./Invoices.ts"
 import { Payload } from "./Payload.ts"
 
 export const ChxEvent = S.TaggedUnion({

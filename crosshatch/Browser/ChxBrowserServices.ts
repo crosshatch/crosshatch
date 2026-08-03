@@ -40,10 +40,7 @@ export const layer = Payer.layerFromBridge.pipe(
     layerBridge.pipe(
       Layer.provideMerge(
         Layer.mergeAll(
-          ChxDomain.ChxDomain.pipe(
-            Effect.map(({ url }) => EmbedLauncher.layer({ url })),
-            Layer.unwrap,
-          ),
+          ChxDomain.ChxDomain.pipe(Effect.map(EmbedLauncher.layer), Layer.unwrap),
           FacadeStateRef.layer.pipe(Layer.provideMerge(FacadeClient.layer)),
         ).pipe(Layer.provideMerge(ChxDomain.layer("link.crosshatch.dev").pipe(Layer.provideMerge(ChxStage.layer)))),
       ),
