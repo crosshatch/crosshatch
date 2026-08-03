@@ -1,6 +1,6 @@
 import { type Cause, Context, Data, Deferred, Effect, Layer } from "effect"
 
-import type { PaymentId } from "./Extensions/PaymentId.ts"
+import type { PaymentId } from "./Extensions/index.ts"
 import * as Payload from "./Payload.ts"
 import type { Requirements } from "./Requirements.ts"
 
@@ -11,12 +11,12 @@ export class PayloadUnacceptableError extends Data.TaggedError("PayloadUnaccepta
 export class Invoices extends Context.Service<
   Invoices,
   {
-    readonly add: (accepts: ReadonlyArray<Requirements>, id: typeof PaymentId.Type) => Effect.Effect<void>
+    readonly add: (accepts: ReadonlyArray<Requirements>, id: PaymentId.PaymentId) => Effect.Effect<void>
 
-    readonly await: (id: typeof PaymentId.Type) => Effect.Effect<Payload.Payload, Cause.NoSuchElementError>
+    readonly await: (id: PaymentId.PaymentId) => Effect.Effect<Payload.Payload, Cause.NoSuchElementError>
 
     readonly resolve: (
-      id: typeof PaymentId.Type,
+      id: PaymentId.PaymentId,
       payload: Payload.Payload,
     ) => Effect.Effect<void, Cause.NoSuchElementError | PayloadUnacceptableError>
   }
@@ -26,7 +26,7 @@ export const layerMemory = Layer.effect(
   Invoices,
   Effect.sync(() => {
     const invoices: Record<
-      typeof PaymentId.Type,
+      PaymentId.PaymentId,
       {
         readonly accepts: ReadonlyArray<Requirements>
         readonly deferred: Deferred.Deferred<Payload.Payload>
