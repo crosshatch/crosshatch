@@ -29,10 +29,10 @@ const program = Effect.gen(function* () {
 })
 ```
 
-`Bridge.propose` accepts a `Bridge.Proposal`, containing `required` and an
-optional `traceId`, and returns `{ payload }`. When `traceId` is omitted and the
-installed bridge implements `createTrace`, Crosshatch forwards the id from the
-surrounding `Bridge.traced` scope.
+`Bridge.propose` accepts a `Bridge.Proposal`, containing `required` and optional
+`trace` information, and returns `{ payload }`. When `trace` is omitted and the
+installed bridge implements `createTrace`, Crosshatch forwards the trace from
+the surrounding `Bridge.traced` scope.
 
 The bridge implementation owns the user approval and signing experience. It can
 open an extension popup, call a hosted wallet, route to a native app, or use any
@@ -49,9 +49,9 @@ declare const askWalletToPay: (
 ) => Effect.Effect<{ readonly payload: Payload.Payload }, Bridge.ProposeError>
 
 const layerBridge = Layer.succeed(Bridge.Bridge, {
-  propose: ({ required, traceId }) =>
+  propose: ({ required, trace }) =>
     Effect.gen(function* () {
-      return yield* askWalletToPay({ required, traceId })
+      return yield* askWalletToPay({ required, trace })
     }),
 })
 

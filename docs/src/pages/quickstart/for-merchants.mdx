@@ -213,7 +213,7 @@ const paidRoute = Effect.gen(function* () {
 
 Browser clients need access to the `payment-required` response header so they
 can read the invoice and retry with a payment payload. Crosshatch exports
-`ChxHttp.HEADERS` for the headers used by the HTTP integration.
+`ChxHttp.exposedHeaders` for the response headers used by the HTTP integration.
 
 ```ts
 import { ChxHttp } from "crosshatch"
@@ -228,7 +228,7 @@ const app = router.pipe(
       allowedHeaders: ["*"],
       allowedMethods: ["*"],
       allowedOrigins: ["*"],
-      exposedHeaders: ChxHttp.HEADERS,
+      exposedHeaders: ChxHttp.exposedHeaders,
     }),
     ChxHttp.layerMiddleware(),
   ]),

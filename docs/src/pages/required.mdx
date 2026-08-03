@@ -57,14 +57,14 @@ that may show the payment request to a user.
 ## JSON Encoding
 
 `RequiredJson` converts between a `Required` value and its JSON representation.
-`RequiredJsonString` additionally parses and serializes the JSON string.
+`RequiredFromJsonString` additionally parses and serializes the JSON string.
 
 ```ts
 import { Required } from "crosshatch"
 import { Schema } from "effect"
 
-const decodeRequired = Schema.decodeEffect(Required.RequiredJsonString)
-const encodeRequired = Schema.encodeEffect(Required.RequiredJsonString)
+const decodeRequired = Schema.decodeEffect(Required.RequiredFromJsonString)
+const encodeRequired = Schema.encodeEffect(Required.RequiredFromJsonString)
 ```
 
 ## Requirements Groups
