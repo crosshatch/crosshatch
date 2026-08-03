@@ -3,7 +3,8 @@ import { Effect, Schema as S, Context, type Ref } from "effect"
 import * as Ed25519PrivateKey from "./Ed25519PrivateKey.ts"
 import * as Ed25519PublicKey from "./Ed25519PublicKey.ts"
 
-const TypeId = "~crosshatch/Crypto/Ed25519Pair" as const
+const Id = "crosshatch/Crypto/Ed25519Pair" as const
+const TypeId = `~${Id}`
 
 type Ed25519Pair_ = typeof Ed25519Pair_.Type
 const Ed25519Pair_ = S.Struct({
@@ -16,7 +17,7 @@ const Ed25519Pair_ = S.Struct({
 export interface Ed25519Pair extends Ed25519Pair_ {}
 
 export const Ed25519Pair = Object.assign(
-  Context.Service<Ed25519Pair, Ref.Ref<Ed25519Pair | undefined>>()("crosshatch/Crypto/Ed25519Pair"),
+  Context.Service<Ed25519Pair, Ref.Ref<Ed25519Pair | undefined>>()(TypeId),
   Ed25519Pair_,
 )
 

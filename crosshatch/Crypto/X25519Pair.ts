@@ -3,7 +3,8 @@ import { Effect, Schema as S, Context, type Ref } from "effect"
 import { X25519PrivateKey } from "./X25519PrivateKey.ts"
 import { X25519PublicKey } from "./X25519PublicKey.ts"
 
-const TypeId = "~crosshatch/Crypto/X25519Pair" as const
+const Id = "crosshatch/Crypto/X25519Pair" as const
+const TypeId = `~${Id}` as const
 
 type X25519Pair_ = typeof X25519Pair_.Type
 const X25519Pair_ = S.Struct({
@@ -15,10 +16,7 @@ const X25519Pair_ = S.Struct({
 // oxlint-disable-next-line typescript/no-empty-interface
 export interface X25519Pair extends X25519Pair_ {}
 
-export const X25519Pair = Object.assign(
-  Context.Service<X25519Pair, Ref.Ref<X25519Pair | undefined>>()("crosshatch/Crypto/X25519Pair"),
-  X25519Pair_,
-)
+export const X25519Pair = Object.assign(Context.Service<X25519Pair, Ref.Ref<X25519Pair | undefined>>()(Id), X25519Pair_)
 
 export const fromNative = ({ privateKey, publicKey }: CryptoKeyPair) =>
   X25519Pair.make(
