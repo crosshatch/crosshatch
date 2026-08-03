@@ -19,8 +19,8 @@ const layerBridge = Layer.effect(
         Effect.mapError((cause) => new Bridge.CreateTraceError({ cause })),
       ),
       propose: Effect.fnUntraced(
-        function* ({ traceId, required }) {
-          const propose = facade.Propose({ traceId, required })
+        function* ({ required, trace }) {
+          const propose = facade.Propose({ required, trace })
           const { payload } = yield* propose.pipe(
             Effect.catchTags({
               PrerequisitesUnmetError: ({ prerequisites }) =>

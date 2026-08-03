@@ -1,7 +1,7 @@
 import { Array, Schema as S, Context, Effect, Layer, Record, Predicate, flow } from "effect"
 
 import type { Accept, AcceptError } from "./Accept.ts"
-import { Bridge } from "./Bridge.ts"
+import * as Bridge from "./Bridge.ts"
 import { ExtensionRegistry } from "./Extension.ts"
 import type { Payload } from "./Payload.ts"
 import type { Required } from "./Required.ts"
@@ -11,7 +11,8 @@ export class Payer extends Context.Service<
   Payer,
   {
     readonly createPayload: (config: {
-      readonly traceId?: string | undefined
+      readonly trace?: Bridge.TraceInfo | undefined
+
       readonly required: Required
     }) => Effect.Effect<{ readonly payload: Payload }, AcceptError | CreatePayloadError>
   }
@@ -71,7 +72,7 @@ export const layerLocal = <ROut, E, RIn>({
     }),
   )
 
-export const layerFromBridge = Effect.map(Bridge, ({ propose }) => ({
+export const layerFromBridge = Effect.map(Bridge.Bridge, ({ propose }) => ({
   createPayload: flow(
     propose,
     Effect.catchTags({

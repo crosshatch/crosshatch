@@ -17,7 +17,9 @@ import { type Required, RequiredFromBase64JsonString } from "./Required.ts"
 export const PAYMENT_REQUIRED = "payment-required" as const
 export const PAYMENT_SIGNATURE = "payment-signature" as const
 export const PAYMENT_RESPONSE = "payment-response" as const
+
 export const CROSSHATCH_TRACE_ID = "x-crosshatch-trace-id" as const
+export const CROSSHATCH_SPAN_ID = "x-crosshatch-span-id" as const
 
 export const exposedHeaders = [PAYMENT_REQUIRED, PAYMENT_RESPONSE, CROSSHATCH_TRACE_ID] as const
 
@@ -30,8 +32,14 @@ export class PaymentRequired
 {
   [HttpServerRespondable.symbol]() {
     return Effect.gen({ self: this }, function* () {
-      const traceId = yield* Effect.currentSpan.pipe(
-        Effect.map(Struct.get("traceId")),
+      const traceInfo = yield* Effect.currentSpan.pipe(
+        Effect.map(Struct.pick(["traceId", "spanId"])),
+        Effect.map(
+          Struct.renameKeys({
+            traceId: CROSSHATCH_TRACE_ID,
+            spanId: CROSSHATCH_SPAN_ID,
+          }),
+        ),
         Effect.catchTags({
           NoSuchElementError: () => Effect.undefined,
         }),
@@ -40,8 +48,8 @@ export class PaymentRequired
       return HttpServerResponse.empty({
         status: 402,
         headers: {
-          ...(traceId && { [CROSSHATCH_TRACE_ID]: traceId }),
           [PAYMENT_REQUIRED]: paymentRequired,
+          ...traceInfo,
         },
       })
     })
@@ -108,13 +116,15 @@ export const layerFetch = Layer.effect(
         if (retry.headers.has(PAYMENT_SIGNATURE)) {
           return yield* new PaymentAlreadyAttemptedError()
         }
-        const traceId = response.headers.get(CROSSHATCH_TRACE_ID) ?? undefined
+        const spanId = response.headers.get(CROSSHATCH_TRACE_ID)
+        const traceId = response.headers.get(CROSSHATCH_TRACE_ID)
+        const trace = traceId && spanId ? { spanId, traceId } : undefined
         const requiredHeader = response.headers.get(PAYMENT_REQUIRED)
         if (!requiredHeader) {
           return yield* new NoSuchRequiredError()
         }
         const required = yield* S.decodeUnknownEffect(RequiredFromBase64JsonString)(requiredHeader)
-        const { payload } = yield* payer.createPayload({ required, traceId })
+        const { payload } = yield* payer.createPayload({ required, trace })
         const encoded = yield* S.encodeEffect(PayloadFromBase64JsonString)(payload)
         retry.headers.set(PAYMENT_SIGNATURE, encoded)
         return yield* Effect.promise(() => fetch(retry))
