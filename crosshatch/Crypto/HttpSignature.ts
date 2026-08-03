@@ -67,7 +67,7 @@ export const layer = Layer.effect(
 export const layerFetch = Layer.effect(
   FetchHttpClient.Fetch,
   Effect.gen(function* () {
-    const ref = yield* Ed25519Pair.Ed25519PairRef
+    const ref = yield* Ed25519Pair.Ed25519Pair
     const fetch = yield* Effect.serviceOption(FetchHttpClient.Fetch).pipe(
       Effect.map(Option.getOrElse(() => globalThis.fetch)),
     )

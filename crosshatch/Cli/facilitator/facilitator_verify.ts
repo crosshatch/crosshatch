@@ -14,7 +14,7 @@ export const verify = Command.make("verify", {
   Command.withDescription("Verify a payment payload without settling it"),
   Command.withHandler(({ baseUrl, payload, stdin }) =>
     Input.read(payload, stdin, "payload").pipe(
-      Effect.flatMap(S.decodeEffect(Payload.PayloadJsonString)),
+      Effect.flatMap(S.decodeEffect(Payload.PayloadFromJsonString)),
       Effect.flatMap((payload) => FacilitatorService.verify({ payload })),
       Effect.flatMap(S.encodeEffect(VerifyResponseJsonString)),
       Effect.andThen(Console.log),

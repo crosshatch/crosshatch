@@ -93,8 +93,7 @@ import {
     <div className="crosshatch-code-block">
 
 ```ts
-import { Payer } from "crosshatch"
-import * as ChxHttp from "crosshatch/ChxHttp"
+import { Payer, ChxHttp } from "crosshatch"
 import { Console, Effect, Layer } from "effect"
 import { HttpClient, HttpClientRequest } from "effect/unstable/http"
 
@@ -135,8 +134,13 @@ Effect.gen(function* () {
     <div className="crosshatch-code-block">
 
 ```ts
-import { Facilitator, Payload, Required, Requirements } from "crosshatch"
-import * as ChxHttp from "crosshatch/ChxHttp"
+import {
+  Facilitator,
+  Payload,
+  Required,
+  Requirements,
+  ChxHttp,
+} from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
 import * as Known from "crosshatch/Known"
 import { Config, Effect, Layer } from "effect"
@@ -191,8 +195,7 @@ const router = HttpRouter.add(
 
 ```ts
 import { OpenAiClient, OpenAiLanguageModel } from "@effect/ai-openai-compat"
-import { Payer } from "crosshatch"
-import * as ChxHttp from "crosshatch/ChxHttp"
+import { Payer, ChxHttp } from "crosshatch"
 import { Console, Effect, Layer } from "effect"
 import { LanguageModel } from "effect/unstable/ai"
 

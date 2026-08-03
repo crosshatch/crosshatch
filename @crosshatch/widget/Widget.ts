@@ -45,6 +45,11 @@ export const makeUrl = <Payload extends WidgetPayload, A extends S.Top, E extend
 }) =>
   S.encodeEffect(S.fromURLSearchParams(Payload))(payload).pipe(
     Effect.map(UrlParams.fromInput),
-    Effect.flatMap((q) => Url.make(new URL(pathname ?? "./", baseUrl).pathname, q, undefined).pipe(Effect.fromResult)),
+    Effect.flatMap((q) =>
+      Url.make(baseUrl ? new URL(pathname ?? "./", baseUrl).href : (pathname ?? "./"), q, undefined).pipe(
+        Effect.fromResult,
+      ),
+    ),
+
     Effect.map(Struct.get("href")),
   )

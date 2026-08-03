@@ -38,7 +38,7 @@ export const layer = Layer.effect(
       Effect.forkScoped,
       Scope.provide(scope),
     )
-    parent.postMessage(RequestHostIntroduction.make({}), "*")
+    parent().postMessage(RequestHostIntroduction.make({}), "*")
     return yield* Deferred.await(deferred)
   }),
 )

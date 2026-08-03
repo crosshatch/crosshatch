@@ -10,6 +10,8 @@ import * as Ed25519PublicKey from "./Ed25519PublicKey.ts"
 
 const TypeId = "~crosshatch/Crypto/SocketSignature" as const
 
+const ProtocolKey = "crosshatch-signature" as const
+
 export type Service<A extends S.Top> = [
   | undefined
   | {
@@ -35,7 +37,7 @@ export const Service =
     return Object.assign(tag, { [TypeId]: TypeId, payload })
   }
 
-export const ProtocolFromBase64JsonString = S.StringFromBase64.pipe(
+export const ProtocolFromBase64UrlJsonString = S.StringFromBase64Url.pipe(
   S.decodeTo(
     S.Struct({
       signer: Ed25519PublicKey.Ed25519PublicKeyFromUint8Array,
@@ -51,10 +53,10 @@ export const layer = <Self, Id extends string, A extends S.Top>(signedPayload: S
     Effect.gen(function* () {
       const protocols = yield* CurrentSocketProtocols
       if (!protocols) return
-      const protocolI = protocols.indexOf("crosshatch")
+      const protocolI = protocols.indexOf(ProtocolKey)
       const protocol = protocols[protocolI + 1]
       if (!protocol) return
-      const { signer, input, signature } = yield* S.decodeEffect(ProtocolFromBase64JsonString)(protocol)
+      const { signer, input, signature } = yield* S.decodeEffect(ProtocolFromBase64UrlJsonString)(protocol)
       const verified = yield* Ed25519PublicKey.verify(signer, signature, new TextEncoder().encode(input))
       if (!verified) {
         return yield* new HttpApiError.Unauthorized()
@@ -65,24 +67,26 @@ export const layer = <Self, Id extends string, A extends S.Top>(signedPayload: S
   )
 
 export const makeSocket = <Self, Id extends string, A extends S.Top>(
-  url: string | Effect.Effect<string>,
+  url: string,
   signedPayload: Signature<Self, Id, A>,
   payload: A["Type"],
-  options?: {
-    readonly closeCodeIsError?: ((code: number) => boolean) | undefined
-    readonly openTimeout?: Duration.Input | undefined
-    readonly protocols?: string | Array<string> | undefined
-  },
+  options?:
+    | undefined
+    | {
+        readonly closeCodeIsError?: ((code: number) => boolean) | undefined
+        readonly openTimeout?: Duration.Input | undefined
+        readonly protocols?: string | Array<string> | undefined
+      },
 ) =>
   Effect.gen(function* () {
     const { closeCodeIsError, openTimeout, protocols } = options ?? {}
-    const { privateKey, publicKey: signer } = yield* Ed25519Pair.Ed25519PairRef.pipe(ensureRef)
+    const { privateKey, publicKey: signer } = yield* Ed25519Pair.Ed25519Pair.pipe(ensureRef)
     const input = yield* S.encodeEffect(S.fromJsonString(S.toCodecJson(signedPayload.payload)))(payload)
     const signature = yield* Ed25519PrivateKey.sign(privateKey, new TextEncoder().encode(input))
-    const protocol = yield* S.encodeEffect(ProtocolFromBase64JsonString)({ input, signature, signer })
+    const protocol = yield* S.encodeEffect(ProtocolFromBase64UrlJsonString)({ input, signature, signer })
     return yield* Socket.makeWebSocket(url, {
       closeCodeIsError,
       openTimeout,
-      protocols: ["signature", protocol, ...(protocols ? Array.ensure(protocols) : [])],
+      protocols: [ProtocolKey, protocol, ...(protocols ? Array.ensure(protocols) : [])],
     })
   })

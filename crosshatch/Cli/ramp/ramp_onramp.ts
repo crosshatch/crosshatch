@@ -4,7 +4,7 @@ import { Command, Flag } from "effect/unstable/cli"
 
 import { AccountId } from "../../AccountId.ts"
 import * as Amount from "../../Amount.ts"
-import { CirqueClient, Providers } from "../../Cirque/index.ts"
+import { CirqueClient } from "../../Cirque/index.ts"
 import { Eip155Address } from "../../Eip155/index.ts"
 import { MnemonicStore } from "../../index.ts"
 import * as Mnemonic from "../../Mnemonic.ts"
@@ -17,7 +17,9 @@ export const onramp = Command.make("onramp", {
     Flag.withDescription("EIP-155 chain reference (e.g., 8453 for Base)"),
   ),
   amount: Flag.integer("amount").pipe(Flag.withDescription("Positive integer fiat amount")),
-  provider: Flag.choice("provider", Providers).pipe(Flag.withDefault("Coinbase")),
+  provider: Flag.choice("provider", ["Coinbase"] /* TODO: use `Providers` from `Cirque` */).pipe(
+    Flag.withDefault("Coinbase"),
+  ),
 }).pipe(
   Command.withDescription("Create an onramp URL for a stored mnemonic"),
   Command.withHandler(

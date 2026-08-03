@@ -1,7 +1,7 @@
 ---
 "@crosshatch/alchemy": patch
 "@crosshatch/util": patch
-"crosshatch": patch
 ---
 
-Move alchemicals into `@crosshatch/alchemy` package. Consolidate `CirqueClient`.
+Publish deployment and documentation helpers from `@crosshatch/alchemy`,
+replacing the former `@crosshatch/util/alchemicals/*` entry points.

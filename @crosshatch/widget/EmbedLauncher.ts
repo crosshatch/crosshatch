@@ -2,6 +2,7 @@ import { BrowserStream } from "@effect/platform-browser"
 import { Effect, Queue, Record, Schema as S, Stream, Layer } from "effect"
 
 import { Launcher, LaunchError, type LauncherConfig } from "./Launcher.ts"
+import { ChxWidgetEvent } from "./Self.ts"
 import * as Widget from "./Widget.ts"
 
 export interface EmbedLauncherConfig extends LauncherConfig {
@@ -27,7 +28,10 @@ export const layer = (config?: EmbedLauncherConfig) =>
                     const context = yield* Effect.fromNullishOr(iframe.contentWindow).pipe(
                       Effect.mapError((cause) => new LaunchError({ cause })),
                     )
-                    if (source === context && S.is(item)(data)) {
+                    if (source !== context) return
+                    if (S.is(ChxWidgetEvent.cases.Done)(data)) {
+                      yield* Queue.end(queue)
+                    } else if (S.is(item)(data)) {
                       yield* Queue.offer(queue, data)
                     }
                   }),

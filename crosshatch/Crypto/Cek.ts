@@ -10,21 +10,24 @@ const AES_GCM = "AES-GCM"
 const AES_KEY_BITS = 256
 const GCM_TAG_BITS = 128
 
-export type Cek = typeof Cek.Type
-export const Cek = CryptoKey.CryptoKey.pipe(S.brand("crosshatch/Crypto/Cek"))
+type Cek_ = typeof Cek_.Type
+const Cek_ = CryptoKey.CryptoKey.pipe(S.brand("crosshatch/Crypto/Cek"))
 
-export class CekRef extends Context.Service<CekRef, Ref.Ref<Cek | undefined>>()("crosshatch/Crypto/CurrentCek") {}
+// oxlint-disable-next-line typescript/no-empty-interface
+export interface Cek extends Cek_ {}
 
-export const value = CekRef.pipe(Effect.flatMap(Ref.get))
+export const Cek = Object.assign(Context.Service<Cek, Ref.Ref<Cek | undefined>>()("crosshatch/Crypto/Cek"), Cek_)
 
-export const set = (value: Cek | undefined) => CekRef.pipe(Effect.flatMap(Ref.set(value)))
+export const value = Cek.pipe(Effect.flatMap(Ref.get))
 
-export const layer = Layer.effect(CekRef, Ref.make<Cek | undefined>(undefined))
+export const set = (value: Cek | undefined) => Cek.pipe(Effect.flatMap(Ref.set(value)))
+
+export const layer = Layer.effect(Cek, Ref.make<Cek | undefined>(undefined))
 
 export class HydrationError extends Data.TaggedClass("HydrationError") {}
 
 export const hydrate = Effect.fnUntraced(function* (envelope: Envelope.Asymmetric) {
-  const { privateKey } = yield* X25519Pair.X25519PairRef.pipe(
+  const { privateKey } = yield* X25519Pair.X25519Pair.pipe(
     Effect.flatMap(Ref.get),
     Effect.filterOrFail(Predicate.isNotUndefined, () => new HydrationError()),
   )

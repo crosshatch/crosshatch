@@ -2,6 +2,5 @@
 "crosshatch": patch
 ---
 
-Consolidate Ramp API and client into Cirque. Expand the crypto toolkit with HTTP
-message signing and verification, hashing helpers, and more consistent key types
-and branding.
+Replace the Ramp API and client with a consolidated, stage-aware Cirque API; add
+`AccountId` and return on-ramp URLs as `{ url }`.

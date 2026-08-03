@@ -5,16 +5,20 @@ import * as Ed25519PublicKey from "./Ed25519PublicKey.ts"
 
 const TypeId = "~crosshatch/Crypto/Ed25519Pair" as const
 
-export type Ed25519Pair = typeof Ed25519Pair.Type
-export const Ed25519Pair = S.Struct({
+type Ed25519Pair_ = typeof Ed25519Pair_.Type
+const Ed25519Pair_ = S.Struct({
   [TypeId]: S.tag(TypeId),
   privateKey: Ed25519PrivateKey.Ed25519PrivateKey,
   publicKey: Ed25519PublicKey.Ed25519PublicKey,
 })
 
-export class Ed25519PairRef extends Context.Service<Ed25519PairRef, Ref.Ref<Ed25519Pair | undefined>>()(
-  "crosshatch/Crypto/Ed25519PairRef",
-) {}
+// oxlint-disable-next-line typescript/no-empty-interface
+export interface Ed25519Pair extends Ed25519Pair_ {}
+
+export const Ed25519Pair = Object.assign(
+  Context.Service<Ed25519Pair, Ref.Ref<Ed25519Pair | undefined>>()("crosshatch/Crypto/Ed25519Pair"),
+  Ed25519Pair_,
+)
 
 export const fromNative = ({ privateKey, publicKey }: CryptoKeyPair) =>
   Ed25519Pair.make(

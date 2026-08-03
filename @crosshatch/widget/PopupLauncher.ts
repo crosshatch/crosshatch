@@ -2,6 +2,7 @@ import { BrowserStream } from "@effect/platform-browser"
 import { Effect, Layer, Queue, Schema as S, Stream } from "effect"
 
 import { Launcher, type LauncherConfig, LaunchError } from "./Launcher.ts"
+import { ChxWidgetEvent } from "./Self.ts"
 import { type Widget, type WidgetPayload, makeUrl } from "./Widget.ts"
 
 export const layer = (config?: LauncherConfig) =>
@@ -19,9 +20,17 @@ export const layer = (config?: LauncherConfig) =>
             Effect.fn(function* (queue) {
               let context: WindowProxy | null = null
               yield* BrowserStream.fromEventListenerWindow("message").pipe(
-                Stream.runForEach(({ data, source }) =>
-                  source === context && S.is(item)(data) ? Queue.offer(queue, data) : Effect.void,
+                Stream.runForEach(
+                  Effect.fn(function* ({ data, source }) {
+                    if (source !== context) return
+                    if (S.is(ChxWidgetEvent.cases.Done)(data)) {
+                      yield* Queue.end(queue)
+                    } else if (S.is(item)(data)) {
+                      yield* Queue.offer(queue, data)
+                    }
+                  }),
                 ),
+
                 Effect.forkScoped,
               )
               context = yield* makeUrl({ baseUrl: url, widget, payload }).pipe(Effect.map(open))

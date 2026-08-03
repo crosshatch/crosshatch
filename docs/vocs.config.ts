@@ -52,7 +52,6 @@ export default defineConfig({
           },
           { text: "Lifecycle", link: "/lifecycle" },
           { text: "Facilitation", link: "/facilitation" },
-          { text: "Configuration", link: "/configuration" },
         ],
       },
       {
@@ -63,7 +62,6 @@ export default defineConfig({
           { text: "Required", link: "/required" },
           { text: "Payload", link: "/payload" },
           { text: "Extension", link: "/extension" },
-          { text: "Crypto", link: "/crypto" },
         ],
       },
       {
@@ -73,14 +71,7 @@ export default defineConfig({
           { text: "Bridge", link: "/bridge" },
           { text: "ChxRpc", link: "/chx-rpc" },
           { text: "Scheme", link: "/scheme" },
-          { text: "Cirque", link: "/cirque" },
-          { text: "Browser", link: "/browser" },
-          { text: "Widget", link: "/widget" },
         ],
-      },
-      {
-        text: "Deployment",
-        items: [{ text: "Alchemy", link: "/alchemy" }],
       },
       {
         text: "Schemes",

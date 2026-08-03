@@ -18,25 +18,29 @@ export class GetUserConfigError extends Data.TaggedError("GetUserConfigError")<{
 
 export class SetUserConfigError extends Data.TaggedError("SetUserConfigError")<{ readonly cause?: unknown }> {}
 
-export interface UserConfig {
-  readonly mnemonics: MnemonicConfigs
-}
+type UserConfig_ = typeof UserConfig_.Type
+const UserConfig_ = S.Struct({
+  mnemonics: S.Record(S.String, MnemonicConfig),
+})
+
+// oxlint-disable-next-line typescript/no-empty-interface
+export interface UserConfig extends UserConfig_ {}
 
 export const UserConfig = Object.assign(
   Context.Service<
     UserConfig,
     {
       readonly get: Effect.Effect<UserConfig, GetUserConfigError>
+
       readonly set: (config: UserConfig) => Effect.Effect<void, SetUserConfigError>
+
       readonly update: (
         setter: (config: UserConfig) => UserConfig,
       ) => Effect.Effect<void, GetUserConfigError | SetUserConfigError>
     }
   >()("crosshatch/UserConfig"),
-  S.Struct({
-    mnemonics: S.Record(S.String, MnemonicConfig),
-  }),
+  UserConfig_,
 )
 
 export const UserConfigJson = S.toCodecJson(UserConfig)
-export const UserConfigJsonString = S.fromJsonString(UserConfigJson)
+export const UserConfigFromJsonString = S.fromJsonString(UserConfigJson)

@@ -26,8 +26,7 @@ example uses HTTP, but Crosshatch is not limited to HTTP; route protection is
 just one integration path.
 
 ```ts
-import { Payload, Required, Requirements } from "crosshatch"
-import * as ChxHttp from "crosshatch/ChxHttp"
+import { Payload, Required, Requirements, ChxHttp } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
 import * as Known from "crosshatch/Known"
 import { Config, Effect } from "effect"
@@ -93,7 +92,7 @@ Use this integration when your merchant service is built with
 the route as `Payload.Payload`.
 
 ```ts
-import * as ChxHttp from "crosshatch/ChxHttp"
+import { ChxHttp } from "crosshatch"
 import { HttpRouter } from "effect/unstable/http"
 
 const app = ChxHttp.layerMiddleware().pipe(HttpRouter.toHttpEffect)
@@ -113,8 +112,7 @@ fail with `ChxHttp.require({ required })`. The HTTP server renders the failure
 as the payment-required response.
 
 ```ts
-import { Payload, Required, Requirements } from "crosshatch"
-import * as ChxHttp from "crosshatch/ChxHttp"
+import { Payload, Required, Requirements, ChxHttp } from "crosshatch"
 import { Eip155Address } from "crosshatch/Eip155"
 import * as Known from "crosshatch/Known"
 import { Config, Effect } from "effect"
@@ -159,8 +157,7 @@ Most merchant routes should settle the payload before returning the paid
 resource.
 
 ```ts
-import { Facilitator, Payload, Required } from "crosshatch"
-import * as ChxHttp from "crosshatch/ChxHttp"
+import { Facilitator, Payload, Required, ChxHttp } from "crosshatch"
 import { Effect } from "effect"
 import { HttpServerResponse } from "effect/unstable/http"
 
@@ -193,8 +190,7 @@ To avoid blocking the resource delivery, you can fork a scope-bound fiber from
 the settlement effect.
 
 ```ts
-import { Facilitator, Payload, Required } from "crosshatch"
-import * as ChxHttp from "crosshatch/ChxHttp"
+import { Facilitator, Payload, Required, ChxHttp } from "crosshatch"
 import { Effect } from "effect"
 import { HttpServerResponse } from "effect/unstable/http"
 
@@ -220,7 +216,7 @@ can read the invoice and retry with a payment payload. Crosshatch exports
 `ChxHttp.HEADERS` for the headers used by the HTTP integration.
 
 ```ts
-import * as ChxHttp from "crosshatch/ChxHttp"
+import { ChxHttp } from "crosshatch"
 import { Layer } from "effect"
 import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
 

@@ -38,16 +38,15 @@ const layerBridge = Layer.effect(
 export const layer = Payer.layerFromBridge.pipe(
   Layer.provideMerge([
     layerBridge.pipe(
-      Layer.provideMerge([
-        EmbedLauncher.layer({ url: "link.crosshatch.dev" }),
-        FacadeStateRef.layer.pipe(
-          Layer.provideMerge(
-            FacadeClient.layer.pipe(
-              Layer.provideMerge(ChxDomain.layer("link.crosshatch.dev").pipe(Layer.provideMerge(ChxStage.layer))),
-            ),
+      Layer.provideMerge(
+        Layer.mergeAll(
+          ChxDomain.ChxDomain.pipe(
+            Effect.map(({ url }) => EmbedLauncher.layer({ url })),
+            Layer.unwrap,
           ),
-        ),
-      ]),
+          FacadeStateRef.layer.pipe(Layer.provideMerge(FacadeClient.layer)),
+        ).pipe(Layer.provideMerge(ChxDomain.layer("link.crosshatch.dev").pipe(Layer.provideMerge(ChxStage.layer)))),
+      ),
     ),
   ]),
 )

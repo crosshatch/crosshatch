@@ -1,6 +1,6 @@
 export * as ChxBrowserServices from "./ChxBrowserServices.ts"
 export * from "./ChxBrowserRuntime.ts"
-export * as ChxAtoms from "./ChxAtoms.ts"
+export * as ChxAtom from "./ChxAtom.ts"
 export * from "./BrowserProposeError.ts"
 export * from "./LinkChallengeId.ts"
 export * from "./Widgets.ts"

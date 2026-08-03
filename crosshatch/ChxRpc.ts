@@ -1,10 +1,18 @@
-import { Schema as S, Stream, PubSub, Layer, Effect } from "effect"
+import { Schema as S, Stream, Context, PubSub, Layer, Effect } from "effect"
 import { Rpc, RpcGroup } from "effect/unstable/rpc"
 
-import { Bridge } from "../Bridge.ts"
-import { Invoices, PaymentId } from "../Extensions/index.ts"
-import { Payload } from "../Payload.ts"
-import { ChxEvent, ChxEvents } from "./ChxEvent.ts"
+import * as Bridge from "./Bridge.ts"
+import { Invoices, PaymentId } from "./Extensions/index.ts"
+import { Payload } from "./Payload.ts"
+
+export const ChxEvent = S.TaggedUnion({
+  CreateTrace: { config: Bridge.TraceConfig },
+  Propose: { proposal: Bridge.Proposal },
+})
+
+export class ChxEvents extends Context.Service<ChxEvents, PubSub.PubSub<typeof ChxEvent.Type>>()(
+  "crosshatch/ChxRpc/ChxEvents",
+) {}
 
 export class ChxRpcGroup extends RpcGroup.make(
   Rpc.make("crosshatch_StreamEvents", {
@@ -23,7 +31,7 @@ export class ChxRpcGroup extends RpcGroup.make(
 
 export const layer = Layer.mergeAll(
   Layer.effect(
-    Bridge,
+    Bridge.Bridge,
     Effect.gen(function* () {
       const invoices = yield* Invoices.Invoices
       const events = yield* ChxEvents
@@ -49,4 +57,4 @@ export const layer = Layer.mergeAll(
       yield* invoices.resolve(id, payload)
     }, Effect.orDie),
   }),
-).pipe(Layer.provideMerge([Layer.effect(ChxEvents, PubSub.unbounded()), Invoices.layerMemory]))
+).pipe(Layer.provideMerge([Layer.effect(ChxEvents, PubSub.unbounded())]))

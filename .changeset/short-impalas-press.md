@@ -1,7 +1,6 @@
 ---
-"@crosshatch/alchemy": patch
 "@crosshatch/util": patch
 ---
 
-Introduces reusable stage/domain configuration, and moves deployment utilities
-into @crosshatch/alchemy.
+Add reusable Crosshatch stage and stage-aware domain services, replacing the
+previous `ChxEnv` configuration model.

@@ -1,4 +1,4 @@
-import * as ChxStage from "@crosshatch/util/ChxStage"
+import * as ChxDomain from "@crosshatch/util/ChxDomain"
 import { Context, Effect, Layer } from "effect"
 import { HttpApiClient } from "effect/unstable/httpapi"
 
@@ -11,9 +11,7 @@ export class CirqueClient extends Context.Service<CirqueClient, HttpApiClient.Fo
 export const layer = Layer.effect(
   CirqueClient,
   Effect.gen(function* () {
-    const stage = yield* ChxStage.ChxStage
-    return yield* HttpApiClient.make(CirqueApi, {
-      baseUrl: `https://cirque.sh${stage.startsWith("dev_") ? ".localhost" : ""}`,
-    })
-  }),
+    const { url: baseUrl } = yield* ChxDomain.ChxDomain
+    return yield* HttpApiClient.make(CirqueApi, { baseUrl })
+  }).pipe(Effect.provide(ChxDomain.layer("cirque.sh"))),
 )

@@ -23,7 +23,7 @@ export const payloadMake = Command.make("make", {
       function* ({ required, stdin }) {
         const payer = yield* Payer.Payer
         yield* Input.read(required, stdin, "required").pipe(
-          Effect.flatMap(S.decodeEffect(Required.RequiredJsonString)),
+          Effect.flatMap(S.decodeEffect(Required.RequiredFromJsonString)),
           Effect.flatMap((required) => payer.createPayload({ required })),
           Effect.flatMap(({ payload }) => S.encodeEffect(Payload.PayloadJson)(payload)),
           Effect.map((v) => JSON.stringify(v, null, 2)),
