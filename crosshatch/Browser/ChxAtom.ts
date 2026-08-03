@@ -1,5 +1,5 @@
 import { Launcher } from "@crosshatch/widget"
-import { Effect, Stream, Struct, Option, Match } from "effect"
+import { Effect, Stream, Struct, Option, Match, SubscriptionRef } from "effect"
 import { Atom } from "effect/unstable/reactivity"
 
 import * as Amount from "../Amount.ts"
@@ -13,11 +13,11 @@ import { ActivityWidget, LinkWidget } from "./Widgets.ts"
 
 export const runtime = Atom.context({ memoMap })(BrowserServices.layer)
 
-export const state = runtime
-  .subscriptionRef(() => FacadeStateRef)
-  .pipe(Atom.mapResult(Struct.get("session")), Atom.keepAlive)
+export const state = runtime.subscriptionRef(() => FacadeStateRef).pipe(Atom.keepAlive)
 
-export const isLinked = state.pipe(Atom.mapResult((v) => v._tag === "Linked"))
+export const session = state.pipe(Atom.mapResult(Struct.get("session")))
+
+export const isLinked = session.pipe(Atom.mapResult((v) => v._tag === "Linked"))
 
 export const rescind = runtime.fn<void>()(
   Effect.fnUntraced(function* () {
@@ -33,21 +33,20 @@ export const propose = runtime.fn<Bridge.Proposal>()(
   }),
 )
 
-export const open = runtime.fn<void>()((_, ctx) =>
-  ctx.result(state).pipe(
-    Effect.flatMap(
-      Match.valueTags({
-        Challenged: ({ challengeId }) =>
-          Effect.gen(function* () {
-            const amount = yield* Amount.from(10)
-            const allowance = yield* Effect.serviceOption(Allowance).pipe(
-              Effect.map(Option.getOrElse(() => ({ amount, window: "Week" as const }))),
-            )
-            yield* Launcher.launch(LinkWidget, { challengeId, allowance }).pipe(Stream.runDrain)
-          }),
-        Linked: () => Launcher.launch(ActivityWidget, void 0).pipe(Stream.runDrain),
-        Rescinded: () => Effect.undefined,
-      }),
-    ),
-  ),
+export const open = runtime.fn<void>()(
+  Effect.fnUntraced(function* (_) {
+    const { session } = yield* FacadeStateRef.pipe(Effect.flatMap(SubscriptionRef.get))
+    yield* Match.valueTags(session, {
+      Challenged: ({ challengeId }) =>
+        Effect.gen(function* () {
+          const amount = yield* Amount.from(10)
+          const allowance = yield* Effect.serviceOption(Allowance).pipe(
+            Effect.map(Option.getOrElse(() => ({ amount, window: "Week" as const }))),
+          )
+          yield* Launcher.launch(LinkWidget, { challengeId, allowance }).pipe(Stream.runDrain)
+        }),
+      Linked: () => Launcher.launch(ActivityWidget, void 0).pipe(Stream.runDrain),
+      Rescinded: () => Effect.undefined,
+    })
+  }),
 )

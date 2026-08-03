@@ -10,7 +10,7 @@ import * as Ed25519PublicKey from "./Ed25519PublicKey.ts"
 
 const TypeId = "~crosshatch/Crypto/SocketSignature" as const
 
-const ProtocolKey = "crosshatch-signature" as const
+const ProtocolKey = "x-crosshatch-signature" as const
 
 export type Service<A extends S.Top> = [
   | undefined

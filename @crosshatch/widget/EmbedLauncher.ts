@@ -21,7 +21,7 @@ export const layer = (config?: EmbedLauncherConfig) =>
         ) => {
           const { item } = widget
           return Stream.callback<A["Type"], Launcher.Error<E>, Payload["EncodingServices"]>(
-            Effect.fn(function* (queue) {
+            Effect.fnUntraced(function* (queue) {
               yield* BrowserStream.fromEventListenerWindow("message").pipe(
                 Stream.runForEach(
                   Effect.fn(function* ({ data, source }) {

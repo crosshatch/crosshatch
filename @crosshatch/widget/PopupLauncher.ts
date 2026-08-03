@@ -17,7 +17,7 @@ export const layer = (config?: LauncherConfig) =>
         ) => {
           const { item } = widget
           return Stream.callback<A["Type"], Launcher.Error<E>, Payload["EncodingServices"]>(
-            Effect.fn(function* (queue) {
+            Effect.fnUntraced(function* (queue) {
               let context: WindowProxy | null = null
               yield* BrowserStream.fromEventListenerWindow("message").pipe(
                 Stream.runForEach(
