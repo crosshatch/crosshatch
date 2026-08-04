@@ -1,13 +1,18 @@
-import type { WorkerProps } from "alchemy/Cloudflare"
+import type { WorkerDomainConfig, WorkerProps } from "alchemy/Cloudflare"
 import { Stack } from "alchemy/Stack"
 import { Effect } from "effect"
 
 export const domain = (domain: string) =>
   Stack.pipe(
     Effect.map(({ stage }) =>
-      stage === "prod" ? prepends(domain) : stage.startsWith("staging-") ? prepends(`${stage}.${domain}`) : undefined,
+      stage === "prod" ? withAlias(domain) : stage.startsWith("staging-") ? withAlias(`${stage}.${domain}`) : undefined,
     ),
   )
+
+const withAlias = (name: string): WorkerDomainConfig => ({
+  name,
+  aliases: [`www.${name}`],
+})
 
 export const WorkerConfig = Effect.fn(function* ({
   domain,
@@ -20,9 +25,9 @@ export const WorkerConfig = Effect.fn(function* ({
   return {
     placement: { mode: "smart" },
     ...(stage === "prod"
-      ? { domain: prepends(domain) }
+      ? { domain: withAlias(domain) }
       : stage.startsWith("staging-")
-        ? { domain: prepends(`${stage}.${domain}`) }
+        ? { domain: withAlias(`${stage}.${domain}`) }
         : {}),
     compatibility: {
       date: "2026-02-05",
@@ -39,5 +44,3 @@ export const WorkerConfig = Effect.fn(function* ({
       : {}),
   } satisfies Partial<WorkerProps>
 })
-
-const prepends = (v: string) => [v, `www.${v}`]

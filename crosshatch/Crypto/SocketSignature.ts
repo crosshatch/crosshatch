@@ -1,6 +1,6 @@
 import { ensureRef } from "@crosshatch/util/ensureRef"
 import { CurrentSocketProtocols } from "@crosshatch/util/SocketProtocols"
-import { Array, Context, Effect, Schema as S, Layer, type Duration } from "effect"
+import { Array, Context, Effect, Schema as S, Layer, type Duration, Data } from "effect"
 import { HttpApiError } from "effect/unstable/httpapi"
 import { Socket } from "effect/unstable/socket"
 
@@ -47,6 +47,8 @@ export const ProtocolFromBase64UrlJsonString = S.StringFromBase64Url.pipe(
   ),
 )
 
+export class MissingSignatureProtocolError extends Data.TaggedError("MissingSignatureProtocolError") {}
+
 export const layer = <Self, Id extends string, A extends S.Top>(signedPayload: Signature<Self, Id, A>) =>
   Layer.effect(
     signedPayload,
@@ -54,8 +56,11 @@ export const layer = <Self, Id extends string, A extends S.Top>(signedPayload: S
       const protocols = yield* CurrentSocketProtocols
       if (!protocols) return
       const protocolI = protocols.indexOf(ProtocolKey)
+      if (protocolI === -1) return
       const protocol = protocols[protocolI + 1]
-      if (!protocol) return
+      if (!protocol) {
+        return yield* new MissingSignatureProtocolError()
+      }
       const { signer, input, signature } = yield* S.decodeEffect(ProtocolFromBase64UrlJsonString)(protocol)
       const verified = yield* Ed25519PublicKey.verify(signer, signature, new TextEncoder().encode(input))
       if (!verified) {

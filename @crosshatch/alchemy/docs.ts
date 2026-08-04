@@ -13,15 +13,15 @@ export const docs = Effect.fnUntraced(function* ({
   readonly devPort: number
 }) {
   const base = yield* WorkerConfig({ domain })
-  const STAGE = yield* Alchemy.Stage
+  const CHX_INTERNAL_STAGE = yield* Alchemy.Stage
   const { url } = yield* Cloudflare.Website.StaticSite("Docs", {
     ...base,
     dev: { command: `pnpm exec vocs dev --host 127.0.0.1 --port ${devPort}` },
     command: "pnpm exec vocs build",
     outdir: "dist/public",
     env: {
-      STAGE,
-      VITE_PUBLIC_STAGE: STAGE,
+      CHX_INTERNAL_STAGE,
+      VITE_PUBLIC_CHX_INTERNAL_STAGE: CHX_INTERNAL_STAGE,
       CLOUDFLARE: 1,
     },
     assets: {

@@ -26,30 +26,47 @@ import * as Hash from "./Hash.ts"
 export const SignatureKey = "Signature" as const
 export const SignatureInputKey = "Signature-Input" as const
 
+export class DigestError extends Data.TaggedError("DigestError") {}
+
 export class SignatureError extends Data.TaggedError("SignatureError") {}
 
 export class Signature extends Context.Service<Signature, Ed25519PublicKey.Ed25519PublicKey | undefined>()(
   "crosshatch/Crypto/HttpSignature",
 ) {}
 
+const calculateDigest = flow(
+  Hash.digest("SHA-256"),
+  Effect.map(Encoding.encodeBase64Url),
+  Effect.map((v) => `sha-256=:${v}:`),
+)
+
 export const layer = Layer.effect(
   Signature,
   Effect.gen(function* () {
     const request = yield* HttpServerRequest.HttpServerRequest
     let { method, url: pathname, headers } = request
-    const url = Headers.get(headers, "X-Forwarded-Host").pipe(
-      Option.getOrElse(() => new URL(request.originalUrl).host),
-      (v) => `https://${v}${pathname}`,
-    )
     const signatureHeaders = Option.all({
       [SignatureKey]: Headers.get(headers, SignatureKey),
       [SignatureInputKey]: Headers.get(headers, SignatureInputKey),
     }).pipe(Option.getOrUndefined)
     if (!signatureHeaders) return
+    const host = Headers.get(headers, "X-Forwarded-Host").pipe(
+      Option.orElse(() => Headers.get(headers, "Host")),
+      Option.getOrElse(() => new URL(request.originalUrl).host),
+    )
+    const { parameters, components } = parseAcceptSignature(signatureHeaders[SignatureInputKey])
+    if (components.includes("digest")) {
+      const digest = yield* request.arrayBuffer.pipe(Effect.flatMap(calculateDigest))
+      yield* Headers.get(headers, "digest").pipe(
+        Option.match({
+          onNone: () => new DigestError(),
+          onSome: (expected) => (digest === expected ? Effect.void : new DigestError()),
+        }),
+      )
+    }
+    const url = `https://${host}${pathname}`
     const publicKey = yield* pipe(
-      signatureHeaders[SignatureInputKey],
-      parseAcceptSignature,
-      Struct.get("parameters"),
+      parameters,
       S.decodeUnknownEffect(S.Struct({ keyid: S.String })),
       Effect.map(flow(Struct.get("keyid"), Encoding.decodeBase64Url)),
       Effect.flatMap(Effect.fromResult),
@@ -74,11 +91,7 @@ export const layerFetch = Layer.effect(
     return (input, init) =>
       Effect.gen(function* () {
         const request = new Request(input, init)
-        const digest = yield* Effect.promise(() => request.clone().arrayBuffer()).pipe(
-          Effect.flatMap(Hash.digest("SHA-256")),
-          Effect.map(Encoding.encodeBase64Url),
-          Effect.map((v) => `sha-256=:${v}:`),
-        )
+        const digest = yield* Effect.promise(() => request.clone().arrayBuffer()).pipe(Effect.flatMap(calculateDigest))
         request.headers.set("digest", digest)
         const { publicKey, privateKey } = yield* Ref.get(ref).pipe(
           Effect.flatMap(

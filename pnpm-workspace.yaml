@@ -14,7 +14,7 @@ catalog:
   "@cloudflare/vitest-pool-workers": ^0.18.4
   "@cloudflare/worker-bundler": ^0.1.2
   "@cloudflare/workers-types": ^5.20260713.1
-  "@distilled.cloud/coinbase": ^0.30.1
+  "@distilled.cloud/coinbase": ^0.30.3
   "@effect/ai-openai-compat": ^4.0.0-beta.100
   "@effect/atom-react": ^4.0.0-beta.100
   "@effect/language-service": ^0.86.6
@@ -56,7 +56,7 @@ catalog:
   "@vitest/coverage-v8": ^4.1.10
   "@vitest/expect": ^4.1.10
   "@vitest/web-worker": ^4.1.10
-  alchemy: 2.0.0-beta.64
+  alchemy: 2.0.0-beta.67
   "@effect/tsgo": 0.24.2
   babel-plugin-react-compiler: ^1.0.0
   class-variance-authority: ^0.7.1
@@ -68,7 +68,7 @@ catalog:
   effect: ^4.0.0-beta.100
   fake-indexeddb: ^6.2.5
   happy-dom: ^20.10.6
-  http-message-sig: ^0.1.0
+  http-message-sig: ^0.2.0
   lucide-react: ^1.24.0
   lucide-static: ^1.24.0
   markdown-to-jsx: ^9.7.3
