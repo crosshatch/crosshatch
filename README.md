@@ -124,31 +124,20 @@ single mnemonic `MNEMONIC` in the environment variables.
 `layerPayer.ts`
 
 ```ts
-import { NodeServices } from "@effect/platform-node"
-import { Accept, MnemonicStore, Payer } from "crosshatch"
-import * as ChxNodeServices from "crosshatch/ChxNodeServices"
+import { Accept, Payer, Mnemonic } from "crosshatch"
 import * as Known from "crosshatch/Known"
 import { UnifiedSchemes } from "crosshatch/Unified"
 import { Config, Layer } from "effect"
 
-export const layerPayer = Payer.layerLocal({
+export const layer = Payer.layerLocal({
   accept: Accept.first(Known),
   schemes: UnifiedSchemes.layer({
     solana: {
       rpc: Config.string("SOLANA_RPC_URL").pipe(Config.withDefault(undefined)),
     },
-  }).pipe(
-    Layer.provide(
-      MnemonicStore.layerMnemonicFromName().pipe(
-        Layer.provide(ChxNodeServices.layer),
-      ),
-    ),
-  ),
-}).pipe(Layer.provideMerge(NodeServices.layer))
+  }).pipe(Layer.provide(Mnemonic.layerFromEnv)),
+})
 ```
-
-The default mnemonic is encrypted at rest; its encryption key is kept in the
-operating system keychain. Create it with `pnpm crosshatch mnemonic add`.
 
 ## Contributing
 
