@@ -39,11 +39,11 @@ export const makeUrl = <Payload extends WidgetPayload, A extends S.Top, E extend
   widget: { pathname, payload: Payload },
   payload,
 }: {
-  readonly baseUrl?: string | undefined
+  readonly baseUrl: string | undefined
   readonly widget: Widget<Payload, A, E>
   readonly payload: Payload["Type"]
 }) =>
-  S.encodeEffect(S.fromURLSearchParams(Payload))(payload).pipe(
+  S.encodeEffect(S.fromURLSearchParams(S.toCodecStringTree(Payload)))(payload).pipe(
     Effect.map(UrlParams.fromInput),
     Effect.flatMap((q) =>
       Url.make(baseUrl ? new URL(pathname ?? "./", baseUrl).href : (pathname ?? "./"), q, undefined).pipe(

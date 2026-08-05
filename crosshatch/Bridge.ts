@@ -46,7 +46,7 @@ export const propose = Effect.fnUntraced(function* (proposal: Proposal) {
   return yield* propose({ required, trace })
 })
 
-export class Trace extends Context.Service<Trace, TraceConfig>()("crosshatch/Trace") {}
+export class Trace extends Context.Service<Trace, TraceConfig>()("crosshatch/Bridge/Trace") {}
 
 export const TraceId = Effect.serviceOption(Trace).pipe(
   Effect.map(flow(Option.map(Struct.get("trace")), Option.getOrUndefined)),

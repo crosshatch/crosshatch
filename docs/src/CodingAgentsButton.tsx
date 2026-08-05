@@ -40,6 +40,7 @@ export const CodingAgentsButton = (props: {
     "effect-http-client": props.effectHttpClientPrompt,
   }
 
+  // oxlint-disable-next-line effecttsgo/async-function
   const onCopy = async (value: keyof typeof promptByValue) => {
     await navigator.clipboard.writeText(promptByValue[value])
     setCopied(value)
@@ -130,7 +131,9 @@ export const CodingAgentsButton = (props: {
                   className="crosshatch-agents-prompt-button"
                   key={prompt.value}
                   type="button"
-                  onClick={() => onCopy(prompt.value)}
+                  onClick={() => {
+                    onCopy(prompt.value)
+                  }}
                 >
                   <span>{prompt.label}</span>
                   <small>{prompt.description}</small>

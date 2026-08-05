@@ -16,7 +16,7 @@ const layerBridge = Layer.effect(
     return {
       createTrace: flow(
         facade.CreateTrace,
-        Effect.mapError((cause) => new Bridge.CreateTraceError({ cause })),
+        Effect.mapError((cause) => Bridge.CreateTraceError.make({ cause })),
       ),
       propose: Effect.fnUntraced(
         function* ({ required, trace }) {
@@ -29,7 +29,7 @@ const layerBridge = Layer.effect(
           )
           return { payload }
         },
-        Effect.mapError((cause) => new Bridge.ProposeError({ cause })),
+        Effect.mapError((cause) => Bridge.ProposeError.make({ cause })),
       ),
     }
   }),

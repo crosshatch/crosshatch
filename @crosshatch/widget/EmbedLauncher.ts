@@ -52,7 +52,11 @@ export const layer = (config?: EmbedLauncherConfig) =>
               Object.assign(iframe, {
                 sandbox: "allow-scripts allow-same-origin allow-popups allow-forms",
                 allow,
-                src: yield* Widget.makeUrl({ widget, payload }),
+                src: yield* Widget.makeUrl({
+                  baseUrl: url,
+                  widget,
+                  payload,
+                }),
                 referrerPolicy: "no-referrer",
                 ...(className && { className }),
               })

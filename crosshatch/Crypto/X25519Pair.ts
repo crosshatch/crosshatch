@@ -33,5 +33,6 @@ export const random = (config?: { readonly extractable?: boolean | undefined }) 
       crypto.subtle.generateKey({ name: "X25519" }, config?.extractable ?? false, [
         "deriveKey",
         "deriveBits",
+        // oxlint-disable-next-line typescript/no-unnecessary-type-assertion
       ]) as Promise<CryptoKeyPair>,
   ).pipe(Effect.map(fromNative))

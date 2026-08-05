@@ -22,7 +22,7 @@ export const mnemonicImport = Command.make("import", {
       const store = yield* MnemonicStore
       yield* store.add({ name, mnemonic, description })
       const addresses = yield* DerivedAddresses.fromMnemonic(mnemonic)
-      yield* Console.log(JSON.stringify({ name, addresses }))
+      yield* Console.log(JSON.stringify({ name, addresses }, null, 2))
     }),
   ),
 )

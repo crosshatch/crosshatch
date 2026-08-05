@@ -6,6 +6,7 @@
     "dev": "alchemy dev --env-file ../../.env"
   },
   "dependencies": {
+    "@crosshatch/alchemy": "workspace:*",
     "@crosshatch/util": "workspace:*",
     "@effect/ai-openai-compat": "catalog:",
     "@effect/atom-react": "catalog:",
