@@ -1,5 +1,56 @@
 # crosshatch
 
+## 0.0.16
+
+### Patch Changes
+
+- [#156](https://github.com/crosshatch/crosshatch/pull/156)
+  [`98b994e`](https://github.com/crosshatch/crosshatch/commit/98b994e2d8071ef3a683bc056d3c3a118608bc22) -
+  Add SHA digest helpers and signed HTTP and WebSocket transports, introduce
+  mutable key and CEK refs, and standardize crypto schemas and branding.
+
+- [#156](https://github.com/crosshatch/crosshatch/pull/156)
+  [`98b994e`](https://github.com/crosshatch/crosshatch/commit/98b994e2d8071ef3a683bc056d3c3a118608bc22) -
+  Rework browser integration around `ChxBrowserRuntime`, `ChxBrowserServices`,
+  and namespaced `ChxAtoms`, with typed hosted widgets and injectable allowance
+  configuration.
+
+- [#157](https://github.com/crosshatch/crosshatch/pull/157)
+  [`7f0d32b`](https://github.com/crosshatch/crosshatch/commit/7f0d32b4377fde1223f49f83b892faca040ee58f) -
+  Validate HTTP request body digests during signature verification, improve
+  signed WebSocket protocol errors, and update Effect service and layer wiring.
+
+- [#156](https://github.com/crosshatch/crosshatch/pull/156)
+  [`98b994e`](https://github.com/crosshatch/crosshatch/commit/98b994e2d8071ef3a683bc056d3c3a118608bc22) -
+  Replace the Ramp API and client with a consolidated, stage-aware Cirque API;
+  add `AccountId` and return on-ramp URLs as `{ url }`.
+
+- [#154](https://github.com/crosshatch/crosshatch/pull/154)
+  [`c6ff6fd`](https://github.com/crosshatch/crosshatch/commit/c6ff6fd8efda5cf458ce110c8fc3f527f0d707d3) -
+  Fix import cycles, add missing type-only modifiers, move `Known` back into
+  export path.
+
+- [#156](https://github.com/crosshatch/crosshatch/pull/156)
+  [`98b994e`](https://github.com/crosshatch/crosshatch/commit/98b994e2d8071ef3a683bc056d3c3a118608bc22) -
+  Change `ChxHttp.require` to fail with a typed, HTTP-respondable
+  `PaymentRequired` error containing the payment requirements and current trace
+  ID.
+
+- [#156](https://github.com/crosshatch/crosshatch/pull/156)
+  [`98b994e`](https://github.com/crosshatch/crosshatch/commit/98b994e2d8071ef3a683bc056d3c3a118608bc22) -
+  Normalize package subpath entry points and add dedicated `ChxHttp`, `ChxRpc`,
+  `Cirque`, and `Dev` imports, replacing superseded root exports.
+- Updated dependencies
+  [[`98b994e`](https://github.com/crosshatch/crosshatch/commit/98b994e2d8071ef3a683bc056d3c3a118608bc22),
+  [`7f0d32b`](https://github.com/crosshatch/crosshatch/commit/7f0d32b4377fde1223f49f83b892faca040ee58f),
+  [`98b994e`](https://github.com/crosshatch/crosshatch/commit/98b994e2d8071ef3a683bc056d3c3a118608bc22),
+  [`98b994e`](https://github.com/crosshatch/crosshatch/commit/98b994e2d8071ef3a683bc056d3c3a118608bc22),
+  [`c6ff6fd`](https://github.com/crosshatch/crosshatch/commit/c6ff6fd8efda5cf458ce110c8fc3f527f0d707d3),
+  [`98b994e`](https://github.com/crosshatch/crosshatch/commit/98b994e2d8071ef3a683bc056d3c3a118608bc22),
+  [`7f0d32b`](https://github.com/crosshatch/crosshatch/commit/7f0d32b4377fde1223f49f83b892faca040ee58f)]:
+  - @crosshatch/util@0.0.3
+  - @crosshatch/widget@0.0.8
+
 ## 0.0.15
 
 ### Patch Changes

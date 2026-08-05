@@ -1,5 +1,33 @@
 # @crosshatch/alchemy
 
+## 0.0.13
+
+### Patch Changes
+
+- [#157](https://github.com/crosshatch/crosshatch/pull/157)
+  [`7f0d32b`](https://github.com/crosshatch/crosshatch/commit/7f0d32b4377fde1223f49f83b892faca040ee58f) -
+  Add an Alchemy-backed Crosshatch stage layer and configure worker domains with
+  `www` aliases for production and staging deployments.
+
+- [#156](https://github.com/crosshatch/crosshatch/pull/156)
+  [`98b994e`](https://github.com/crosshatch/crosshatch/commit/98b994e2d8071ef3a683bc056d3c3a118608bc22) -
+  Publish deployment and documentation helpers from `@crosshatch/alchemy`,
+  replacing the former `@crosshatch/util/alchemicals/*` entry points.
+
+- [#154](https://github.com/crosshatch/crosshatch/pull/154)
+  [`c6ff6fd`](https://github.com/crosshatch/crosshatch/commit/c6ff6fd8efda5cf458ce110c8fc3f527f0d707d3) -
+  Fix import cycles, add missing type-only modifiers, move `Known` back into
+  export path.
+- Updated dependencies
+  [[`98b994e`](https://github.com/crosshatch/crosshatch/commit/98b994e2d8071ef3a683bc056d3c3a118608bc22),
+  [`98b994e`](https://github.com/crosshatch/crosshatch/commit/98b994e2d8071ef3a683bc056d3c3a118608bc22),
+  [`7f0d32b`](https://github.com/crosshatch/crosshatch/commit/7f0d32b4377fde1223f49f83b892faca040ee58f),
+  [`98b994e`](https://github.com/crosshatch/crosshatch/commit/98b994e2d8071ef3a683bc056d3c3a118608bc22),
+  [`c6ff6fd`](https://github.com/crosshatch/crosshatch/commit/c6ff6fd8efda5cf458ce110c8fc3f527f0d707d3),
+  [`98b994e`](https://github.com/crosshatch/crosshatch/commit/98b994e2d8071ef3a683bc056d3c3a118608bc22),
+  [`98b994e`](https://github.com/crosshatch/crosshatch/commit/98b994e2d8071ef3a683bc056d3c3a118608bc22)]:
+  - crosshatch@0.0.16
+
 ## 0.0.12
 
 ### Patch Changes
