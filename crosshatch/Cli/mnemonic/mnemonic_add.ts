@@ -16,10 +16,14 @@ export const mnemonicAdd = Command.make("add", {
       const store = yield* MnemonicStore
       yield* store.add({ name, mnemonic, description })
       yield* Console.log(
-        JSON.stringify({
-          name,
-          addresses: yield* DerivedAddresses.fromMnemonic(mnemonic),
-        }),
+        JSON.stringify(
+          {
+            name,
+            addresses: yield* DerivedAddresses.fromMnemonic(mnemonic),
+          },
+          null,
+          2,
+        ),
       )
     }),
   ),

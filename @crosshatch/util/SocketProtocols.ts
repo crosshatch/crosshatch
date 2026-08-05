@@ -1,29 +1,33 @@
-import { Effect, flow, Struct, Option, Schema as S, SchemaGetter, Context, Layer } from "effect"
+import { Layer, Effect, flow, Struct, Option, Schema as S, SchemaGetter, Context } from "effect"
 import { HttpServerRequest, Headers } from "effect/unstable/http"
 
-export const SocketProtocols = S.String.pipe(
+type SocketProtocols_ = typeof SocketProtocols_.Type
+const SocketProtocols_ = S.String.pipe(
   S.decodeTo(S.Array(S.Trim), {
     decode: SchemaGetter.split({ separator: "," }),
     encode: SchemaGetter.transform((arr) => arr.join(",")),
   }),
 )
 
-export class CurrentSocketProtocols extends Context.Service<CurrentSocketProtocols>()(
-  "@crosshatch/util/SocketProtocols",
-  {
+// oxlint-disable-next-line typescript/no-empty-interface
+export interface SocketProtocols extends SocketProtocols_ {}
+
+export const SocketProtocols = Object.assign(
+  Context.Service<SocketProtocols>()("@crosshatch/util/SocketProtocols", {
     make: HttpServerRequest.HttpServerRequest.pipe(
       Effect.flatMap(
         flow(
           Struct.get("headers"),
           Headers.get("Sec-WebSocket-Protocol"),
           Option.match({
-            onSome: S.decodeEffect(SocketProtocols),
+            onSome: S.decodeEffect(SocketProtocols_),
             onNone: () => Effect.undefined,
           }),
         ),
       ),
     ),
-  },
-) {
-  static readonly layer = Layer.effect(this, this.make)
-}
+  }),
+  SocketProtocols_,
+)
+
+export const layer = Layer.effect(SocketProtocols, SocketProtocols.make)

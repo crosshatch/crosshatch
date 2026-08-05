@@ -44,7 +44,7 @@ export const logical = Effect.fnUntraced(function* <A extends LogicalAsset>(
   const nominal = yield* Amount.from(amount)
   return Record.toEntries(recipients).flatMap(([namespace, references]) =>
     references
-      ? Record.toEntries(references).reduce((acc, [reference, payTo]) => {
+      ? Record.toEntries(references).reduce<ReadonlyArray<Requirements>>((acc, [reference, payTo]) => {
           const physical = asset[namespace]?.[reference]
           if (!physical) return acc
           const { name, version } = physical
@@ -59,7 +59,7 @@ export const logical = Effect.fnUntraced(function* <A extends LogicalAsset>(
                 extra: { name, version },
               })
             : acc
-        }, [] as ReadonlyArray<Requirements>)
+        }, [])
       : [],
   )
 })

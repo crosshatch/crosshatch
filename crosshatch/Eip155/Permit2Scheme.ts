@@ -1,4 +1,4 @@
-import { Effect, Schema as S, Encoding } from "effect"
+import { DateTime, Effect, Schema as S, Encoding } from "effect"
 import { Address } from "ox"
 
 import * as Random from "../Crypto/Random.ts"
@@ -56,7 +56,7 @@ export const PERMIT2_ABI_TYPES = {
 export const layer = Permit2Scheme.layer({ known: S.Void, extra: Extra }, () =>
   Effect.fnUntraced(function* ({ accepted }) {
     const signer = yield* Eip155Signer
-    const now = Math.floor(Date.now() / 1000)
+    const now = Math.floor(DateTime.toEpochMillis(yield* DateTime.now) / 1000)
     const chainId = parseInt(accepted.network.split(":")[1]!)
     const nonce = BigInt(`0x${Encoding.encodeHex(Random.bytes(32))}`).toString()
     const token = Address.from(accepted.asset, { checksum: true })

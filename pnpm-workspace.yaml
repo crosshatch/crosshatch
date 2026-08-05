@@ -57,7 +57,7 @@ catalog:
   "@vitest/expect": ^4.1.10
   "@vitest/web-worker": ^4.1.10
   alchemy: 2.0.0-beta.67
-  "@effect/tsgo": 0.24.2
+  "@effect/tsgo": 0.31.0
   babel-plugin-react-compiler: ^1.0.0
   class-variance-authority: ^0.7.1
   clsx: ^2.1.1
@@ -77,7 +77,8 @@ catalog:
   next-themes: ^0.4.6
   ox: ^0.10.5
   oxfmt: ^0.58.0
-  oxlint: ^1.75.0
+  oxlint: 1.77.0
+  oxlint-tsgolint: 7.0.2001
   pkg-pr-new: ^0.0.78
   pg: ^8.16.3
   playwright: ^1.61.1
@@ -93,7 +94,7 @@ catalog:
   swagger2openapi: ^7.0.8
   tailwind-merge: ^3.4.0
   tailwindcss: ^4.3.2
-  turbo: ^2.10.5
+  turbo: ^2.10.8
   tw-animate-css: ^1.4.0
   typescript: ^7.0.2
   vaul: ^1.1.2
@@ -146,14 +147,14 @@ minimumReleaseAgeExclude:
   - turbo@2.9.18
   - vite@8.1.2
   - vocs@2.6.2
-  - "@effect/tsgo-darwin-arm64@0.24.2"
-  - "@effect/tsgo-darwin-x64@0.24.2"
-  - "@effect/tsgo-linux-arm64@0.24.2"
-  - "@effect/tsgo-linux-arm@0.24.2"
-  - "@effect/tsgo-linux-x64@0.24.2"
-  - "@effect/tsgo-win32-arm64@0.24.2"
-  - "@effect/tsgo-win32-x64@0.24.2"
-  - "@effect/tsgo@0.24.2"
+  - "@effect/tsgo-darwin-arm64@0.31.0"
+  - "@effect/tsgo-darwin-x64@0.31.0"
+  - "@effect/tsgo-linux-arm64@0.31.0"
+  - "@effect/tsgo-linux-arm@0.31.0"
+  - "@effect/tsgo-linux-x64@0.31.0"
+  - "@effect/tsgo-win32-arm64@0.31.0"
+  - "@effect/tsgo-win32-x64@0.31.0"
+  - "@effect/tsgo@0.31.0"
 
 allowBuilds:
   bigint-buffer: false

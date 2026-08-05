@@ -48,7 +48,7 @@ export const verify = Effect.fnUntraced(function* ({ payload }: { readonly paylo
     },
   })
   if (!response.isValid) {
-    return yield* new VerificationError(response)
+    return yield* VerificationError.make(response)
   }
   return response
 })
@@ -68,7 +68,7 @@ export const settle = Effect.fnUntraced(function* ({ payload }: { readonly paylo
     },
   })
   if (!response.success) {
-    return yield* new SettlementError(response)
+    return yield* SettlementError.make(response)
   }
   return response
 })

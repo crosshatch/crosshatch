@@ -85,9 +85,12 @@ export const layerMiddleware = <X extends ReadonlyArray<Extension.Extension.Any>
           Option.getOrUndefined,
         )
         const layer = Layer.mergeAll(
-          Layer.succeed(Payload, payload),
-          ...(config?.extensions?.map((v) => Extension.layerFromPayload(v, payload)) ?? []),
-        ) as Layer.Layer<X[number] | Payload, S.SchemaError>
+          Layer.empty,
+          // oxlint-disable-next-line effecttsgo/missing-layer-context, effecttsgo/any-unknown-in-error-context
+          ...((config?.extensions?.map((v) => Extension.layerFromPayload(v, payload)) ?? []) as never as ReadonlyArray<
+            Layer.Layer<never>
+          >),
+        ).pipe(Layer.provideMerge(Layer.succeed(Payload, payload))) as Layer.Layer<X[number] | Payload, S.SchemaError>
         return yield* effect.pipe(Effect.provide(layer))
       }),
     { global: true },

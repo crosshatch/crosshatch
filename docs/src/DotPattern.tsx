@@ -57,7 +57,7 @@ export const DotPattern = ({
   const dotsRef = React.useRef<Dot[]>([])
   const mouseRef = React.useRef({ x: -1000, y: -1000 })
   const animationRef = React.useRef<number>(undefined)
-  const startTimeRef = React.useRef(Date.now())
+  const startTimeRef = React.useRef<number>(undefined)
 
   const baseRgb = React.useMemo(() => hexToRgb(baseColor), [baseColor])
   const glowRgb = React.useMemo(() => hexToRgb(glowColor), [glowColor])
@@ -97,69 +97,73 @@ export const DotPattern = ({
     dotsRef.current = dots
   }, [dotSize, gap])
 
-  const draw = React.useCallback(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
+  const draw = React.useCallback(
+    (timestamp: number) => {
+      const canvas = canvasRef.current
+      if (!canvas) return
 
-    const ctx = canvas.getContext("2d")
-    if (!ctx) return
+      const ctx = canvas.getContext("2d")
+      if (!ctx) return
 
-    const dpr = window.devicePixelRatio || 1
-    ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr)
+      const dpr = window.devicePixelRatio || 1
+      ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr)
 
-    const { x: mx, y: my } = mouseRef.current
-    const proxSq = proximity * proximity
-    const time = (Date.now() - startTimeRef.current) * 0.001 * waveSpeed
+      const { x: mx, y: my } = mouseRef.current
+      const proxSq = proximity * proximity
+      startTimeRef.current ??= timestamp
+      const time = (timestamp - startTimeRef.current) * 0.001 * waveSpeed
 
-    for (const dot of dotsRef.current) {
-      const dx = dot.x - mx
-      const dy = dot.y - my
-      const distSq = dx * dx + dy * dy
-      const wave = Math.sin(dot.x * 0.02 + dot.y * 0.02 + time) * 0.5 + 0.5
-      const waveOpacity = dot.baseOpacity + wave * 0.15
-      const waveScale = 1 + wave * 0.2
+      for (const dot of dotsRef.current) {
+        const dx = dot.x - mx
+        const dy = dot.y - my
+        const distSq = dx * dx + dy * dy
+        const wave = Math.sin(dot.x * 0.02 + dot.y * 0.02 + time) * 0.5 + 0.5
+        const waveOpacity = dot.baseOpacity + wave * 0.15
+        const waveScale = 1 + wave * 0.2
 
-      let opacity = waveOpacity
-      let scale = waveScale
-      let r = baseRgb.r
-      let g = baseRgb.g
-      let b = baseRgb.b
-      let glow = 0
+        let opacity = waveOpacity
+        let scale = waveScale
+        let r = baseRgb.r
+        let g = baseRgb.g
+        let b = baseRgb.b
+        let glow = 0
 
-      if (distSq < proxSq) {
-        const dist = Math.sqrt(distSq)
-        const t = 1 - dist / proximity
-        const easedT = t * t * (3 - 2 * t)
+        if (distSq < proxSq) {
+          const dist = Math.sqrt(distSq)
+          const t = 1 - dist / proximity
+          const easedT = t * t * (3 - 2 * t)
 
-        r = Math.round(baseRgb.r + (glowRgb.r - baseRgb.r) * easedT)
-        g = Math.round(baseRgb.g + (glowRgb.g - baseRgb.g) * easedT)
-        b = Math.round(baseRgb.b + (glowRgb.b - baseRgb.b) * easedT)
-        opacity = Math.min(1, waveOpacity + easedT * 0.7)
-        scale = waveScale + easedT * 0.8
-        glow = easedT * glowIntensity
-      }
+          r = Math.round(baseRgb.r + (glowRgb.r - baseRgb.r) * easedT)
+          g = Math.round(baseRgb.g + (glowRgb.g - baseRgb.g) * easedT)
+          b = Math.round(baseRgb.b + (glowRgb.b - baseRgb.b) * easedT)
+          opacity = Math.min(1, waveOpacity + easedT * 0.7)
+          scale = waveScale + easedT * 0.8
+          glow = easedT * glowIntensity
+        }
 
-      const radius = (dotSize / 2) * scale
+        const radius = (dotSize / 2) * scale
 
-      if (glow > 0) {
-        const gradient = ctx.createRadialGradient(dot.x, dot.y, 0, dot.x, dot.y, radius * 4)
-        gradient.addColorStop(0, `rgba(${glowRgb.r}, ${glowRgb.g}, ${glowRgb.b}, ${glow * 0.4})`)
-        gradient.addColorStop(0.5, `rgba(${glowRgb.r}, ${glowRgb.g}, ${glowRgb.b}, ${glow * 0.1})`)
-        gradient.addColorStop(1, `rgba(${glowRgb.r}, ${glowRgb.g}, ${glowRgb.b}, 0)`)
+        if (glow > 0) {
+          const gradient = ctx.createRadialGradient(dot.x, dot.y, 0, dot.x, dot.y, radius * 4)
+          gradient.addColorStop(0, `rgba(${glowRgb.r}, ${glowRgb.g}, ${glowRgb.b}, ${glow * 0.4})`)
+          gradient.addColorStop(0.5, `rgba(${glowRgb.r}, ${glowRgb.g}, ${glowRgb.b}, ${glow * 0.1})`)
+          gradient.addColorStop(1, `rgba(${glowRgb.r}, ${glowRgb.g}, ${glowRgb.b}, 0)`)
+          ctx.beginPath()
+          ctx.arc(dot.x, dot.y, radius * 4, 0, Math.PI * 2)
+          ctx.fillStyle = gradient
+          ctx.fill()
+        }
+
         ctx.beginPath()
-        ctx.arc(dot.x, dot.y, radius * 4, 0, Math.PI * 2)
-        ctx.fillStyle = gradient
+        ctx.arc(dot.x, dot.y, radius, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`
         ctx.fill()
       }
 
-      ctx.beginPath()
-      ctx.arc(dot.x, dot.y, radius, 0, Math.PI * 2)
-      ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`
-      ctx.fill()
-    }
-
-    animationRef.current = requestAnimationFrame(draw)
-  }, [proximity, baseRgb, glowRgb, dotSize, glowIntensity, waveSpeed])
+      animationRef.current = requestAnimationFrame(draw)
+    },
+    [proximity, baseRgb, glowRgb, dotSize, glowIntensity, waveSpeed],
+  )
 
   React.useEffect(() => {
     buildGrid()

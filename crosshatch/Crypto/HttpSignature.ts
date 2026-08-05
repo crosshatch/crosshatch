@@ -31,7 +31,7 @@ export class DigestError extends Data.TaggedError("DigestError") {}
 export class SignatureError extends Data.TaggedError("SignatureError") {}
 
 export class Signature extends Context.Service<Signature, Ed25519PublicKey.Ed25519PublicKey | undefined>()(
-  "crosshatch/Crypto/HttpSignature",
+  "crosshatch/Crypto/HttpSignature/Signature",
 ) {}
 
 const calculateDigest = flow(

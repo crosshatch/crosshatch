@@ -7,7 +7,7 @@ export type MnemonicConfig = typeof MnemonicConfig.Type
 export const MnemonicConfig = S.Struct({
   addresses: DerivedAddresses.DerivedAddresses,
   envelope: Envelope.Asymmetric,
-  dateAdded: S.DateFromString.pipe(S.optional),
+  dateAdded: S.DateTimeUtcFromString.pipe(S.optional),
   description: S.String.pipe(S.optional),
 })
 

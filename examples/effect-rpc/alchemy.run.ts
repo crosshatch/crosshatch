@@ -10,6 +10,7 @@ export default Alchemy.Stack(
     state: Cloudflare.state(),
     providers: Cloudflare.providers(),
   },
+  // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
   Effect.gen(function* () {
     const worker = yield* ExampleEffectRpc
     return { url: worker.url.as<string>() }

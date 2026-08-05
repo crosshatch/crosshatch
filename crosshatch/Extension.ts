@@ -105,7 +105,7 @@ export interface ExtensionHandlerConfig<Info extends S.Top> {
 }
 
 export class ExtensionRegistry extends Context.Reference<
-  Map<Extension.Any, (payload: ExtensionHandlerConfig<any>) => Effect.Effect<unknown, never, never>>
+  Map<Extension.Any, (payload: ExtensionHandlerConfig<any>) => Effect.Effect<unknown>>
 >("crosshatch/ExtensionRegistry", {
   defaultValue: () => new Map(),
 }) {}

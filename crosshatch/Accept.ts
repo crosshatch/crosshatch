@@ -54,5 +54,5 @@ export const first = (denominations: Denominations): Accept =>
         }
       }
     }
-    return yield* new AcceptError({ required })
+    return yield* AcceptError.make({ required })
   })

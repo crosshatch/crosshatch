@@ -10,7 +10,7 @@ const f = <A>(name: string, operation: Keychain.KeychainOperation, evaluate: (en
   })
 
 export const layer = Layer.succeed(Keychain.Keychain, {
-  get: Effect.fn(function* (name) {
+  get: Effect.fnUntraced(function* (name: string) {
     const secret = yield* f(name, "read", (entry) => entry.getSecret())
     return secret ? new Uint8Array(secret) : undefined
   }),

@@ -1,7 +1,7 @@
 import { Changelog, type Config } from "vocs/config"
 
-export const VocsConfig = ({ title, repo }: { readonly title: string; readonly repo: string }) => {
-  return {
+export const VocsConfig = ({ title, repo }: { readonly title: string; readonly repo: string }) =>
+  ({
     title,
     titleTemplate: `%s ⋅ ${title}`,
     accentColor: "light-dark(#6D5BD0, #A99BFF)",
@@ -30,5 +30,4 @@ export const VocsConfig = ({ title, repo }: { readonly title: string; readonly r
     //     }),
     //   ],
     // },
-  } satisfies Partial<Config>
-}
+  }) satisfies Partial<Config>

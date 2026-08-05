@@ -1,6 +1,6 @@
 import { Schema as S, Struct } from "effect"
 
-export const parent = () => globalThis.opener ?? globalThis.parent
+export const parent = () => (globalThis.opener as Window | null) ?? globalThis.parent
 
 const ChxWidgetEventTypeId = "~@crosshatch/widget/Self/ChxWidgetEvent" as const
 

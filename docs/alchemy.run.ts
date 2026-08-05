@@ -1,4 +1,4 @@
-import { docs } from "@crosshatch/alchemy/docs"
+import { docs } from "@crosshatch/alchemy"
 import * as Alchemy from "alchemy"
 import * as Cloudflare from "alchemy/Cloudflare"
 import * as GitHub from "alchemy/GitHub"

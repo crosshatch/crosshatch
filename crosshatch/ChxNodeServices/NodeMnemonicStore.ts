@@ -1,4 +1,4 @@
-import { Effect, Layer, Predicate, Redacted, Schema as S, Struct, UndefinedOr } from "effect"
+import { DateTime, Effect, Layer, Predicate, Redacted, Schema as S, Struct, UndefinedOr } from "effect"
 
 import { X25519Pair, X25519PrivateKey, X25519PublicKey } from "../Crypto/index.ts"
 import { Mnemonic, MnemonicStore, UserConfig, Keychain } from "../index.ts"
@@ -49,7 +49,7 @@ export const layer = Layer.effect(
         const mnemonicConfig: UserConfig.MnemonicConfig = {
           addresses: yield* DerivedAddresses.fromMnemonic(mnemonic),
           envelope,
-          dateAdded: new Date(),
+          dateAdded: yield* DateTime.now,
           ...(description && { description }),
         }
         yield* keychain

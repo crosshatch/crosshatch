@@ -1,4 +1,4 @@
-import { Effect, Schema as S, Encoding } from "effect"
+import { DateTime, Effect, Schema as S, Encoding } from "effect"
 import { Address, type Hex } from "ox"
 
 import * as Random from "../Crypto/Random.ts"
@@ -39,7 +39,7 @@ export const ERC3009_ABI_TYPES = {
 
 export const layer = Erc3009Scheme.layer({ known: S.Void, extra: Extra }, () =>
   Effect.fnUntraced(function* ({ accepted, physical: { name, version } }) {
-    const now = Math.floor(Date.now() / 1000)
+    const now = Math.floor(DateTime.toEpochMillis(yield* DateTime.now) / 1000)
     const chainId = parseInt(accepted.network.split(":")[1]!)
     const signer = yield* Eip155Signer
     const authorization: Erc3009["authorization"] = {

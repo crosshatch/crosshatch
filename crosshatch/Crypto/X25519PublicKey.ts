@@ -8,6 +8,7 @@ export const X25519PublicKey = CryptoKey.CryptoKey.pipe(S.brand("crosshatch/Cryp
 
 export const encrypt = Effect.fnUntraced(function* (publicKey: X25519PublicKey, value: Uint8Array) {
   const eph = yield* Effect.promise(
+    // oxlint-disable-next-line typescript/no-unnecessary-type-assertion
     () => crypto.subtle.generateKey({ name: "X25519" }, false, ["deriveKey", "deriveBits"]) as Promise<CryptoKeyPair>,
   )
   const aeadKey = yield* Effect.promise(() =>

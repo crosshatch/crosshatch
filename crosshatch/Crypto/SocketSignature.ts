@@ -1,5 +1,5 @@
 import { ensureRef } from "@crosshatch/util/ensureRef"
-import { CurrentSocketProtocols } from "@crosshatch/util/SocketProtocols"
+import { SocketProtocols } from "@crosshatch/util/SocketProtocols"
 import { Array, Context, Effect, Schema as S, Layer, type Duration, Data } from "effect"
 import { HttpApiError } from "effect/unstable/httpapi"
 import { Socket } from "effect/unstable/socket"
@@ -53,7 +53,7 @@ export const layer = <Self, Id extends string, A extends S.Top>(signedPayload: S
   Layer.effect(
     signedPayload,
     Effect.gen(function* () {
-      const protocols = yield* CurrentSocketProtocols
+      const protocols = yield* SocketProtocols
       if (!protocols) return
       const protocolI = protocols.indexOf(ProtocolKey)
       if (protocolI === -1) return
@@ -64,7 +64,7 @@ export const layer = <Self, Id extends string, A extends S.Top>(signedPayload: S
       const { signer, input, signature } = yield* S.decodeEffect(ProtocolFromBase64UrlJsonString)(protocol)
       const verified = yield* Ed25519PublicKey.verify(signer, signature, new TextEncoder().encode(input))
       if (!verified) {
-        return yield* new HttpApiError.Unauthorized()
+        return yield* HttpApiError.Unauthorized.make()
       }
       const payload = yield* S.decodeEffect(signedPayload.payload.pipe(S.toCodecJson, S.fromJsonString))(input)
       return { signer, payload, input, signature }

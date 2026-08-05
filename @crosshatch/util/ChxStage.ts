@@ -1,4 +1,3 @@
-import * as Alchemy from "alchemy"
 import { Context, Config, Effect, Schema as S, Layer } from "effect"
 
 export type Stage = `dev_${string}` | `staging-${number}` | "prod"
@@ -21,9 +20,4 @@ export const layer = Layer.effect(
     stage ??= yield* Config.string("CHX_INTERNAL_STAGE")
     return yield* S.decodeUnknownEffect(Stage)(stage)
   }).pipe(Effect.orElseSucceed(() => "prod" as const)),
-)
-
-export const layerAlchemy = Layer.effect(
-  ChxStage,
-  Alchemy.Stage.pipe(Effect.flatMap(S.decodeUnknownEffect(Stage)), Effect.orDie),
 )
