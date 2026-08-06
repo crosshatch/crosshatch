@@ -1,5 +1,34 @@
 # @crosshatch/util
 
+## 0.0.3
+
+### Patch Changes
+
+- [#156](https://github.com/crosshatch/crosshatch/pull/156)
+  [`98b994e`](https://github.com/crosshatch/crosshatch/commit/98b994e2d8071ef3a683bc056d3c3a118608bc22) -
+  Add shared schema, string, ref, typed HTTP API handler, and WebSocket protocol
+  utilities.
+
+- [#157](https://github.com/crosshatch/crosshatch/pull/157)
+  [`7f0d32b`](https://github.com/crosshatch/crosshatch/commit/7f0d32b4377fde1223f49f83b892faca040ee58f) -
+  Expose WebSocket protocols as a schema-backed Effect service with a standalone
+  layer for request-derived protocol access.
+
+- [#156](https://github.com/crosshatch/crosshatch/pull/156)
+  [`98b994e`](https://github.com/crosshatch/crosshatch/commit/98b994e2d8071ef3a683bc056d3c3a118608bc22) -
+  Publish deployment and documentation helpers from `@crosshatch/alchemy`,
+  replacing the former `@crosshatch/util/alchemicals/*` entry points.
+
+- [#156](https://github.com/crosshatch/crosshatch/pull/156)
+  [`98b994e`](https://github.com/crosshatch/crosshatch/commit/98b994e2d8071ef3a683bc056d3c3a118608bc22) -
+  Add reusable Crosshatch stage and stage-aware domain services, replacing the
+  previous `ChxEnv` configuration model.
+
+- [#154](https://github.com/crosshatch/crosshatch/pull/154)
+  [`c6ff6fd`](https://github.com/crosshatch/crosshatch/commit/c6ff6fd8efda5cf458ce110c8fc3f527f0d707d3) -
+  Fix import cycles, add missing type-only modifiers, move `Known` back into
+  export path.
+
 ## 0.0.2
 
 ### Patch Changes
