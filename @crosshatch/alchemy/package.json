@@ -16,13 +16,11 @@
   "type": "module",
   "sideEffects": false,
   "exports": {
-    ".": "./index.ts",
-    "./*": "./*.ts"
+    ".": "./index.ts"
   },
   "publishConfig": {
     "exports": {
-      ".": "./dist/index.js",
-      "./*": "./dist/*.js"
+      ".": "./dist/index.js"
     }
   },
   "dependencies": {
