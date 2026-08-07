@@ -125,7 +125,7 @@ export const layerFetch = Layer.effect(
         if (!requiredHeader) {
           return yield* new NoSuchRequiredError()
         }
-        const required = yield* S.decodeUnknownEffect(RequiredFromBase64JsonString)(requiredHeader)
+        const required = yield* S.decodeEffect(RequiredFromBase64JsonString)(requiredHeader)
         const { payload } = yield* payer.createPayload({ required, trace })
         const encoded = yield* S.encodeEffect(PayloadFromBase64JsonString)(payload)
         retry.headers.set(PAYMENT_SIGNATURE, encoded)

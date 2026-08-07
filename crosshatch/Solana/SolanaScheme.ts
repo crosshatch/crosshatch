@@ -49,7 +49,7 @@ export const layer = SolanaScheme.layer(
         const { getLatestBlockhash } = yield* SolanaState
         const latestBlockhash = yield* getLatestBlockhash
 
-        const mintAsset = yield* S.decodeUnknownEffect(SolanaAsset.SolanaAsset)(accepted.asset)
+        const mintAsset = yield* S.decodeEffect(SolanaAsset.SolanaAsset)(accepted.asset)
         const mint = address(mintAsset)
         const tokenProgram = address(tokenProgramId)
 

@@ -12,6 +12,6 @@ export const Prerequisite = S.TaggedUnion({
 export type Prerequisites = typeof Prerequisites.Type
 export const Prerequisites = S.NonEmptyArray(Prerequisite)
 
-export class PrerequisitesUnmetError extends S.TaggedErrorClass<PrerequisitesUnmetError>()("PrerequisitesUnmetError", {
+export class PrerequisitesUnmetError extends S.TaggedError<PrerequisitesUnmetError>()("PrerequisitesUnmetError", {
   prerequisites: Prerequisites,
 }) {}

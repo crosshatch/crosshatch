@@ -67,7 +67,7 @@ export const Service =
             const match = yield* Effect.all(
               {
                 known: S.decodeUnknownEffect(S.toType(known))(physical.metadata),
-                extra: S.decodeUnknownEffect(extra)(accepted.extra),
+                extra: S.decodeEffect(extra)(accepted.extra),
               },
               { concurrency: "unbounded" },
             )

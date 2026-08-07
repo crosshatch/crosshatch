@@ -25,7 +25,7 @@ export const onramp = Command.make("onramp", {
   Command.withHandler(
     Effect.fn(
       function* ({ amount, chain }) {
-        const chainRef = chain === undefined ? Reference.make("8453") : yield* S.decodeUnknownEffect(Reference)(chain)
+        const chainRef = chain === undefined ? Reference.make("8453") : yield* S.decodeEffect(Reference)(chain)
         const mnemonic = yield* Mnemonic.Mnemonic
         const address = yield* Eip155Address.fromMnemonic(mnemonic)
         const recipient = AccountId.make(`eip155:${chainRef}:${address}`, { disableChecks: true })

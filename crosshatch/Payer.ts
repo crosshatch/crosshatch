@@ -47,7 +47,7 @@ export const layerLocal = <ROut, E, RIn>({
                   return
                 }
                 const [{ info: Info, enrichment: Enrichment }, f] = extension
-                const info = yield* S.decodeUnknownEffect(S.toCodecJson(Info))(infoJson)
+                const info = yield* S.decodeEffect(S.toCodecJson(Info))(infoJson)
                 const enrichment = yield* f({ accepted, info, payload, required }).pipe(
                   Effect.flatMap(S.encodeEffect(S.toCodecJson(Enrichment))),
                 )

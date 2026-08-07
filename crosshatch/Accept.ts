@@ -18,7 +18,7 @@ export interface Accepted {
   readonly adapt: Adapt<never>
 }
 
-export class AcceptError extends S.TaggedErrorClass<AcceptError>()("AcceptError", { required: Required }) {}
+export class AcceptError extends S.TaggedError<AcceptError>()("AcceptError", { required: Required }) {}
 
 export type Accept = (config: AcceptedConfig) => Effect.Effect<Accepted, AcceptError>
 

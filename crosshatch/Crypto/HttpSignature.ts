@@ -97,7 +97,7 @@ export const layerFetch = Layer.effect(
           Effect.flatMap(
             UndefinedOr.match({
               onDefined: Effect.succeed,
-              onUndefined: () => new S.SchemaError(new SchemaIssue.InvalidValue(Option.some(undefined))),
+              onUndefined: () => new S.SchemaError(new SchemaIssue.InvalidValue()),
             }),
           ),
         )
