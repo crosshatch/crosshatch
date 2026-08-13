@@ -1,4 +1,4 @@
-import { Array, Schema as S, Context, Effect, Layer, Record, Predicate, flow } from "effect"
+import { Array, Schema as S, Context, Effect, Layer, Record, flow } from "effect"
 
 import type { Accept, AcceptError } from "./Accept.ts"
 import * as Bridge from "./Bridge.ts"
@@ -58,7 +58,14 @@ export const layerLocal = <ROut, E, RIn>({
               }),
             ),
             { concurrency: "unbounded" },
-          ).pipe(Effect.map(flow(Array.filter(Predicate.isNotUndefined), Record.fromEntries)))
+          ).pipe(
+            Effect.map(
+              flow(
+                Array.filter((v) => !!v),
+                Record.fromEntries,
+              ),
+            ),
+          )
           return {
             payload: {
               x402Version: 2 as const,

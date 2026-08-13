@@ -25,11 +25,12 @@ export const layer = Layer.effect(
           () => new MnemonicStore.MnemonicConfigNameAlreadyTakenError({ name }),
         ),
       )
-      yield* keychain
-        .get(name)
-        .pipe(
-          Effect.filterOrFail(Predicate.isUndefined, () => new MnemonicStore.KeychainNameAlreadyTakenError({ name })),
-        )
+      yield* keychain.get(name).pipe(
+        Effect.filterOrFail(
+          (v) => !v,
+          () => new MnemonicStore.KeychainNameAlreadyTakenError({ name }),
+        ),
+      )
     })
 
     const add = Effect.fnUntraced(

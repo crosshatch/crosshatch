@@ -1,4 +1,4 @@
-import * as ChxDomain from "@crosshatch/util/ChxDomain"
+import { ChxDomain } from "@crosshatch/util"
 import { Context, Effect, Layer } from "effect"
 import { HttpApiClient } from "effect/unstable/httpapi"
 

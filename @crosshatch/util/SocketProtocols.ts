@@ -1,6 +1,8 @@
 import { Layer, Effect, flow, Struct, Option, Schema as S, SchemaGetter, Context } from "effect"
 import { HttpServerRequest, Headers } from "effect/unstable/http"
 
+export const SocketProtocolsKey = "Sec-WebSocket-Protocol" as const
+
 type SocketProtocols_ = typeof SocketProtocols_.Type
 const SocketProtocols_ = S.String.pipe(
   S.decodeTo(S.Array(S.Trim), {
@@ -18,7 +20,7 @@ export const SocketProtocols = Object.assign(
       Effect.flatMap(
         flow(
           Struct.get("headers"),
-          Headers.get("Sec-WebSocket-Protocol"),
+          Headers.get(SocketProtocolsKey),
           Option.match({
             onSome: S.decodeEffect(SocketProtocols_),
             onNone: () => Effect.undefined,

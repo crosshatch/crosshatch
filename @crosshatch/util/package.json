@@ -17,24 +17,20 @@
   "exports": {
     "./fonts.css": "./fonts.css",
     "./vocs.css": "./vocs.css",
-    "./*": "./*.ts"
+    ".": "./index.ts"
   },
   "publishConfig": {
     "exports": {
       "./fonts.css": "./fonts.css",
       "./vocs.css": "./vocs.css",
-      "./*": "./dist/*.js"
+      ".": "./dist/index.js"
     }
   },
   "peerDependencies": {
-    "alchemy": "catalog:",
     "effect": "catalog:",
     "vocs": "catalog:"
   },
   "peerDependenciesMeta": {
-    "alchemy": {
-      "optional": true
-    },
     "vocs": {
       "optional": true
     }
