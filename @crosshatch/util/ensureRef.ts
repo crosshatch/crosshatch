@@ -4,7 +4,7 @@ export const ensureRef = <Identifier, A>(tag: Context.Service<Identifier, Ref.Re
   tag.pipe(
     Effect.flatMap(Ref.get),
     Effect.filterOrFail(
-      (v) => !!v,
+      (v): v is NonNullable<A> => !!v,
       () => new S.SchemaError(new SchemaIssue.InvalidValue()),
     ),
   )

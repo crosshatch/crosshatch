@@ -9,7 +9,7 @@ export const layer = Layer.effect(
   Effect.gen(function* () {
     const keychain = yield* Keychain.Keychain
     const config = yield* UserConfig.UserConfig
-    const mnemonicConfigs = config.get.pipe(Effect.map(Struct.get("mnemonics")))
+    const mnemonicConfigs = config.get.pipe(Effect.map((v) => v.mnemonics))
     const mnemonicConfig = Effect.fnUntraced(function* (name: string) {
       const mnemonic = yield* mnemonicConfigs.pipe(Effect.map(Struct.get(name)))
       if (!mnemonic) return yield* new MnemonicStore.NoSuchMnemonicError({ name })

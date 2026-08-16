@@ -17,13 +17,15 @@
   "exports": {
     "./fonts.css": "./fonts.css",
     "./vocs.css": "./vocs.css",
-    ".": "./index.ts"
+    ".": "./index.ts",
+    "./*": "./*.ts"
   },
   "publishConfig": {
     "exports": {
       "./fonts.css": "./fonts.css",
       "./vocs.css": "./vocs.css",
-      ".": "./dist/index.js"
+      ".": "./dist/index.js",
+      "./*": "./dist/*.js"
     }
   },
   "peerDependencies": {

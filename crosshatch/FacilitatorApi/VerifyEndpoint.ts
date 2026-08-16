@@ -1,4 +1,4 @@
-import { JsonRecord } from "@crosshatch/util/schema"
+import { JsonRecord } from "@crosshatch/util"
 import { Schema as S, String, Tuple } from "effect"
 import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 

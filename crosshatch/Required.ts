@@ -1,5 +1,4 @@
-import { JsonRecord } from "@crosshatch/util/schema"
-import { stringRaw } from "@crosshatch/util/string"
+import { JsonRecord, stringRaw } from "@crosshatch/util"
 import { Schema as S, Effect, Context } from "effect"
 
 import type { InvalidAmountError } from "./Amount.ts"

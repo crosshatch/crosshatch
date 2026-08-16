@@ -1,5 +1,5 @@
 import { BrowserLauncher } from "@crosshatch/widget"
-import { Effect, Schema as S, Struct } from "effect"
+import { Effect, Schema as S } from "effect"
 import { Command, Flag } from "effect/unstable/cli"
 
 import { AccountId } from "../../AccountId.ts"
@@ -38,7 +38,10 @@ export const onramp = Command.make("onramp", {
               recipient,
             },
           })
-          .pipe(Effect.map(Struct.get("url")), Effect.flatMap(BrowserLauncher.open))
+          .pipe(
+            Effect.map((v) => v.url),
+            Effect.flatMap(BrowserLauncher.open),
+          )
       },
       (effect, { mnemonic }) => Effect.provide(effect, MnemonicStore.layerMnemonicFromName(mnemonic)),
     ),

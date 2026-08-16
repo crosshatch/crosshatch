@@ -1,5 +1,4 @@
-import * as ChxDomain from "@crosshatch/util/ChxDomain"
-import * as ChxStage from "@crosshatch/util/ChxStage"
+import { ChxStage, ChxDomain } from "@crosshatch/util"
 import { Launcher, EmbedLauncher } from "@crosshatch/widget"
 import { Stream, Effect, Layer, flow } from "effect"
 

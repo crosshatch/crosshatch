@@ -76,7 +76,7 @@ export const addResponseHeader = (settlement: SettleResponse) =>
 export const layerMiddleware = <X extends ReadonlyArray<Extension.Extension.Any> = []>(
   config?: { readonly extensions: X } | undefined,
 ) =>
-  HttpRouter.middleware<{ readonly provides: Payload | InstanceType<X[number]> }>()(
+  HttpRouter.middleware<{ readonly provides: Payload | X[number] }>()(
     (effect) =>
       Effect.gen(function* () {
         const { headers } = yield* HttpServerRequest.HttpServerRequest

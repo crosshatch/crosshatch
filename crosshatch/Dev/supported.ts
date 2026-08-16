@@ -1,4 +1,4 @@
-import { handler } from "@crosshatch/util/httpapi"
+import { handler } from "@crosshatch/util"
 import { Effect, Record, Struct } from "effect"
 
 import type { Denomination } from "../Asset.ts"

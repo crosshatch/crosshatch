@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import * as ChxStage from "@crosshatch/util/ChxStage"
+import { ChxStage } from "@crosshatch/util"
 import { NodeRuntime, NodeServices, NodeHttpClient } from "@effect/platform-node"
 import { Effect, Layer } from "effect"
 import { Command } from "effect/unstable/cli"

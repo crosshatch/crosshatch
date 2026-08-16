@@ -1,6 +1,5 @@
 import {
   Effect,
-  Struct,
   Encoding,
   Ref,
   Option,
@@ -68,7 +67,7 @@ export const layer = Layer.effect(
     const publicKey = yield* pipe(
       parameters,
       S.decodeUnknownEffect(S.Struct({ keyid: S.String })),
-      Effect.map(flow(Struct.get("keyid"), Encoding.decodeBase64Url)),
+      Effect.map(flow((v) => v.keyid, Encoding.decodeBase64Url)),
       Effect.flatMap(Effect.fromResult),
       Effect.flatMap(Ed25519PublicKey.fromBytes),
     )

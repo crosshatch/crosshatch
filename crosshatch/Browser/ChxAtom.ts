@@ -1,5 +1,5 @@
 import { Launcher } from "@crosshatch/widget"
-import { Effect, Stream, Struct, Option, Match, SubscriptionRef } from "effect"
+import { Effect, Stream, Option, Match, SubscriptionRef } from "effect"
 import { Atom } from "effect/unstable/reactivity"
 
 import * as Amount from "../Amount.ts"
@@ -15,7 +15,7 @@ export const runtime = Atom.context({ memoMap })(BrowserServices.layer)
 
 export const state = runtime.subscriptionRef(() => FacadeStateRef).pipe(Atom.keepAlive)
 
-export const session = state.pipe(Atom.mapResult(Struct.get("session")))
+export const session = state.pipe(Atom.mapResult((v) => v.session))
 
 export const isLinked = session.pipe(Atom.mapResult((v) => v._tag === "Linked"))
 
