@@ -18,24 +18,15 @@ export class Payer extends Context.Service<
   }
 >()("crosshatch/Payer") {}
 
-export const layerLocal = <ROut, E, RIn>({
-  accept,
-  schemes,
-}: {
-  readonly schemes: Layer.Layer<ROut, E, RIn>
-  readonly accept: Accept
-}) =>
+export const layerLocal = (accept: Accept) =>
   Layer.effect(
     Payer,
     Effect.gen(function* () {
       const registry = yield* ExtensionRegistry
-      const context = yield* Effect.context<RIn>()
-      const schemesContext = yield* Layer.build(schemes)
+      const context = yield* Effect.context()
       return {
         createPayload: Effect.fnUntraced(function* ({ required }) {
-          const { accepted, adapt } = yield* accept({ required }).pipe(
-            Effect.provideContext(Context.mergeAll(context, schemesContext)),
-          )
+          const { accepted, adapt } = yield* accept({ required }).pipe(Effect.provideContext(context))
           const { extensions: infos = {} } = required
           const payload = yield* adapt
           const extensions = yield* Effect.forEach(
