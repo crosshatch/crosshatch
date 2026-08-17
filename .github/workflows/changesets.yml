@@ -20,6 +20,7 @@ jobs:
       - uses: ./.github/actions/checkout-crosshatch
       - uses: ./konfik/configure-environment
       - run: pnpm build
+      - run: git config fetch.recurseSubmodules false
       - uses: changesets/action@v1
         with:
           setupGitUser: false
