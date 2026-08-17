@@ -15,15 +15,15 @@ catalog:
   "@cloudflare/worker-bundler": ^0.1.2
   "@cloudflare/workers-types": ^5.20260713.1
   "@distilled.cloud/coinbase": 1.0.0-rc.2
-  "@effect/ai-openai-compat": ^4.0.0-rc.109
-  "@effect/atom-react": ^4.0.0-rc.109
+  "@effect/ai-openai-compat": ^4.0.0-rc.110
+  "@effect/atom-react": ^4.0.0-rc.110
   "@effect/language-service": ^0.86.6
-  "@effect/openapi-generator": ^4.0.0-rc.109
-  "@effect/platform-browser": ^4.0.0-rc.109
-  "@effect/platform-node": ^4.0.0-rc.109
-  "@effect/sql-d1": ^4.0.0-rc.109
-  "@effect/sql-pg": ^4.0.0-rc.109
-  "@effect/vitest": ^4.0.0-rc.109
+  "@effect/openapi-generator": ^4.0.0-rc.110
+  "@effect/platform-browser": ^4.0.0-rc.110
+  "@effect/platform-node": ^4.0.0-rc.110
+  "@effect/sql-d1": ^4.0.0-rc.110
+  "@effect/sql-pg": ^4.0.0-rc.110
+  "@effect/vitest": ^4.0.0-rc.110
   "@electric-sql/pglite": ^0.3.15
   "@icons-pack/react-simple-icons": ^13.13.0
   "@kitlangton/motel": ^0.2.6
@@ -65,7 +65,7 @@ catalog:
   date-fns: ^4.1.0
   drizzle-kit: ^1.0.0-rc.4
   drizzle-orm: ^1.0.0-rc.4
-  effect: ^4.0.0-rc.109
+  effect: ^4.0.0-rc.110
   fake-indexeddb: ^6.2.5
   happy-dom: ^20.10.6
   http-message-sig: ^0.2.0
@@ -113,14 +113,14 @@ packageExtensions:
 
 overrides:
   "crosshatch.dev>typescript": 5.9.3
-  "@effect/platform-bun": 4.0.0-rc.109
-  "@effect/platform-node": 4.0.0-rc.109
-  "@effect/platform-node-shared": 4.0.0-rc.109
+  "@effect/platform-bun": 4.0.0-rc.110
+  "@effect/platform-node": 4.0.0-rc.110
+  "@effect/platform-node-shared": 4.0.0-rc.110
   "@types/react": ^19.2.14
   "@types/react-dom": ^19.2.3
   react: ^19.2.4
   react-dom: ^19.2.4
-  effect: 4.0.0-rc.109
+  effect: 4.0.0-rc.110
   zod: 3.25.76
 
 patchedDependencies:
@@ -132,16 +132,16 @@ minimumReleaseAgeExclude:
   - "@aws-sdk/*"
   - "@distilled.cloud/*"
   - alchemy
-  - "@effect/ai-openai-compat@4.0.0-rc.109"
-  - "@effect/atom-react@4.0.0-rc.109"
-  - "@effect/openapi-generator@4.0.0-rc.109"
-  - "@effect/platform-browser@4.0.0-rc.109"
-  - "@effect/platform-node-shared@4.0.0-rc.109"
-  - "@effect/platform-node@4.0.0-rc.109"
-  - "@effect/sql-d1@4.0.0-rc.109"
-  - "@effect/vitest@4.0.0-rc.109"
-  - effect@4.0.0-rc.109
-  - "@effect/sql-pg@4.0.0-rc.109"
+  - "@effect/ai-openai-compat@4.0.0-rc.110"
+  - "@effect/atom-react@4.0.0-rc.110"
+  - "@effect/openapi-generator@4.0.0-rc.110"
+  - "@effect/platform-browser@4.0.0-rc.110"
+  - "@effect/platform-node-shared@4.0.0-rc.110"
+  - "@effect/platform-node@4.0.0-rc.110"
+  - "@effect/sql-d1@4.0.0-rc.110"
+  - "@effect/vitest@4.0.0-rc.110"
+  - effect@4.0.0-rc.110
+  - "@effect/sql-pg@4.0.0-rc.110"
   - "@turbo/darwin-64@2.9.18"
   - "@turbo/darwin-arm64@2.9.18"
   - "@turbo/linux-64@2.9.18"
@@ -159,7 +159,7 @@ minimumReleaseAgeExclude:
   - "@effect/tsgo-win32-arm64@0.36.5"
   - "@effect/tsgo-win32-x64@0.36.5"
   - "@effect/tsgo@0.36.5"
-  - "@effect/platform-bun@4.0.0-rc.109"
+  - "@effect/platform-bun@4.0.0-rc.110"
 
 allowBuilds:
   bigint-buffer: false
