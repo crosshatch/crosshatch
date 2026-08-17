@@ -23,7 +23,7 @@ jobs:
       - uses: changesets/action@v1
         with:
           setupGitUser: false
-          version: pnpm changeset version && pnpm format
+          version: bash -c "pnpm changeset version && pnpm format"
           publish: pnpm changeset publish
           commit: version packages
           title: version packages
