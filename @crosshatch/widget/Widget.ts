@@ -1,5 +1,5 @@
 import type { StandardSchemaV1 } from "@standard-schema/spec"
-import { Schema as S, Pipeable, Effect, Struct } from "effect"
+import { Schema as S, Pipeable, Effect } from "effect"
 import { Url, UrlParams } from "effect/unstable/http"
 
 const TypeId = "~@crosshatch/widget/Widget" as const
@@ -51,5 +51,5 @@ export const makeUrl = <Payload extends WidgetPayload, A extends S.Top, E extend
       ),
     ),
 
-    Effect.map(Struct.get("href")),
+    Effect.map((v) => v.href),
   )

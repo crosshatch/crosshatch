@@ -33,7 +33,7 @@ export const layer = (config?: { readonly baseUrl?: string | undefined }) =>
     }),
   )
 
-export class VerificationError extends S.TaggedErrorClass<VerificationError>()("VerificationError", {
+export class VerificationError extends S.TaggedError<VerificationError>()("VerificationError", {
   invalidReason: S.String.pipe(S.optional),
   invalidMessage: S.String.pipe(S.optional),
 }) {}
@@ -53,7 +53,7 @@ export const verify = Effect.fnUntraced(function* ({ payload }: { readonly paylo
   return response
 })
 
-export class SettlementError extends S.TaggedErrorClass<SettlementError>()("SettlementError", {
+export class SettlementError extends S.TaggedError<SettlementError>()("SettlementError", {
   errorReason: S.String.pipe(S.optional),
   errorMessage: S.String.pipe(S.optional),
 }) {}

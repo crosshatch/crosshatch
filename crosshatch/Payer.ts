@@ -1,4 +1,4 @@
-import { Array, Schema as S, Context, Effect, Layer, Record, Predicate, flow } from "effect"
+import { Array, Schema as S, Context, Effect, Layer, Record, flow } from "effect"
 
 import type { Accept, AcceptError } from "./Accept.ts"
 import * as Bridge from "./Bridge.ts"
@@ -18,24 +18,15 @@ export class Payer extends Context.Service<
   }
 >()("crosshatch/Payer") {}
 
-export const layerLocal = <ROut, E, RIn>({
-  accept,
-  schemes,
-}: {
-  readonly schemes: Layer.Layer<ROut, E, RIn>
-  readonly accept: Accept
-}) =>
+export const layerLocal = (accept: Accept) =>
   Layer.effect(
     Payer,
     Effect.gen(function* () {
       const registry = yield* ExtensionRegistry
-      const context = yield* Effect.context<RIn>()
-      const schemesContext = yield* Layer.build(schemes)
+      const context = yield* Effect.context()
       return {
         createPayload: Effect.fnUntraced(function* ({ required }) {
-          const { accepted, adapt } = yield* accept({ required }).pipe(
-            Effect.provideContext(Context.mergeAll(context, schemesContext)),
-          )
+          const { accepted, adapt } = yield* accept({ required }).pipe(Effect.provideContext(context))
           const { extensions: infos = {} } = required
           const payload = yield* adapt
           const extensions = yield* Effect.forEach(
@@ -47,7 +38,7 @@ export const layerLocal = <ROut, E, RIn>({
                   return
                 }
                 const [{ info: Info, enrichment: Enrichment }, f] = extension
-                const info = yield* S.decodeUnknownEffect(S.toCodecJson(Info))(infoJson)
+                const info = yield* S.decodeEffect(S.toCodecJson(Info))(infoJson)
                 const enrichment = yield* f({ accepted, info, payload, required }).pipe(
                   Effect.flatMap(S.encodeEffect(S.toCodecJson(Enrichment))),
                 )
@@ -58,7 +49,14 @@ export const layerLocal = <ROut, E, RIn>({
               }),
             ),
             { concurrency: "unbounded" },
-          ).pipe(Effect.map(flow(Array.filter(Predicate.isNotUndefined), Record.fromEntries)))
+          ).pipe(
+            Effect.map(
+              flow(
+                Array.filter((v) => !!v),
+                Record.fromEntries,
+              ),
+            ),
+          )
           return {
             payload: {
               x402Version: 2 as const,

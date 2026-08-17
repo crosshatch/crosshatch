@@ -1,4 +1,4 @@
-import { handler } from "@crosshatch/util/httpapi"
+import { handler } from "@crosshatch/util"
 import { Effect } from "effect"
 
 import { FacilitatorApi } from "../FacilitatorApi/index.ts"

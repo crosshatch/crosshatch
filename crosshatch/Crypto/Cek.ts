@@ -1,4 +1,4 @@
-import { Effect, Ref, Schema as S, Context, Layer, Predicate, Data } from "effect"
+import { Effect, Ref, Schema as S, Context, Layer, Data } from "effect"
 
 import * as CryptoKey from "./CryptoKey.ts"
 import type * as Envelope from "./Envelope.ts"
@@ -29,7 +29,10 @@ export class HydrationError extends Data.TaggedClass("HydrationError") {}
 export const hydrate = Effect.fnUntraced(function* (envelope: Envelope.Asymmetric) {
   const { privateKey } = yield* X25519Pair.X25519Pair.pipe(
     Effect.flatMap(Ref.get),
-    Effect.filterOrFail(Predicate.isNotUndefined, () => new HydrationError()),
+    Effect.filterOrFail(
+      (v) => !!v,
+      () => new HydrationError(),
+    ),
   )
   const cekBytes = yield* X25519PrivateKey.decrypt(privateKey, envelope)
   const cek = yield* fromBytes(cekBytes)

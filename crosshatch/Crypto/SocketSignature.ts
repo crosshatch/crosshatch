@@ -1,5 +1,4 @@
-import { ensureRef } from "@crosshatch/util/ensureRef"
-import { SocketProtocols } from "@crosshatch/util/SocketProtocols"
+import { ensureRef, SocketProtocols } from "@crosshatch/util"
 import { Array, Context, Effect, Schema as S, Layer, type Duration, Data } from "effect"
 import { HttpApiError } from "effect/unstable/httpapi"
 import { Socket } from "effect/unstable/socket"
@@ -53,7 +52,7 @@ export const layer = <Self, Id extends string, A extends S.Top>(signedPayload: S
   Layer.effect(
     signedPayload,
     Effect.gen(function* () {
-      const protocols = yield* SocketProtocols
+      const protocols = yield* SocketProtocols.SocketProtocols
       if (!protocols) return
       const protocolI = protocols.indexOf(ProtocolKey)
       if (protocolI === -1) return

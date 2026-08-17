@@ -91,7 +91,7 @@ export const layerFromPayload = <
     Effect.gen(function* () {
       const entry = payload?.extensions?.[extension.identifier]
       if (entry) {
-        return yield* S.decodeUnknownEffect(S.toCodecJson(extension.enrichment))(entry)
+        return yield* S.decodeEffect(S.toCodecJson(extension.enrichment))(entry)
       }
       return
     }),

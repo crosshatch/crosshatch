@@ -251,10 +251,9 @@ const layerSchemes = Layer.mergeAll(
   Permit2Scheme.layer,
 ).pipe(Layer.provide(Eip155Signer.layerFromMnemonic))
 
-export const layerPayerLocal = Payer.layerLocal({
-  accept: Accept.first(Known),
-  schemes: layerSchemes,
-}).pipe(Layer.provide(Mnemonic.layerFromEnv))
+export const layerPayerLocal = Payer.layerLocal(Accept.first(Known)).pipe(
+  Layer.provide(layerSchemes.pipe(Layer.provide(Mnemonic.layerFromEnv))),
+)
 ```
 
     </div>

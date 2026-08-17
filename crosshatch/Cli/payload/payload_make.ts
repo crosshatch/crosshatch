@@ -33,12 +33,13 @@ export const payloadMake = Command.make("make", {
       (effect, { mnemonic }) =>
         Effect.provide(
           effect,
-          Payer.layerLocal({
-            accept: Accept.first(Known),
-            schemes: UnifiedSchemes.layer({
-              solana: { rpc: Config.string("SOLANA_RPC_URL").pipe(Config.withDefault(undefined)) },
-            }),
-          }).pipe(Layer.provide(MnemonicStore.layerMnemonicFromName(mnemonic))),
+          Payer.layerLocal(Accept.first(Known)).pipe(
+            Layer.provide(
+              UnifiedSchemes.layer({
+                solana: { rpc: Config.string("SOLANA_RPC_URL").pipe(Config.withDefault(undefined)) },
+              }).pipe(Layer.provide(MnemonicStore.layerMnemonicFromName(mnemonic))),
+            ),
+          ),
         ),
     ),
   ),

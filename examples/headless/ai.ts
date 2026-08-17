@@ -3,14 +3,14 @@ import { ChxHttp } from "crosshatch"
 import { Console, Effect, Layer } from "effect"
 import { LanguageModel } from "effect/unstable/ai"
 
-import * as Prelude from "./Prelude.ts"
+import { layerPrelude } from "./layerPrelude.ts"
 
 const layerLanguageModelBlockrun = OpenAiLanguageModel.layer({
   model: "deepseek/deepseek-chat",
 }).pipe(
   Layer.provide(
     OpenAiClient.layer({ apiUrl: "https://blockrun.ai/api/v1" }).pipe(
-      Layer.provide(ChxHttp.layerClient.pipe(Layer.provide(Prelude.layer))),
+      Layer.provide(ChxHttp.layerClient.pipe(Layer.provide(layerPrelude))),
     ),
   ),
 )

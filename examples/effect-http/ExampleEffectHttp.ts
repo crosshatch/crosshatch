@@ -24,7 +24,7 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
   },
   Effect.gen(function* () {
     const recipient = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
-    const handler = HttpRouter.add(
+    const fetch = HttpRouter.add(
       "GET",
       "/paid",
       Effect.gen(function* () {
@@ -56,21 +56,21 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
       }),
     ).pipe(
       Layer.provide([
-        Facilitator.layer(),
+        ChxHttp.layerMiddleware({
+          extensions: [PaymentId.FromMerchant],
+        }),
         HttpRouter.cors({
           allowedHeaders: ["*"],
           allowedMethods: ["*"],
           allowedOrigins: ["*"],
           exposedHeaders: ChxHttp.exposedHeaders,
         }),
-        ChxHttp.layerMiddleware({
-          extensions: [PaymentId.FromMerchant],
-        }),
       ]),
       HttpRouter.toHttpEffect,
-      Effect.scoped,
       Effect.flatten,
+      Effect.provide([Facilitator.layer()]),
+      Effect.orDie,
     )
-    return { fetch: handler }
+    return { fetch }
   }),
 ) {}

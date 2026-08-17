@@ -1,5 +1,4 @@
-import * as ChxDomain from "@crosshatch/util/ChxDomain"
-import * as ChxStage from "@crosshatch/util/ChxStage"
+import { ChxStage, ChxDomain } from "@crosshatch/util"
 import { Launcher, EmbedLauncher } from "@crosshatch/widget"
 import { Stream, Effect, Layer, flow } from "effect"
 
@@ -36,7 +35,7 @@ const layerBridge = Layer.effect(
 )
 
 export const layer = Payer.layerFromBridge.pipe(
-  Layer.provideMerge([
+  Layer.provideMerge(
     layerBridge.pipe(
       Layer.provideMerge(
         Layer.mergeAll(
@@ -45,5 +44,5 @@ export const layer = Payer.layerFromBridge.pipe(
         ).pipe(Layer.provideMerge(ChxDomain.layer("link.crosshatch.dev").pipe(Layer.provideMerge(ChxStage.layer)))),
       ),
     ),
-  ]),
+  ),
 )

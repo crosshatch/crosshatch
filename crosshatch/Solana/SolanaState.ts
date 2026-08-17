@@ -1,5 +1,5 @@
 import { type Blockhash, createSolanaRpc } from "@solana/kit"
-import { Effect, Layer, Struct } from "effect"
+import { Effect, Layer } from "effect"
 
 import * as State from "../State.ts"
 
@@ -13,7 +13,7 @@ export const layer = (url: string) =>
       const getLatestBlockhash = Effect.tryPromise({
         try: (abortSignal) => rpc.getLatestBlockhash().send({ abortSignal }),
         catch: (cause) => new State.GetLatestBlockhashError({ cause }),
-      }).pipe(Effect.map(Struct.get("value")))
+      }).pipe(Effect.map((v) => v.value))
       return { getLatestBlockhash }
     }),
   )

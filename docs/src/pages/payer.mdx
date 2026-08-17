@@ -24,14 +24,15 @@ const layerSchemes = Layer.mergeAll(
   Permit2Scheme.layer,
 ).pipe(Layer.provide(Eip155Signer.layerFromMnemonic))
 
-const layerPayerLocal = Payer.layerLocal({
-  accept: Accept.first({ USD: Known.USD }),
-  schemes: layerSchemes,
-}).pipe(Layer.provide(Mnemonic.layerFromEnv))
+const layerPayerLocal = Payer.layerLocal(Accept.first({ USD: Known.USD })).pipe(
+  Layer.provide(layerSchemes.pipe(Layer.provide(Mnemonic.layerFromEnv))),
+)
 ```
 
 This example reads `MNEMONIC` from the environment. Other `Mnemonic` layers can
-provide the same signer dependency.
+provide the same signer dependency. `Payer.layerLocal` accepts the requirement
+selection policy directly; provide the supported scheme layers through the
+resulting layer's Effect dependencies.
 
 ## Requirement Selection
 

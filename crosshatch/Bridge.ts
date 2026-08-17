@@ -1,14 +1,14 @@
-import { stringRaw } from "@crosshatch/util/string"
+import { stringRaw } from "@crosshatch/util"
 import { Schema as S, Context, Option, Data, Effect, flow, Struct } from "effect"
 
 import type { Payload } from "./Payload.ts"
 import { Required } from "./Required.ts"
 
-export class CreateTraceError extends S.TaggedErrorClass<CreateTraceError>()("CreateTraceError", {
+export class CreateTraceError extends S.TaggedError<CreateTraceError>()("CreateTraceError", {
   cause: S.Unknown.pipe(S.optional),
 }) {}
 
-export class ProposeError extends S.TaggedErrorClass<ProposeError>()("ProposeError", {
+export class ProposeError extends S.TaggedError<ProposeError>()("ProposeError", {
   cause: S.Unknown.pipe(S.optional),
 }) {}
 
@@ -49,7 +49,12 @@ export const propose = Effect.fnUntraced(function* (proposal: Proposal) {
 export class Trace extends Context.Service<Trace, TraceConfig>()("crosshatch/Bridge/Trace") {}
 
 export const TraceId = Effect.serviceOption(Trace).pipe(
-  Effect.map(flow(Option.map(Struct.get("trace")), Option.getOrUndefined)),
+  Effect.map(
+    flow(
+      Option.map((v) => v.trace),
+      Option.getOrUndefined,
+    ),
+  ),
 )
 
 export class NoSurroundingTraceError extends Data.TaggedError("NoSurroundingTraceError") {}
