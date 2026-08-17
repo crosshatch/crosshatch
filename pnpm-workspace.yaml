@@ -8,8 +8,8 @@ packages:
   - "!konfik"
 
 catalog:
-  "@changesets/changelog-github": ^0.7.0
-  "@changesets/cli": ^2.31.0
+  "@changesets/changelog-github": ^1.0.0
+  "@changesets/cli": ^3.0.0
   "@cloudflare/vite-plugin": ^1.32.3
   "@cloudflare/vitest-pool-workers": ^0.18.4
   "@cloudflare/worker-bundler": ^0.1.2
@@ -122,11 +122,6 @@ overrides:
   react-dom: ^19.2.4
   effect: 4.0.0-rc.110
   zod: 3.25.76
-
-patchedDependencies:
-  "@changesets/apply-release-plan@7.1.1": konfik/patches/@changesets__apply-release-plan@7.1.1.patch
-  "@changesets/assemble-release-plan@6.0.10": konfik/patches/@changesets__assemble-release-plan@6.0.10.patch
-  "@changesets/get-github-info@0.8.0": konfik/patches/@changesets__get-github-info@0.8.0.patch
 
 minimumReleaseAgeExclude:
   - "@aws-sdk/*"
