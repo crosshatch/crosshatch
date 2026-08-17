@@ -1,5 +1,15 @@
 # @crosshatch/widget
 
+## 0.0.9
+
+### Patch Changes
+
+- [#160](https://github.com/crosshatch/crosshatch/pull/160)
+  [`58defcc`](https://github.com/crosshatch/crosshatch/commit/58defcc1a98241479a71fa02d31f6866bbb1621d) -
+  Update package APIs and layer composition for Effect 4 RC. Simplify
+  `Payer.layerLocal` to accept an `Accept` function directly and receive
+  supported schemes through its Effect layer dependencies.
+
 ## 0.0.8
 
 ### Patch Changes
