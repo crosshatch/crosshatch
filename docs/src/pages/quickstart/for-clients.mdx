@@ -81,27 +81,28 @@ const program = Effect.gen(function* () {
 `layerPayerLocal` wires the payer to supported assets and signers. In Node.js,
 the built-in services load a named mnemonic encrypted at rest, with its
 encryption key kept in the operating system keychain. This example uses the
-`default` mnemonic and includes known USD assets, EIP-3009, Permit2, and
-optional Solana support:
+`default` mnemonic and includes known USD assets, EIP-3009, Permit2, and Solana
+support:
 
 ```ts
 import { NodeServices } from "@effect/platform-node"
 import { Accept, MnemonicStore, Payer } from "crosshatch"
 import * as ChxNodeServices from "crosshatch/ChxNodeServices"
 import * as Known from "crosshatch/Known"
+import { SolanaState } from "crosshatch/Solana"
 import { UnifiedSchemes } from "crosshatch/Unified"
-import { Config, Layer } from "effect"
+import { Config, Effect, Layer } from "effect"
 
-const layerSchemes = UnifiedSchemes.layer({
-  solana: {
-    rpc: Config.string("SOLANA_RPC_URL").pipe(Config.withDefault(undefined)),
-  },
-}).pipe(
-  Layer.provide(
+const layerSchemes = UnifiedSchemes.layer.pipe(
+  Layer.provide([
+    Config.string("SOLANA_RPC_URL").pipe(
+      Effect.map(SolanaState.layer),
+      Layer.unwrap,
+    ),
     MnemonicStore.layerMnemonicFromName().pipe(
       Layer.provide(ChxNodeServices.layer),
     ),
-  ),
+  ]),
 )
 
 export const layerPayerLocal = Payer.layerLocal(Accept.first(Known)).pipe(
@@ -112,8 +113,8 @@ export const layerPayerLocal = Payer.layerLocal(Accept.first(Known)).pipe(
 
 Create the default mnemonic with `pnpm crosshatch mnemonic add`. Pass a name to
 both the command and `MnemonicStore.layerMnemonicFromName(name)` to use another
-account. Set `SOLANA_RPC_URL` to enable Solana payments. See [Payer](/payer) for
-custom asset, policy, and scheme composition.
+account. Set `SOLANA_RPC_URL` to the Solana JSON-RPC endpoint used when creating
+payments. See [Payer](/payer) for custom asset, policy, and scheme composition.
 
 ## Delegate Payment Creation
 

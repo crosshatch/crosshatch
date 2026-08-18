@@ -7,6 +7,7 @@ import * as Known from "../../Known/index.ts"
 import * as Payer from "../../Payer.ts"
 import * as Payload from "../../Payload.ts"
 import * as Required from "../../Required.ts"
+import { SolanaState } from "../../Solana/index.ts"
 import { UnifiedSchemes } from "../../Unified/index.ts"
 import * as Input from "../Input.ts"
 
@@ -25,7 +26,7 @@ export const payloadMake = Command.make("make", {
         yield* Input.read(required, stdin, "required").pipe(
           Effect.flatMap(S.decodeEffect(Required.RequiredFromJsonString)),
           Effect.flatMap((required) => payer.createPayload({ required })),
-          Effect.flatMap(({ payload }) => S.encodeEffect(Payload.PayloadJson)(payload)),
+          Effect.flatMap((v) => S.encodeEffect(Payload.PayloadJson)(v.payload)),
           Effect.map((v) => JSON.stringify(v, null, 2)),
           Effect.andThen(Console.log),
         )
@@ -35,9 +36,16 @@ export const payloadMake = Command.make("make", {
           effect,
           Payer.layerLocal(Accept.first(Known)).pipe(
             Layer.provide(
-              UnifiedSchemes.layer({
-                solana: { rpc: Config.string("SOLANA_RPC_URL").pipe(Config.withDefault(undefined)) },
-              }).pipe(Layer.provide(MnemonicStore.layerMnemonicFromName(mnemonic))),
+              UnifiedSchemes.layer.pipe(
+                Layer.provide([
+                  Config.string("SOLANA_RPC_URL").pipe(
+                    Config.withDefault(undefined),
+                    Effect.map((v) => (v ? SolanaState.layer(v) : Layer.empty)),
+                    Layer.unwrap,
+                  ),
+                  MnemonicStore.layerMnemonicFromName(mnemonic),
+                ]),
+              ),
             ),
           ),
         ),
