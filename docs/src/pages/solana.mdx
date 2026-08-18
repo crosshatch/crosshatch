@@ -88,4 +88,25 @@ const layerSolanaScheme = SolanaScheme.layer.pipe(
 A Solana-capable payer provides the Solana scheme, signer, chain state service,
 and denomination.
 
+`UnifiedSchemes.layer` includes Solana alongside the built-in EIP-3009 and
+Permit2 schemes. It is a layer value rather than a configuration function, so
+provide its mnemonic and Solana state dependencies directly:
+
+```ts
+import { Mnemonic } from "crosshatch"
+import { SolanaState } from "crosshatch/Solana"
+import { UnifiedSchemes } from "crosshatch/Unified"
+import { Config, Effect, Layer } from "effect"
+
+const layerUnifiedSchemes = UnifiedSchemes.layer.pipe(
+  Layer.provide([
+    Mnemonic.layerFromEnv,
+    Config.string("SOLANA_RPC_URL").pipe(
+      Effect.map(SolanaState.layer),
+      Layer.unwrap,
+    ),
+  ]),
+)
+```
+
 See [Payer Service](/payer) for the full composition pattern.
