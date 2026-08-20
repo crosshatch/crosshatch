@@ -39,7 +39,7 @@ export default class ExampleEffectRpc extends Cloudflare.RpcWorker<ExampleEffect
         Api.toLayerHandler(
           "Foo",
           Effect.fn(function* () {
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < 60; i++) {
               const required = yield* Required.make`iteration ${i}`.pipe(
                 Required.extend(PaymentId.FromMerchant, {
                   required: true,
