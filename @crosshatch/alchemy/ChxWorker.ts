@@ -27,6 +27,7 @@ export const config = Effect.fnUntraced(function* ({
           assets: {
             notFoundHandling: "single-page-application",
             directory: "dist",
+            htmlHandling: "drop-trailing-slash",
           },
         }
       : {}),
