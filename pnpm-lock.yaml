@@ -121,8 +121,8 @@ catalogs:
       specifier: ^4.3.2
       version: 4.3.3
     turbo:
-      specifier: ^2.10.8
-      version: 2.10.8
+      specifier: ^2.10.11
+      version: 2.10.11
     typescript:
       specifier: ^7.0.2
       version: 7.0.2
@@ -240,7 +240,7 @@ importers:
         version: 1.61.1
       turbo:
         specifier: 'catalog:'
-        version: 2.10.8
+        version: 2.10.11
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
@@ -950,13 +950,13 @@ packages:
       effect: 4.0.0-rc.110
       redis: '>=5.0.0 <7.0.0'
 
-  '@effect/sql-d1@4.0.0-rc.109':
-    resolution: {integrity: sha512-Y078FqyxTE0zPsowefAMXm0GpNFuyAsG0oefy2m9zqA+Gc9VqpnADjKk61IW0kAHskmlmjdq4nmYnzlqWnczGg==}
+  '@effect/sql-d1@4.0.0-rc.110':
+    resolution: {integrity: sha512-QSOJVPW9x9f5+x5GIfznBwz1UL81GfGX3sEtFgHJ4Ub6zsredVfv14Eex7SNxDM6nf/7zwSbh5YWQMTHV6oNmQ==}
     peerDependencies:
       effect: 4.0.0-rc.110
 
-  '@effect/sql-sqlite-do@4.0.0-rc.109':
-    resolution: {integrity: sha512-pOEGY9zz+8GIJOKuJ7LS37bOA6pLeQ4gXHT379nZeDm8z/4cG/f7DhpUoedu5jQhP0pyLit0szNfF/GXA1XnSA==}
+  '@effect/sql-sqlite-do@4.0.0-rc.110':
+    resolution: {integrity: sha512-i9+ZssM/n1KONpg3jhXhiSaevNGjLyBu3im2rdHGEfK+E7m56Astvuwevy8YSvHfkjRqjP64eGckSAagkGVKRA==}
     peerDependencies:
       effect: 4.0.0-rc.110
 
@@ -3620,33 +3620,33 @@ packages:
   '@tootallnate/quickjs-emscripten@0.23.0':
     resolution: {integrity: sha512-C5Mc6rdnsaJDjO3UpGW/CQTHtCKaYlScZTly4JIu97Jxo/odCiH0ITnDXSJPTOrEKk/ycSZ0AOgTmkDtkOsvIA==}
 
-  '@turbo/darwin-64@2.10.8':
-    resolution: {integrity: sha512-po+7rfJfUnFXjWlcoN2RwhErgzCdRtBc1T26vYPcywHlggmCQiQe1uWaE4j+BibI2uY9/2pDoFzMN0rmSaPFOw==}
+  '@turbo/darwin-64@2.10.11':
+    resolution: {integrity: sha512-v3R+1R/Ysozyo+p7Ri8MCIbndOvYt3DgPFrGLhrhQHfvyvbxyH3WyJj+A/2JTNmNleuAlh3JUyCV0iSVHIONTA==}
     cpu: [x64]
     os: [darwin]
 
-  '@turbo/darwin-arm64@2.10.8':
-    resolution: {integrity: sha512-+zB2btDJ00lnPRuqOvpVvgl4x34k/djZQGZTTCfjn7JgNCl8QFY5Njo5+dqkY1g/+9gbbsnAvWm9CmJg9ebcXA==}
+  '@turbo/darwin-arm64@2.10.11':
+    resolution: {integrity: sha512-R0a0CvGAeYYsBgPIgFNB3agGXh6qukjduNhFlwVVX1Ss2IdBJLXmgjytNGmo084bLKS0B6UdLRwKhXMHKKaObQ==}
     cpu: [arm64]
     os: [darwin]
 
-  '@turbo/linux-64@2.10.8':
-    resolution: {integrity: sha512-K1dxqiVisyN7cViVsfQLs6xscQbYuI8aO2nbUhFURDACgEDfZRdP/b4CCxeosBJpcMfhYyiibWqJorCnvz9kKg==}
+  '@turbo/linux-64@2.10.11':
+    resolution: {integrity: sha512-dGlY2vg7jpsLjGS1bf9sD/cw1sGMAYbeHGQKGRFxd5Zaj+Ufbj8cNXl/vIit8ueCU97zhL/znn60ZV5iSfZAxw==}
     cpu: [x64]
     os: [android, linux]
 
-  '@turbo/linux-arm64@2.10.8':
-    resolution: {integrity: sha512-Gi77ibVnrE1fEmvr+/wBD/yvRqhwp/RQuCp2+//lv1U1wNFFyVg0V7Wj8FG9FXPFAw5QHReo8rxc9+wBSDZjzA==}
+  '@turbo/linux-arm64@2.10.11':
+    resolution: {integrity: sha512-eSP9+jjsSCBs2x0QpJZlp49dSD1EIMwXH7PsMIhdWk7w6IThhuKJ+jL95JQ2IW7tRjRmdh8gKcKQtrHLD5R5lA==}
     cpu: [arm64]
     os: [android, linux]
 
-  '@turbo/windows-64@2.10.8':
-    resolution: {integrity: sha512-znnLO1haJPYTHoKMKwlAvlkjRiYbbhBzME6wIGaMd+fwir23U6jVd1ecaTWWi1fbnRVqxMfgDBKseQ/hLKb83g==}
+  '@turbo/windows-64@2.10.11':
+    resolution: {integrity: sha512-4aD7edogJ8arK8DOyvjTI2KKwmchD5M/WM4BZgidrtFf7aSgn8Ce2rJnDwmriw980c2cKlHnhXtlGy38VtKB8g==}
     cpu: [x64]
     os: [win32]
 
-  '@turbo/windows-arm64@2.10.8':
-    resolution: {integrity: sha512-VN30vh3b3Czh2WzYHNTfF1FE0YMZ5aHsLO8dBMGHJewA6792wX6iJR8ZxlzFW6WdOu0gEAKIvlYhfyT81Wkm4Q==}
+  '@turbo/windows-arm64@2.10.11':
+    resolution: {integrity: sha512-m8tJkIrTrbQ9O1uHxV0GUq623Zg1678xGna8eMsy4KbygUX/wVFgdZDYV/AxyoyaW/U7nyKoBvaDVwm22p9xqA==}
     cpu: [arm64]
     os: [win32]
 
@@ -4324,8 +4324,8 @@ packages:
       bare-events:
         optional: true
 
-  bare-url@2.4.7:
-    resolution: {integrity: sha512-o8CRCiJtib+ycO3mE4A5UChtGX4dDP2XxsWVu9P+Zc3H8tcmKwNVEDoDTXmwN+uuMhfKeT7/i7Y26xS8W7ohoA==}
+  bare-url@2.5.2:
+    resolution: {integrity: sha512-L13PCJzKG8RGvx8V1/DdMi12ERhC3tprr7/8a94BxpmnRsFqxh5XZNdhtMxu5HPkRshYOOWRGY8lDP7ZhpG9Cg==}
 
   base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
@@ -6894,8 +6894,8 @@ packages:
   turbo-stream@3.2.0:
     resolution: {integrity: sha512-EK+bZ9UVrVh7JLslVFOV0GEMsociOqVOvEMTAd4ixMyffN5YNIEdLZWXUx5PJqDbTxSIBWw04HS9gCY4frYQDQ==}
 
-  turbo@2.10.8:
-    resolution: {integrity: sha512-9+8YX5QOkGXzZxcIykTHgaooRHGMWO+jfdyRK0o+rN0U7hBIig2MrJ8r/aNzIPDPhdA73SGb0O+tIztaModTMg==}
+  turbo@2.10.11:
+    resolution: {integrity: sha512-yQfwQVoRXwOuyX1LxiJFBFNg6VfuYh+/RyZLd82+isgyLkBXw3S5XRRzvcck1FAjSCG5sVyLd+O1eDMvYa3J7g==}
     hasBin: true
 
   twoslash-protocol@0.3.9:
@@ -8192,12 +8192,12 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@effect/sql-d1@4.0.0-rc.109(effect@4.0.0-rc.110)':
+  '@effect/sql-d1@4.0.0-rc.110(effect@4.0.0-rc.110)':
     dependencies:
       '@cloudflare/workers-types': 5.20260722.1
       effect: 4.0.0-rc.110
 
-  '@effect/sql-sqlite-do@4.0.0-rc.109(effect@4.0.0-rc.110)':
+  '@effect/sql-sqlite-do@4.0.0-rc.110(effect@4.0.0-rc.110)':
     dependencies:
       effect: 4.0.0-rc.110
 
@@ -10913,22 +10913,22 @@ snapshots:
 
   '@tootallnate/quickjs-emscripten@0.23.0': {}
 
-  '@turbo/darwin-64@2.10.8':
+  '@turbo/darwin-64@2.10.11':
     optional: true
 
-  '@turbo/darwin-arm64@2.10.8':
+  '@turbo/darwin-arm64@2.10.11':
     optional: true
 
-  '@turbo/linux-64@2.10.8':
+  '@turbo/linux-64@2.10.11':
     optional: true
 
-  '@turbo/linux-arm64@2.10.8':
+  '@turbo/linux-arm64@2.10.11':
     optional: true
 
-  '@turbo/windows-64@2.10.8':
+  '@turbo/windows-64@2.10.11':
     optional: true
 
-  '@turbo/windows-arm64@2.10.8':
+  '@turbo/windows-arm64@2.10.11':
     optional: true
 
   '@tybys/wasm-util@0.10.3':
@@ -11453,8 +11453,8 @@ snapshots:
       '@distilled.cloud/core': 1.0.0-rc.4(effect@4.0.0-rc.110)
       '@distilled.cloud/neon': 1.0.0-rc.4(effect@4.0.0-rc.110)
       '@distilled.cloud/planetscale': 1.0.0-rc.4(effect@4.0.0-rc.110)
-      '@effect/sql-d1': 4.0.0-rc.109(effect@4.0.0-rc.110)
-      '@effect/sql-sqlite-do': 4.0.0-rc.109(effect@4.0.0-rc.110)
+      '@effect/sql-d1': 4.0.0-rc.110(effect@4.0.0-rc.110)
+      '@effect/sql-sqlite-do': 4.0.0-rc.110(effect@4.0.0-rc.110)
       '@effect/vitest': 4.0.0-rc.110(effect@4.0.0-rc.110)(vitest@4.1.10)
       '@libsql/client': 0.17.4
       '@octokit/rest': 22.0.1
@@ -11510,8 +11510,8 @@ snapshots:
       '@distilled.cloud/core': 1.0.0-rc.4(effect@4.0.0-rc.110)
       '@distilled.cloud/neon': 1.0.0-rc.4(effect@4.0.0-rc.110)
       '@distilled.cloud/planetscale': 1.0.0-rc.4(effect@4.0.0-rc.110)
-      '@effect/sql-d1': 4.0.0-rc.109(effect@4.0.0-rc.110)
-      '@effect/sql-sqlite-do': 4.0.0-rc.109(effect@4.0.0-rc.110)
+      '@effect/sql-d1': 4.0.0-rc.110(effect@4.0.0-rc.110)
+      '@effect/sql-sqlite-do': 4.0.0-rc.110(effect@4.0.0-rc.110)
       '@effect/vitest': 4.0.0-rc.110(effect@4.0.0-rc.110)(vitest@4.1.10)
       '@libsql/client': 0.17.4
       '@octokit/rest': 22.0.1
@@ -11616,7 +11616,7 @@ snapshots:
       bare-events: 2.9.1
       bare-path: 3.1.1
       bare-stream: 2.13.3(bare-events@2.9.1)
-      bare-url: 2.4.7
+      bare-url: 2.5.2
       fast-fifo: 1.3.2
     transitivePeerDependencies:
       - bare-abort-controller
@@ -11634,7 +11634,7 @@ snapshots:
     transitivePeerDependencies:
       - react-native-b4a
 
-  bare-url@2.4.7:
+  bare-url@2.5.2:
     dependencies:
       bare-path: 3.1.1
 
@@ -14769,14 +14769,14 @@ snapshots:
 
   turbo-stream@3.2.0: {}
 
-  turbo@2.10.8:
+  turbo@2.10.11:
     optionalDependencies:
-      '@turbo/darwin-64': 2.10.8
-      '@turbo/darwin-arm64': 2.10.8
-      '@turbo/linux-64': 2.10.8
-      '@turbo/linux-arm64': 2.10.8
-      '@turbo/windows-64': 2.10.8
-      '@turbo/windows-arm64': 2.10.8
+      '@turbo/darwin-64': 2.10.11
+      '@turbo/darwin-arm64': 2.10.11
+      '@turbo/linux-64': 2.10.11
+      '@turbo/linux-arm64': 2.10.11
+      '@turbo/windows-64': 2.10.11
+      '@turbo/windows-arm64': 2.10.11
 
   twoslash-protocol@0.3.9: {}
 

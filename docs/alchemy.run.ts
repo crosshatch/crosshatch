@@ -14,6 +14,6 @@ export default Alchemy.Stack(
   },
   docs({
     domain: PackageJson.name,
-    devPort: 4382,
+    port: 4382,
   }).pipe(Effect.asVoid),
 )
