@@ -7,6 +7,8 @@ packages:
   - scratchpad
   - "!konfik"
 
+blockExoticSubdeps: false
+
 catalog:
   "@changesets/changelog-github": ^1.0.0
   "@changesets/cli": ^3.0.0
@@ -56,8 +58,9 @@ catalog:
   "@vitest/coverage-v8": ^4.1.10
   "@vitest/expect": ^4.1.10
   "@vitest/web-worker": ^4.1.10
-  alchemy: 2.0.0-beta.72
+  "alchemy": https://pkg.ing/alchemy/08b1197
   "@effect/tsgo": 0.36.5
+  "@alchemy.run/frontend-frameworks": https://pkg.ing/@alchemy.run/frontend-frameworks/08b1197
   babel-plugin-react-compiler: ^1.0.0
   class-variance-authority: ^0.7.1
   clsx: ^2.1.1
