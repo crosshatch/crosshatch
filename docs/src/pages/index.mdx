@@ -8,10 +8,9 @@ showLogo: false
 
 import { Card, HomePage } from "vocs"
 import { SiGithub } from "@icons-pack/react-simple-icons"
-import { ChevronRight, UserRound } from "lucide-static"
+import { ChevronRight, UserRound } from "lucide-react"
 import { DotPattern } from "../DotPattern"
 import { CodingAgentsButton } from "../CodingAgentsButton"
-import { LucideIcon } from "../LucideIcon"
 import {
   EFFECT_AI_CLIENT_PROMPT,
   EFFECT_HTTP_CLIENT_PROMPT,
@@ -51,7 +50,7 @@ import {
   />
   <HomePage.Button href="/quickstart" variant="accent">
     Quickstart
-    <LucideIcon className="ml-2 size-4 stroke-1" svg={UserRound} />
+    <UserRound aria-hidden="true" className="ml-2 size-4 stroke-1" />
   </HomePage.Button>
 </HomePage.Buttons>
 
@@ -86,7 +85,7 @@ import {
       <a className="crosshatch-code-link" href="/quickstart/for-clients#fetch-a-paid-resource">
         <span>Read the HTTP client quickstart</span>
         <span className="crosshatch-code-link-icon" aria-hidden="true">
-          <LucideIcon svg={ChevronRight} />
+          <ChevronRight />
         </span>
       </a>
     </div>
@@ -127,7 +126,7 @@ Effect.gen(function* () {
       <a className="crosshatch-code-link" href="/quickstart/for-merchants#effect-http">
         <span>Read the merchant quickstart</span>
         <span className="crosshatch-code-link-icon" aria-hidden="true">
-          <LucideIcon svg={ChevronRight} />
+          <ChevronRight />
         </span>
       </a>
     </div>
@@ -187,7 +186,7 @@ const router = HttpRouter.add(
       <a className="crosshatch-code-link" href="/quickstart/for-clients">
         <span>Read the client quickstart</span>
         <span className="crosshatch-code-link-icon" aria-hidden="true">
-          <LucideIcon svg={ChevronRight} />
+          <ChevronRight />
         </span>
       </a>
     </div>
@@ -234,7 +233,7 @@ LanguageModel.generateText({
       <a className="crosshatch-code-link" href="/payer">
         <span>Read the Payer docs</span>
         <span className="crosshatch-code-link-icon" aria-hidden="true">
-          <LucideIcon svg={ChevronRight} />
+          <ChevronRight />
         </span>
       </a>
     </div>

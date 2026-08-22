@@ -1,9 +1,7 @@
 "use client"
 
-import { Bot, Check, Copy, X } from "lucide-static"
+import { Bot, Check, Copy, X } from "lucide-react"
 import * as React from "react"
-
-import { LucideIcon } from "./LucideIcon"
 
 const prompts = [
   {
@@ -78,7 +76,7 @@ export const CodingAgentsButton = (props: {
         onClick={() => setOpen(true)}
       >
         Coding Agents
-        <LucideIcon className="ml-2 size-4 stroke-1" svg={Bot} />
+        <Bot aria-hidden="true" className="ml-2 size-4 stroke-1" />
       </button>
       {open ? (
         <div
@@ -101,7 +99,7 @@ export const CodingAgentsButton = (props: {
               type="button"
               onClick={() => setOpen(false)}
             >
-              <LucideIcon svg={X} />
+              <X aria-hidden="true" />
             </button>
             <p className="crosshatch-code-kicker">Coding Agents</p>
             <h2 id="crosshatch-agents-modal-title">Give agents the right context</h2>
@@ -120,12 +118,12 @@ export const CodingAgentsButton = (props: {
                 {copied === "mcp" ? (
                   <>
                     Copied
-                    <LucideIcon svg={Check} />
+                    <Check aria-hidden="true" />
                   </>
                 ) : (
                   <>
                     Copy URL
-                    <LucideIcon svg={Copy} />
+                    <Copy aria-hidden="true" />
                   </>
                 )}
               </button>
@@ -146,12 +144,12 @@ export const CodingAgentsButton = (props: {
                     {copied === prompt.value ? (
                       <>
                         Copied
-                        <LucideIcon svg={Check} />
+                        <Check aria-hidden="true" />
                       </>
                     ) : (
                       <>
                         Copy prompt
-                        <LucideIcon svg={Copy} />
+                        <Copy aria-hidden="true" />
                       </>
                     )}
                   </strong>

@@ -23,11 +23,6 @@ export default defineConfig({
         },
       ],
     },
-    // {
-    //   text: "Wallet",
-    //   link: "https://crosshatch.dev",
-    //   external: true,
-    // },
   ],
   iconUrl: "/icon.svg",
   banner: {
