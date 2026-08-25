@@ -6,7 +6,6 @@
     "dev": "alchemy dev --env-file ../../.env"
   },
   "dependencies": {
-    "@cloudflare/workers-types": "catalog:",
     "alchemy": "catalog:",
     "crosshatch": "workspace:*",
     "effect": "catalog:",

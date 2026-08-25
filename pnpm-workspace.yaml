@@ -12,21 +12,12 @@ blockExoticSubdeps: false
 catalog:
   "@changesets/changelog-github": ^1.0.0
   "@changesets/cli": ^3.0.0
-  "@cloudflare/vite-plugin": ^1.32.3
-  "@cloudflare/vitest-pool-workers": ^0.18.4
-  "@cloudflare/worker-bundler": ^0.1.2
-  "@cloudflare/workers-types": ^5.20260713.1
-  "@distilled.cloud/coinbase": 1.0.0-rc.5
   "@effect/ai-openai-compat": ^4.0.0-rc.110
   "@effect/atom-react": ^4.0.0-rc.110
   "@effect/language-service": ^0.86.6
-  "@effect/openapi-generator": ^4.0.0-rc.110
   "@effect/platform-browser": ^4.0.0-rc.110
   "@effect/platform-node": ^4.0.0-rc.110
-  "@effect/sql-d1": ^4.0.0-rc.110
-  "@effect/sql-pg": ^4.0.0-rc.110
   "@effect/vitest": ^4.0.0-rc.110
-  "@electric-sql/pglite": ^0.3.15
   "@icons-pack/react-simple-icons": ^13.13.0
   "@kitlangton/motel": ^0.2.6
   "@napi-rs/keyring": ^1.3.0
