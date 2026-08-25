@@ -2,7 +2,6 @@ import { flow, type Types, Array, Effect, Schema as S, Record, Duration, Undefin
 
 import { Address } from "./Address.ts"
 import * as Amount from "./Amount.ts"
-import type { InvalidAmountError } from "./Amount.ts"
 import { Asset, type Denomination, type LogicalAsset } from "./Asset.ts"
 import { ChainId } from "./ChainId.ts"
 
@@ -19,9 +18,9 @@ export const Requirements = S.Struct({
 
 export type RequirementsLike =
   | Requirements
-  | Effect.Effect<Requirements, InvalidAmountError>
+  | Effect.Effect<Requirements, S.SchemaError>
   | Array<Requirements>
-  | Effect.Effect<Array<Requirements>, InvalidAmountError>
+  | Effect.Effect<Array<Requirements>, S.SchemaError>
 
 export const logical = Effect.fnUntraced(function* <A extends LogicalAsset>(
   asset: A,
@@ -42,26 +41,25 @@ export const logical = Effect.fnUntraced(function* <A extends LogicalAsset>(
     onUndefined: () => 300,
   })
   const nominal = yield* Amount.from(amount)
-  return Record.toEntries(recipients).flatMap(([namespace, references]) =>
-    references
-      ? Record.toEntries(references).reduce<ReadonlyArray<Requirements>>((acc, [reference, payTo]) => {
-          const physical = asset[namespace]?.[reference]
-          if (!physical) return acc
-          const { name, version } = physical
-          return payTo
-            ? acc.concat({
-                amount: Amount.toAtomic(nominal, physical),
-                asset: Asset.make(physical.asset, { disableChecks: true }),
-                maxTimeoutSeconds,
-                network: ChainId.make(`${namespace}:${reference}`, { disableChecks: true }),
-                payTo,
-                scheme: "exact",
-                extra: { name, version },
-              })
-            : acc
-        }, [])
-      : [],
-  )
+  const requirements: Array<Requirements> = []
+  for (const [namespace, references] of Record.toEntries(recipients)) {
+    if (!references) continue
+    for (const [reference, payTo] of Record.toEntries(references)) {
+      const physical = asset[namespace]?.[reference]
+      if (!physical || !payTo) continue
+      const { name, version } = physical
+      requirements.push({
+        amount: yield* Amount.toAtomic(nominal, physical),
+        asset: Asset.make(physical.asset, { disableChecks: true }),
+        maxTimeoutSeconds,
+        network: ChainId.make(`${namespace}:${reference}`, { disableChecks: true }),
+        payTo,
+        scheme: "exact",
+        extra: { name, version },
+      })
+    }
+  }
+  return requirements
 })
 
 export const denomination = <A extends Denomination>(

@@ -1,7 +1,6 @@
 import { JsonRecord, stringRaw } from "@crosshatch/util"
 import { Schema as S, Effect, Context } from "effect"
 
-import type { InvalidAmountError } from "./Amount.ts"
 import type { Extension } from "./Extension.ts"
 import { Requirements, type RequirementsLike } from "./Requirements.ts"
 import { ResourceInfo } from "./ResourceInfo.ts"
@@ -43,7 +42,7 @@ export const make = Effect.fnUntraced(function* (
 
 export const accept =
   (...acceptsInputs: ReadonlyArray<RequirementsLike>) =>
-  <E, R>(effect: Effect.Effect<Required, E, R>): Effect.Effect<Required, E | InvalidAmountError, R> =>
+  <E, R>(effect: Effect.Effect<Required, E, R>): Effect.Effect<Required, E | S.SchemaError, R> =>
     Effect.flatMap(
       effect,
       Effect.fnUntraced(function* ({ accepts, ...rest }) {

@@ -12,7 +12,7 @@ export const Provider = S.Literals(Providers)
 export type OnrampPayload = typeof OnrampPayload.Type
 export const OnrampPayload = S.Struct({
   provider: Provider,
-  amount: Amount.Amount.check(S.isGreaterThanBigDecimal(BigDecimal.fromBigInt(0n))),
+  amount: Amount.AmountFromString.check(S.isGreaterThanBigDecimal(BigDecimal.fromBigInt(0n))),
   recipient: AccountId,
 })
 

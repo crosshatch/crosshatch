@@ -8,7 +8,6 @@
   "dependencies": {
     "alchemy": "catalog:",
     "crosshatch": "workspace:*",
-    "effect": "catalog:",
-    "vitest": "catalog:"
+    "effect": "catalog:"
   }
 }
