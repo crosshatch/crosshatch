@@ -7,7 +7,6 @@
     "@crosshatch/widget": "workspace:*",
     "@effect/platform-node": "catalog:",
     "crosshatch": "workspace:*",
-    "effect": "catalog:",
-    "viem": "catalog:"
+    "effect": "catalog:"
   }
 }

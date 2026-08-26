@@ -107,7 +107,6 @@ export default class Merchant extends Cloudflare.Worker<Merchant>()(
         Facilitator.layer(),
       ]),
       HttpRouter.toHttpEffect,
-      Effect.scoped,
       Effect.flatten,
     )
     return { fetch }

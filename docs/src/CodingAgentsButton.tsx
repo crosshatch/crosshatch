@@ -1,9 +1,7 @@
 "use client"
 
-import { Bot, Check, Copy, X } from "lucide-static"
+import { Bot, Check, Copy, X } from "lucide-react"
 import * as React from "react"
-
-import { LucideIcon } from "./LucideIcon"
 
 const prompts = [
   {
@@ -23,7 +21,7 @@ const prompts = [
   },
 ] as const
 
-// const MCP_URL = "https://crosshatch.dev/api/mcp"
+const MCP_URL = "https://crosshatch.dev/api/mcp"
 
 export const CodingAgentsButton = (props: {
   readonly merchantPrompt: string
@@ -47,11 +45,11 @@ export const CodingAgentsButton = (props: {
     window.setTimeout(() => setCopied(undefined), 5000)
   }
 
-  // const onCopyMcpUrl = async () => {
-  //   await navigator.clipboard.writeText(MCP_URL)
-  //   setCopied("mcp")
-  //   window.setTimeout(() => setCopied(undefined), 5000)
-  // }
+  const onCopyMcpUrl = async () => {
+    await navigator.clipboard.writeText(MCP_URL)
+    setCopied("mcp")
+    window.setTimeout(() => setCopied(undefined), 5000)
+  }
 
   React.useLayoutEffect(() => {
     if (!open) return
@@ -78,7 +76,7 @@ export const CodingAgentsButton = (props: {
         onClick={() => setOpen(true)}
       >
         Coding Agents
-        <LucideIcon className="ml-2 size-4 stroke-1" svg={Bot} />
+        <Bot aria-hidden="true" className="ml-2 size-4 stroke-1" />
       </button>
       {open ? (
         <div
@@ -101,30 +99,35 @@ export const CodingAgentsButton = (props: {
               type="button"
               onClick={() => setOpen(false)}
             >
-              <LucideIcon svg={X} />
+              <X aria-hidden="true" />
             </button>
             <p className="crosshatch-code-kicker">Coding Agents</p>
             <h2 id="crosshatch-agents-modal-title">Give agents the right context</h2>
             <p>Connect the Crosshatch docs MCP server, then paste one of these integration-specific prompts.</p>
-            {/* <section className="crosshatch-agents-mcp" aria-labelledby="crosshatch-agents-mcp-title">
+            <section className="crosshatch-agents-mcp" aria-labelledby="crosshatch-agents-mcp-title">
               <div>
                 <h3 id="crosshatch-agents-mcp-title">Docs MCP server</h3>
                 <code className="px-0">{MCP_URL}</code>
               </div>
-              <button type="button" onClick={onCopyMcpUrl}>
+              <button
+                type="button"
+                onClick={() => {
+                  onCopyMcpUrl()
+                }}
+              >
                 {copied === "mcp" ? (
                   <>
                     Copied
-                    <LucideIcon svg={Check} />
+                    <Check aria-hidden="true" />
                   </>
                 ) : (
                   <>
                     Copy URL
-                    <LucideIcon svg={Copy} />
+                    <Copy aria-hidden="true" />
                   </>
                 )}
               </button>
-            </section> */}
+            </section>
             <div className="crosshatch-agents-prompt-grid">
               {prompts.map((prompt) => (
                 <button
@@ -141,12 +144,12 @@ export const CodingAgentsButton = (props: {
                     {copied === prompt.value ? (
                       <>
                         Copied
-                        <LucideIcon svg={Check} />
+                        <Check aria-hidden="true" />
                       </>
                     ) : (
                       <>
                         Copy prompt
-                        <LucideIcon svg={Copy} />
+                        <Copy aria-hidden="true" />
                       </>
                     )}
                   </strong>

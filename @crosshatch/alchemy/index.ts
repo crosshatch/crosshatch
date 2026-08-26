@@ -1,5 +1,4 @@
 export * from "./GithubDeployer.ts"
 export * as ChxWorker from "./ChxWorker.ts"
 export * from "./docs.ts"
-export * as AlchemyChxStage from "./AlchemyChxStage.ts"
 export * from "./PrComment.ts"

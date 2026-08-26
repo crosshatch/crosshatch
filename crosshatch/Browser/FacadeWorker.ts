@@ -1,4 +1,4 @@
-import { ChxDomain, Boundary } from "@crosshatch/util"
+import { ChxDomain } from "@crosshatch/util"
 import { Host } from "@crosshatch/widget"
 import { BrowserWorker, BrowserStream } from "@effect/platform-browser"
 import { type Cause, Effect, Fiber, Layer, Stream, Schema as S, Schedule, Data, Record } from "effect"
@@ -37,7 +37,6 @@ export const layer = Effect.gen(function* () {
   yield* Effect.addFinalizer(() => Effect.sync(() => iframe.remove()))
   return BrowserWorker.layer(() => port1)
 }).pipe(
-  Boundary.span("make", import.meta.url),
   Effect.retry(Schedule.exponential("100 millis", 2).pipe(Schedule.jittered, Schedule.upTo({ times: 6 }))),
   Layer.unwrap,
 )
