@@ -21,7 +21,7 @@ export const PAYMENT_RESPONSE = "payment-response" as const
 export const CROSSHATCH_TRACE_ID = "x-crosshatch-trace-id" as const
 export const CROSSHATCH_SPAN_ID = "x-crosshatch-span-id" as const
 
-export const exposedHeaders = [PAYMENT_REQUIRED, PAYMENT_RESPONSE, CROSSHATCH_TRACE_ID] as const
+export const exposedHeaders = [PAYMENT_REQUIRED, PAYMENT_RESPONSE, CROSSHATCH_TRACE_ID, CROSSHATCH_SPAN_ID] as const
 
 export class PaymentRequired
   extends Data.TaggedError("PaymentRequired")<{
@@ -118,7 +118,7 @@ export const layerFetch = Layer.effect(
         if (retry.headers.has(PAYMENT_SIGNATURE)) {
           return yield* new PaymentAlreadyAttemptedError()
         }
-        const spanId = response.headers.get(CROSSHATCH_TRACE_ID)
+        const spanId = response.headers.get(CROSSHATCH_SPAN_ID)
         const traceId = response.headers.get(CROSSHATCH_TRACE_ID)
         const trace = traceId && spanId ? { spanId, traceId } : undefined
         const requiredHeader = response.headers.get(PAYMENT_REQUIRED)
