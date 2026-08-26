@@ -46,7 +46,7 @@ export const layer = Erc3009Scheme.layer({ known: S.Void, extra: Extra }, () =>
       from: signer.address,
       to: Address.from(accepted.payTo, { checksum: true }),
       value: accepted.amount,
-      validAfter: (now - 600).toString(),
+      validAfter: Math.max(0, now - 600).toString(),
       validBefore: (now + accepted.maxTimeoutSeconds).toString(),
       nonce: `0x${Encoding.encodeHex(Random.bytes(32))}`,
     }

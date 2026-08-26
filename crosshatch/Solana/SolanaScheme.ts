@@ -1,5 +1,7 @@
-import { getSetComputeUnitLimitInstruction, getSetComputeUnitPriceInstruction } from "@solana-program/compute-budget"
-import { getAddMemoInstruction } from "@solana-program/memo"
+import {
+  getSetComputeUnitLimitInstruction,
+  setTransactionMessageComputeUnitPrice,
+} from "@solana-program/compute-budget"
 import { findAssociatedTokenPda, getTransferCheckedInstruction } from "@solana-program/token"
 import { address, type Address } from "@solana/addresses"
 import {
@@ -7,6 +9,7 @@ import {
   createTransactionMessage,
   getBase64EncodedWireTransaction,
   partiallySignTransactionMessageWithSigners,
+  prependTransactionMessageInstruction,
   setTransactionMessageFeePayer,
   setTransactionMessageLifetimeUsingBlockhash,
   pipe as solanaPipe,
@@ -19,6 +22,10 @@ import * as SolanaAddress from "./SolanaAddress.ts"
 import * as SolanaAsset from "./SolanaAsset.ts"
 import { SolanaSigner } from "./SolanaSigner.ts"
 import { SolanaState } from "./SolanaState.ts"
+
+const MEMO_PROGRAM_ADDRESS = address("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr")
+const COMPUTE_UNIT_LIMIT = 20_000
+const COMPUTE_UNIT_PRICE_MICROLAMPORTS = 1
 
 export type Known = typeof Known.Type
 export const Known = S.Struct({
@@ -42,7 +49,7 @@ export class SolanaScheme extends Scheme.Service<SolanaScheme, Known, Extra>()("
 
 export const layer = SolanaScheme.layer(
   { known: Known, extra: Extra },
-  ({ known: { tokenProgramId }, extra: { memo } }) =>
+  ({ known: { tokenProgramId }, extra: { feePayer, memo } }) =>
     Effect.fnUntraced(
       function* ({ physical, accepted }) {
         const signer = yield* SolanaSigner
@@ -65,30 +72,31 @@ export const layer = SolanaScheme.layer(
           concurrency: "unbounded",
         })
 
+        const transferIx = getTransferCheckedInstruction(
+          {
+            source: sourceAta,
+            mint,
+            destination: destAta,
+            authority: signer,
+            amount: BigInt(accepted.amount),
+            decimals: physical.decimals,
+          },
+          { programAddress: tokenProgram },
+        )
+        const memoIx = {
+          programAddress: MEMO_PROGRAM_ADDRESS,
+          accounts: [] as const,
+          data: new TextEncoder().encode(memo ?? Encoding.encodeHex(Random.bytes(16))),
+        }
+
         const message = solanaPipe(
           createTransactionMessage({ version: 0 }),
-          (v) => setTransactionMessageFeePayer(signer.address, v),
-          (v) => setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, v),
+          (v) => setTransactionMessageComputeUnitPrice(COMPUTE_UNIT_PRICE_MICROLAMPORTS, v),
+          (v) => setTransactionMessageFeePayer(address(feePayer), v),
           (v) =>
-            appendTransactionMessageInstructions(
-              [
-                getSetComputeUnitLimitInstruction({ units: 20000 }),
-                getSetComputeUnitPriceInstruction({ microLamports: 1n }),
-                getTransferCheckedInstruction(
-                  {
-                    source: sourceAta,
-                    mint,
-                    destination: destAta,
-                    authority: signer,
-                    amount: BigInt(accepted.amount),
-                    decimals: physical.decimals,
-                  },
-                  { programAddress: tokenProgram },
-                ),
-                getAddMemoInstruction({ memo: memo ?? Encoding.encodeHex(Random.bytes(16)) }),
-              ],
-              v,
-            ),
+            prependTransactionMessageInstruction(getSetComputeUnitLimitInstruction({ units: COMPUTE_UNIT_LIMIT }), v),
+          (v) => appendTransactionMessageInstructions([transferIx, memoIx], v),
+          (v) => setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, v),
         )
 
         const transaction = yield* Effect.promise(() => partiallySignTransactionMessageWithSigners(message)).pipe(

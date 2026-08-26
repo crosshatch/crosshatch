@@ -48,9 +48,6 @@ catalogs:
     '@solana-program/compute-budget':
       specifier: ^0.16.0
       version: 0.16.0
-    '@solana-program/memo':
-      specifier: ^0.11.2
-      version: 0.11.2
     '@solana-program/token':
       specifier: ^0.14.0
       version: 0.14.0
@@ -302,9 +299,6 @@ importers:
       '@solana-program/compute-budget':
         specifier: 'catalog:'
         version: 0.16.0(@solana/kit@6.10.0(typescript@7.0.2))
-      '@solana-program/memo':
-        specifier: 'catalog:'
-        version: 0.11.2(@solana/kit@6.10.0(typescript@7.0.2))
       '@solana-program/token':
         specifier: 'catalog:'
         version: 0.14.0(@solana/kit@6.10.0(typescript@7.0.2))
@@ -2661,11 +2655,6 @@ packages:
   '@solana-program/compute-budget@0.16.0':
     resolution: {integrity: sha512-tNBH2AK163yLh+rMn64z1vEKKHsMmrc+UM5dHsWzy5DVnfKRIbdG54RPA1LWgjssch3RF88EXa82iPnkLZjtgw==}
     engines: {node: '>=24.0.0'}
-    peerDependencies:
-      '@solana/kit': ^6.4.0
-
-  '@solana-program/memo@0.11.2':
-    resolution: {integrity: sha512-W32j3JAibRDG7s17NJpMwhDWkHlfltW8guWmWylB9wsszboOHkT372iI+th7BmhzOmuCqRZQWCNS5yUVZvUTOQ==}
     peerDependencies:
       '@solana/kit': ^6.4.0
 
@@ -9205,10 +9194,6 @@ snapshots:
       tslib: 2.8.1
 
   '@solana-program/compute-budget@0.16.0(@solana/kit@6.10.0(typescript@7.0.2))':
-    dependencies:
-      '@solana/kit': 6.10.0(typescript@7.0.2)
-
-  '@solana-program/memo@0.11.2(@solana/kit@6.10.0(typescript@7.0.2))':
     dependencies:
       '@solana/kit': 6.10.0(typescript@7.0.2)
 
