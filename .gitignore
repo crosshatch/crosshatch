@@ -2,9 +2,8 @@
 .DS_Store
 .alchemy
 .dev.vars
-.direnv/
 .env*
-!.envrc
+.planning
 .tanstack
 .turbo/
 dist/
