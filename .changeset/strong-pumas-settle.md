@@ -1,6 +1,6 @@
 ---
-"@crosshatch/util": minor
-"crosshatch": minor
+"@crosshatch/util": patch
+"crosshatch": patch
 ---
 
 Add structured extension envelopes, align facilitator API schemas with x402
