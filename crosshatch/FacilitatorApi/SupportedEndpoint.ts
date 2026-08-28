@@ -1,6 +1,6 @@
 import { JsonRecord } from "@crosshatch/util"
 import { Schema as S, String } from "effect"
-import { HttpApiEndpoint, HttpApiError, OpenApi } from "effect/unstable/httpapi"
+import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 
 import { ChainId } from "../ChainId.ts"
 import { Version } from "../Version.ts"
@@ -24,7 +24,6 @@ export const SupportedResponseJsonString = S.fromJsonString(SupportedResponseJso
 
 export class SupportedEndpoint extends HttpApiEndpoint.get("supported", "/supported", {
   success: SupportedResponse,
-  error: HttpApiError.ServiceUnavailable,
 }).annotate(
   OpenApi.Description,
   String.stripMargin(`

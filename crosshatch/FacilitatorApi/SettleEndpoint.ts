@@ -1,6 +1,6 @@
 import { JsonRecord } from "@crosshatch/util"
 import { Schema as S, String, Tuple } from "effect"
-import { HttpApiEndpoint, HttpApiError, OpenApi } from "effect/unstable/httpapi"
+import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 
 import { Address } from "../Address.ts"
 import * as Amount from "../Amount.ts"
@@ -48,7 +48,6 @@ export const SettleResponseFromBase64JsonString = S.StringFromBase64.pipe(S.deco
 export class SettleEndpoint extends HttpApiEndpoint.post("settle", "/settle", {
   payload: SettlePayload,
   success: SettleResponse,
-  error: HttpApiError.ServiceUnavailable,
 }).annotate(
   OpenApi.Description,
   String.stripMargin(`

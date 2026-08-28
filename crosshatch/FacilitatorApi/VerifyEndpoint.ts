@@ -1,6 +1,6 @@
 import { JsonRecord } from "@crosshatch/util"
 import { Schema as S, String, Tuple } from "effect"
-import { HttpApiEndpoint, HttpApiError, OpenApi } from "effect/unstable/httpapi"
+import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 
 import { Address } from "../Address.ts"
 import { Payload } from "../Payload.ts"
@@ -40,7 +40,6 @@ export const VerifyResponseJsonString = S.fromJsonString(VerifyResponseJson)
 export class VerifyEndpoint extends HttpApiEndpoint.post("verify", "/verify", {
   payload: VerifyPayload,
   success: VerifyResponse,
-  error: HttpApiError.ServiceUnavailable,
 }).annotate(
   OpenApi.Description,
   String.stripMargin(`
