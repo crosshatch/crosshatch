@@ -7,14 +7,14 @@ import type { SchemePayload } from "./Scheme.ts"
 
 const TypeId = "~crosshatch/Extension" as const
 
-export type Envelope = typeof Envelope.Type
-export const Envelope = S.Struct({
-  info: S.Json,
-  schema: S.Json,
-})
-
-export type Envelopes = typeof Envelopes.Type
-export const Envelopes = S.Record(S.String, Envelope)
+export type ExtensionEnvelopes = typeof ExtensionEnvelopes.Type
+export const ExtensionEnvelopes = S.Record(
+  S.String,
+  S.Struct({
+    info: S.Json,
+    schema: S.Json,
+  }),
+)
 
 export type Service<Enrichment extends S.Top> = Enrichment["Type"] | undefined
 
@@ -35,8 +35,6 @@ export interface Extension<
 
   readonly enrichment: Enrichment
 
-  readonly schema: S.JsonObject
-
   readonly decodeRequired: (required: Required) => Effect.Effect<Info["Type"], S.SchemaError, Info["DecodingServices"]>
 
   readonly decodePayload: (
@@ -55,7 +53,7 @@ export declare namespace Extension {
   export type Any = Extension<any, string, string, Info, Enrichment<Info>>
 }
 
-const envelopeInfo = (extensions: Envelopes | undefined, identifier: string) => extensions?.[identifier]?.info
+const envelopeInfo = (v: ExtensionEnvelopes | undefined, identifier: string) => v?.[identifier]?.info
 
 export const Service =
   <Self>() =>
@@ -70,7 +68,6 @@ export const Service =
       readonly identifier: Identifier
       readonly info: Info
       readonly enrichment: Enrichment
-      readonly schema: S.JsonObject
     },
   ): Extension<Self, Id, Identifier, Info, Enrichment> => {
     const tag = Context.Service<Self, Service<Enrichment>>()(id)

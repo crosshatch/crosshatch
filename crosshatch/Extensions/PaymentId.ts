@@ -11,26 +11,8 @@ export const random = () => PaymentId.make(crypto.randomUUID(), { disableChecks:
 
 const identifier = "payment-identifier" as const
 
-const schema = {
-  $schema: "https://json-schema.org/draft/2020-12/schema",
-  type: "object",
-  properties: {
-    required: {
-      type: "boolean",
-    },
-    id: {
-      type: "string",
-      minLength: 16,
-      maxLength: 128,
-      pattern: "^[a-zA-Z0-9_-]+$",
-    },
-  },
-  required: ["required"],
-}
-
 export class FromMerchant extends Extension.Service<FromMerchant>()("crosshatch/FromMerchant", {
   identifier,
-  schema,
   info: S.Struct({
     required: S.tag(true),
     id: PaymentId,
@@ -43,7 +25,6 @@ export class FromMerchant extends Extension.Service<FromMerchant>()("crosshatch/
 
 export class FromClient extends Extension.Service<FromClient>()("crosshatch/FromClient", {
   identifier,
-  schema,
   info: S.Struct({
     required: S.tag(true),
   }),
@@ -55,7 +36,6 @@ export class FromClient extends Extension.Service<FromClient>()("crosshatch/From
 
 export class FromEither extends Extension.Service<FromEither>()("crosshatch/FromEither", {
   identifier,
-  schema,
   info: S.Struct({
     required: S.tag(true),
     id: PaymentId.pipe(S.optional),
