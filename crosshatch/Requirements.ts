@@ -10,7 +10,7 @@ export const Requirements = S.Struct({
   amount: Amount.Atomic,
   asset: Asset,
   extra: S.Record(S.String, S.Unknown).pipe(S.optional),
-  maxTimeoutSeconds: S.Finite.check(S.isGreaterThan(0)),
+  maxTimeoutSeconds: S.Int.check(S.isGreaterThan(0)),
   network: ChainId,
   payTo: Address,
   scheme: S.Literals(["exact", "upto"]),

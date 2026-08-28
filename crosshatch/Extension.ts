@@ -7,6 +7,15 @@ import type { SchemePayload } from "./Scheme.ts"
 
 const TypeId = "~crosshatch/Extension" as const
 
+export type ExtensionEnvelopes = typeof ExtensionEnvelopes.Type
+export const ExtensionEnvelopes = S.Record(
+  S.String,
+  S.Struct({
+    info: S.Json,
+    schema: S.Json,
+  }),
+)
+
 export type Service<Enrichment extends S.Top> = Enrichment["Type"] | undefined
 
 export interface Extension<
@@ -44,6 +53,8 @@ export declare namespace Extension {
   export type Any = Extension<any, string, string, Info, Enrichment<Info>>
 }
 
+const envelopeInfo = (v: ExtensionEnvelopes | undefined, identifier: string) => v?.[identifier]?.info
+
 export const Service =
   <Self>() =>
   <
@@ -63,10 +74,10 @@ export const Service =
     const { identifier, info, enrichment } = definition
 
     const decodeRequired = (required: Required) =>
-      S.decodeUnknownEffect(S.toCodecJson(info))(required.extensions?.[identifier])
+      S.decodeUnknownEffect(S.toCodecJson(info))(envelopeInfo(required.extensions, identifier))
 
-    const decodePayload = (required: Payload) =>
-      S.decodeUnknownEffect(S.toCodecJson(enrichment))(required.extensions?.[identifier])
+    const decodePayload = (payload: Payload) =>
+      S.decodeUnknownEffect(S.toCodecJson(enrichment))(envelopeInfo(payload.extensions, identifier))
 
     return Object.assign(tag, {
       [TypeId]: TypeId,
@@ -89,9 +100,9 @@ export const layerFromPayload = <
   Layer.effect(
     extension,
     Effect.gen(function* () {
-      const entry = payload?.extensions?.[extension.identifier]
-      if (entry) {
-        return yield* S.decodeEffect(S.toCodecJson(extension.enrichment))(entry)
+      const info = envelopeInfo(payload?.extensions, extension.identifier)
+      if (info) {
+        return yield* S.decodeEffect(S.toCodecJson(extension.enrichment))(info)
       }
       return
     }),

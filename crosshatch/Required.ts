@@ -1,7 +1,7 @@
-import { JsonRecord, stringRaw } from "@crosshatch/util"
+import { stringRaw } from "@crosshatch/util"
 import { Schema as S, Effect, Context } from "effect"
 
-import type { Extension } from "./Extension.ts"
+import { type Extension, ExtensionEnvelopes } from "./Extension.ts"
 import { Requirements, type RequirementsLike } from "./Requirements.ts"
 import { ResourceInfo } from "./ResourceInfo.ts"
 import { Version } from "./Version.ts"
@@ -12,7 +12,7 @@ export const Required = S.Struct({
   resource: ResourceInfo,
   accepts: S.Array(Requirements),
   error: S.String.pipe(S.optional),
-  extensions: JsonRecord.pipe(S.optional),
+  extensions: ExtensionEnvelopes.pipe(S.optional),
 })
 
 export const RequiredJson = S.toCodecJson(Required)
@@ -72,11 +72,18 @@ export const extend =
     Effect.flatMap(
       effect,
       Effect.fnUntraced(function* ({ extensions, ...rest }) {
+        const envelope = yield* Effect.all(
+          {
+            schema: S.encodeUnknownEffect(S.Json)(S.toJsonSchemaDocument(extension.info)),
+            info: S.encodeEffect(S.toCodecJson(extension.info))(payload),
+          },
+          { concurrency: "unbounded" },
+        )
         return {
           ...rest,
           extensions: {
             ...extensions,
-            [extension.identifier]: yield* S.encodeEffect(S.toCodecJson(extension.info))(payload),
+            [extension.identifier]: envelope,
           },
         }
       }),

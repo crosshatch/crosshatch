@@ -106,8 +106,8 @@ const paymentIdHandler = Extension.layerHandler(
 
 Provide the handler alongside `Payer.layerLocal`. When the local payer creates a
 payload, it reads `required.extensions`, decodes any extension requests that
-have registered handlers, and stores each handler's enrichment in
-`payload.extensions`.
+have registered handlers, and stores each handler's enrichment in the payload
+envelope's `info`, echoing the merchant's `schema`.
 
 Provide the handler as part of your payer layer, alongside asset selection and
 the signing schemes your client supports.
@@ -131,9 +131,10 @@ const layerExtensionFromPayload = Extension.layerFromPayload(
 )
 ```
 
-At the wire-envelope level, extension maps are JSON records keyed by extension
-identifier. Each extension's `info` and `enrichment` schemas supply type safety
-when creating requirements, invoking handlers, and decoding payloads.
+On the wire, each map value is an x402 envelope `{ info, schema }` keyed by
+extension identifier. Crosshatch's `info` and `enrichment` schemas type the
+`info` object on `Required` and `Payload` respectively; `schema` is the JSON
+Schema the merchant advertised.
 
 ## Example: Payment Identifiers
 
@@ -159,6 +160,6 @@ Crosshatch ships three variants of the built-in `payment-identifier` extension:
 - `PaymentId.FromMerchant`: the merchant supplies the id in the requirement and
   the payer includes the same id in its enrichment.
 - `PaymentId.FromClient`: the merchant requests a client-generated id. The
-  payload enrichment may omit it.
+  payload enrichment must include it.
 - `PaymentId.FromEither`: the merchant may supply an id, but the final payload
   must contain one.

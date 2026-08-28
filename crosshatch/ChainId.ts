@@ -4,4 +4,5 @@ import { Namespace } from "./Namespace.ts"
 import { Reference } from "./Reference.ts"
 
 /** Encoded CAIP-2 chain id — `namespace:reference`. */
+export type ChainId = typeof ChainId.Type
 export const ChainId = S.TemplateLiteral([Namespace, ":", Reference]).pipe(S.brand("crosshatch/ChainId"))

@@ -6,9 +6,6 @@ const toJsonStringCodec = flow(S.toCodecJson, S.fromJsonString)
 export const encodeJsonString = flow(toJsonStringCodec, S.encodeEffect)
 export const decodeJsonString = flow(toJsonStringCodec, S.decodeUnknownEffect)
 
-export type JsonRecord = typeof JsonRecord.Type
-export const JsonRecord = S.Record(S.String, S.Json)
-
 interface TagLiteral extends Struct.Lambda {
   (member: S.TaggedStruct<string, S.Struct.Fields>): string
   readonly "~lambda.out": this["~lambda.in"] extends {
@@ -19,3 +16,6 @@ interface TagLiteral extends Struct.Lambda {
 }
 
 export const getLiterals = Tuple.map(Struct.lambda<TagLiteral>((m) => m.fields._tag.schema.literal))
+
+/** Printable ASCII (U+0020–U+007E), 1–32 characters. */
+export const PrintableAscii32 = S.String.check(S.isLengthBetween(1, 32), S.isPattern(/^[\u0020-\u007E]+$/u))

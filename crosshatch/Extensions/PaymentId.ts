@@ -30,7 +30,7 @@ export class FromClient extends Extension.Service<FromClient>()("crosshatch/From
   }),
   enrichment: S.Struct({
     required: S.tag(true),
-    id: PaymentId.pipe(S.optional),
+    id: PaymentId,
   }),
 }) {}
 

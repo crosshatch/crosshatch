@@ -1,6 +1,8 @@
 import { Config, Context, Effect, Layer, Schema as S, Option } from "effect"
 import { HttpApiClient } from "effect/unstable/httpapi"
 
+import { Address } from "./Address.ts"
+import { ChainId } from "./ChainId.ts"
 import { type FacilitatorApiGroup, FacilitatorApi } from "./FacilitatorApi/index.ts"
 import type { Payload } from "./Payload.ts"
 
@@ -36,13 +38,15 @@ export const layer = (config?: { readonly baseUrl?: string | undefined }) =>
 export class VerificationError extends S.TaggedError<VerificationError>()("VerificationError", {
   invalidReason: S.String.pipe(S.optional),
   invalidMessage: S.String.pipe(S.optional),
+  payer: Address.pipe(S.optional),
 }) {}
 
 export const verify = Effect.fnUntraced(function* ({ payload }: { readonly payload: Payload }) {
   const facilitator = yield* Facilitator
-  const { accepted: paymentRequirements } = payload
+  const { accepted: paymentRequirements, x402Version } = payload
   const response = yield* facilitator.verify({
     payload: {
+      x402Version,
       paymentPayload: payload,
       paymentRequirements,
     },
@@ -56,13 +60,17 @@ export const verify = Effect.fnUntraced(function* ({ payload }: { readonly paylo
 export class SettlementError extends S.TaggedError<SettlementError>()("SettlementError", {
   errorReason: S.String.pipe(S.optional),
   errorMessage: S.String.pipe(S.optional),
+  payer: Address.pipe(S.optional),
+  transaction: S.String,
+  network: ChainId,
 }) {}
 
 export const settle = Effect.fnUntraced(function* ({ payload }: { readonly payload: Payload }) {
   const facilitator = yield* Facilitator
-  const { accepted: paymentRequirements } = payload
+  const { accepted: paymentRequirements, x402Version } = payload
   const response = yield* facilitator.settle({
     payload: {
+      x402Version,
       paymentPayload: payload,
       paymentRequirements,
     },
