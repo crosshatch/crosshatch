@@ -35,15 +35,6 @@ export class ClientReference extends Extension.Service<ClientReference>()(
   "example/ClientReference",
   {
     identifier: "client-reference",
-    schema: {
-      $schema: "https://json-schema.org/draft/2020-12/schema",
-      type: "object",
-      properties: {
-        required: { type: "boolean" },
-        id: { type: "string" },
-      },
-      required: ["required"],
-    },
     info: S.Struct({
       required: S.tag(true),
     }),
