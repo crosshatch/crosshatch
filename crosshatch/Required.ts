@@ -72,15 +72,18 @@ export const extend =
     Effect.flatMap(
       effect,
       Effect.fnUntraced(function* ({ extensions, ...rest }) {
-        const schema = yield* S.encodeUnknownEffect(S.Json)(S.toJsonSchemaDocument(extension.info))
+        const envelope = yield* Effect.all(
+          {
+            schema: S.encodeUnknownEffect(S.Json)(S.toJsonSchemaDocument(extension.info)),
+            info: S.encodeEffect(S.toCodecJson(extension.info))(payload),
+          },
+          { concurrency: "unbounded" },
+        )
         return {
           ...rest,
           extensions: {
             ...extensions,
-            [extension.identifier]: {
-              info: yield* S.encodeEffect(S.toCodecJson(extension.info))(payload),
-              schema,
-            },
+            [extension.identifier]: envelope,
           },
         }
       }),
