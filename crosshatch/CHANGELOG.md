@@ -1,5 +1,21 @@
 # crosshatch
 
+## 0.0.18
+
+### Patch Changes
+
+- [#170](https://github.com/crosshatch/crosshatch/pull/170)
+  [`7c64c39`](https://github.com/crosshatch/crosshatch/commit/7c64c397c21c87f5bc485da872dec1807fe0f646) -
+  Add structured extension envelopes, align facilitator API schemas with x402
+  responses, and fix Solana transaction construction.
+
+  Add the `PrintableAscii32` schema and remove the `JsonRecord` schema from
+  `@crosshatch/util`.
+
+- Updated dependencies
+  [[`7c64c39`](https://github.com/crosshatch/crosshatch/commit/7c64c397c21c87f5bc485da872dec1807fe0f646)]:
+  - @crosshatch/util@0.0.5
+
 ## 0.0.17
 
 ### Patch Changes
