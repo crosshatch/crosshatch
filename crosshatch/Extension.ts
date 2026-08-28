@@ -1,4 +1,3 @@
-import { JsonRecord } from "@crosshatch/util"
 import { Schema as S, Context, Layer, Effect, type Scope, flow } from "effect"
 
 import type { Payload } from "./Payload.ts"
@@ -10,8 +9,8 @@ const TypeId = "~crosshatch/Extension" as const
 
 export type Envelope = typeof Envelope.Type
 export const Envelope = S.Struct({
-  info: JsonRecord,
-  schema: JsonRecord,
+  info: S.Json,
+  schema: S.Json,
 })
 
 export type Envelopes = typeof Envelopes.Type
@@ -36,7 +35,7 @@ export interface Extension<
 
   readonly enrichment: Enrichment
 
-  readonly schema: JsonRecord
+  readonly schema: S.JsonObject
 
   readonly decodeRequired: (required: Required) => Effect.Effect<Info["Type"], S.SchemaError, Info["DecodingServices"]>
 
@@ -58,12 +57,6 @@ export declare namespace Extension {
 
 const envelopeInfo = (extensions: Envelopes | undefined, identifier: string) => extensions?.[identifier]?.info
 
-export const encodeJsonRecord = <A extends S.Top>(schema: A) =>
-  Effect.fnUntraced(function* (value: A["Type"]) {
-    const json = yield* S.encodeEffect(S.toCodecJson(schema))(value)
-    return yield* S.decodeUnknownEffect(JsonRecord)(json)
-  })
-
 export const Service =
   <Self>() =>
   <
@@ -77,7 +70,7 @@ export const Service =
       readonly identifier: Identifier
       readonly info: Info
       readonly enrichment: Enrichment
-      readonly schema: JsonRecord
+      readonly schema: S.JsonObject
     },
   ): Extension<Self, Id, Identifier, Info, Enrichment> => {
     const tag = Context.Service<Self, Service<Enrichment>>()(id)

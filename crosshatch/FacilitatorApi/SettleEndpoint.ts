@@ -1,9 +1,8 @@
-import { JsonRecord } from "@crosshatch/util"
 import { Schema as S, String, Tuple } from "effect"
 import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 
 import { Address } from "../Address.ts"
-import * as Amount from "../Amount.ts"
+import { Atomic } from "../Amount.ts"
 import { ChainId } from "../ChainId.ts"
 import { Payload } from "../Payload.ts"
 import { Requirements } from "../Requirements.ts"
@@ -35,9 +34,9 @@ export const SettleResponse = S.Union([
 ]).mapMembers(
   Tuple.map(
     S.fieldsAssign({
-      amount: Amount.Atomic.pipe(S.optional),
-      extra: JsonRecord.pipe(S.optional),
-      extensions: JsonRecord.pipe(S.optional),
+      amount: Atomic.pipe(S.optional),
+      extra: S.JsonObject.pipe(S.optional),
+      extensions: S.JsonObject.pipe(S.optional),
     }),
   ),
 )

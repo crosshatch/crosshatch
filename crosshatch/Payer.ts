@@ -2,7 +2,7 @@ import { Array, Schema as S, Context, Effect, Layer, Record, flow } from "effect
 
 import type { Accept, AcceptError } from "./Accept.ts"
 import * as Bridge from "./Bridge.ts"
-import { encodeJsonRecord, ExtensionRegistry } from "./Extension.ts"
+import { ExtensionRegistry } from "./Extension.ts"
 import type { Payload } from "./Payload.ts"
 import type { Required } from "./Required.ts"
 import { CreatePayloadError } from "./Scheme.ts"
@@ -40,7 +40,7 @@ export const layerLocal = (accept: Accept) =>
                 const [{ info: Info, enrichment: Enrichment }, f] = extension
                 const info = yield* S.decodeEffect(S.toCodecJson(Info))(envelope.info)
                 const enrichment = yield* f({ accepted, info, payload, required }).pipe(
-                  Effect.flatMap(encodeJsonRecord(Enrichment)),
+                  Effect.flatMap(S.encodeEffect(S.toCodecJson(Enrichment))),
                 )
                 return [identifier, { info: enrichment, schema: envelope.schema }] as const
               },

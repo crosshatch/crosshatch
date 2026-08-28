@@ -1,7 +1,7 @@
 import { stringRaw } from "@crosshatch/util"
 import { Schema as S, Effect, Context } from "effect"
 
-import { type Extension, Envelopes, encodeJsonRecord } from "./Extension.ts"
+import { type Extension, Envelopes } from "./Extension.ts"
 import { Requirements, type RequirementsLike } from "./Requirements.ts"
 import { ResourceInfo } from "./ResourceInfo.ts"
 import { Version } from "./Version.ts"
@@ -77,7 +77,7 @@ export const extend =
           extensions: {
             ...extensions,
             [extension.identifier]: {
-              info: yield* encodeJsonRecord(extension.info)(payload),
+              info: yield* S.encodeEffect(S.toCodecJson(extension.info))(payload),
               schema: extension.schema,
             },
           },

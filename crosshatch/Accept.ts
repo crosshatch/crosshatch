@@ -13,7 +13,7 @@ export interface AcceptedConfig {
 export interface Accepted {
   readonly accepted: Requirements
   readonly acceptedI: number
-  readonly chainId: typeof ChainId.Type
+  readonly chainId: ChainId
   readonly physical: PhysicalAsset
   readonly adapt: Adapt<never>
 }

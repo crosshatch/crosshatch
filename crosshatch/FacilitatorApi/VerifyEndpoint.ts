@@ -1,4 +1,3 @@
-import { JsonRecord } from "@crosshatch/util"
 import { Schema as S, String, Tuple } from "effect"
 import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 
@@ -29,8 +28,8 @@ export const VerifyResponse = S.Union([
 ]).mapMembers(
   Tuple.map(
     S.fieldsAssign({
-      extra: JsonRecord.pipe(S.optional),
-      extensions: JsonRecord.pipe(S.optional),
+      extra: S.JsonObject.pipe(S.optional),
+      extensions: S.JsonObject.pipe(S.optional),
     }),
   ),
 )

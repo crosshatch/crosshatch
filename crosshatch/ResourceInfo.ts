@@ -1,7 +1,5 @@
+import { PrintableAscii32 } from "@crosshatch/util"
 import { Schema as S } from "effect"
-
-/** Printable ASCII (U+0020–U+007E), 1–32 characters. */
-const PrintableAscii32 = S.String.check(S.isLengthBetween(1, 32), S.isPattern(/^[\u0020-\u007E]+$/u))
 
 export type ResourceInfo = typeof ResourceInfo.Type
 export const ResourceInfo = S.Struct({
