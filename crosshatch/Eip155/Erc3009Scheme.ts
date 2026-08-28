@@ -7,7 +7,7 @@ import { Eip155Signer } from "./Eip155Signer.ts"
 
 export type Extra = typeof Extra.Type
 export const Extra = S.Struct({
-  assetTransferMethod: S.Never.pipe(S.optional),
+  assetTransferMethod: S.Literal("eip3009").pipe(S.optional),
   name: S.String,
   version: S.String,
 })

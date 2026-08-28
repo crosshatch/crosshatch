@@ -1,6 +1,6 @@
 import { JsonRecord } from "@crosshatch/util"
 import { Schema as S, String } from "effect"
-import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
+import { HttpApiEndpoint, HttpApiError, OpenApi } from "effect/unstable/httpapi"
 
 import { ChainId } from "../ChainId.ts"
 import { Version } from "../Version.ts"
@@ -22,12 +22,13 @@ export const SupportedResponse = S.Struct({
 export const SupportedResponseJson = S.toCodecJson(SupportedResponse)
 export const SupportedResponseJsonString = S.fromJsonString(SupportedResponseJson)
 
-export const SupportedEndpoint = HttpApiEndpoint.get("supported", "/supported", {
+export class SupportedEndpoint extends HttpApiEndpoint.get("supported", "/supported", {
   success: SupportedResponse,
+  error: HttpApiError.ServiceUnavailable,
 }).annotate(
   OpenApi.Description,
   String.stripMargin(`
   | Returns the list of payment schemes, networks, and extensions supported by this facilitator,
   | along with signer addresses keyed by CAIP-2 network family patterns.
   `),
-)
+) {}

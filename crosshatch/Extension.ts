@@ -1,3 +1,4 @@
+import { JsonRecord } from "@crosshatch/util"
 import { Schema as S, Context, Layer, Effect, type Scope, flow } from "effect"
 
 import type { Payload } from "./Payload.ts"
@@ -6,6 +7,15 @@ import type { Requirements } from "./Requirements.ts"
 import type { SchemePayload } from "./Scheme.ts"
 
 const TypeId = "~crosshatch/Extension" as const
+
+export type Envelope = typeof Envelope.Type
+export const Envelope = S.Struct({
+  info: JsonRecord,
+  schema: JsonRecord,
+})
+
+export type Envelopes = typeof Envelopes.Type
+export const Envelopes = S.Record(S.String, Envelope)
 
 export type Service<Enrichment extends S.Top> = Enrichment["Type"] | undefined
 
@@ -26,6 +36,8 @@ export interface Extension<
 
   readonly enrichment: Enrichment
 
+  readonly schema: JsonRecord
+
   readonly decodeRequired: (required: Required) => Effect.Effect<Info["Type"], S.SchemaError, Info["DecodingServices"]>
 
   readonly decodePayload: (
@@ -44,6 +56,14 @@ export declare namespace Extension {
   export type Any = Extension<any, string, string, Info, Enrichment<Info>>
 }
 
+const envelopeInfo = (extensions: Envelopes | undefined, identifier: string) => extensions?.[identifier]?.info
+
+export const encodeJsonRecord = <A extends S.Top>(schema: A) =>
+  Effect.fnUntraced(function* (value: A["Type"]) {
+    const json = yield* S.encodeEffect(S.toCodecJson(schema))(value)
+    return yield* S.decodeUnknownEffect(JsonRecord)(json)
+  })
+
 export const Service =
   <Self>() =>
   <
@@ -57,16 +77,17 @@ export const Service =
       readonly identifier: Identifier
       readonly info: Info
       readonly enrichment: Enrichment
+      readonly schema: JsonRecord
     },
   ): Extension<Self, Id, Identifier, Info, Enrichment> => {
     const tag = Context.Service<Self, Service<Enrichment>>()(id)
     const { identifier, info, enrichment } = definition
 
     const decodeRequired = (required: Required) =>
-      S.decodeUnknownEffect(S.toCodecJson(info))(required.extensions?.[identifier])
+      S.decodeUnknownEffect(S.toCodecJson(info))(envelopeInfo(required.extensions, identifier))
 
-    const decodePayload = (required: Payload) =>
-      S.decodeUnknownEffect(S.toCodecJson(enrichment))(required.extensions?.[identifier])
+    const decodePayload = (payload: Payload) =>
+      S.decodeUnknownEffect(S.toCodecJson(enrichment))(envelopeInfo(payload.extensions, identifier))
 
     return Object.assign(tag, {
       [TypeId]: TypeId,
@@ -89,9 +110,9 @@ export const layerFromPayload = <
   Layer.effect(
     extension,
     Effect.gen(function* () {
-      const entry = payload?.extensions?.[extension.identifier]
-      if (entry) {
-        return yield* S.decodeEffect(S.toCodecJson(extension.enrichment))(entry)
+      const info = envelopeInfo(payload?.extensions, extension.identifier)
+      if (info) {
+        return yield* S.decodeEffect(S.toCodecJson(extension.enrichment))(info)
       }
       return
     }),

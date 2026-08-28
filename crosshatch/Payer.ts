@@ -2,7 +2,7 @@ import { Array, Schema as S, Context, Effect, Layer, Record, flow } from "effect
 
 import type { Accept, AcceptError } from "./Accept.ts"
 import * as Bridge from "./Bridge.ts"
-import { ExtensionRegistry } from "./Extension.ts"
+import { encodeJsonRecord, ExtensionRegistry } from "./Extension.ts"
 import type { Payload } from "./Payload.ts"
 import type { Required } from "./Required.ts"
 import { CreatePayloadError } from "./Scheme.ts"
@@ -27,22 +27,22 @@ export const layerLocal = (accept: Accept) =>
       return {
         createPayload: Effect.fnUntraced(function* ({ required }) {
           const { accepted, adapt } = yield* accept({ required }).pipe(Effect.provideContext(context))
-          const { extensions: infos = {} } = required
+          const { extensions: envelopes = {} } = required
           const payload = yield* adapt
           const extensions = yield* Effect.forEach(
-            Record.toEntries(infos),
+            Record.toEntries(envelopes),
             Effect.fnUntraced(
-              function* ([identifier, infoJson]) {
+              function* ([identifier, envelope]) {
                 const extension = registry.entries().find(([extension]) => extension.identifier === identifier)
                 if (!extension) {
                   return
                 }
                 const [{ info: Info, enrichment: Enrichment }, f] = extension
-                const info = yield* S.decodeEffect(S.toCodecJson(Info))(infoJson)
+                const info = yield* S.decodeEffect(S.toCodecJson(Info))(envelope.info)
                 const enrichment = yield* f({ accepted, info, payload, required }).pipe(
-                  Effect.flatMap(S.encodeEffect(S.toCodecJson(Enrichment))),
+                  Effect.flatMap(encodeJsonRecord(Enrichment)),
                 )
-                return [identifier, enrichment] as const
+                return [identifier, { info: enrichment, schema: envelope.schema }] as const
               },
               Effect.catchTags({
                 SchemaError: () => Effect.undefined,
