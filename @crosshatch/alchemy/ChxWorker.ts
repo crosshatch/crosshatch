@@ -16,6 +16,7 @@ export const config = Effect.fnUntraced(function* ({
   return {
     ...(yield* domain(domain_)),
     ...(main ? { main } : {}),
+    observability: { enabled: true },
     placement: { mode: "smart" },
     compatibility: {
       date: "2026-02-05",
