@@ -4,7 +4,7 @@ import * as Atomic from "./Atomic.ts"
 import * as Decimals from "./Decimals.ts"
 
 /**
- * A non-negative `BigDecimal` with a safe integer scale.
+ * A non-negative `BigDecimal` with a safe integer scale between -255 and 255.
  *
  * In-memory brand. On the wire use {@link AmountFromString} (canonical decimal
  * text) or {@link AmountFromAtomic} (unit-scaled integer string). JSON encoding of this
@@ -13,24 +13,29 @@ import * as Decimals from "./Decimals.ts"
  */
 export type Amount = typeof Amount.Type
 export const Amount = S.BigDecimal.check(
-  S.isGreaterThanOrEqualToBigDecimal(BigDecimal.fromBigInt(0n)),
-  S.makeFilter((v) => Number.isSafeInteger(v.scale), {
-    expected: "a BigDecimal with a safe integer scale",
+  S.makeFilter((v) => Number.isSafeInteger(v.scale) && Math.abs(v.scale) <= Decimals.MAX_DECIMALS, {
+    expected: `a BigDecimal with a safe integer scale between -${Decimals.MAX_DECIMALS} and ${Decimals.MAX_DECIMALS}`,
   }),
+  S.isGreaterThanOrEqualToBigDecimal(BigDecimal.fromBigInt(0n)),
 ).pipe(S.brand("crosshatch/Amount"))
 
 export type AmountInput = number | bigint | string | BigDecimal.BigDecimal
+export interface ParseOptions {
+  readonly reportInput?: boolean | undefined
+}
 
-export const fromBigDecimal = S.decodeEffect(Amount)
+const decodeAmount = S.decodeEffect(Amount)
 
-const fail = (input: unknown, expected: string, options?: SchemaAST.ParseOptions) =>
-  new S.SchemaError(new SchemaIssue.InvalidValue({ expected }, input, options))
+const toSchemaParseOptions = (options?: ParseOptions): SchemaAST.ParseOptions | undefined =>
+  options?.reportInput === undefined ? undefined : { reportInput: options.reportInput }
 
-const fromBigDecimalOption = (
-  input: unknown,
-  option: Option.Option<BigDecimal.BigDecimal>,
-  options?: SchemaAST.ParseOptions,
-) => {
+export const fromBigDecimal = (input: BigDecimal.BigDecimal, options?: ParseOptions) =>
+  decodeAmount(input, toSchemaParseOptions(options))
+
+const fail = (input: unknown, expected: string, options?: ParseOptions) =>
+  new S.SchemaError(new SchemaIssue.InvalidValue({ expected }, input, toSchemaParseOptions(options)))
+
+const fromBigDecimalOption = (input: unknown, option: Option.Option<BigDecimal.BigDecimal>, options?: ParseOptions) => {
   const decimal = Option.getOrUndefined(option)
   if (!decimal) {
     return fail(input, "an amount that can be parsed into a BigDecimal", options)
@@ -38,18 +43,18 @@ const fromBigDecimalOption = (
   return fromBigDecimal(decimal, options)
 }
 
-export const fromNumber = Effect.fnUntraced(function* (input: number, options?: SchemaAST.ParseOptions) {
+export const fromNumber = Effect.fnUntraced(function* (input: number, options?: ParseOptions) {
   if (!Number.isFinite(input)) return yield* fail(input, "a finite number", options)
   return yield* fromBigDecimalOption(input, BigDecimal.fromNumber(input), options)
 })
 
-export const fromString = Effect.fnUntraced(function* (input: string, options?: SchemaAST.ParseOptions) {
+export const fromString = Effect.fnUntraced(function* (input: string, options?: ParseOptions) {
   const trimmed = input.trim()
   if (trimmed === "") return yield* fail(input, "a non-empty amount string", options)
   return yield* fromBigDecimalOption(input, BigDecimal.fromString(trimmed), options)
 })
 
-export const fromBigInt = (input: bigint, options?: SchemaAST.ParseOptions) =>
+export const fromBigInt = (input: bigint, options?: ParseOptions) =>
   fromBigDecimal(BigDecimal.fromBigInt(input), options)
 
 /**
@@ -60,7 +65,7 @@ export const fromBigInt = (input: bigint, options?: SchemaAST.ParseOptions) =>
  * integers above `Number.MAX_SAFE_INTEGER` lose precision. Prefer `string` or
  * `bigint` for money.
  */
-export const from = (input: AmountInput, options?: SchemaAST.ParseOptions) =>
+export const from = (input: AmountInput, options?: ParseOptions) =>
   typeof input === "number"
     ? fromNumber(input, options)
     : typeof input === "bigint"
@@ -70,9 +75,13 @@ export const from = (input: AmountInput, options?: SchemaAST.ParseOptions) =>
         : fromBigDecimal(input, options)
 
 /** Converts {@link Atomic} units back to a nominal {@link Amount}, losslessly. */
-export const fromAtomic = Effect.fnUntraced(function* (atomic: Atomic.Atomic, decimals: number) {
+export const fromAtomic = Effect.fnUntraced(function* (
+  atomic: Atomic.Atomic,
+  decimals: number,
+  options?: ParseOptions,
+) {
   const decoded = yield* Decimals.decodeEffect(decimals)
-  return yield* fromBigDecimal(BigDecimal.make(BigInt(atomic), decoded))
+  return yield* fromBigDecimal(BigDecimal.make(BigInt(atomic), decoded), options)
 })
 
 /** Renders an {@link Amount} as a minimal decimal string, with trailing fractional zeros removed. */
@@ -90,23 +99,31 @@ export const toString = (amount: Amount) => {
 /**
  * Schema codec between {@link Atomic} strings and nominal {@link Amount}s for the given unit.
  *
- * Encode rounds with `config.rounding` (default `"ceil"`) when the amount is more precise than the unit,
- * so encode-then-decode is not identity for over-precise values.
+ * Encode truncates excess precision and rejects non-zero amounts smaller than
+ * one atomic unit, so encode-then-decode is not identity for over-precise values.
  */
-export const AmountFromAtomic = (config: Atomic.AtomicConfig) =>
+export const AmountFromAtomic = (decimals: number) =>
   Atomic.Atomic.pipe(
     S.decodeTo(Amount, {
-      decode: SchemaGetter.transformOrFail((v) => fromAtomic(v, config.decimals).pipe(Effect.mapError((e) => e.issue))),
+      decode: SchemaGetter.transformOrFail((v, options) =>
+        fromAtomic(v, decimals, options).pipe(Effect.mapError((e) => e.issue)),
+      ),
       encode: SchemaGetter.transformOrFail((v, options) =>
         fromBigDecimal(v, options).pipe(
-          Effect.flatMap((v) => Atomic.fromAmount(v, config)),
+          Effect.flatMap((v) => Atomic.fromAmount(v, decimals, options)),
           Effect.mapError((e) => e.issue),
         ),
       ),
     }),
   )
 
-/** Schema codec between decimal strings and {@link Amount}s. */
+/**
+ * Schema codec between decimal strings and {@link Amount}s.
+ *
+ * Decoding accepts supported `BigDecimal` syntax and surrounding whitespace.
+ * Encoding emits canonical plain decimal text without exponent notation or
+ * insignificant trailing zeros.
+ */
 export const AmountFromString = S.String.pipe(
   S.decodeTo(Amount, {
     decode: SchemaGetter.transformOrFail((v, options) => fromString(v, options).pipe(Effect.mapError((e) => e.issue))),

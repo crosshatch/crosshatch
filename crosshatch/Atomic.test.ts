@@ -5,19 +5,19 @@ import * as Amount from "./Amount.ts"
 import * as Atomic from "./Atomic.ts"
 
 const fromAmountCases = [
+  { amount: "4.02", decimals: 6, expected: "4020000" },
   { amount: 1, decimals: 6, expected: "1000000" },
   { amount: 1, decimals: 18, expected: `1${"0".repeat(18)}` },
   { amount: 0, decimals: 6, expected: "0" },
   { amount: "1e5", decimals: 6, expected: "100000000000" },
   { amount: 1, decimals: 0, expected: "1" },
-  { amount: "1.1", decimals: 0, expected: "2" },
-  { amount: "1.1", decimals: 0, rounding: "floor", expected: "1" },
-  { amount: "0.0000001", decimals: 6, expected: "1" },
-  { amount: "0.0000001", decimals: 6, rounding: "floor", expected: "0" },
-  { amount: "1.0000001", decimals: 6, expected: "1000001" },
+  { amount: "1.1", decimals: 0, expected: "1" },
+  { amount: "1.5", decimals: 0, expected: "1" },
+  { amount: "1.12345678", decimals: 7, expected: "11234567" },
+  { amount: "1.0000001", decimals: 6, expected: "1000000" },
   { amount: "1.000001", decimals: 6, expected: "1000001" },
-  { amount: "0.9999991", decimals: 6, expected: "1000000" },
-  { amount: "1.0000005", decimals: 6, rounding: "half-even", expected: "1000000" },
+  { amount: "0.9999991", decimals: 6, expected: "999999" },
+  { amount: "0.000001", decimals: 6, expected: "1" },
 ] as const
 
 describe(import.meta.url, () => {
@@ -34,18 +34,27 @@ describe(import.meta.url, () => {
 
   it.effect.each(fromAmountCases)(
     "converts $amount to $expected atomic units with $decimals decimals",
-    Effect.fn(function* ({ amount, decimals, expected, ...options }) {
-      assert.strictEqual<string>(
-        yield* Atomic.fromAmount(yield* Amount.from(amount), { decimals, ...options }),
-        expected,
-      )
+    Effect.fn(function* ({ amount, decimals, expected }) {
+      assert.strictEqual<string>(yield* Atomic.fromAmount(yield* Amount.from(amount), decimals), expected)
+    }),
+  )
+
+  it.effect(
+    "rejects non-zero amounts smaller than one atomic unit",
+    Effect.fn(function* () {
+      for (const amount of ["0.0000001", "0.00000001", "0.0000000001"] as const) {
+        const error = yield* Atomic.fromAmount(yield* Amount.from(amount), 6).pipe(Effect.flip)
+        assert.isTrue(S.isSchemaError(error))
+        assert.match(error.message, /representable with 6 decimal places/u)
+      }
+      assert.strictEqual(yield* Atomic.fromAmount(yield* Amount.from(0), 6), "0")
     }),
   )
 
   it.effect(
     "converts large values without assuming an asset limit",
     Effect.fn(function* () {
-      const atomic = yield* Atomic.fromAmount(yield* Amount.from(10n ** 200n), { decimals: 18 })
+      const atomic = yield* Atomic.fromAmount(yield* Amount.from(10n ** 200n), 18)
       assert.strictEqual(atomic, `1${"0".repeat(218)}`)
       assert.strictEqual(yield* S.decodeEffect(Atomic.Atomic)(atomic), atomic)
     }),

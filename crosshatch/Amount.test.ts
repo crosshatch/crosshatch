@@ -75,13 +75,20 @@ describe(import.meta.url, () => {
   )
 
   it.effect(
-    "rejects invalid BigDecimal scales",
+    "accepts bounded scales and rejects unsafe expansion",
     Effect.fn(function* () {
+      assertAmount(yield* Amount.from("1e255"), `1${"0".repeat(255)}`)
+      assertAmount(yield* Amount.from("1e-255"), `0.${"0".repeat(254)}1`)
       assert.match((yield* Amount.from(BigDecimal.make(15n, 1.5)).pipe(Effect.flip)).message, /safe integer scale/u)
       assert.match((yield* Amount.from(BigDecimal.make(15n, NaN)).pipe(Effect.flip)).message, /safe integer scale/u)
+      for (const input of ["1e256", "1e-256"] as const) {
+        assert.match((yield* Amount.from(input).pipe(Effect.flip)).message, /between -255 and 255/u)
+      }
+      for (const scale of [-256, 256, Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER + 1]) {
+        assert.match((yield* Amount.from(BigDecimal.make(15n, scale)).pipe(Effect.flip)).message, /safe integer scale/u)
+      }
       assert.match(
-        (yield* Effect.flip(BigDecimal.make(15n, Number.MAX_SAFE_INTEGER + 1).pipe(S.decodeEffect(Amount.Amount))))
-          .message,
+        (yield* Amount.from(BigDecimal.make(0n, Number.MAX_SAFE_INTEGER)).pipe(Effect.flip)).message,
         /safe integer scale/u,
       )
     }),
@@ -96,6 +103,8 @@ describe(import.meta.url, () => {
       assertAmount(yield* Amount.from(BigDecimal.fromStringUnsafe("2.5")), "2.5")
       const error = yield* Amount.from(-0.01).pipe(Effect.flip)
       assert.isTrue(S.isSchemaError(error))
+      const unsafeOptions = { disableChecks: true } as unknown as Amount.ParseOptions
+      assert.isTrue(S.isSchemaError(yield* Amount.from("-1", unsafeOptions).pipe(Effect.flip)))
       assert.strictEqual(Amount.toString(yield* Amount.from(0.1 + 0.2)), `${0.1 + 0.2}`)
       assert.strictEqual(
         Amount.toString(yield* Amount.from(Number.MAX_SAFE_INTEGER + 1)),
@@ -110,14 +119,12 @@ describe(import.meta.url, () => {
       const amount = yield* Amount.from(1)
       const atomic = Atomic.Atomic.make("1")
       for (const decimals of [-1, 1.5, NaN, Infinity, Decimals.MAX_DECIMALS + 1, Number.MAX_SAFE_INTEGER]) {
-        assert.isTrue(S.isSchemaError(yield* Effect.flip(Atomic.fromAmount(amount, { decimals }))))
+        assert.isTrue(S.isSchemaError(yield* Effect.flip(Atomic.fromAmount(amount, decimals))))
         assert.isTrue(S.isSchemaError(yield* Effect.flip(Amount.fromAtomic(atomic, decimals))))
         assert.isTrue(S.isSchemaError(yield* Effect.flip(Amount.display(amount, decimals))))
+        assert.isTrue(S.isSchemaError(yield* Effect.flip(S.decodeEffect(Amount.AmountFromAtomic(decimals))(atomic))))
         assert.isTrue(
-          S.isSchemaError(yield* Effect.flip(S.decodeEffect(Amount.AmountFromAtomic({ decimals }))(atomic))),
-        )
-        assert.isTrue(
-          S.isSchemaError(yield* Effect.flip(amount.pipe(S.encodeEffect(Amount.AmountFromAtomic({ decimals }))))),
+          S.isSchemaError(yield* Effect.flip(amount.pipe(S.encodeEffect(Amount.AmountFromAtomic(decimals))))),
         )
       }
     }),
@@ -136,29 +143,20 @@ describe(import.meta.url, () => {
       const amount = yield* Amount.from(1)
       const atomic = Atomic.Atomic.make("1")
 
-      assert.strictEqual(yield* Atomic.fromAmount(amount, { decimals: 0 }), "1")
+      assert.strictEqual(yield* Atomic.fromAmount(amount, 0), "1")
       assertAmount(yield* Amount.fromAtomic(atomic, 0), "1")
       assert.strictEqual(yield* Amount.display(amount, 0), "1")
-      assertAmount(yield* S.decodeEffect(Amount.AmountFromAtomic({ decimals: 0 }))(atomic), "1")
-      assert.strictEqual(yield* amount.pipe(S.encodeEffect(Amount.AmountFromAtomic({ decimals: 0 }))), "1")
-      assert.strictEqual(
-        yield* Atomic.fromAmount(yield* Amount.fromAtomic(Atomic.Atomic.make("0"), 0), { decimals: 0 }),
-        "0",
-      )
+      assertAmount(yield* S.decodeEffect(Amount.AmountFromAtomic(0))(atomic), "1")
+      assert.strictEqual(yield* amount.pipe(S.encodeEffect(Amount.AmountFromAtomic(0))), "1")
+      assert.strictEqual(yield* Atomic.fromAmount(yield* Amount.fromAtomic(Atomic.Atomic.make("0"), 0), 0), "0")
 
       const max = Decimals.MAX_DECIMALS
-      assert.strictEqual(yield* Atomic.fromAmount(amount, { decimals: max }), `1${"0".repeat(max)}`)
+      assert.strictEqual(yield* Atomic.fromAmount(amount, max), `1${"0".repeat(max)}`)
       assertAmount(yield* Amount.fromAtomic(atomic, max), `0.${"0".repeat(max - 1)}1`)
       assert.strictEqual(yield* Amount.display(amount, max), `1.${"0".repeat(max)}`)
-      assertAmount(
-        yield* S.decodeEffect(Amount.AmountFromAtomic({ decimals: max }))(atomic),
-        `0.${"0".repeat(max - 1)}1`,
-      )
-      assert.strictEqual(
-        yield* amount.pipe(S.encodeEffect(Amount.AmountFromAtomic({ decimals: max }))),
-        `1${"0".repeat(max)}`,
-      )
-      assert.strictEqual(yield* Atomic.fromAmount(yield* Amount.fromAtomic(atomic, max), { decimals: max }), "1")
+      assertAmount(yield* S.decodeEffect(Amount.AmountFromAtomic(max))(atomic), `0.${"0".repeat(max - 1)}1`)
+      assert.strictEqual(yield* amount.pipe(S.encodeEffect(Amount.AmountFromAtomic(max))), `1${"0".repeat(max)}`)
+      assert.strictEqual(yield* Atomic.fromAmount(yield* Amount.fromAtomic(atomic, max), max), "1")
     }),
   )
 
@@ -170,7 +168,7 @@ describe(import.meta.url, () => {
       assertAmount(yield* Amount.fromAtomic(Atomic.Atomic.make("1"), 18), "0.000000000000000001")
       const original = Atomic.Atomic.make(`1${"0".repeat(200)}1`)
       const nominal = yield* Amount.fromAtomic(original, 18)
-      assert.strictEqual(yield* Atomic.fromAmount(nominal, { decimals: 18 }), original)
+      assert.strictEqual(yield* Atomic.fromAmount(nominal, 18), original)
     }),
   )
 
@@ -178,21 +176,17 @@ describe(import.meta.url, () => {
     it.effect(
       "round-trips through the atomic schema codec",
       Effect.fn(function* () {
-        const codec = Amount.AmountFromAtomic({ decimals: 6 })
+        const codec = Amount.AmountFromAtomic(6)
         const decoded = yield* S.decodeEffect(codec)(Atomic.Atomic.make("1500000"))
         assertAmount(decoded, "1.5")
         assert.strictEqual(yield* S.encodeEffect(codec)(decoded), "1500000")
         assert.isTrue(S.isSchemaError(yield* Effect.flip(S.decodeEffect(codec)("01"))))
         const overPrecise = yield* Amount.from("1.0000001")
         const encoded = yield* S.encodeEffect(codec)(overPrecise)
-        assert.strictEqual(encoded, "1000001")
-        assertAmount(yield* S.decodeEffect(codec)(encoded), "1.000001")
-        const floorCodec = Amount.AmountFromAtomic({ decimals: 0, rounding: "floor" })
-        assert.strictEqual(yield* S.encodeEffect(floorCodec)(yield* Amount.from("1.1")), "1")
-        assert.strictEqual(
-          yield* S.encodeEffect(Amount.AmountFromAtomic({ decimals: 0 }))(yield* Amount.from("1.1")),
-          "2",
-        )
+        assert.strictEqual(encoded, "1000000")
+        assertAmount(yield* S.decodeEffect(codec)(encoded), "1")
+        assert.strictEqual(yield* S.encodeEffect(Amount.AmountFromAtomic(0))(yield* Amount.from("1.1")), "1")
+        assert.isTrue(S.isSchemaError(yield* S.encodeEffect(codec)(yield* Amount.from("0.0000001")).pipe(Effect.flip)))
       }),
     )
 
@@ -218,6 +212,20 @@ describe(import.meta.url, () => {
         const wei = yield* Amount.fromAtomic(Atomic.Atomic.make("1"), 18)
         assert.strictEqual(yield* S.encodeEffect(S.toCodecJson(Amount.Amount))(wei), "1e-18")
         assert.strictEqual(yield* S.encodeEffect(Amount.AmountFromString)(wei), "0.000000000000000001")
+      }),
+    )
+
+    it.effect(
+      "rejects forged amounts when encoding",
+      Effect.fn(function* () {
+        const forged = [
+          BigDecimal.fromStringUnsafe("-1") as Amount.Amount,
+          BigDecimal.make(1n, Decimals.MAX_DECIMALS + 1) as Amount.Amount,
+        ]
+        for (const amount of forged) {
+          assert.isTrue(S.isSchemaError(yield* S.encodeEffect(Amount.AmountFromAtomic(6))(amount).pipe(Effect.flip)))
+          assert.isTrue(S.isSchemaError(yield* S.encodeEffect(Amount.AmountFromString)(amount).pipe(Effect.flip)))
+        }
       }),
     )
   })
