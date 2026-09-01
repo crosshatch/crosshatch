@@ -2,6 +2,8 @@ import { assert, describe, it } from "@effect/vitest"
 import { BigDecimal, Effect, Schema as S } from "effect"
 
 import * as Amount from "./Amount.ts"
+import * as Atomic from "./Atomic.ts"
+import * as Decimals from "./Decimals.ts"
 
 const assertAmount = (actual: Amount.Amount, expected: string) =>
   assert.isTrue(
@@ -22,22 +24,6 @@ const parseCases = [
 
 const invalidInputs = ["", "-1", "not-a-number", "$1", -1, Infinity, NaN, -1n] as const
 
-const toAtomicCases = [
-  { amount: 1, decimals: 6, expected: "1000000" },
-  { amount: 1, decimals: 18, expected: `1${"0".repeat(18)}` },
-  { amount: 0, decimals: 6, expected: "0" },
-  { amount: "1e5", decimals: 6, expected: "100000000000" },
-  { amount: 1, decimals: 0, expected: "1" },
-  { amount: "1.1", decimals: 0, expected: "2" },
-  { amount: "1.1", decimals: 0, rounding: "floor", expected: "1" },
-  { amount: "0.0000001", decimals: 6, expected: "1" },
-  { amount: "0.0000001", decimals: 6, rounding: "floor", expected: "0" },
-  { amount: "1.0000001", decimals: 6, expected: "1000001" },
-  { amount: "1.000001", decimals: 6, expected: "1000001" },
-  { amount: "0.9999991", decimals: 6, expected: "1000000" },
-  { amount: "1.0000005", decimals: 6, rounding: "half-even", expected: "1000000" },
-] as const
-
 const displayCases = [
   { amount: 20, decimals: 2, expected: "20.00" },
   { amount: "1.5", decimals: 2, expected: "1.50" },
@@ -45,6 +31,7 @@ const displayCases = [
   { amount: "1.9", decimals: 0, expected: "1" },
   { amount: 0, decimals: 2, expected: "0.00" },
   { amount: "0.001", decimals: 2, expected: "0.00" },
+  { amount: "100.5", decimals: 2, expected: "100.50" },
 ] as const
 
 describe(import.meta.url, () => {
@@ -65,7 +52,7 @@ describe(import.meta.url, () => {
   it.effect(
     "reports why input is invalid",
     Effect.fn(function* () {
-      const error = (input: Amount.Input) => Effect.flip(Amount.from(input))
+      const error = (input: Amount.AmountInput) => Effect.flip(Amount.from(input, { reportInput: true }))
       assert.match((yield* error("")).message, /non-empty amount string/u)
       assert.match((yield* error("   ")).message, /non-empty amount string/u)
       assert.match((yield* error("not-a-number")).message, /parsed into a BigDecimal/u)
@@ -83,7 +70,6 @@ describe(import.meta.url, () => {
       assertAmount(yield* Amount.from("1e5"), "100000")
       assertAmount(yield* Amount.from("1e65"), `1${"0".repeat(65)}`)
       assertAmount(yield* Amount.from(10n ** 200n), `1${"0".repeat(200)}`)
-      assert.strictEqual(yield* S.decodeEffect(Amount.Atomic)(`1${"0".repeat(200)}`), `1${"0".repeat(200)}`)
       assertAmount(yield* S.decodeEffect(Amount.Amount)(BigDecimal.make(10n ** 200n, 0)), `1${"0".repeat(200)}`)
     }),
   )
@@ -102,26 +88,6 @@ describe(import.meta.url, () => {
   )
 
   it.effect(
-    "validates atomic strings",
-    Effect.fn(function* () {
-      assert.strictEqual(yield* S.decodeEffect(Amount.Atomic)("0"), "0")
-      assert.strictEqual(yield* S.decodeEffect(Amount.Atomic)("1234567890"), "1234567890")
-      for (const input of ["", "01", "-1", "+1", "1.0", "1e6", " 1", "abc"] as const) {
-        assert.isTrue(S.isSchemaError(yield* Effect.flip(S.decodeEffect(Amount.Atomic)(input))))
-      }
-    }),
-  )
-
-  it.effect(
-    "converts large atomic values without assuming an asset limit",
-    Effect.fn(function* () {
-      const atomic = yield* Amount.toAtomic(yield* Amount.from(10n ** 200n), { decimals: 18 })
-      assert.strictEqual(atomic, `1${"0".repeat(218)}`)
-      assert.strictEqual(yield* S.decodeEffect(Amount.Atomic)(atomic), atomic)
-    }),
-  )
-
-  it.effect(
     "constructs from numbers, bigints, strings, and decimals",
     Effect.fn(function* () {
       assertAmount(yield* Amount.from(0.01), "0.01")
@@ -130,13 +96,11 @@ describe(import.meta.url, () => {
       assertAmount(yield* Amount.from(BigDecimal.fromStringUnsafe("2.5")), "2.5")
       const error = yield* Amount.from(-0.01).pipe(Effect.flip)
       assert.isTrue(S.isSchemaError(error))
-    }),
-  )
-
-  it.effect.each(toAtomicCases)(
-    "converts $amount to $expected atomic units with $decimals decimals",
-    Effect.fn(function* ({ amount, decimals, expected, ...options }) {
-      assert.strictEqual<string>(yield* Amount.toAtomic(yield* Amount.from(amount), { decimals, ...options }), expected)
+      assert.strictEqual(Amount.toString(yield* Amount.from(0.1 + 0.2)), `${0.1 + 0.2}`)
+      assert.strictEqual(
+        Amount.toString(yield* Amount.from(Number.MAX_SAFE_INTEGER + 1)),
+        `${Number.MAX_SAFE_INTEGER + 1}`,
+      )
     }),
   )
 
@@ -144,13 +108,17 @@ describe(import.meta.url, () => {
     "validates decimal precision across public APIs",
     Effect.fn(function* () {
       const amount = yield* Amount.from(1)
-      const atomic = Amount.Atomic.make("1")
-      for (const decimals of [-1, 1.5, NaN, Infinity, Amount.MAX_DECIMALS + 1, Number.MAX_SAFE_INTEGER]) {
-        assert.isTrue(S.isSchemaError(yield* Effect.flip(Amount.toAtomic(amount, { decimals }))))
-        assert.isTrue(S.isSchemaError(yield* Effect.flip(Amount.fromAtomic(atomic, { decimals }))))
+      const atomic = Atomic.Atomic.make("1")
+      for (const decimals of [-1, 1.5, NaN, Infinity, Decimals.MAX_DECIMALS + 1, Number.MAX_SAFE_INTEGER]) {
+        assert.isTrue(S.isSchemaError(yield* Effect.flip(Atomic.fromAmount(amount, { decimals }))))
+        assert.isTrue(S.isSchemaError(yield* Effect.flip(Amount.fromAtomic(atomic, decimals))))
         assert.isTrue(S.isSchemaError(yield* Effect.flip(Amount.display(amount, decimals))))
-        assert.isTrue(S.isSchemaError(yield* Effect.flip(S.decodeEffect(Amount.atomic({ decimals }))(atomic))))
-        assert.isTrue(S.isSchemaError(yield* Effect.flip(amount.pipe(S.encodeEffect(Amount.atomic({ decimals }))))))
+        assert.isTrue(
+          S.isSchemaError(yield* Effect.flip(S.decodeEffect(Amount.AmountFromAtomic({ decimals }))(atomic))),
+        )
+        assert.isTrue(
+          S.isSchemaError(yield* Effect.flip(amount.pipe(S.encodeEffect(Amount.AmountFromAtomic({ decimals }))))),
+        )
       }
     }),
   )
@@ -158,7 +126,7 @@ describe(import.meta.url, () => {
   it.effect(
     "supports large decimal precision",
     Effect.fn(function* () {
-      assertAmount(yield* Amount.fromAtomic(Amount.Atomic.make("1"), { decimals: 65 }), `0.${"0".repeat(64)}1`)
+      assertAmount(yield* Amount.fromAtomic(Atomic.Atomic.make("1"), 65), `0.${"0".repeat(64)}1`)
     }),
   )
 
@@ -166,40 +134,43 @@ describe(import.meta.url, () => {
     "accepts decimals from 0 through MAX_DECIMALS",
     Effect.fn(function* () {
       const amount = yield* Amount.from(1)
-      const atomic = Amount.Atomic.make("1")
+      const atomic = Atomic.Atomic.make("1")
 
-      assert.strictEqual(yield* Amount.toAtomic(amount, { decimals: 0 }), "1")
-      assertAmount(yield* Amount.fromAtomic(atomic, { decimals: 0 }), "1")
+      assert.strictEqual(yield* Atomic.fromAmount(amount, { decimals: 0 }), "1")
+      assertAmount(yield* Amount.fromAtomic(atomic, 0), "1")
       assert.strictEqual(yield* Amount.display(amount, 0), "1")
-      assertAmount(yield* S.decodeEffect(Amount.atomic({ decimals: 0 }))(atomic), "1")
-      assert.strictEqual(yield* amount.pipe(S.encodeEffect(Amount.atomic({ decimals: 0 }))), "1")
+      assertAmount(yield* S.decodeEffect(Amount.AmountFromAtomic({ decimals: 0 }))(atomic), "1")
+      assert.strictEqual(yield* amount.pipe(S.encodeEffect(Amount.AmountFromAtomic({ decimals: 0 }))), "1")
       assert.strictEqual(
-        yield* Amount.toAtomic(yield* Amount.fromAtomic(Amount.Atomic.make("0"), { decimals: 0 }), { decimals: 0 }),
+        yield* Atomic.fromAmount(yield* Amount.fromAtomic(Atomic.Atomic.make("0"), 0), { decimals: 0 }),
         "0",
       )
 
-      const max = Amount.MAX_DECIMALS
-      assert.strictEqual(yield* Amount.toAtomic(amount, { decimals: max }), `1${"0".repeat(max)}`)
-      assertAmount(yield* Amount.fromAtomic(atomic, { decimals: max }), `0.${"0".repeat(max - 1)}1`)
+      const max = Decimals.MAX_DECIMALS
+      assert.strictEqual(yield* Atomic.fromAmount(amount, { decimals: max }), `1${"0".repeat(max)}`)
+      assertAmount(yield* Amount.fromAtomic(atomic, max), `0.${"0".repeat(max - 1)}1`)
       assert.strictEqual(yield* Amount.display(amount, max), `1.${"0".repeat(max)}`)
-      assertAmount(yield* S.decodeEffect(Amount.atomic({ decimals: max }))(atomic), `0.${"0".repeat(max - 1)}1`)
-      assert.strictEqual(yield* amount.pipe(S.encodeEffect(Amount.atomic({ decimals: max }))), `1${"0".repeat(max)}`)
-      assert.strictEqual(
-        yield* Amount.toAtomic(yield* Amount.fromAtomic(atomic, { decimals: max }), { decimals: max }),
-        "1",
+      assertAmount(
+        yield* S.decodeEffect(Amount.AmountFromAtomic({ decimals: max }))(atomic),
+        `0.${"0".repeat(max - 1)}1`,
       )
+      assert.strictEqual(
+        yield* amount.pipe(S.encodeEffect(Amount.AmountFromAtomic({ decimals: max }))),
+        `1${"0".repeat(max)}`,
+      )
+      assert.strictEqual(yield* Atomic.fromAmount(yield* Amount.fromAtomic(atomic, max), { decimals: max }), "1")
     }),
   )
 
   it.effect(
     "converts atomic units to nominal amounts losslessly",
     Effect.fn(function* () {
-      assertAmount(yield* Amount.fromAtomic(Amount.Atomic.make("1000000"), { decimals: 6 }), "1")
-      assertAmount(yield* Amount.fromAtomic(Amount.Atomic.make("0"), { decimals: 6 }), "0")
-      assertAmount(yield* Amount.fromAtomic(Amount.Atomic.make("1"), { decimals: 18 }), "0.000000000000000001")
-      const original = Amount.Atomic.make(`1${"0".repeat(200)}1`)
-      const nominal = yield* Amount.fromAtomic(original, { decimals: 18 })
-      assert.strictEqual(yield* Amount.toAtomic(nominal, { decimals: 18 }), original)
+      assertAmount(yield* Amount.fromAtomic(Atomic.Atomic.make("1000000"), 6), "1")
+      assertAmount(yield* Amount.fromAtomic(Atomic.Atomic.make("0"), 6), "0")
+      assertAmount(yield* Amount.fromAtomic(Atomic.Atomic.make("1"), 18), "0.000000000000000001")
+      const original = Atomic.Atomic.make(`1${"0".repeat(200)}1`)
+      const nominal = yield* Amount.fromAtomic(original, 18)
+      assert.strictEqual(yield* Atomic.fromAmount(nominal, { decimals: 18 }), original)
     }),
   )
 
@@ -207,8 +178,8 @@ describe(import.meta.url, () => {
     it.effect(
       "round-trips through the atomic schema codec",
       Effect.fn(function* () {
-        const codec = Amount.atomic({ decimals: 6 })
-        const decoded = yield* S.decodeEffect(codec)(Amount.Atomic.make("1500000"))
+        const codec = Amount.AmountFromAtomic({ decimals: 6 })
+        const decoded = yield* S.decodeEffect(codec)(Atomic.Atomic.make("1500000"))
         assertAmount(decoded, "1.5")
         assert.strictEqual(yield* S.encodeEffect(codec)(decoded), "1500000")
         assert.isTrue(S.isSchemaError(yield* Effect.flip(S.decodeEffect(codec)("01"))))
@@ -216,6 +187,12 @@ describe(import.meta.url, () => {
         const encoded = yield* S.encodeEffect(codec)(overPrecise)
         assert.strictEqual(encoded, "1000001")
         assertAmount(yield* S.decodeEffect(codec)(encoded), "1.000001")
+        const floorCodec = Amount.AmountFromAtomic({ decimals: 0, rounding: "floor" })
+        assert.strictEqual(yield* S.encodeEffect(floorCodec)(yield* Amount.from("1.1")), "1")
+        assert.strictEqual(
+          yield* S.encodeEffect(Amount.AmountFromAtomic({ decimals: 0 }))(yield* Amount.from("1.1")),
+          "2",
+        )
       }),
     )
 
@@ -238,6 +215,9 @@ describe(import.meta.url, () => {
         const dust = yield* S.decodeEffect(Amount.AmountFromString)("1e-18")
         assertAmount(dust, "0.000000000000000001")
         assert.strictEqual(yield* S.encodeEffect(Amount.AmountFromString)(dust), "0.000000000000000001")
+        const wei = yield* Amount.fromAtomic(Atomic.Atomic.make("1"), 18)
+        assert.strictEqual(yield* S.encodeEffect(S.toCodecJson(Amount.Amount))(wei), "1e-18")
+        assert.strictEqual(yield* S.encodeEffect(Amount.AmountFromString)(wei), "0.000000000000000001")
       }),
     )
   })
@@ -246,14 +226,15 @@ describe(import.meta.url, () => {
     it.effect(
       "formats nominal amounts",
       Effect.fn(function* () {
-        assert.strictEqual(Amount.format(yield* Amount.from(10)), "10")
-        assert.strictEqual(Amount.format(yield* Amount.from("1.50")), "1.5")
-        assert.strictEqual(Amount.format(yield* Amount.from("0.000001")), "0.000001")
+        assert.strictEqual(Amount.toString(yield* Amount.from(10)), "10")
+        assert.strictEqual(Amount.toString(yield* Amount.from("1.50")), "1.5")
+        assert.strictEqual(Amount.toString(yield* Amount.from("0.000001")), "0.000001")
         assert.strictEqual(
-          Amount.format(yield* Amount.fromAtomic(Amount.Atomic.make("1"), { decimals: 18 })),
+          Amount.toString(yield* Amount.fromAtomic(Atomic.Atomic.make("1"), 18)),
           "0.000000000000000001",
         )
-        assert.strictEqual(Amount.format(yield* Amount.from(10n ** 200n)), `1${"0".repeat(200)}`)
+        assert.strictEqual(Amount.toString(yield* Amount.from(10n ** 200n)), `1${"0".repeat(200)}`)
+        assert.strictEqual(Amount.toString(yield* Amount.from(BigDecimal.make(15n, -2))), "1500")
       }),
     )
 

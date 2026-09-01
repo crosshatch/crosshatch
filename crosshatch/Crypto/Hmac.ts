@@ -1,9 +1,0 @@
-import { Effect } from "effect"
-
-import type { Hash } from "./Hash.ts"
-
-export const digest = (key: Uint8Array, data: Uint8Array, hash: Hash) =>
-  Effect.promise(() => crypto.subtle.importKey("raw", key.slice(), { name: "HMAC", hash }, false, ["sign"])).pipe(
-    Effect.flatMap((v) => Effect.promise(() => crypto.subtle.sign("HMAC", v, data.slice()))),
-    Effect.map((v) => new Uint8Array(v)),
-  )

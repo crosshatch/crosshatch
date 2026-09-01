@@ -21,16 +21,7 @@
   "exports": {
     ".": "./index.ts",
     "./*": "./*.ts",
-    "./Browser": "./Browser/index.ts",
-    "./ChxNodeServices": "./ChxNodeServices/index.ts",
-    "./Cirque": "./Cirque/index.ts",
-    "./Crypto": "./Crypto/index.ts",
-    "./Eip155": "./Eip155/index.ts",
-    "./FacilitatorApi": "./FacilitatorApi/index.ts",
-    "./Known": "./Known/index.ts",
-    "./package.json": "./package.json",
-    "./Solana": "./Solana/index.ts",
-    "./Unified": "./Unified/index.ts"
+    "./package.json": "./package.json"
   },
   "publishConfig": {
     "bin": {
@@ -39,16 +30,7 @@
     "exports": {
       ".": "./dist/index.js",
       "./*": "./dist/*.js",
-      "./Browser": "./dist/Browser/index.js",
-      "./ChxNodeServices": "./dist/ChxNodeServices/index.js",
-      "./Cirque": "./dist/Cirque/index.js",
-      "./Crypto": "./dist/Crypto/index.js",
-      "./Eip155": "./dist/Eip155/index.js",
-      "./FacilitatorApi": "./dist/FacilitatorApi/index.js",
-      "./Known": "./dist/Known/index.js",
-      "./package.json": "./package.json",
-      "./Solana": "./dist/Solana/index.js",
-      "./Unified": "./dist/Unified/index.js"
+      "./package.json": "./package.json"
     }
   },
   "scripts": {
