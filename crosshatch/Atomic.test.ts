@@ -1,8 +1,9 @@
 import { assert, describe, it } from "@effect/vitest"
-import { Effect, Schema as S } from "effect"
+import { BigDecimal, Effect, Schema as S } from "effect"
 
 import * as Amount from "./Amount.ts"
 import * as Atomic from "./Atomic.ts"
+import * as Decimals from "./Decimals.ts"
 
 const fromAmountCases = [
   { amount: "4.02", decimals: 6, expected: "4020000" },
@@ -43,9 +44,11 @@ describe(import.meta.url, () => {
     "rejects non-zero amounts smaller than one atomic unit",
     Effect.fn(function* () {
       for (const amount of ["0.0000001", "0.00000001", "0.0000000001"] as const) {
-        const error = yield* Atomic.fromAmount(yield* Amount.from(amount), 6).pipe(Effect.flip)
+        const parsed = yield* Amount.from(amount)
+        const error = yield* Atomic.fromAmount(parsed, 6).pipe(Effect.flip)
         assert.isTrue(S.isSchemaError(error))
         assert.match(error.message, /representable with 6 decimal places/u)
+        assert.isTrue(BigDecimal.equals(error.issue.input as Amount.Amount, parsed))
       }
       assert.strictEqual(yield* Atomic.fromAmount(yield* Amount.from(0), 6), "0")
     }),
@@ -57,6 +60,28 @@ describe(import.meta.url, () => {
       const atomic = yield* Atomic.fromAmount(yield* Amount.from(10n ** 200n), 18)
       assert.strictEqual(atomic, `1${"0".repeat(218)}`)
       assert.strictEqual(yield* S.decodeEffect(Atomic.Atomic)(atomic), atomic)
+    }),
+  )
+
+  it.effect(
+    "round-trips canonical atomic values at boundary precisions",
+    Effect.fn(function* () {
+      const atomicValues = ["0", "1", "999999", `1${"0".repeat(200)}1`] as const
+      for (const decimals of [0, 6, 18, Decimals.MAX_DECIMALS]) {
+        for (const value of atomicValues) {
+          const atomic = Atomic.Atomic.make(value)
+          assert.strictEqual(yield* Atomic.fromAmount(yield* Amount.fromAtomic(atomic, decimals), decimals), atomic)
+        }
+      }
+    }),
+  )
+
+  it.effect(
+    "rejects forged atomic values when encoding",
+    Effect.fn(function* () {
+      for (const value of ["01", "-1", "1.0"] as const) {
+        assert.isTrue(S.isSchemaError(yield* S.encodeEffect(Atomic.Atomic)(value as Atomic.Atomic).pipe(Effect.flip)))
+      }
     }),
   )
 })

@@ -20,6 +20,8 @@ const parseCases = [
   { input: "0.000001", expected: "0.000001" },
   { input: "0", expected: "0" },
   { input: "+1", expected: "1" },
+  { input: "1E+2", expected: "100" },
+  { input: "\t1.5\n", expected: "1.5" },
 ] as const
 
 const invalidInputs = ["", "-1", "not-a-number", "$1", -1, Infinity, NaN, -1n] as const
@@ -52,7 +54,7 @@ describe(import.meta.url, () => {
   it.effect(
     "reports why input is invalid",
     Effect.fn(function* () {
-      const error = (input: Amount.AmountInput) => Effect.flip(Amount.from(input, { reportInput: true }))
+      const error = (input: Amount.AmountInput) => Effect.flip(Amount.from(input))
       assert.match((yield* error("")).message, /non-empty amount string/u)
       assert.match((yield* error("   ")).message, /non-empty amount string/u)
       assert.match((yield* error("not-a-number")).message, /parsed into a BigDecimal/u)
@@ -91,6 +93,21 @@ describe(import.meta.url, () => {
         (yield* Amount.from(BigDecimal.make(0n, Number.MAX_SAFE_INTEGER)).pipe(Effect.flip)).message,
         /safe integer scale/u,
       )
+
+      // The bound applies to the supplied representation, before normalization.
+      assertAmount(yield* Amount.from(BigDecimal.make(10n, -Decimals.MAX_DECIMALS)), `1${"0".repeat(256)}`)
+      assert.isTrue(
+        S.isSchemaError(yield* Amount.from(BigDecimal.make(10n, Decimals.MAX_DECIMALS + 1)).pipe(Effect.flip)),
+      )
+    }),
+  )
+
+  it.effect(
+    "rejects malformed exponent syntax",
+    Effect.fn(function* () {
+      for (const input of ["1e", "1e+", "1e1.5", "1e2e3"] as const) {
+        assert.isTrue(S.isSchemaError(yield* Amount.from(input).pipe(Effect.flip)))
+      }
     }),
   )
 
@@ -103,8 +120,6 @@ describe(import.meta.url, () => {
       assertAmount(yield* Amount.from(BigDecimal.fromStringUnsafe("2.5")), "2.5")
       const error = yield* Amount.from(-0.01).pipe(Effect.flip)
       assert.isTrue(S.isSchemaError(error))
-      const unsafeOptions = { disableChecks: true } as unknown as Amount.ParseOptions
-      assert.isTrue(S.isSchemaError(yield* Amount.from("-1", unsafeOptions).pipe(Effect.flip)))
       assert.strictEqual(Amount.toString(yield* Amount.from(0.1 + 0.2)), `${0.1 + 0.2}`)
       assert.strictEqual(
         Amount.toString(yield* Amount.from(Number.MAX_SAFE_INTEGER + 1)),
@@ -243,6 +258,15 @@ describe(import.meta.url, () => {
         )
         assert.strictEqual(Amount.toString(yield* Amount.from(10n ** 200n)), `1${"0".repeat(200)}`)
         assert.strictEqual(Amount.toString(yield* Amount.from(BigDecimal.make(15n, -2))), "1500")
+      }),
+    )
+
+    it.effect(
+      "uses normalized scale for JSON scientific notation",
+      Effect.fn(function* () {
+        const encodeJson = S.encodeEffect(S.toCodecJson(Amount.Amount))
+        assert.strictEqual(yield* encodeJson(yield* Amount.from(BigDecimal.make(10n, 16))), "0.000000000000001")
+        assert.strictEqual(yield* encodeJson(yield* Amount.from(BigDecimal.make(1n, 16))), "1e-16")
       }),
     )
 

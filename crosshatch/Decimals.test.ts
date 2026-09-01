@@ -20,4 +20,15 @@ describe(import.meta.url, () => {
       }
     }),
   )
+
+  it.effect(
+    "rejects forged decimals when encoding",
+    Effect.fn(function* () {
+      for (const value of [-1, 1.5, Decimals.MAX_DECIMALS + 1]) {
+        assert.isTrue(
+          S.isSchemaError(yield* S.encodeEffect(Decimals.Decimals)(value as Decimals.Decimals).pipe(Effect.flip)),
+        )
+      }
+    }),
+  )
 })

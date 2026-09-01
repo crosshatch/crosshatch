@@ -1,9 +1,10 @@
-import { BigDecimal, Effect, Option, Schema as S, SchemaGetter, SchemaIssue } from "effect"
+import { invalidError } from "@crosshatch/util"
+import { BigDecimal, Effect, Option, Schema as S, SchemaGetter } from "effect"
 
 import * as Atomic from "./Atomic.ts"
 import * as Decimals from "./Decimals.ts"
 
-/** A non-negative `BigDecimal` with a safe integer scale between -255 and 255. */
+/** A non-negative `BigDecimal` whose raw scale is a safe integer between -255 and 255. */
 export type Amount = typeof Amount.Type
 export const Amount = S.BigDecimal.check(
   S.makeFilter((v) => Number.isSafeInteger(v.scale) && Math.abs(v.scale) <= Decimals.MAX_DECIMALS, {
@@ -24,26 +25,26 @@ export const from = (input: AmountInput) =>
         ? fromString(input)
         : fromBigDecimal(input)
 
-const fail = (input: unknown, expected: string) =>
-  new S.SchemaError(new SchemaIssue.InvalidValue({ expected }, input, { reportInput: true }))
-
-export const fromBigDecimal: (input: BigDecimal.BigDecimal) => Effect.Effect<Amount, S.SchemaError> =
-  S.decodeEffect(Amount)
+const decodeEffect = S.decodeEffect(Amount)
+export const fromBigDecimal: (input: BigDecimal.BigDecimal) => Effect.Effect<Amount, S.SchemaError> = (input) =>
+  decodeEffect(input)
 
 const fromBigDecimalOption = (input: unknown, option: Option.Option<BigDecimal.BigDecimal>) => {
   const decimal = Option.getOrUndefined(option)
   if (!decimal) {
-    return fail(input, "an amount that can be parsed into a BigDecimal")
+    return invalidError(input, "an amount that can be parsed into a BigDecimal")
   }
   return fromBigDecimal(decimal)
 }
 
 export const fromNumber = (input: number) =>
-  Number.isFinite(input) ? fromBigDecimalOption(input, BigDecimal.fromNumber(input)) : fail(input, "a finite number")
+  Number.isFinite(input)
+    ? fromBigDecimalOption(input, BigDecimal.fromNumber(input))
+    : invalidError(input, "a finite number")
 
 export const fromString = Effect.fnUntraced(function* (input: string) {
   const trimmed = input.trim()
-  if (trimmed === "") return yield* fail(input, "a non-empty amount string")
+  if (trimmed === "") return yield* invalidError(input, "a non-empty amount string")
   return yield* fromBigDecimalOption(input, BigDecimal.fromString(trimmed))
 })
 

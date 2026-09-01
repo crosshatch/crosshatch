@@ -1,4 +1,4 @@
-import { Schema as S, flow, Tuple, Struct } from "effect"
+import { Schema as S, flow, Tuple, Struct, SchemaIssue } from "effect"
 
 export type TopFromString = S.Codec<any, string, any, any>
 
@@ -19,3 +19,6 @@ export const getLiterals = Tuple.map(Struct.lambda<TagLiteral>((m) => m.fields._
 
 /** Printable ASCII (U+0020–U+007E), 1–32 characters. */
 export const PrintableAscii32 = S.String.check(S.isLengthBetween(1, 32), S.isPattern(/^[\u0020-\u007E]+$/u))
+
+export const invalidError = (input: unknown, expected: string) =>
+  new S.SchemaError(new SchemaIssue.InvalidValue({ expected }, input, { reportInput: true }))
