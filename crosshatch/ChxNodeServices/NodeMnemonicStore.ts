@@ -21,7 +21,7 @@ export const layer = Layer.effect(
     const ensureAvailability = Effect.fnUntraced(function* (name: string) {
       yield* mnemonicConfigs.pipe(
         Effect.filterOrFail(
-          Predicate.hasProperty(name),
+          Predicate.not(Predicate.hasProperty(name)),
           () => new MnemonicStore.MnemonicConfigNameAlreadyTakenError({ name }),
         ),
       )

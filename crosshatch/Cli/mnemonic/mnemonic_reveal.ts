@@ -5,7 +5,7 @@ import { MnemonicStore } from "../../MnemonicStore.ts"
 
 export const mnemonicReveal = Command.make("reveal", {
   name: Argument.string("name").pipe(Argument.withDefault("default")),
-  yes: Flag.boolean("yes").pipe(Flag.withAlias("y")),
+  yes: Flag.boolean("yes").pipe(Flag.withDefault(false), Flag.withAlias("y")),
 }).pipe(
   Command.withDescription("Reveal a stored mnemonic"),
   Command.withHandler(
