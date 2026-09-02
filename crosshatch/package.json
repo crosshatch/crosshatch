@@ -21,7 +21,10 @@
   "exports": {
     ".": "./index.ts",
     "./*": "./*.ts",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./coins": "./coins/index.ts",
+    "./coins/*": "./coins/*.ts",
+    "./Eip155": "./Eip155/index.ts"
   },
   "publishConfig": {
     "bin": {
@@ -30,7 +33,10 @@
     "exports": {
       ".": "./dist/index.js",
       "./*": "./dist/*.js",
-      "./package.json": "./package.json"
+      "./package.json": "./package.json",
+      "./coins": "./dist/coins/index.js",
+      "./coins/*": "./dist/coins/*.js",
+      "./Eip155": "./dist/Eip155/index.js"
     }
   },
   "scripts": {
