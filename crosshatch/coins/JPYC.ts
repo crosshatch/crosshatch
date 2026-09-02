@@ -1,7 +1,8 @@
 import { Eip155 } from "../Eip155/index.ts"
-import { Instrument, Representation, Unit } from "../index.ts"
+import { Instrument, Representation } from "../index.ts"
+import { JPY } from "../units/index.ts"
 
-export class JPYC extends Representation.make("JPYC", Unit.JPY) {}
+export class JPYC extends Representation.make("JPYC", JPY) {}
 
 const eip155 = Instrument.make(JPYC, Eip155.Eip155)
 

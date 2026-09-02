@@ -9,8 +9,3 @@ export interface Unit<K extends string> {
 export type Any = Unit<string>
 
 export declare const make: <K extends string>(name: K) => Unit<K>
-
-export const USD = make("USD")
-export const EUR = make("EUR")
-export const JPY = make("JPY")
-export const SGD = make("SGD")

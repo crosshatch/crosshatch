@@ -5,6 +5,9 @@ import { brand } from "./_common.ts"
 export type Address = typeof Address.Type
 export const Address = S.String.check(S.isPattern(/^[-.%a-zA-Z0-9]{1,128}$/u)).pipe(brand("Address"))
 
+export const decodeEffect = S.decodeEffect(Address)
+export const encodeEffect = S.encodeEffect(Address)
+
 export const factory = <
   T extends S.Top & {
     readonly Encoded: string

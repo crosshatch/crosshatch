@@ -24,7 +24,8 @@
     "./package.json": "./package.json",
     "./coins": "./coins/index.ts",
     "./coins/*": "./coins/*.ts",
-    "./Eip155": "./Eip155/index.ts"
+    "./Eip155": "./Eip155/index.ts",
+    "./units": "./units/index.ts"
   },
   "publishConfig": {
     "bin": {
@@ -36,7 +37,8 @@
       "./package.json": "./package.json",
       "./coins": "./dist/coins/index.js",
       "./coins/*": "./dist/coins/*.js",
-      "./Eip155": "./dist/Eip155/index.js"
+      "./Eip155": "./dist/Eip155/index.js",
+      "./units": "./dist/units/index.js"
     }
   },
   "scripts": {

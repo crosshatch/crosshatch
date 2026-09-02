@@ -20,4 +20,4 @@ export type Accept = (config: { readonly required: Required.Required }) => Effec
   AcceptError
 >
 
-export declare const first: (instruments: Instrument.InstrumentsInput) => Accept
+export declare const first: (instruments: ReadonlyArray<Instrument.InstrumentModule>) => Accept

@@ -1,4 +1,4 @@
-import { Schema as S, Effect, Data, ErrorReporter, Pipeable, Types } from "effect"
+import { Schema as S, Effect, Data, ErrorReporter, Pipeable, Inspectable, Effectable } from "effect"
 import {
   HttpServerRequest,
   HttpServerResponse,
@@ -7,35 +7,48 @@ import {
   Headers,
 } from "effect/unstable/http"
 
-import * as Address from "./Address.ts"
-import type * as Amount from "./Amount.ts"
+import type * as AcceptsBuilder from "./AcceptsBuilder.ts"
 import { PAYMENT_REQUIRED } from "./constants.ts"
 import * as Extension from "./Extension.ts"
-import type * as Instrument from "./Instrument.ts"
-import type * as Namespace from "./Namespace.ts"
-import type * as Payload from "./Payload.ts"
 import * as Requirements from "./Requirements.ts"
 import * as ResourceInfo from "./ResourceInfo.ts"
 
-export class Required extends S.Class<Required>("Required")({
-  x402Version: S.Literal(2),
-  resource: ResourceInfo.ResourceInfo,
-  accepts: S.Array(Requirements.Requirements),
-  error: S.String.pipe(S.optional),
-  extensions: Extension.ExtensionsEnvelope.pipe(S.optional),
-}) {
-  *[Symbol.iterator](): Effect.EffectIterator<
-    | Effect.Effect<HttpServerRequest.HttpServerRequest, never, HttpServerRequest.HttpServerRequest>
-    | Effect.Effect<never, RequiredResponse, never>
-  > {
+type RequiredProto = Effect.Effect<never, RequiredResponse, HttpServerRequest.HttpServerRequest>
+const RequiredProto = Effectable.Prototype<Required>({
+  label: "Required",
+  evaluate: Effect.fnUntraced(function* (this: Required) {
     const request = yield* HttpServerRequest.HttpServerRequest
     return yield* new RequiredResponse({ request, required: this })
+  }),
+})
+
+export class Required
+  extends S.Class<Required>("Required")({
+    x402Version: S.Literal(2),
+    resource: ResourceInfo.ResourceInfo,
+    accepts: S.Array(Requirements.Requirements),
+    error: S.String.pipe(S.optional),
+    extensions: Extension.ExtensionsEnvelope.pipe(S.optional),
+  })
+  implements RequiredProto
+{
+  declare pipe: Pipeable.Pipeable["pipe"]
+
+  readonly [Effect.TypeId]: Effect.Variance<never, RequiredResponse, HttpServerRequest.HttpServerRequest> =
+    RequiredProto[Effect.TypeId];
+
+  [Symbol.iterator](): Effect.EffectIterator<RequiredProto> {
+    return RequiredProto[Symbol.iterator]()
+  }
+
+  toJSON(): unknown {
+    return RequiredProto.toJSON()
+  }
+
+  [Inspectable.NodeInspectSymbol](): unknown {
+    return RequiredProto[Inspectable.NodeInspectSymbol]()
   }
 }
-
-export const RequiredJson = S.toCodecJson(Required)
-export const RequiredFromJsonString = S.fromJsonString(RequiredJson)
-export const RequiredFromBase64JsonString = S.StringFromBase64.pipe(S.decodeTo(RequiredFromJsonString))
 
 export class RequiredResponse
   extends Data.TaggedError("RequiredResponse")<{
@@ -69,48 +82,11 @@ export class RequiredResponse
   }
 }
 
-const BuilderTypeId = "~crosshatch/Required/RequiredBuilder" as const
+export const RequiredJson = S.toCodecJson(Required)
+export const RequiredFromJsonString = S.fromJsonString(RequiredJson)
+export const RequiredFromBase64JsonString = S.StringFromBase64.pipe(S.decodeTo(RequiredFromJsonString))
 
-interface RequiredBuilder<K extends string> extends Pipeable.Pipeable {
-  readonly [BuilderTypeId]: typeof BuilderTypeId
-
-  readonly _tag: K
-}
-
-// oxlint-disable-next-line typescript/no-empty-interface
-export interface Empty extends RequiredBuilder<"Empty"> {}
-
-interface NonEmpty<K extends string> extends RequiredBuilder<K> {
-  readonly accepts: ReadonlyArray<ReadonlyArray<Requirements.Requirements>>
-
-  readonly recipients: ReadonlyArray<Record<string, Address.Address>>
-}
-
-export interface Unaddressed<NamespaceShapes_ extends Namespace.NamespaceShape.Any> extends NonEmpty<"Unaddressed"> {
-  readonly?: [NamespaceShapes_]
-}
-
-export interface Accepts extends NonEmpty<"Undescribed"> {
-  (e0: string | TemplateStringsArray, ...substitutions: ReadonlyArray<string | number>): Effect.Effect<Required>
-
-  readonly match: (payload: Payload.Payload | undefined) => boolean
-}
-
-export declare const empty: Empty
-
-// TODO: constrain instruments array to same unit
-export declare const accept: <const T extends Instrument.InstrumentsInput>(
-  instruments: T,
-  amount: Amount.AmountInput,
-) => <NamespaceShapes_ extends Namespace.NamespaceShape.Any = never>(
-  builder: Empty | Unaddressed<NamespaceShapes_> | Accepts,
-) => Unaddressed<Instrument.FromInput<T>["namespace"]>
-
-export declare const address: <NamespaceShapes_ extends Namespace.NamespaceShape.Any>(addresses: {
-  readonly [K in NamespaceShapes_["_tag"]]: Types.ExtractTag<NamespaceShapes_, K>["address"]
-}) => (builder: Unaddressed<NamespaceShapes_>) => Accepts
-
-export declare const describe: (
+export declare const make: (
   e0: string | TemplateStringsArray,
   ...substitutions: ReadonlyArray<string | number>
-) => (builder: Accepts) => Effect.Effect<Required>
+) => (builder: AcceptsBuilder.Accepts) => Effect.Effect<Required>

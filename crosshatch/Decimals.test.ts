@@ -7,8 +7,8 @@ describe(import.meta.url, () => {
   it.effect(
     "accepts 0 through MAX_DECIMALS",
     Effect.fn(function* () {
-      assert.strictEqual(yield* Decimals.decodeEffect(0), 0)
-      assert.strictEqual(yield* Decimals.decodeEffect(Decimals.MAX_DECIMALS), Decimals.MAX_DECIMALS)
+      assert.strictEqual(yield* Decimals.fromNumber(0), 0)
+      assert.strictEqual(yield* Decimals.fromNumber(Decimals.MAX_DECIMALS), Decimals.MAX_DECIMALS)
     }),
   )
 
@@ -16,7 +16,7 @@ describe(import.meta.url, () => {
     "rejects values outside 0 through MAX_DECIMALS",
     Effect.fn(function* () {
       for (const decimals of [-1, 1.5, NaN, Infinity, Decimals.MAX_DECIMALS + 1, Number.MAX_SAFE_INTEGER]) {
-        assert.isTrue(S.isSchemaError(yield* Effect.flip(Decimals.decodeEffect(decimals))))
+        assert.isTrue(S.isSchemaError(yield* Effect.flip(Decimals.fromNumber(decimals))))
       }
     }),
   )

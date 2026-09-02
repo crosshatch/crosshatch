@@ -1,3 +1,4 @@
-import { Representation, Unit } from "../index.ts"
+import { Representation } from "../index.ts"
+import { USD } from "../units/index.ts"
 
-export class USDCE extends Representation.make("USDCE", Unit.USD) {}
+export class USDCE extends Representation.make("USDCE", USD) {}

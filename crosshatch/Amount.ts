@@ -25,34 +25,34 @@ export const from = (input: AmountInput) =>
         ? fromString(input)
         : fromBigDecimal(input)
 
-const decodeEffect = S.decodeEffect(Amount)
+const decodeEffect = S.decodeEffect(Amount, { reportInput: true })
 export const fromBigDecimal: (input: BigDecimal.BigDecimal) => Effect.Effect<Amount, S.SchemaError> = (input) =>
   decodeEffect(input)
 
-const fromBigDecimalOption = (input: unknown, option: Option.Option<BigDecimal.BigDecimal>) => {
-  const decimal = Option.getOrUndefined(option)
+const fromBigDecimalOption = (input: Option.Option<BigDecimal.BigDecimal>, parentInput: unknown) => {
+  const decimal = Option.getOrUndefined(input)
   if (!decimal) {
-    return invalidError(input, "an amount that can be parsed into a BigDecimal")
+    return invalidError(parentInput, "an amount that can be parsed into a BigDecimal")
   }
   return fromBigDecimal(decimal)
 }
 
 export const fromNumber = (input: number) =>
   Number.isFinite(input)
-    ? fromBigDecimalOption(input, BigDecimal.fromNumber(input))
+    ? fromBigDecimalOption(BigDecimal.fromNumber(input), input)
     : invalidError(input, "a finite number")
 
 export const fromString = Effect.fnUntraced(function* (input: string) {
   const trimmed = input.trim()
   if (trimmed === "") return yield* invalidError(input, "a non-empty amount string")
-  return yield* fromBigDecimalOption(input, BigDecimal.fromString(trimmed))
+  return yield* fromBigDecimalOption(BigDecimal.fromString(trimmed), input)
 })
 
 export const fromBigInt = (input: bigint) => fromBigDecimal(BigDecimal.fromBigInt(input))
 
 /** Converts {@link Atomic} units back to a nominal {@link Amount}, losslessly. */
 export const fromAtomic = Effect.fnUntraced(function* (atomic: Atomic.Atomic, decimals: number) {
-  const decoded = yield* Decimals.decodeEffect(decimals)
+  const decoded = yield* Decimals.fromNumber(decimals)
   return yield* fromBigDecimal(BigDecimal.make(BigInt(atomic), decoded))
 })
 
@@ -97,7 +97,7 @@ export const AmountFromString = S.String.pipe(
 
 /** Renders an {@link Amount} with exactly `decimals` fraction digits, truncating excess precision. */
 export const display = Effect.fnUntraced(function* (amount: Amount, nDecimals: number) {
-  const decimals = yield* Decimals.decodeEffect(nDecimals)
+  const decimals = yield* Decimals.fromNumber(nDecimals)
   const rounded = BigDecimal.normalize(BigDecimal.round(amount, { scale: decimals, mode: "floor" }))
   const units = BigDecimal.scale(rounded, decimals).value
   const scale = 10n ** BigInt(decimals)

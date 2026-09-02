@@ -1,6 +1,7 @@
 import type * as Namespace from "./Namespace.ts"
 import type * as Representation from "./Representation.ts"
 import type * as Scheme from "./Scheme.ts"
+import type * as Unit from "./Unit.ts"
 
 const TypeId = "~crosshatch/Instrument" as const
 
@@ -32,16 +33,13 @@ export declare const make: <
   schemeEnvelopes: ReadonlyArray<Scheme.SchemeEnvelope>
 }) => Instrument<Representation_, NamespaceShape_, Reference>
 
-export type InstrumentModule = Record<string, Representation.RepresentationClass.Any | Any>
+export type InstrumentModule<U extends Unit.Any = Unit.Any> = Record<
+  string,
+  Representation.RepresentationClass<string, U> | Any
+>
+
 export declare namespace InstrumentModule {
   export type ToInstruments<M extends InstrumentModule> = { [K in keyof M]: Extract<M[K], Any> }[keyof M]
+
+  export type Unit<M extends InstrumentModule> = M extends InstrumentModule<infer U> ? U : never
 }
-
-export type InstrumentsInput = InstrumentModule | ReadonlyArray<InstrumentModule>
-
-export type FromInput<I extends InstrumentsInput> =
-  I extends ReadonlyArray<InstrumentModule>
-    ? InstrumentModule.ToInstruments<I[number]>
-    : I extends InstrumentModule
-      ? InstrumentModule.ToInstruments<I>
-      : never
