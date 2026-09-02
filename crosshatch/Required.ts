@@ -86,7 +86,6 @@ interface NonEmpty<K extends string> extends RequiredBuilder<K> {
   readonly recipients: ReadonlyArray<Record<string, Address.Address>>
 }
 
-// oxlint-disable-next-line typescript/no-empty-interface
 export interface Unaddressed<NamespaceShapes_ extends Namespace.NamespaceShape.Any> extends NonEmpty<"Unaddressed"> {
   readonly?: [NamespaceShapes_]
 }
@@ -99,6 +98,7 @@ export interface Accepts extends NonEmpty<"Undescribed"> {
 
 export declare const empty: Empty
 
+// TODO: constrain instruments array to same unit
 export declare const accept: <const T extends Instrument.InstrumentsInput>(
   instruments: T,
   amount: Amount.AmountInput,
