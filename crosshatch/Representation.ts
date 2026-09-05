@@ -1,6 +1,9 @@
+import { Pipeable } from "effect"
+
+import * as Proto from "./_Proto.ts"
 import type * as Unit from "./Unit.ts"
 
-const TypeId = "~crosshatch/Representation" as const
+const TypeId = Proto.id("Representation")
 
 export interface Representation<U extends Unit.Any, K extends string> {
   readonly [TypeId]: typeof TypeId
@@ -12,10 +15,18 @@ export interface Representation<U extends Unit.Any, K extends string> {
 
 export type Any = Representation<Unit.Any, string>
 
-export type RepresentationClass<K extends string, U extends Unit.Any> = new () => Representation<U, K>
+export type RepresentationClass<U extends Unit.Any, K extends string> = new () => Representation<U, K>
 
-export declare namespace RepresentationClass {
-  export type Any = RepresentationClass<string, Unit.Any>
+export const Class = <U extends Unit.Any, K extends string>(options: {
+  readonly unit: U
+  readonly symbol: K
+}): RepresentationClass<U, K> => {
+  const { unit, symbol } = options
+  return class extends Pipeable.Class {
+    readonly [TypeId] = TypeId
+
+    readonly unit = unit
+
+    readonly symbol = symbol
+  }
 }
-
-export declare const make: <K extends string, U extends Unit.Any>(symbol: K, unit: U) => RepresentationClass<K, U>

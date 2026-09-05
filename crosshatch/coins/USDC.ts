@@ -1,8 +1,11 @@
-import { Erc3009Scheme, Eip155, Permit2Scheme } from "../Eip155/index.ts"
 import { Instrument, Representation } from "../index.ts"
+import { Erc3009Scheme, Eip155, Permit2Scheme } from "../namespaces/Eip155/index.ts"
 import { USD } from "../units/index.ts"
 
-export class USDC extends Representation.make("USDC", USD) {}
+export class USDC extends Representation.Class({
+  unit: USD,
+  symbol: "USDC",
+}) {}
 
 const eip155 = Instrument.make(USDC, Eip155.Eip155)
 

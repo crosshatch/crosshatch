@@ -1,32 +1,32 @@
-import { Schema as S, SchemaGetter, Effect } from "effect"
+import { Schema as S, SchemaGetter, type Pipeable, Predicate } from "effect"
 
+import * as Proto from "./_Proto.ts"
 import * as Namespace from "./Namespace.ts"
 import * as Reference from "./Reference.ts"
 
-const TypeId = "~crosshatch/Chain" as const
+const TypeId = Proto.id("Chain")
 
-export type Chain = typeof Chain.Type
-export const Chain = S.Struct({
-  [TypeId]: S.tag(TypeId),
-  namespace: Namespace.Namespace,
-  reference: Reference.Reference,
+export type ChainFields = typeof ChainFields.Type
+export const ChainFields = S.Struct({
+  namespace: Namespace.NamespaceString,
+  reference: Reference.ReferenceString,
 })
 
-export type ChainParts = typeof ChainParts.Type
-export const ChainParts = S.TemplateLiteralParser([Namespace.Namespace, ":", Reference.Reference])
+export interface Chain extends ChainFields, Pipeable.Pipeable {
+  readonly [TypeId]: typeof TypeId
+}
 
-export const ChainFromString = ChainParts.pipe(
-  S.decodeTo(Chain, {
-    decode: SchemaGetter.transformOrFail(([namespace, _1, reference]) => Chain.makeEffect({ namespace, reference })),
-    encode: SchemaGetter.transformOrFail(({ namespace, reference }) =>
-      Effect.all(
-        [
-          Namespace.Namespace.makeEffect(namespace),
-          Effect.succeed(":" as const),
-          Reference.Reference.makeEffect(reference),
-        ],
-        { concurrency: "unbounded" },
-      ).pipe(Effect.flatMap((v) => ChainParts.makeEffect(v))),
-    ),
+export const isChain = (v: unknown): v is Chain => Predicate.hasProperty(v, TypeId)
+
+export const make = (v: ChainFields): Chain => ({ ...Proto.make(TypeId), ...v })
+
+export const ChainFromString = S.TemplateLiteralParser([
+  Namespace.NamespaceString,
+  ":",
+  Reference.ReferenceString,
+]).pipe(
+  S.decodeTo(S.declare(isChain), {
+    decode: SchemaGetter.transform(([namespace, _1, reference]) => make({ namespace, reference })),
+    encode: SchemaGetter.transform(({ namespace, reference }) => [namespace, ":", reference]),
   }),
 )

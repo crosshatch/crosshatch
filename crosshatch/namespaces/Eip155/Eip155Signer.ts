@@ -1,7 +1,7 @@
-import { Redacted, Context, Layer, Effect } from "effect"
+import { Context, Layer, Effect } from "effect"
 import { Address, Hash, type Hex, Mnemonic as OxMnemonic, Secp256k1, Signature, TypedData } from "ox"
 
-import * as Mnemonic from "../Mnemonic.ts"
+import { Mnemonic } from "../../index.ts"
 
 export class Eip155Signer extends Context.Service<
   Eip155Signer,
@@ -14,13 +14,13 @@ export class Eip155Signer extends Context.Service<
       value: TypedData.Definition<typedData, primaryType>,
     ) => Hex.Hex
   }
->()("crosshatch/Eip155/Eip155Signer") {}
+>()("crosshatch/namespaces/Eip155/Eip155Signer") {}
 
 export const layerFromMnemonic = Layer.effect(
   Eip155Signer,
   Effect.gen(function* () {
     const mnemonic = yield* Mnemonic.Mnemonic
-    const privateKey = OxMnemonic.toPrivateKey(Redacted.value(mnemonic), { as: "Hex" })
+    const privateKey = OxMnemonic.toPrivateKey(Mnemonic.value(mnemonic), { as: "Hex" })
     const publicKey = Secp256k1.getPublicKey({ privateKey })
     return {
       address: Address.fromPublicKey(publicKey, { checksum: true }),

@@ -1,15 +1,20 @@
-import { Data, Context, type Effect, type Layer } from "effect"
+import { Data, Context, Effect, type Layer } from "effect"
 
-import type * as Accept from "./Accept.ts"
-import type * as Payload from "./Payload.ts"
+import type { Allow } from "./Allow.ts"
+import type { Payload } from "./Payload.ts"
 import type * as Required from "./Required.ts"
 
 export class PayerError extends Data.TaggedError("PayerError")<{ readonly cause?: unknown }> {}
 
-export interface Service {
-  readonly make: (required: Required.Required) => Effect.Effect<Payload.Payload, PayerError>
-}
+export type Make<R> = (required: Required.Required) => Effect.Effect<Payload, PayerError, R>
 
-export class Payer extends Context.Service<Payer, Service>()("crosshatch/Payer") {}
+export class Payer extends Context.Service<
+  Payer,
+  {
+    readonly make: Make<never>
+  }
+>()("crosshatch/Payer") {}
 
-export declare const layer: (accepts: Accept.Accept) => Layer.Layer<Payer>
+export const make: Make<Payer> = (required) => Payer.pipe(Effect.flatMap((v) => v.make(required)))
+
+export declare const layer: (allow: Allow) => Layer.Layer<Payer>

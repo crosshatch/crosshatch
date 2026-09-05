@@ -1,92 +1,53 @@
-import { Schema as S, Effect, Data, ErrorReporter, Pipeable, Inspectable, Effectable } from "effect"
-import {
-  HttpServerRequest,
-  HttpServerResponse,
-  HttpServerRespondable,
-  HttpTraceContext,
-  Headers,
-} from "effect/unstable/http"
+import { type Effect, type Pipeable, Predicate, Schema as S, SchemaGetter, Function } from "effect"
 
-import type * as AcceptsBuilder from "./AcceptsBuilder.ts"
-import { PAYMENT_REQUIRED } from "./constants.ts"
-import * as Extension from "./Extension.ts"
-import * as Requirements from "./Requirements.ts"
-import * as ResourceInfo from "./ResourceInfo.ts"
+import * as Proto from "./_Proto.ts"
+import { Accepts } from "./Accepts.ts"
+import { ExtensionsEnvelope } from "./Extension.ts"
+import { ResourceInfo } from "./ResourceInfo.ts"
+import { Version } from "./Version.ts"
 
-type RequiredProto = Effect.Effect<never, RequiredResponse, HttpServerRequest.HttpServerRequest>
-const RequiredProto = Effectable.Prototype<Required>({
-  label: "Required",
-  evaluate: Effect.fnUntraced(function* (this: Required) {
-    const request = yield* HttpServerRequest.HttpServerRequest
-    return yield* new RequiredResponse({ request, required: this })
-  }),
+const TypeId = Proto.id("Required")
+
+export type RequiredFields = typeof RequiredFields.Type
+export const RequiredFields = S.Struct({
+  x402Version: Version,
+  resource: ResourceInfo,
+  accepts: Accepts,
+  error: S.String.pipe(S.optional),
+  extensions: ExtensionsEnvelope.pipe(S.optional),
 })
 
-export class Required
-  extends S.Class<Required>("Required")({
-    x402Version: S.Literal(2),
-    resource: ResourceInfo.ResourceInfo,
-    accepts: S.Array(Requirements.Requirements),
-    error: S.String.pipe(S.optional),
-    extensions: Extension.ExtensionsEnvelope.pipe(S.optional),
-  })
-  implements RequiredProto
-{
-  declare pipe: Pipeable.Pipeable["pipe"]
-
-  readonly [Effect.TypeId]: Effect.Variance<never, RequiredResponse, HttpServerRequest.HttpServerRequest> =
-    RequiredProto[Effect.TypeId];
-
-  [Symbol.iterator](): Effect.EffectIterator<RequiredProto> {
-    return RequiredProto[Symbol.iterator]()
-  }
-
-  toJSON(): unknown {
-    return RequiredProto.toJSON()
-  }
-
-  [Inspectable.NodeInspectSymbol](): unknown {
-    return RequiredProto[Inspectable.NodeInspectSymbol]()
-  }
+export interface Required extends RequiredFields, Pipeable.Pipeable {
+  readonly [TypeId]: typeof TypeId
 }
 
-export class RequiredResponse
-  extends Data.TaggedError("RequiredResponse")<{
-    readonly required: Required
-    readonly request: HttpServerRequest.HttpServerRequest
-  }>
-  implements HttpServerRespondable.Respondable
-{
-  [HttpServerRespondable.symbol]() {
-    return Effect.gen({ self: this }, function* () {
-      const required = yield* S.encodeEffect(RequiredFromBase64JsonString)(this.required)
-      const headers = yield* Effect.currentSpan.pipe(
-        Effect.map(HttpTraceContext.toHeaders),
-        Effect.catchTags({
-          NoSuchElementError: () => Effect.succeed(Headers.empty),
-        }),
-        Effect.map(Headers.set(PAYMENT_REQUIRED, required)),
-      )
-      return HttpServerResponse.empty({ status: 402, headers })
-    })
-  }
+export const isRequired = (v: unknown): v is Required => Predicate.hasProperty(v, TypeId)
 
-  override readonly [ErrorReporter.ignore] = true
+export const make = (v: RequiredFields): Required => ({ ...Proto.make(TypeId), ...v })
 
-  get methodAndUrl() {
-    return `${this.request.method} ${this.request.url}`
-  }
+export const Required = RequiredFields.pipe(
+  S.decodeTo(S.declare(isRequired), {
+    decode: SchemaGetter.transform(make),
+    encode: SchemaGetter.transform(({ x402Version, resource, accepts, error, extensions }) => ({
+      x402Version,
+      resource,
+      accepts,
+      error,
+      extensions,
+    })),
+  }),
+)
 
-  override get message() {
-    return `${this._tag} (${this.methodAndUrl}): retry with an attached x402 payment payload`
-  }
-}
+export const RequiredFromString = S.StringFromBase64.pipe(S.decodeTo(S.fromJsonString(S.toCodecJson(Required))))
 
-export const RequiredJson = S.toCodecJson(Required)
-export const RequiredFromJsonString = S.fromJsonString(RequiredJson)
-export const RequiredFromBase64JsonString = S.StringFromBase64.pipe(S.decodeTo(RequiredFromJsonString))
-
-export declare const make: (
-  e0: string | TemplateStringsArray,
-  ...substitutions: ReadonlyArray<string | number>
-) => (builder: AcceptsBuilder.Accepts) => Effect.Effect<Required>
+export const describe = Function.dual<
+  (
+    e0: TemplateStringsArray | string,
+    ...substitutions: ReadonlyArray<string | number>
+  ) => (accepts: Accepts) => Effect.Effect<Required, S.SchemaError>,
+  (
+    accepts: Accepts,
+    e0: TemplateStringsArray | string,
+    ...substitutions: ReadonlyArray<string | number>
+  ) => Effect.Effect<Required, S.SchemaError>
+>(2, null!)

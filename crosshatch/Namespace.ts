@@ -1,53 +1,62 @@
-import { Schema as S, type Context } from "effect"
+import { Schema as S, Pipeable } from "effect"
 
-import { brand } from "./_common.ts"
-import type * as Address from "./Address.ts"
+import * as Proto from "./_Proto.ts"
+import { AddressString } from "./Address.ts"
+import { ReferenceString } from "./Reference.ts"
 
-export type Namespace = typeof Namespace.Type
-export const Namespace = S.String.check(S.isPattern(/^[-a-z0-9]{3,8}$/u)).pipe(brand("Namespace"))
+const TypeId = Proto.id("Namespace")
 
-export const decodeEffect = S.decodeEffect(Namespace)
+export type NamespaceString = typeof NamespaceString.Type
+export const NamespaceString = S.String.check(S.isPattern(/^[-a-z0-9]{3,8}$/u)).pipe(S.brand(TypeId))
 
-const TypeId = "~crosshatch/Namespace" as const
-
-export interface NamespaceShape<
-  Identifier extends string,
-  Client,
-  K extends string,
-  Address_ extends Address.Address,
-  Uniform,
-> extends Context.ServiceClass.Shape<Identifier, Client> {
-  readonly ""?: [Address_]
-  readonly _tag: K
-  readonly address: Address_
-  readonly uniform: Uniform
-}
-
-export declare namespace NamespaceShape {
-  export type Any = NamespaceShape<string, any, string, Address.Address, boolean>
-}
-
-export interface NamespaceClass<
-  Self,
-  Identifier extends string,
-  Client,
-  K extends string,
-  Address_ extends Address.Address,
-  Uniform extends boolean,
-> extends Context.Service<Self, Client> {
-  new (_: never): NamespaceShape<Identifier, Client, K, Address_, Uniform>
-
-  readonly [TypeId]: typeof TypeId
-}
-
-export declare const Service: <Self, Client, Address_ extends Address.Address>() => <
-  Id extends string,
-  K extends string,
-  Uniform extends boolean = false,
->(
-  id: Id,
-  config: {
-    readonly _tag: K
+export interface NamespaceSpec<K extends string, Uniform extends boolean> {
+  readonly name: K
+  readonly address: {
     readonly uniform: Uniform
-  },
-) => NamespaceClass<Self, Id, Client, K, Address_, Uniform>
+    readonly pattern: RegExp
+  }
+  readonly reference: {
+    readonly pattern: RegExp
+  }
+}
+
+export interface Namespace<K extends string, Uniform extends boolean> extends Pipeable.Pipeable {
+  readonly [TypeId]: typeof TypeId
+
+  readonly id: Proto.id<`namespaces/${K}`>
+
+  readonly _tag: K
+
+  readonly spec: NamespaceSpec<K, Uniform>
+
+  readonly AddressString: S.brand<typeof AddressString, this["id"]>
+
+  readonly ReferenceString: S.brand<typeof ReferenceString, this["id"]>
+}
+
+export type Any = Namespace<string, boolean>
+
+export type NamespaceClass<K extends string, Uniform extends boolean> = new () => Namespace<K, Uniform>
+
+export declare namespace NamespaceClass {
+  export type Any = NamespaceClass<string, boolean>
+}
+
+export const Class = <K extends string, Uniform extends boolean>(
+  spec: NamespaceSpec<K, Uniform>,
+): NamespaceClass<K, Uniform> => {
+  const { name, address, reference } = spec
+  return class extends Pipeable.Class {
+    readonly [TypeId] = TypeId
+
+    readonly id = Proto.id(`namespaces/${name}`)
+
+    readonly _tag = name
+
+    readonly spec = spec
+
+    readonly AddressString = AddressString.check(S.isPattern(address.pattern)).pipe(S.brand(this.id))
+
+    readonly ReferenceString = ReferenceString.check(S.isPattern(reference.pattern)).pipe(S.brand(this.id))
+  }
+}

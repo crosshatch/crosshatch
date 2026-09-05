@@ -1,17 +1,18 @@
 import { invalidError } from "@crosshatch/util"
 import { BigDecimal, Effect, Option, Schema as S, SchemaGetter } from "effect"
 
+import { id } from "./_Proto.ts"
 import * as Atomic from "./Atomic.ts"
 import * as Decimals from "./Decimals.ts"
 
 /** A non-negative `BigDecimal` whose raw scale is a safe integer between -255 and 255. */
 export type Amount = typeof Amount.Type
 export const Amount = S.BigDecimal.check(
-  S.makeFilter((v) => Number.isSafeInteger(v.scale) && Math.abs(v.scale) <= Decimals.MAX_DECIMALS, {
+  S.makeFilter((input) => Number.isSafeInteger(input.scale) && Math.abs(input.scale) <= Decimals.MAX_DECIMALS, {
     expected: `a BigDecimal with a safe integer scale between -${Decimals.MAX_DECIMALS} and ${Decimals.MAX_DECIMALS}`,
   }),
   S.isGreaterThanOrEqualToBigDecimal(BigDecimal.fromBigInt(0n)),
-).pipe(S.brand("crosshatch/Amount"))
+).pipe(S.brand(id("Amount")))
 
 export type AmountInput = number | bigint | string | BigDecimal.BigDecimal
 

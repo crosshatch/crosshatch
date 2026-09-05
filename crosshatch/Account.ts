@@ -1,28 +1,28 @@
-import { Effect, Schema as S, SchemaGetter } from "effect"
+import { Schema as S, type Pipeable, Predicate, SchemaGetter } from "effect"
 
-import * as Address from "./Address.ts"
-import * as Chain from "./Chain.ts"
+import * as Proto from "./_Proto.ts"
+import { AddressString } from "./Address.ts"
+import { ChainFromString } from "./Chain.ts"
 
-const TypeId = "~crosshatch/AccountId" as const
+const TypeId = Proto.id("Account")
 
-export type Account = typeof Account.Type
-export const Account = S.Struct({
-  [TypeId]: S.tag(TypeId),
-  chain: Chain.ChainFromString,
-  address: Address.Address,
+export type AccountFields = typeof AccountFields.Type
+export const AccountFields = S.Struct({
+  chain: ChainFromString,
+  address: AddressString,
 })
 
-export type AccountParts = typeof AccountParts.Type
-export const AccountParts = S.TemplateLiteralParser([Chain.ChainFromString, ":", Address.Address])
+export interface Account extends AccountFields, Pipeable.Pipeable {
+  readonly [TypeId]: typeof TypeId
+}
 
-export type AccountFromString = typeof AccountFromString.Type
-export const AccountFromString = AccountParts.pipe(
-  S.decodeTo(Account, {
-    decode: SchemaGetter.transformOrFail(([chain, _1, address]) =>
-      S.encodeEffect(Account)({ [TypeId]: TypeId, chain, address }).pipe(Effect.mapError((e) => e.issue)),
-    ),
-    encode: SchemaGetter.transformOrFail(({ chain, address }) =>
-      S.decodeEffect(AccountParts)(`${chain}:${address}`).pipe(Effect.mapError((e) => e.issue)),
-    ),
+export const isAccount = (v: unknown): v is Account => Predicate.hasProperty(v, TypeId)
+
+export const make = (v: AccountFields): Account => ({ ...Proto.make(TypeId), ...v })
+
+export const AccountFromString = S.TemplateLiteralParser([ChainFromString, ":", AddressString]).pipe(
+  S.decodeTo(S.declare(isAccount), {
+    decode: SchemaGetter.transform(([chain, _1, address]) => make({ chain, address })),
+    encode: SchemaGetter.transform(({ chain, address }) => [chain, ":", address]),
   }),
 )

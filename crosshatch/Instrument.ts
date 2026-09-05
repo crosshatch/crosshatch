@@ -1,41 +1,40 @@
+import * as Proto from "./_Proto.ts"
 import type * as Namespace from "./Namespace.ts"
+import type { Reference } from "./Reference.ts"
 import type * as Representation from "./Representation.ts"
-import type * as Scheme from "./Scheme.ts"
+import type { SchemeEnvelope } from "./Scheme.ts"
 import type * as Unit from "./Unit.ts"
 
-const TypeId = "~crosshatch/Instrument" as const
+const TypeId = Proto.id("Instrument")
 
 export interface Instrument<
   Representation_ extends Representation.Any,
-  NamespaceShape_ extends Namespace.NamespaceShape.Any,
-  Reference extends string,
+  Namespace_ extends Namespace.Any,
+  Reference_ extends string,
 > {
   readonly [TypeId]: typeof TypeId
 
   readonly representation: Representation_
 
-  readonly namespace: NamespaceShape_
+  readonly namespace: Namespace_
 
-  readonly reference: Reference
+  readonly reference: Reference<Namespace_, Reference_>
 }
 
-export type Any = Instrument<Representation.Any, Namespace.NamespaceShape.Any, string>
+export type Any = Instrument<Representation.Any, Namespace.Any, string>
 
-export declare const make: <
-  Representation_ extends Representation.Any,
-  NamespaceShape_ extends Namespace.NamespaceShape.Any,
->(
+export declare const make: <Representation_ extends Representation.Any, Namespace_ extends Namespace.Any>(
   representation: new () => Representation_,
-  namespace: new (_: never) => NamespaceShape_,
+  namespace: new () => Namespace_,
 ) => <Reference extends string>(spec: {
   reference: Reference
   address: string
-  schemeEnvelopes: ReadonlyArray<Scheme.SchemeEnvelope>
-}) => Instrument<Representation_, NamespaceShape_, Reference>
+  schemeEnvelopes: ReadonlyArray<SchemeEnvelope>
+}) => Instrument<Representation_, Namespace_, Reference>
 
 export type InstrumentModule<U extends Unit.Any = Unit.Any> = Record<
   string,
-  Representation.RepresentationClass<string, U> | Any
+  Representation.RepresentationClass<U, string> | Any
 >
 
 export declare namespace InstrumentModule {
