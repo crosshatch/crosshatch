@@ -4,42 +4,42 @@ import { Effect, Exit } from "effect"
 
 import { CryptoKey, Ed25519Pair, Ed25519PrivateKey, X25519Pair, X25519PrivateKey, X25519PublicKey } from "./index.ts"
 
-const test = it.layer(NodeCrypto.layer)
-
 describe(import.meta.url, () => {
-  test(
-    "encrypting and decrypting",
-    Effect.fn(function* () {
-      const { privateKey, publicKey } = yield* X25519Pair.random()
-      const data = new TextEncoder().encode("crosshatching")
-      const cva = yield* X25519PublicKey.encrypt(publicKey, data)
-      const decrypted = yield* X25519PrivateKey.decrypt(privateKey, cva)
-      expect(decrypted).toStrictEqual(data)
-    }),
-  )
-  test(
-    "X25519 wrong-key decrypt failure",
-    Effect.fn(function* () {
-      const pairA = yield* X25519Pair.random()
-      const pairB = yield* X25519Pair.random()
-      const data = new TextEncoder().encode("crosshatching")
-      const envelope = yield* X25519PublicKey.encrypt(pairA.publicKey, data)
-      const exit = yield* X25519PrivateKey.decrypt(pairB.privateKey, envelope).pipe(Effect.exit)
-      expect(Exit.isFailure(exit)).toBeTruthy()
-    }),
-  )
-  test(
-    "private key serialization roundtrip",
-    Effect.fn(function* () {
-      const { privateKey, publicKey } = yield* X25519Pair.random({ extractable: true })
-      const pkcs8 = yield* X25519PrivateKey.toPkcs8(privateKey)
-      const hydrated = yield* X25519PrivateKey.fromPkcs8(pkcs8)
-      const data = new TextEncoder().encode("crosshatching")
-      const envelope = yield* X25519PublicKey.encrypt(publicKey, data)
-      const decrypted = yield* X25519PrivateKey.decrypt(hydrated, envelope)
-      expect(decrypted).toStrictEqual(data)
-    }),
-  )
+  it.layer(NodeCrypto.layer)((it) => {
+    it.effect(
+      "encrypting and decrypting",
+      Effect.fn(function* () {
+        const { privateKey, publicKey } = yield* X25519Pair.random()
+        const data = new TextEncoder().encode("crosshatching")
+        const cva = yield* X25519PublicKey.encrypt(publicKey, data)
+        const decrypted = yield* X25519PrivateKey.decrypt(privateKey, cva)
+        expect(decrypted).toStrictEqual(data)
+      }),
+    )
+    it.effect(
+      "X25519 wrong-key decrypt failure",
+      Effect.fn(function* () {
+        const pairA = yield* X25519Pair.random()
+        const pairB = yield* X25519Pair.random()
+        const data = new TextEncoder().encode("crosshatching")
+        const envelope = yield* X25519PublicKey.encrypt(pairA.publicKey, data)
+        const exit = yield* X25519PrivateKey.decrypt(pairB.privateKey, envelope).pipe(Effect.exit)
+        expect(Exit.isFailure(exit)).toBeTruthy()
+      }),
+    )
+    it.effect(
+      "private key serialization roundtrip",
+      Effect.fn(function* () {
+        const { privateKey, publicKey } = yield* X25519Pair.random({ extractable: true })
+        const pkcs8 = yield* X25519PrivateKey.toPkcs8(privateKey)
+        const hydrated = yield* X25519PrivateKey.fromPkcs8(pkcs8)
+        const data = new TextEncoder().encode("crosshatching")
+        const envelope = yield* X25519PublicKey.encrypt(publicKey, data)
+        const decrypted = yield* X25519PrivateKey.decrypt(hydrated, envelope)
+        expect(decrypted).toStrictEqual(data)
+      }),
+    )
+  })
   it.effect(
     "non-extractable private key export fails",
     Effect.fn(function* () {
