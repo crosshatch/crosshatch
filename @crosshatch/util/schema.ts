@@ -22,3 +22,6 @@ export const PrintableAscii32 = S.String.check(S.isLengthBetween(1, 32), S.isPat
 
 export const invalidError = (input: unknown, expected: string) =>
   new S.SchemaError(new SchemaIssue.InvalidValue({ expected }, input, { reportInput: true }))
+
+export type HexString = typeof HexString.Type
+export const HexString = S.TemplateLiteral(["0x", S.String])

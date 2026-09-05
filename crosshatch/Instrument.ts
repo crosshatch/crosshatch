@@ -2,6 +2,7 @@ import * as Proto from "./_Proto.ts"
 import type * as Namespace from "./Namespace.ts"
 import type { Reference } from "./Reference.ts"
 import type * as Representation from "./Representation.ts"
+import type { Requirements } from "./Requirements.ts"
 import type { SchemeEnvelope } from "./Scheme.ts"
 import type * as Unit from "./Unit.ts"
 
@@ -42,3 +43,7 @@ export declare namespace InstrumentModule {
 
   export type Unit<M extends InstrumentModule> = M extends InstrumentModule<infer U> ? U : never
 }
+
+export declare const matchRequirements: (
+  instruments: ReadonlyArray<InstrumentModule>,
+) => (requirements: Requirements) => boolean

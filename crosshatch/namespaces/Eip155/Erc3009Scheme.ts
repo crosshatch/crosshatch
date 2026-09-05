@@ -4,6 +4,7 @@ import { Address, type Hex } from "ox"
 import { Scheme, Adapt } from "../../index.ts"
 import type { Eip155 } from "./Eip155.ts"
 import { Eip155Signer } from "./Eip155Signer.ts"
+import { getDelegation, type Erc7710DelegatorPayload } from "./Erc7710Delegator.ts"
 
 const Extra = S.Struct({
   assetTransferMethod: S.Literal("eip3009").pipe(S.optional),
@@ -15,22 +16,25 @@ export class Erc3009Scheme extends Scheme.Service<
   Erc3009Scheme,
   Eip155,
   typeof Extra.Type,
-  {
-    readonly signature: string
-    readonly authorization: {
-      readonly from: Hex.Hex
-      readonly to: Hex.Hex
-      readonly value: string
-      readonly validAfter: string
-      readonly validBefore: string
-      readonly nonce: Hex.Hex
+  | {
+      readonly signature: string
+      readonly authorization: {
+        readonly from: Hex.Hex
+        readonly to: Hex.Hex
+        readonly value: string
+        readonly validAfter: string
+        readonly validBefore: string
+        readonly nonce: Hex.Hex
+      }
     }
-  }
+  | Erc7710DelegatorPayload
 >()("crosshatch/namespaces/Eip155/Erc3009Scheme") {}
 
 export const layer = Erc3009Scheme.layer(
   Extra,
   Effect.fnUntraced(function* ({ accepted, extra: { name, version } }) {
+    const delegation = yield* getDelegation
+    if (delegation) return delegation
     const now = Math.floor(DateTime.toEpochMillis(yield* DateTime.now) / 1000)
     const chainId = parseInt(accepted.network.reference)
     const signer = yield* Eip155Signer

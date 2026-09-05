@@ -4,39 +4,44 @@ import { Address } from "ox"
 import { Scheme, Adapt } from "../../index.ts"
 import type { Eip155 } from "./Eip155.ts"
 import { Eip155Signer } from "./Eip155Signer.ts"
+import { getDelegation, type Erc7710DelegatorPayload } from "./Erc7710Delegator.ts"
 
 const Extra = S.Struct({
   assetTransferMethod: S.Literal("permit2"),
   name: S.String,
   version: S.String,
+  supportsEip2612: S.Boolean.pipe(S.optional),
 })
 
 export class Permit2Scheme extends Scheme.Service<
   Permit2Scheme,
   Eip155,
   typeof Extra.Type,
-  {
-    readonly signature: string
-    readonly permit2Authorization: {
-      readonly from: string
-      readonly permitted: {
-        readonly token: string
-        readonly amount: string
-      }
-      readonly spender: string
-      readonly nonce: string
-      readonly deadline: string
-      readonly witness: {
-        readonly to: string
-        readonly validAfter: string
+  | {
+      readonly signature: string
+      readonly permit2Authorization: {
+        readonly from: string
+        readonly permitted: {
+          readonly token: string
+          readonly amount: string
+        }
+        readonly spender: string
+        readonly nonce: string
+        readonly deadline: string
+        readonly witness: {
+          readonly to: string
+          readonly validAfter: string
+        }
       }
     }
-  }
+  | Erc7710DelegatorPayload
 >()("crosshatch/namespaces/Eip155/Permit2Scheme") {}
 
 export const layer = Permit2Scheme.layer(
   Extra,
   Effect.fnUntraced(function* ({ accepted }) {
+    const delegation = yield* getDelegation
+    if (delegation) return delegation
     const signer = yield* Eip155Signer
     const now = Math.floor(DateTime.toEpochMillis(yield* DateTime.now) / 1000)
     const chainId = parseInt(accepted.network.reference)
