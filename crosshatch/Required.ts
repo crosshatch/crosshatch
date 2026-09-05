@@ -1,90 +1,53 @@
-import { stringRaw } from "@crosshatch/util"
-import { Schema as S, Effect, Context } from "effect"
+import { type Effect, type Pipeable, Predicate, Schema as S, SchemaGetter, Function } from "effect"
 
-import { type Extension, ExtensionEnvelopes } from "./Extension.ts"
-import { Requirements, type RequirementsLike } from "./Requirements.ts"
+import * as Proto from "./_Proto.ts"
+import { Accepts } from "./Accepts.ts"
+import { ExtensionsEnvelope } from "./Extension.ts"
 import { ResourceInfo } from "./ResourceInfo.ts"
 import { Version } from "./Version.ts"
 
-export type Required = typeof Required.Type
-export const Required = S.Struct({
+const TypeId = Proto.id("Required")
+
+export type RequiredFields = typeof RequiredFields.Type
+export const RequiredFields = S.Struct({
   x402Version: Version,
   resource: ResourceInfo,
-  accepts: S.Array(Requirements),
+  accepts: Accepts,
   error: S.String.pipe(S.optional),
-  extensions: ExtensionEnvelopes.pipe(S.optional),
+  extensions: ExtensionsEnvelope.pipe(S.optional),
 })
 
-export const RequiredJson = S.toCodecJson(Required)
-export const RequiredFromJsonString = S.fromJsonString(RequiredJson)
-export const RequiredFromBase64JsonString = S.StringFromBase64.pipe(S.decodeTo(RequiredFromJsonString))
+export interface Required extends RequiredFields, Pipeable.Pipeable {
+  readonly [TypeId]: typeof TypeId
+}
 
-export class RequiredUrl extends Context.Reference<string | undefined>("crosshatch/RequiredUrl", {
-  defaultValue: () => undefined,
-}) {}
+export const isRequired = (v: unknown): v is Required => Predicate.hasProperty(v, TypeId)
 
-export const make = Effect.fnUntraced(function* (
-  template?: TemplateStringsArray | string,
-  ...substitutions: ReadonlyArray<unknown>
-) {
-  const url = yield* RequiredUrl
-  return {
-    accepts: [],
-    x402Version: 2,
-    resource: {
-      url,
-      ...(template && {
-        description: stringRaw(template, substitutions),
-      }),
-    },
-  } satisfies Required
-})
+export const make = (v: RequiredFields): Required => ({ ...Proto.make(TypeId), ...v })
 
-export const accept =
-  (...acceptsInputs: ReadonlyArray<RequirementsLike>) =>
-  <E, R>(effect: Effect.Effect<Required, E, R>): Effect.Effect<Required, E | S.SchemaError, R> =>
-    Effect.flatMap(
-      effect,
-      Effect.fnUntraced(function* ({ accepts, ...rest }) {
-        return {
-          ...rest,
-          accepts: yield* Effect.forEach(acceptsInputs ?? [], (v) => (Effect.isEffect(v) ? v : Effect.succeed(v))).pipe(
-            Effect.map((v) => v.flat()),
-          ),
-        }
-      }),
-    )
+export const Required = RequiredFields.pipe(
+  S.decodeTo(S.declare(isRequired), {
+    decode: SchemaGetter.transform(make),
+    encode: SchemaGetter.transform(({ x402Version, resource, accepts, error, extensions }) => ({
+      x402Version,
+      resource,
+      accepts,
+      error,
+      extensions,
+    })),
+  }),
+)
 
-export const extend =
-  <
-    Self,
-    K extends string,
-    Name extends string,
-    ExtensionPayload extends Extension.Info,
-    Enrichment extends Extension.Enrichment<ExtensionPayload>,
-  >(
-    extension: Extension<Self, K, Name, ExtensionPayload, Enrichment>,
-    payload: ExtensionPayload["Type"],
-  ) =>
-  <E, R>(
-    effect: Effect.Effect<Required, E, R>,
-  ): Effect.Effect<Required, E | S.SchemaError, R | ExtensionPayload["EncodingServices"]> =>
-    Effect.flatMap(
-      effect,
-      Effect.fnUntraced(function* ({ extensions, ...rest }) {
-        const envelope = yield* Effect.all(
-          {
-            schema: S.encodeUnknownEffect(S.Json)(S.toJsonSchemaDocument(extension.info)),
-            info: S.encodeEffect(S.toCodecJson(extension.info))(payload),
-          },
-          { concurrency: "unbounded" },
-        )
-        return {
-          ...rest,
-          extensions: {
-            ...extensions,
-            [extension.identifier]: envelope,
-          },
-        }
-      }),
-    )
+export const RequiredFromString = S.StringFromBase64.pipe(S.decodeTo(S.fromJsonString(S.toCodecJson(Required))))
+
+export const describe = Function.dual<
+  (
+    e0: TemplateStringsArray | string,
+    ...substitutions: ReadonlyArray<string | number>
+  ) => (accepts: Accepts) => Effect.Effect<Required, S.SchemaError>,
+  (
+    accepts: Accepts,
+    e0: TemplateStringsArray | string,
+    ...substitutions: ReadonlyArray<string | number>
+  ) => Effect.Effect<Required, S.SchemaError>
+>(2, null!)

@@ -1,7 +1,7 @@
 import { Schema as S, String, Tuple } from "effect"
 import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 
-import { Address } from "../Address.ts"
+import { AddressFromString } from "../Address.ts"
 import { Payload } from "../Payload.ts"
 import { Requirements } from "../Requirements.ts"
 import { Version } from "../Version.ts"
@@ -13,15 +13,15 @@ export const VerifyPayload = S.Struct({
   paymentRequirements: Requirements,
 })
 
-export type VerifyResponse = typeof VerifyResponse
+export type VerifyResponse = typeof VerifyResponse.Type
 export const VerifyResponse = S.Union([
   S.Struct({
     isValid: S.tag(true),
-    payer: Address.pipe(S.optional),
+    payer: AddressFromString.pipe(S.optional),
   }),
   S.Struct({
     isValid: S.tag(false),
-    payer: Address.pipe(S.optional),
+    payer: AddressFromString.pipe(S.optional),
     invalidReason: S.String.pipe(S.optional),
     invalidMessage: S.String.pipe(S.optional),
   }),

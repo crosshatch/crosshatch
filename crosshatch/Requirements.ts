@@ -1,84 +1,42 @@
-import { flow, type Types, Array, Effect, Schema as S, Record, Duration, UndefinedOr } from "effect"
+import { type Pipeable, Predicate, Schema as S, SchemaGetter } from "effect"
 
-import { Address } from "./Address.ts"
-import * as Amount from "./Amount.ts"
-import { Asset, type Denomination, type LogicalAsset } from "./Asset.ts"
-import { ChainId } from "./ChainId.ts"
+import * as Proto from "./_Proto.ts"
+import { AddressFromString } from "./Address.ts"
+import { Atomic } from "./Atomic.ts"
+import { ChainFromString } from "./Chain.ts"
 
-export type Requirements = typeof Requirements.Type
-export const Requirements = S.Struct({
-  amount: Amount.Atomic,
-  asset: Asset,
-  extra: S.Record(S.String, S.Unknown).pipe(S.optional),
+const TypeId = Proto.id("Requirements")
+
+export type RequirementsFields = typeof RequirementsFields.Type
+export const RequirementsFields = S.Struct({
+  amount: Atomic,
+  asset: AddressFromString,
+  extra: S.JsonObject.pipe(S.optional),
   maxTimeoutSeconds: S.Int.check(S.isGreaterThan(0)),
-  network: ChainId,
-  payTo: Address,
+  network: ChainFromString,
+  payTo: AddressFromString,
   scheme: S.Literals(["exact", "upto"]),
 })
 
-export type RequirementsLike =
-  | Requirements
-  | Effect.Effect<Requirements, S.SchemaError>
-  | Array<Requirements>
-  | Effect.Effect<Array<Requirements>, S.SchemaError>
+export interface Requirements extends RequirementsFields, Pipeable.Pipeable {
+  readonly [TypeId]: typeof TypeId
+}
 
-export const logical = Effect.fnUntraced(function* <A extends LogicalAsset>(
-  asset: A,
-  {
-    amount,
-    recipients,
-    ttl,
-  }: {
-    readonly amount: Amount.Input
-    readonly recipients: {
-      readonly [K in keyof A]?: { readonly [K2 in keyof A[K]]?: typeof Address.Type | undefined } | undefined
-    }
-    readonly ttl?: Duration.Input | undefined
-  },
-) {
-  const maxTimeoutSeconds = UndefinedOr.match(ttl, {
-    onDefined: flow(Duration.fromInputUnsafe, Duration.toSeconds, Math.ceil),
-    onUndefined: () => 300,
-  })
-  const nominal = yield* Amount.from(amount)
-  const requirements: Array<Requirements> = []
-  for (const [namespace, references] of Record.toEntries(recipients)) {
-    if (!references) continue
-    for (const [reference, payTo] of Record.toEntries(references)) {
-      const physical = asset[namespace]?.[reference]
-      if (!physical || !payTo) continue
-      const { name, version } = physical
-      requirements.push({
-        amount: yield* Amount.toAtomic(nominal, physical),
-        asset: Asset.make(physical.asset, { disableChecks: true }),
-        maxTimeoutSeconds,
-        network: ChainId.make(`${namespace}:${reference}`, { disableChecks: true }),
-        payTo,
-        scheme: "exact",
-        extra: { name, version },
-      })
-    }
-  }
-  return requirements
-})
+export const isRequirements = (v: unknown): v is Requirements => Predicate.hasProperty(v, TypeId)
 
-export const denomination = <A extends Denomination>(
-  denomination: A,
-  config: {
-    readonly amount: Amount.Input
-    readonly recipients: Types.UnionToIntersection<
-      {
-        readonly [K in keyof A]: {
-          readonly [K2 in keyof A[K]]?:
-            | { readonly [K3 in keyof A[K][K2]]?: typeof Address.Type | undefined }
-            | undefined
-        }
-      }[keyof A]
-    >
-    readonly ttl?: Duration.Input | undefined
-  },
-) =>
-  Effect.all(
-    Record.toEntries(denomination).map(([_k, logicalAsset]) => logical(logicalAsset, config as never)),
-    { concurrency: "unbounded" },
-  ).pipe(Effect.map(Array.flatten))
+export const make = (v: RequirementsFields): Requirements => ({ ...Proto.make(TypeId), ...v })
+
+export const Requirements = RequirementsFields.pipe(
+  S.decodeTo(S.declare(isRequirements), {
+    decode: SchemaGetter.transform(make),
+    encode: SchemaGetter.transform(({ amount, asset, extra, maxTimeoutSeconds, network, payTo, scheme }) => ({
+      amount,
+      asset,
+      extra,
+      maxTimeoutSeconds,
+      network,
+      payTo,
+      scheme,
+    })),
+  }),
+)

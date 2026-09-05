@@ -1,80 +1,43 @@
-import { Context, Data, Effect, flow, Layer, Schema as S, type Scope } from "effect"
+import { type Layer, type Scope, type Schema as S, Context } from "effect"
 
-import type { PhysicalAsset } from "./Asset.ts"
-import type { Requirements } from "./Requirements.ts"
+import * as Proto from "./_Proto.ts"
+import type { Adapt } from "./Adapt.ts"
+import type * as Namespace from "./Namespace.ts"
 
-export type SchemePayload = Record<string, S.Json>
+const TypeId = Proto.id("Scheme")
 
-export class CreatePayloadError extends Data.TaggedError("CreatePayloadError")<{ readonly cause?: unknown }> {}
-
-export type Adapt<R> = Effect.Effect<SchemePayload, CreatePayloadError, R>
-
-export interface SchemeConfig {
-  readonly accepted: Requirements
-  readonly physical: PhysicalAsset
-}
-
-export interface SchemeMetadata<T extends S.Top, T2 extends S.Top> {
-  readonly known: T
-  readonly extra: T2
-}
-
-export interface SchemeMetadataResolved<T extends S.Top, T2 extends S.Top> {
-  readonly known: T["Type"]
-  readonly extra: T2["Type"]
-}
-
-export type Service = ({ accepted, physical }: SchemeConfig) => Effect.Effect<Adapt<never>, S.SchemaError>
-
-const TypeId = "~crosshatch/Scheme" as const
-
-export interface Scheme<Self, Id extends string, Known, Extra> extends Context.Service<Self, Service> {
-  new (_: never): Context.ServiceClass.Shape<Id, Service>
+export interface Scheme<
+  Self,
+  Id extends string,
+  Namespace_ extends Namespace.Any,
+  Extra,
+  A extends S.JsonObject,
+> extends Context.Service<Self, Adapt<Extra, A, never>> {
+  new (_: never): Context.ServiceClass.Shape<Id, Adapt<Extra, A, never>>
 
   readonly [TypeId]: typeof TypeId
 
-  readonly layer: <T extends S.Top & { readonly Type: Known }, T2 extends S.Top & { readonly Type: Extra }, R>(
-    metadata: SchemeMetadata<T, T2>,
-    f: (metadata: SchemeMetadataResolved<T, T2>) => (config: SchemeConfig) => Adapt<R>,
-  ) => Layer.Layer<Self, never, Exclude<T2["DecodingServices"] | R, Scope.Scope>>
+  readonly namespace: Namespace_
+
+  readonly make: (extra: Extra) => SchemeEnvelope
+
+  readonly layer: <X extends S.Top & { readonly Type: Extra }, R>(
+    Extra: X,
+    f: Adapt<Extra, A, R>,
+  ) => Layer.Layer<Self, never, Exclude<X["DecodingServices"] | R, Scope.Scope>>
 }
 
-export declare namespace Scheme {
-  export type Any = Scheme<any, any, any, any>
+export type Any = Scheme<any, string, Namespace.Any, any, S.JsonObject>
+
+export interface SchemeEnvelope {
+  readonly scheme: Any
+  readonly extra: S.Top
 }
 
 export const Service =
-  <Self, Known, Extra>() =>
-  <Id extends string>(id: Id): Scheme<Self, Id, Known, Extra> => {
-    const tag = Context.Service<Self, Service>()(id)
-    const layer = <T extends S.Top & { readonly Type: Known }, T2 extends S.Top & { readonly Type: Extra }, R>(
-      metadata: SchemeMetadata<T, T2>,
-      f: (metadata: SchemeMetadataResolved<T, T2>) => (config: SchemeConfig) => Adapt<R>,
-    ): Layer.Layer<Self, never, Exclude<T2["DecodingServices"] | R, Scope.Scope>> => {
-      const { known, extra } = metadata
-      return Layer.effect(
-        tag,
-        Effect.gen(function* () {
-          const context = yield* Effect.context<Exclude<T2["DecodingServices"] | R, Scope.Scope>>()
-          const bound = flow(Effect.scoped, Effect.provideContext(context))
-          return Effect.fnUntraced(function* ({
-            accepted,
-            physical,
-          }: {
-            readonly accepted: Requirements
-            readonly physical: PhysicalAsset
-          }) {
-            const match = yield* Effect.all(
-              {
-                known: S.decodeUnknownEffect(S.toType(known))(physical.metadata),
-                extra: S.decodeEffect(extra)(accepted.extra),
-              },
-              { concurrency: "unbounded" },
-            )
-            return f(match)({ accepted, physical }).pipe(bound)
-          }, bound)
-        }),
-      )
-    }
-    return Object.assign(tag, { [TypeId]: TypeId, layer })
+  <Self, Namespace_ extends Namespace.Any, Extra, A extends S.JsonObject>() =>
+  <Id extends string>(_id: Id): Scheme<Self, Id, Namespace_, Extra, A> => {
+    // oxlint-disable-next-line effecttsgo/service-not-as-class
+    const Context_ = Context.Service<Self, Adapt<Extra, A, never>>()
+    return Object.assign(Context_, {}) as never
   }

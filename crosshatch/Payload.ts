@@ -1,38 +1,61 @@
-import { Context, Effect, Equal, Schema as S } from "effect"
+import { Context, Equal, Schema as S, Option, Effect, Layer, type Pipeable, Predicate, SchemaGetter } from "effect"
+import { HttpServerRequest, Headers } from "effect/unstable/http"
 
-import { ExtensionEnvelopes } from "./Extension.ts"
-import { Payer } from "./Payer.ts"
-import type { Required } from "./Required.ts"
+import { PAYMENT_SIGNATURE } from "./_constants.ts"
+import * as Proto from "./_Proto.ts"
+import type { Accepts } from "./Accepts.ts"
+import { ExtensionsEnvelope } from "./Extension.ts"
 import { Requirements } from "./Requirements.ts"
 import { ResourceInfo } from "./ResourceInfo.ts"
 import { Version } from "./Version.ts"
 
-type Payload_ = typeof Payload_.Type
-const Payload_ = S.Struct({
+const TypeId = Proto.id("Payload")
+
+export type PayloadFields = typeof PayloadFields.Type
+export const PayloadFields = S.Struct({
   x402Version: Version,
   accepted: Requirements,
-  extensions: ExtensionEnvelopes.pipe(S.optional),
-  payload: S.Record(S.String, S.Unknown),
+  extensions: ExtensionsEnvelope.pipe(S.optional),
+  payload: S.JsonObject,
   resource: ResourceInfo.pipe(S.optional),
 })
 
-// oxlint-disable-next-line typescript/no-empty-interface
-export interface Payload extends Payload_ {}
+export interface Payload extends PayloadFields, Pipeable.Pipeable {
+  readonly [TypeId]: typeof TypeId
+}
 
-export const Payload = Object.assign(Context.Service<Payload, Payload | undefined>("crosshatch/Payload"), Payload_)
+export const isPayload = (v: unknown): v is Payload => Predicate.hasProperty(v, TypeId)
 
-export type Acceptable = typeof Acceptable.Type
-export const Acceptable = Payload.pipe(S.brand("crosshatch/Acceptable"))
+export const make = (v: PayloadFields): Payload => ({ ...Proto.make(TypeId), ...v })
 
-export const PayloadJson = S.toCodecJson(Payload)
-export const PayloadFromJsonString = S.fromJsonString(PayloadJson)
-export const PayloadFromBase64JsonString = S.StringFromBase64.pipe(S.decodeTo(PayloadFromJsonString))
+export const Payload = Object.assign(
+  Context.Service<Payload, Payload | undefined>("crosshatch/Payload"),
+  PayloadFields.pipe(
+    S.decodeTo(S.declare(isPayload), {
+      decode: SchemaGetter.transform(make),
+      encode: SchemaGetter.transform(({ x402Version, accepted, extensions, payload, resource }) => ({
+        x402Version,
+        accepted,
+        extensions,
+        payload,
+        resource,
+      })),
+    }),
+  ),
+)
 
-export const make = ({ required }: { readonly required: Required }) =>
-  Effect.flatMap(Payer, ({ createPayload }) => createPayload({ required }))
+export const PayloadFromString = S.StringFromBase64.pipe(S.decodeTo(S.fromJsonString(S.toCodecJson(Payload))))
 
-export const isAcceptable = (
-  accepts: ReadonlyArray<Requirements>,
-  payload: Payload | undefined,
-): payload is Acceptable =>
-  payload !== undefined && accepts.some((requirement) => Equal.equals(requirement, payload.accepted))
+export const match = (payload: unknown, accepts: Accepts): payload is Payload =>
+  isPayload(payload) ? accepts.raw.some(Equal.equals(payload.accepted)) : false
+
+export const layerFromRequest = Layer.effect(
+  Payload,
+  Effect.gen(function* () {
+    const { headers } = yield* HttpServerRequest.HttpServerRequest
+    return Headers.get(PAYMENT_SIGNATURE)(headers).pipe(
+      Option.flatMap(S.decodeUnknownOption(PayloadFromString)),
+      Option.getOrUndefined,
+    )
+  }),
+)

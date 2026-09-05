@@ -3,7 +3,7 @@ import { Effect, Stream, Option, Match, SubscriptionRef } from "effect"
 import { Atom } from "effect/unstable/reactivity"
 
 import * as Amount from "../Amount.ts"
-import type { Bridge } from "../index.ts"
+import type { Remote } from "../index.ts"
 import { Allowance } from "./Allowance.ts"
 import { memoMap } from "./ChxBrowserRuntime.ts"
 import * as BrowserServices from "./ChxBrowserServices.ts"
@@ -26,7 +26,7 @@ export const rescind = runtime.fn<void>()(
   }),
 )
 
-export const propose = runtime.fn<Bridge.Proposal>()(
+export const propose = runtime.fn<Remote.Proposal>()(
   Effect.fnUntraced(function* (proposal) {
     const facade = yield* FacadeClient
     yield* facade.Propose(proposal)

@@ -21,16 +21,17 @@
   "exports": {
     ".": "./index.ts",
     "./*": "./*.ts",
-    "./Browser": "./Browser/index.ts",
-    "./ChxNodeServices": "./ChxNodeServices/index.ts",
-    "./Cirque": "./Cirque/index.ts",
-    "./Crypto": "./Crypto/index.ts",
-    "./Eip155": "./Eip155/index.ts",
-    "./FacilitatorApi": "./FacilitatorApi/index.ts",
-    "./Known": "./Known/index.ts",
     "./package.json": "./package.json",
-    "./Solana": "./Solana/index.ts",
-    "./Unified": "./Unified/index.ts"
+    "./Crypto": "./Crypto/index.ts",
+    "./Crypto/*": "./Crypto/*.ts",
+    "./coins": "./coins/index.ts",
+    "./coins/*": "./coins/*.ts",
+    "./namespaces/*": "./namespaces/*/index.ts",
+    "./namespaces/*/*": "./namespaces/*/*.ts",
+    "./units": "./units/index.ts",
+    "./units/*": "./units/*.ts",
+    "./FacilitatorApi": "./FacilitatorApi/index.ts",
+    "./FacilitatorApi/*": "./FacilitatorApi/*.ts"
   },
   "publishConfig": {
     "bin": {
@@ -39,16 +40,17 @@
     "exports": {
       ".": "./dist/index.js",
       "./*": "./dist/*.js",
-      "./Browser": "./dist/Browser/index.js",
-      "./ChxNodeServices": "./dist/ChxNodeServices/index.js",
-      "./Cirque": "./dist/Cirque/index.js",
-      "./Crypto": "./dist/Crypto/index.js",
-      "./Eip155": "./dist/Eip155/index.js",
-      "./FacilitatorApi": "./dist/FacilitatorApi/index.js",
-      "./Known": "./dist/Known/index.js",
       "./package.json": "./package.json",
-      "./Solana": "./dist/Solana/index.js",
-      "./Unified": "./dist/Unified/index.js"
+      "./Crypto": "./dist/Crypto/index.js",
+      "./Crypto/*": "./dist/Crypto/*.js",
+      "./coins": "./dist/coins/index.js",
+      "./coins/*": "./dist/coins/*.js",
+      "./namespaces/*": "./dist/namespaces/*/index.js",
+      "./namespaces/*/*": "./dist/namespaces/*/*.js",
+      "./units": "./dist/units/index.js",
+      "./units/*": "./dist/units/*.js",
+      "./FacilitatorApi": "./dist/FacilitatorApi/index.js",
+      "./FacilitatorApi/*": "./dist/FacilitatorApi/*.js"
     }
   },
   "scripts": {

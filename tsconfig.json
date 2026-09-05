@@ -5,7 +5,6 @@
     { "path": "./@crosshatch/widget" },
     { "path": "./crosshatch" },
     { "path": "./docs" },
-    { "path": "./examples" },
     { "path": "./konfik" },
     { "path": "./scratchpad" },
     { "path": "./tasks" }

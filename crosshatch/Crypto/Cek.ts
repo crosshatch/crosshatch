@@ -1,8 +1,7 @@
-import { Effect, Ref, Schema as S, Context, Layer, Data } from "effect"
+import { Effect, Ref, Schema as S, Context, Layer, Data, Crypto } from "effect"
 
 import * as CryptoKey from "./CryptoKey.ts"
 import type * as Envelope from "./Envelope.ts"
-import * as Random from "./Random.ts"
 import * as X25519Pair from "./X25519Pair.ts"
 import * as X25519PrivateKey from "./X25519PrivateKey.ts"
 
@@ -50,7 +49,10 @@ export const fromBytes = (bytes: Uint8Array, config?: { readonly extractable?: b
 export const toBytes = (cek: Cek) => CryptoKey.toBytes(cek)
 
 export const random = (config?: { readonly extractable?: boolean | undefined }) =>
-  Effect.sync(() => Random.bytes(32)).pipe(Effect.flatMap((v) => fromBytes(v, config)))
+  Crypto.Crypto.pipe(
+    Effect.flatMap((v) => v.randomBytes(32)),
+    Effect.flatMap((v) => fromBytes(v, config)),
+  )
 
 export const fromPrf = Effect.fnUntraced(function* (
   value: Uint8Array,
@@ -78,9 +80,10 @@ export const fromPrf = Effect.fnUntraced(function* (
 })
 
 export const encrypt = Effect.fnUntraced(function* (cek: Cek, value: Uint8Array) {
-  const iv = Random.bytes(12)
+  const crypto = yield* Crypto.Crypto
+  const iv = yield* crypto.randomBytes(12).pipe(Effect.map((v) => v.slice()))
   const cv = yield* Effect.promise(() =>
-    crypto.subtle.encrypt(
+    globalThis.crypto.subtle.encrypt(
       {
         iv,
         name: AES_GCM,

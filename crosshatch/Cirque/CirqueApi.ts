@@ -1,9 +1,8 @@
 import { BigDecimal, Schema as S } from "effect"
 import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "effect/unstable/httpapi"
 
-import { AccountId } from "../AccountId.ts"
 import { FacilitatorApiGroup } from "../FacilitatorApi/index.ts"
-import { Amount } from "../index.ts"
+import { Account, Amount } from "../index.ts"
 
 export const Providers = ["ApplePay", "Stripe", "Coinbase"] as const
 export type Provider = typeof Provider.Type
@@ -13,7 +12,7 @@ export type OnrampPayload = typeof OnrampPayload.Type
 export const OnrampPayload = S.Struct({
   provider: Provider,
   amount: Amount.AmountFromString.check(S.isGreaterThanBigDecimal(BigDecimal.fromBigInt(0n))),
-  recipient: AccountId,
+  recipient: Account.AccountFields,
 })
 
 export class CirqueApi extends HttpApi.make("cirque")

@@ -1,15 +1,15 @@
 import { Schema as S, String } from "effect"
 import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 
-import { ChainId } from "../ChainId.ts"
+import { ChainFromString } from "../Chain.ts"
 import { Version } from "../Version.ts"
 
+// TODO: determine what to do about legacy chain IDs.
 export type SupportedKind = typeof SupportedKind.Type
 export const SupportedKind = S.Struct({
   x402Version: Version,
   scheme: S.String,
-  // TODO: determine what to do about legacy chain IDs.
-  network: S.Union([S.String.pipe(S.brand("crosshatch/LegacyChainId")), ChainId]),
+  network: S.Union([S.String.pipe(S.brand("crosshatch/LegacyChainId")), ChainFromString]),
   extra: S.JsonObject.pipe(S.optional),
 })
 

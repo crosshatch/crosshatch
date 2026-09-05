@@ -2,20 +2,20 @@ import { ChxStage, ChxDomain } from "@crosshatch/util"
 import { Launcher, EmbedLauncher } from "@crosshatch/widget"
 import { Stream, Effect, Layer, flow } from "effect"
 
-import { Bridge, Payer } from "../index.ts"
+import { Remote, Payer } from "../index.ts"
 import { FacadeClient } from "./FacadeClient.ts"
 import { FacadeStateRef } from "./FacadeStateRef.ts"
 import { PrerequisitesWidget } from "./Widgets.ts"
 
-const layerBridge = Layer.effect(
-  Bridge.Bridge,
+const layerRemote = Layer.effect(
+  Remote.Remote,
   Effect.gen(function* () {
     const facade = yield* FacadeClient
     const { launch } = yield* Launcher.Launcher
     return {
       createTrace: flow(
         facade.CreateTrace,
-        Effect.mapError((cause) => Bridge.CreateTraceError.make({ cause })),
+        Effect.mapError((cause) => Remote.CreateTraceError.make({ cause })),
       ),
       propose: Effect.fnUntraced(
         function* ({ required, trace }) {
@@ -28,15 +28,15 @@ const layerBridge = Layer.effect(
           )
           return { payload }
         },
-        Effect.mapError((cause) => Bridge.ProposeError.make({ cause })),
+        Effect.mapError((cause) => Remote.ProposeError.make({ cause })),
       ),
     }
   }),
 )
 
-export const layer = Payer.layerFromBridge.pipe(
+export const layer = Payer.layerRemote.pipe(
   Layer.provideMerge(
-    layerBridge.pipe(
+    layerRemote.pipe(
       Layer.provideMerge(
         Layer.mergeAll(
           ChxDomain.ChxDomain.pipe(Effect.map(EmbedLauncher.layer), Layer.unwrap),

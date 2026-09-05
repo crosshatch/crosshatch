@@ -1,0 +1,42 @@
+import { Context, Layer, Effect } from "effect"
+import { Address, Hash, type Hex, Mnemonic as OxMnemonic, Secp256k1, Signature, TypedData } from "ox"
+
+import { Mnemonic } from "../../index.ts"
+
+export class Eip155Signer extends Context.Service<
+  Eip155Signer,
+  {
+    readonly address: Address.Address
+    readonly signTypedData: <
+      const typedData extends TypedData.TypedData | Record<string, unknown>,
+      primaryType extends keyof typedData | "EIP712Domain",
+    >(
+      value: TypedData.Definition<typedData, primaryType>,
+    ) => Hex.Hex
+  }
+>()("crosshatch/namespaces/Eip155/Eip155Signer") {}
+
+export const layerFromMnemonic = Layer.effect(
+  Eip155Signer,
+  Effect.gen(function* () {
+    const mnemonic = yield* Mnemonic.Mnemonic
+    const privateKey = OxMnemonic.toPrivateKey(Mnemonic.value(mnemonic), { as: "Hex" })
+    const publicKey = Secp256k1.getPublicKey({ privateKey })
+    return {
+      address: Address.fromPublicKey(publicKey, { checksum: true }),
+      signTypedData: <
+        const typedData extends TypedData.TypedData | Record<string, unknown>,
+        primaryType extends keyof typedData | "EIP712Domain",
+      >(
+        typedData: TypedData.Definition<typedData, primaryType>,
+      ) =>
+        Signature.toHex(
+          Secp256k1.sign({
+            extraEntropy: false,
+            payload: Hash.keccak256(TypedData.encode(typedData)),
+            privateKey,
+          }),
+        ),
+    }
+  }),
+)

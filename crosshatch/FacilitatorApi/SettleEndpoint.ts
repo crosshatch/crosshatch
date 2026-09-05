@@ -1,9 +1,9 @@
 import { Schema as S, String, Tuple } from "effect"
 import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 
-import { Address } from "../Address.ts"
-import { Atomic } from "../Amount.ts"
-import { ChainId } from "../ChainId.ts"
+import { AddressFromString } from "../Address.ts"
+import { Atomic } from "../Atomic.ts"
+import { ChainFromString } from "../Chain.ts"
 import { Payload } from "../Payload.ts"
 import { Requirements } from "../Requirements.ts"
 import { Version } from "../Version.ts"
@@ -19,15 +19,15 @@ export type SettleResponse = typeof SettleResponse.Type
 export const SettleResponse = S.Union([
   S.Struct({
     success: S.tag(true),
-    payer: Address.pipe(S.optional),
+    payer: AddressFromString.pipe(S.optional),
     transaction: S.String,
-    network: ChainId,
+    network: ChainFromString,
   }),
   S.Struct({
     success: S.tag(false),
-    payer: Address.pipe(S.optional),
+    payer: AddressFromString.pipe(S.optional),
     transaction: S.String,
-    network: ChainId,
+    network: ChainFromString,
     errorReason: S.String.pipe(S.optional),
     errorMessage: S.String.pipe(S.optional),
   }),
