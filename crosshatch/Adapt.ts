@@ -2,8 +2,11 @@ import { Data, type Schema as S, type Effect } from "effect"
 
 import type { Requirements } from "./Requirements.ts"
 
-export type Adapt<Extra, R> = (input: { readonly extra: Extra; readonly accepted: Requirements }) => AdaptEffect<R>
+export type Adapt<Extra, A extends S.JsonObject, R> = (input: {
+  readonly extra: Extra
+  readonly accepted: Requirements
+}) => AdaptEffect<A, R>
 
-export type AdaptEffect<R> = Effect.Effect<S.JsonObject, AdaptError, R>
+export type AdaptEffect<A extends S.JsonObject, R> = Effect.Effect<A, AdaptError, R>
 
-export class AdaptError extends Data.TaggedError("AdaptError")<{}> {}
+export class AdaptError extends Data.TaggedError("AdaptError")<{ readonly cause?: unknown }> {}

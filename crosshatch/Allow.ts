@@ -1,4 +1,4 @@
-import { type Effect, Data } from "effect"
+import { type Effect, Data, type Schema as S } from "effect"
 
 import type { AdaptEffect } from "./Adapt.ts"
 import type * as Instrument from "./Instrument.ts"
@@ -15,7 +15,7 @@ export type Allow = (config: { readonly required: Required }) => Effect.Effect<
     readonly accepted: Requirements
     readonly index: number
     readonly instrument: Instrument.Any
-    readonly adapt: AdaptEffect<never>
+    readonly adapt: AdaptEffect<S.JsonObject, never>
   },
   AllowError
 >

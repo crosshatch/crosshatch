@@ -14,7 +14,7 @@ export interface Address<Namespace_ extends Namespace.Any> extends Pipeable.Pipe
 
   readonly namespace: Namespace_
 
-  readonly "~address": Brand.Branded<AddressString, Namespace_["id"]>
+  readonly raw: Brand.Branded<AddressString, Namespace_["id"]>
 }
 
 export const isAddress = (v: unknown): v is Address<Namespace.Any> => Predicate.hasProperty(v, TypeId)
@@ -28,7 +28,7 @@ export const make = <Namespace_ extends Namespace.Any = Namespace.Any>(
     Effect.map((v) => ({
       ...Proto.make(TypeId),
       namespace,
-      "~address": v as never,
+      raw: v as never,
     })),
   )
 }
@@ -36,11 +36,11 @@ export const make = <Namespace_ extends Namespace.Any = Namespace.Any>(
 export const AddressFromString = AddressString.pipe(
   S.decodeTo(S.declare(isAddress), {
     decode: SchemaGetter.transformOrFail((v) => make(v).pipe(Effect.mapError((v) => v.issue))),
-    encode: SchemaGetter.transform(({ "~address": v }) => v),
+    encode: SchemaGetter.transform((v) => v.raw),
   }),
 )
 
-export const config = <Namespace_ extends Namespace.Any>(
+export const fromConfig = <Namespace_ extends Namespace.Any>(
   namespaceClass: new () => Namespace_,
   name?: string,
 ): Config.Config<Address<Namespace_>> =>

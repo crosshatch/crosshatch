@@ -1,36 +1,36 @@
-import { type Types, Pipeable, Predicate, Schema as S, SchemaGetter, Effect } from "effect"
+import { type Types, type Pipeable, Predicate, Schema as S, SchemaGetter, type Effect } from "effect"
 
 import * as Proto from "./_Proto.ts"
 import type { Address } from "./Address.ts"
 import type { AmountInput } from "./Amount.ts"
-import * as Instrument from "./Instrument.ts"
-import * as Namespace from "./Namespace.ts"
+import type * as Instrument from "./Instrument.ts"
+import type * as Namespace from "./Namespace.ts"
 import { Requirements } from "./Requirements.ts"
-import * as Unit from "./Unit.ts"
+import type * as Unit from "./Unit.ts"
 
 const TypeId = Proto.id("Accepts")
 
 export interface Accepts extends Pipeable.Pipeable {
   readonly [TypeId]: typeof TypeId
 
-  "~accepts": ReadonlyArray<Requirements>
+  readonly raw: ReadonlyArray<Requirements>
 }
 
-export const make = (v: ReadonlyArray<Requirements>): Accepts => ({ ...Proto.make(TypeId), "~accepts": v })
+export const make = (v: ReadonlyArray<Requirements>): Accepts => ({ ...Proto.make(TypeId), raw: v })
 
 export const isAccepts = (v: unknown): v is Accepts => Predicate.hasProperty(v, TypeId)
 
 export const Accepts = S.Array(Requirements).pipe(
   S.decodeTo(S.declare(isAccepts), {
     decode: SchemaGetter.transform(make),
-    encode: SchemaGetter.transform(({ "~accepts": v }) => v),
+    encode: SchemaGetter.transform((v) => v.raw),
   }),
 )
 
 export const add =
   (requirements: Requirements) =>
   (accepts: Accepts): Accepts =>
-    make([...accepts["~accepts"], requirements])
+    make([...accepts.raw, requirements])
 
 export const empty: Accepts = make([])
 

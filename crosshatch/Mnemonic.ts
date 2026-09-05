@@ -30,22 +30,19 @@ export const MnemonicRedacted = S.Redacted(MnemonicString)
 export interface Mnemonic extends Pipeable.Pipeable {
   readonly [TypeId]: typeof TypeId
 
-  readonly "~redacted": Redacted.Redacted<MnemonicString>
+  readonly raw: Redacted.Redacted<MnemonicString>
 }
 
-export const value = (mnemonic: Mnemonic): MnemonicString => Redacted.value(mnemonic["~redacted"])
+export const value = (mnemonic: Mnemonic): MnemonicString => Redacted.value(mnemonic.raw)
 
 export const isMnemonic = (v: unknown): v is Mnemonic => Predicate.hasProperty(v, TypeId)
 
-export const make = (v: MnemonicRedacted): Mnemonic => ({ ...Proto.make(TypeId), "~redacted": v })
+export const make = (v: MnemonicRedacted): Mnemonic => ({ ...Proto.make(TypeId), raw: v })
 
 export const MnemonicFromRedacted = MnemonicRedacted.pipe(
   S.decodeTo(S.declare(isMnemonic), {
-    decode: SchemaGetter.transform((v) => ({
-      ...Proto.make(TypeId),
-      "~redacted": v,
-    })),
-    encode: SchemaGetter.transform((v) => v["~redacted"]),
+    decode: SchemaGetter.transform((raw) => ({ ...Proto.make(TypeId), raw })),
+    encode: SchemaGetter.transform((v) => v.raw),
   }),
 )
 
@@ -61,7 +58,7 @@ export const layerFromRedacted: (v: Redacted.Redacted) => Layer.Layer<Mnemonic, 
   Layer.effect(Mnemonic),
 )
 
-export const toSeed = (mnemonic: Mnemonic): Uint8Array => mnemonicToSeedSync(Redacted.value(mnemonic["~redacted"]))
+export const toSeed = (mnemonic: Mnemonic): Uint8Array => mnemonicToSeedSync(Redacted.value(mnemonic.raw))
 
 export const fromConfig = (config: string | Config.Config<Redacted.Redacted>): Config.Config<Mnemonic> =>
   Config.mapOrFail(

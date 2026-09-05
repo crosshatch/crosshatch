@@ -47,7 +47,7 @@ export const Payload = Object.assign(
 export const PayloadFromString = S.StringFromBase64.pipe(S.decodeTo(S.fromJsonString(S.toCodecJson(Payload))))
 
 export const match = (payload: unknown, accepts: Accepts): payload is Payload =>
-  isPayload(payload) && accepts["~accepts"].some((requirement) => Equal.equals(requirement, payload.accepted))
+  isPayload(payload) ? accepts.raw.some(Equal.equals(payload.accepted)) : false
 
 export const layerFromRequest = Layer.effect(
   Payload,
