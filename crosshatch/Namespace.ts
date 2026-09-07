@@ -14,6 +14,7 @@ export interface NamespaceSpec<K extends string, Uniform extends boolean> {
   readonly address: {
     readonly uniform: Uniform
     readonly pattern: RegExp
+    readonly canonicalize?: (address: string) => string
   }
   readonly reference: {
     readonly pattern: RegExp
@@ -32,6 +33,8 @@ export interface Namespace<K extends string, Uniform extends boolean> extends Pi
   readonly AddressString: S.brand<typeof AddressString, this["id"]>
 
   readonly ReferenceString: S.brand<typeof ReferenceString, this["id"]>
+
+  readonly canonicalizeAddress: (address: string) => this["AddressString"]["Type"]
 }
 
 export type Any = Namespace<string, boolean>
@@ -58,5 +61,10 @@ export const Class = <K extends string, Uniform extends boolean>(
     readonly AddressString = AddressString.check(S.isPattern(address.pattern)).pipe(S.brand(this.id))
 
     readonly ReferenceString = ReferenceString.check(S.isPattern(reference.pattern)).pipe(S.brand(this.id))
+
+    readonly canonicalizeAddress = (input: string): this["AddressString"]["Type"] => {
+      const validated = S.decodeSync(this.AddressString)(input)
+      return S.decodeSync(this.AddressString)(address.canonicalize ? address.canonicalize(validated) : validated)
+    }
   }
 }

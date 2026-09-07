@@ -18,6 +18,7 @@ const permit2 = Permit2Scheme.Permit2Scheme.make({
 
 export const eip155_31612 = eip155({
   reference: "31612",
+  decimals: 18,
   address: "0xdD468A1DDc392dcdbEf6db6e34E89AA338F9F186",
   schemeEnvelopes: [permit2],
 })

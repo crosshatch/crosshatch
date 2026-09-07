@@ -1,7 +1,6 @@
 import { type Pipeable, Predicate, Schema as S, SchemaGetter } from "effect"
 
 import * as Proto from "./_Proto.ts"
-import { AddressFromString } from "./Address.ts"
 import { Atomic } from "./Atomic.ts"
 import { ChainFromString } from "./Chain.ts"
 
@@ -10,11 +9,11 @@ const TypeId = Proto.id("Requirements")
 export type RequirementsFields = typeof RequirementsFields.Type
 export const RequirementsFields = S.Struct({
   amount: Atomic,
-  asset: AddressFromString,
+  asset: S.NonEmptyString,
   extra: S.JsonObject.pipe(S.optional),
   maxTimeoutSeconds: S.Int.check(S.isGreaterThan(0)),
   network: ChainFromString,
-  payTo: AddressFromString,
+  payTo: S.NonEmptyString,
   scheme: S.Literals(["exact", "upto"]),
 })
 

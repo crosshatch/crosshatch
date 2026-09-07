@@ -1,4 +1,4 @@
-import { Namespace } from "../../index.ts"
+import * as Namespace from "../../Namespace.ts"
 
 const pattern = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/u
 

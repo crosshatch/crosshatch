@@ -23,6 +23,7 @@ export const eip155_1 = eip155({
 
 export const eip155_42220 = eip155({
   reference: "42220",
+  decimals: 6,
   address: "0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e",
   schemeEnvelopes: [permit2],
 })

@@ -39,24 +39,32 @@ export class SolanaScheme extends Scheme.Service<
   Solana,
   typeof Extra.Type,
   { readonly transaction: Base64EncodedWireTransaction }
->()("crosshatch/Eip155/Permit2Scheme") {}
-
-const tokenProgramId = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-
-// TODO:
-declare const decimals: number
+>()("crosshatch/namespaces/Solana/SolanaScheme") {}
 
 export const layer = SolanaScheme.layer(
   Extra,
   Effect.fnUntraced(
     function* ({ accepted, extra: { feePayer, memo } }) {
+      if (accepted.network.namespace !== "solana") {
+        return yield* new Adapt.AdaptError({ cause: new Error("Expected a Solana payment network") })
+      }
       const signer = yield* SolanaSigner
-      const { getLatestBlockhash } = yield* SolanaClient
-      const latestBlockhash = yield* getLatestBlockhash
-      const mint = address(accepted.asset.raw)
-      const tokenProgram = address(tokenProgramId)
-      const ata = (owner: SolanaAddress) => Effect.promise(() => findAssociatedTokenPda({ owner, tokenProgram, mint }))
-      const [[sourceAta], [destAta]] = yield* Effect.all([ata(signer.address), ata(address(accepted.payTo.raw))], {
+      const { getLatestBlockhash, getMintMetadata } = yield* SolanaClient
+      const mint = yield* Effect.try({
+        try: () => address(accepted.asset),
+        catch: (cause) => new Adapt.AdaptError({ cause }),
+      })
+      const { decimals, tokenProgram } = yield* getMintMetadata(mint, accepted.network.reference)
+      const ata = (owner: SolanaAddress) =>
+        Effect.tryPromise({
+          try: () => findAssociatedTokenPda({ owner, tokenProgram, mint }),
+          catch: (cause) => new Adapt.AdaptError({ cause }),
+        })
+      const payTo = yield* Effect.try({
+        try: () => address(accepted.payTo),
+        catch: (cause) => new Adapt.AdaptError({ cause }),
+      })
+      const [[sourceAta], [destAta]] = yield* Effect.all([ata(signer.address), ata(payTo)], {
         concurrency: "unbounded",
       })
       const transferIx = getTransferCheckedInstruction(
@@ -76,6 +84,7 @@ export const layer = SolanaScheme.layer(
         accounts: [] as const,
         data: new TextEncoder().encode(memo ?? Encoding.encodeHex(yield* crypto.randomBytes(16))),
       }
+      const latestBlockhash = yield* getLatestBlockhash
       const message = solanaPipe(
         createTransactionMessage({ version: 0 }),
         (v) => setTransactionMessageComputeUnitPrice(COMPUTE_UNIT_PRICE_MICROLAMPORTS, v),
@@ -85,12 +94,14 @@ export const layer = SolanaScheme.layer(
         (v) => appendTransactionMessageInstructions([transferIx, memoIx], v),
         (v) => setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, v),
       )
-      const transaction = yield* Effect.promise(() => partiallySignTransactionMessageWithSigners(message)).pipe(
-        Effect.map(getBase64EncodedWireTransaction),
-      )
+      const transaction = yield* Effect.tryPromise({
+        try: (abortSignal) => partiallySignTransactionMessageWithSigners(message, { abortSignal }),
+        catch: (cause) => new Adapt.AdaptError({ cause }),
+      }).pipe(Effect.map(getBase64EncodedWireTransaction))
       return { transaction }
     },
-    Effect.mapError((cause) => new Adapt.AdaptError({ cause })),
+    Effect.mapError((cause) => (cause instanceof Adapt.AdaptError ? cause : new Adapt.AdaptError({ cause }))),
+    Effect.withSpan("SolanaScheme.adapt"),
   ),
 )
 

@@ -35,24 +35,28 @@ const eurcPermit2 = Permit2Scheme.Permit2Scheme.make({
 
 export const eip155_1 = eip155({
   reference: "1",
+  decimals: 6,
   address: "0x1aBaEA1f7C830bD89Acc67eC4af516284b1bC33c",
   schemeEnvelopes: [euroCoinErc3009, euroCoinPermit2],
 })
 
 export const eip155_25 = eip155({
   reference: "25",
+  decimals: 6,
   address: "0xA6dE01a2d62C6B5f3525d768f34d276652C554c8",
   schemeEnvelopes: [eurcErc3009, eurcPermit2],
 })
 
 export const eip155_480 = eip155({
   reference: "480",
+  decimals: 6,
   address: "0x1C60ba0A0eD1019e8Eb035E6daF4155A5cE2380B",
   schemeEnvelopes: [eurcErc3009, eurcPermit2],
 })
 
 export const eip155_8453 = eip155({
   reference: "8453",
+  decimals: 6,
   address: "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42",
   schemeEnvelopes: [eurcErc3009, eurcPermit2],
 })
@@ -65,6 +69,7 @@ export const eip155_9745 = eip155({
 
 export const eip155_43114 = eip155({
   reference: "43114",
+  decimals: 6,
   address: "0xC891EB4cbdEFf6e073e859e987815Ed1505c2ACD",
   schemeEnvelopes: [euroCoinErc3009, euroCoinPermit2],
 })

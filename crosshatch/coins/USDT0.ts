@@ -64,6 +64,7 @@ export const eip155_196 = eip155({
 
 export const eip155_988 = eip155({
   reference: "988",
+  decimals: 6,
   address: "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
   schemeEnvelopes: [erc3009, permit2],
 })
@@ -94,6 +95,7 @@ export const eip155_2818 = eip155({
 
 export const eip155_4217 = eip155({
   reference: "4217",
+  decimals: 6,
   address: "0x20C00000000000000000000014f22CA97301EB73",
   schemeEnvelopes: [permit2],
 })
