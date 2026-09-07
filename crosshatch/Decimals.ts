@@ -2,7 +2,7 @@ import { Schema as S, type Effect } from "effect"
 
 import { id } from "./_Proto.ts"
 
-/** Upper bound on {@link Decimals}; converting at a larger scale would also make `10n ** BigInt(decimals)` unbounded. */
+/** Supported asset precision, not a monetary magnitude or input-size limit. Bounds exponent expansion; coefficients remain arbitrary-size. */
 export const MAX_DECIMALS = 255
 
 export type Decimals = typeof Decimals.Type

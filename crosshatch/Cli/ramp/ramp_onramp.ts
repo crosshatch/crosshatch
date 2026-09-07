@@ -13,7 +13,12 @@ export const onramp = Command.make("onramp", {
     Flag.withDefault(undefined),
     Flag.withDescription("EIP-155 chain reference (e.g., 8453 for Base)"),
   ),
-  amount: Flag.integer("amount").pipe(Flag.withDescription("Positive integer fiat amount")),
+  amount: Flag.string("amount").pipe(
+    Flag.withSchema(
+      S.String.check(S.isPattern(/^\+?0*[1-9]\d*$/u, { message: "Expected a positive integer fiat amount" })),
+    ),
+    Flag.withDescription("Positive integer fiat amount"),
+  ),
   provider: Flag.choice("provider", ["Coinbase"] /* TODO: use `Providers` from `Cirque` */).pipe(
     Flag.withDefault("Coinbase"),
   ),
@@ -41,7 +46,7 @@ export const onramp = Command.make("onramp", {
           .onramp({
             payload: {
               provider: "Coinbase",
-              amount: yield* Amount.from(amount),
+              amount: yield* Amount.fromString(amount),
               recipient,
             },
           })

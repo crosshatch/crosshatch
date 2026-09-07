@@ -30,8 +30,8 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
       Effect.gen(function* () {
         const eip155 = yield* Address.fromConfig(Eip155.Eip155, "PAY_TO_EIP155")
         const accepts = Accepts.empty.pipe(
-          Accepts.addInstrument(USDC, 0.01),
-          Accepts.addUnit(USD, [USDT, USDCE, USDT], 0.01),
+          Accepts.addInstrument(USDC, "0.01"),
+          Accepts.addUnit(USD, [USDT, USDCE, USDT], "0.01"),
           Accepts.address({ eip155 }),
         )
         const payload = yield* Payload.Payload

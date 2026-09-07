@@ -7,18 +7,23 @@ import * as Decimals from "./Decimals.ts"
 
 const fromAmountCases = [
   { amount: "4.02", decimals: 6, expected: "4020000" },
-  { amount: 1, decimals: 6, expected: "1000000" },
-  { amount: 1, decimals: 18, expected: `1${"0".repeat(18)}` },
-  { amount: 0, decimals: 6, expected: "0" },
+  { amount: "1", decimals: 6, expected: "1000000" },
+  { amount: "1", decimals: 18, expected: `1${"0".repeat(18)}` },
+  { amount: "0", decimals: 6, expected: "0" },
   { amount: "1e5", decimals: 6, expected: "100000000000" },
-  { amount: 1, decimals: 0, expected: "1" },
-  { amount: "1.1", decimals: 0, expected: "1" },
-  { amount: "1.5", decimals: 0, expected: "1" },
-  { amount: "1.12345678", decimals: 7, expected: "11234567" },
-  { amount: "1.0000001", decimals: 6, expected: "1000000" },
+  { amount: "1", decimals: 0, expected: "1" },
   { amount: "1.000001", decimals: 6, expected: "1000001" },
-  { amount: "0.9999991", decimals: 6, expected: "999999" },
+  { amount: "1.0000010", decimals: 6, expected: "1000001" },
   { amount: "0.000001", decimals: 6, expected: "1" },
+] as const
+
+const lossyCases = [
+  { amount: "1.1", decimals: 0 },
+  { amount: "1.5", decimals: 0 },
+  { amount: "1.12345678", decimals: 7 },
+  { amount: "1.0000001", decimals: 6 },
+  { amount: "0.9999991", decimals: 6 },
+  { amount: "0.0000001", decimals: 6 },
 ] as const
 
 describe(import.meta.url, () => {
@@ -40,6 +45,17 @@ describe(import.meta.url, () => {
     }),
   )
 
+  it.effect.each(lossyCases)(
+    "rejects precision loss for $amount with $decimals decimals",
+    Effect.fn(function* ({ amount, decimals }) {
+      const parsed = yield* Amount.from(amount)
+      const error = yield* Atomic.fromAmount(parsed, decimals).pipe(Effect.flip)
+      assert.isTrue(S.isSchemaError(error))
+      assert.include(error.message, `exactly representable with ${decimals} decimal places`)
+      assert.isTrue(BigDecimal.equals(error.issue.input as Amount.Amount, parsed))
+    }),
+  )
+
   it.effect(
     "rejects non-zero amounts smaller than one atomic unit",
     Effect.fn(function* () {
@@ -47,10 +63,10 @@ describe(import.meta.url, () => {
         const parsed = yield* Amount.from(amount)
         const error = yield* Atomic.fromAmount(parsed, 6).pipe(Effect.flip)
         assert.isTrue(S.isSchemaError(error))
-        assert.match(error.message, /representable with 6 decimal places/u)
+        assert.match(error.message, /exactly representable with 6 decimal places/u)
         assert.isTrue(BigDecimal.equals(error.issue.input as Amount.Amount, parsed))
       }
-      assert.strictEqual(yield* Atomic.fromAmount(yield* Amount.from(0), 6), "0")
+      assert.strictEqual(yield* Atomic.fromAmount(yield* Amount.from("0"), 6), "0")
     }),
   )
 

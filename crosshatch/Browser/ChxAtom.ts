@@ -39,7 +39,7 @@ export const open = runtime.fn<void>()(
     yield* Match.valueTags(session, {
       Challenged: ({ challengeId }) =>
         Effect.gen(function* () {
-          const amount = yield* Amount.from(10)
+          const amount = yield* Amount.from("10")
           const allowance = yield* Effect.serviceOption(Allowance).pipe(
             Effect.map(Option.getOrElse(() => ({ amount, window: "Week" as const }))),
           )

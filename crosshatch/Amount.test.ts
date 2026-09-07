@@ -24,15 +24,16 @@ const parseCases = [
   { input: "\t1.5\n", expected: "1.5" },
 ] as const
 
-const invalidInputs = ["", "-1", "not-a-number", "$1", -1, Infinity, NaN, -1n] as const
+const invalidInputs = ["", "-1", "not-a-number", "$1", "Infinity", "NaN", -1n] as const
 
 const displayCases = [
-  { amount: 20, decimals: 2, expected: "20.00" },
+  { amount: "20", decimals: 2, expected: "20.00" },
   { amount: "1.5", decimals: 2, expected: "1.50" },
-  { amount: "1.239", decimals: 2, expected: "1.23" },
-  { amount: "1.9", decimals: 0, expected: "1" },
-  { amount: 0, decimals: 2, expected: "0.00" },
-  { amount: "0.001", decimals: 2, expected: "0.00" },
+  { amount: "1.2300", decimals: 2, expected: "1.23" },
+  { amount: "1.000", decimals: 0, expected: "1" },
+  { amount: "0", decimals: 2, expected: "0.00" },
+  { amount: "0.000", decimals: 2, expected: "0.00" },
+  { amount: "0.01", decimals: 2, expected: "0.01" },
   { amount: "100.5", decimals: 2, expected: "100.50" },
 ] as const
 
@@ -60,8 +61,6 @@ describe(import.meta.url, () => {
       assert.match((yield* error("not-a-number")).message, /parsed into a BigDecimal/u)
       assert.match((yield* error("-1")).message, /greater than or equal to 0/u)
       assert.match((yield* error(-1n)).message, /greater than or equal to 0/u)
-      assert.match((yield* error(NaN)).message, /finite number/u)
-      assert.match((yield* error(Infinity)).message, /finite number/u)
       assert.strictEqual((yield* error("")).issue.input, "")
     }),
   )
@@ -105,33 +104,27 @@ describe(import.meta.url, () => {
   it.effect(
     "rejects malformed exponent syntax",
     Effect.fn(function* () {
-      for (const input of ["1e", "1e+", "1e1.5", "1e2e3"] as const) {
+      for (const input of ["1e", "1e+", "1e1.5", "1e2e3", ".+1", ".+12", ".+12e2", ".-0"] as const) {
         assert.isTrue(S.isSchemaError(yield* Amount.from(input).pipe(Effect.flip)))
+        assert.isTrue(S.isSchemaError(yield* S.decodeEffect(Amount.AmountFromString)(input).pipe(Effect.flip)))
+        assert.isTrue(S.isSchemaError(yield* S.decodeEffect(S.toCodecJson(Amount.Amount))(input).pipe(Effect.flip)))
       }
     }),
   )
 
   it.effect(
-    "constructs from numbers, bigints, strings, and decimals",
+    "constructs from bigints, strings, and decimals",
     Effect.fn(function* () {
-      assertAmount(yield* Amount.from(0.01), "0.01")
       assertAmount(yield* Amount.from(10n), "10")
       assertAmount(yield* Amount.from("1.5"), "1.5")
       assertAmount(yield* Amount.from(BigDecimal.fromStringUnsafe("2.5")), "2.5")
-      const error = yield* Amount.from(-0.01).pipe(Effect.flip)
-      assert.isTrue(S.isSchemaError(error))
-      assert.strictEqual(Amount.toString(yield* Amount.from(0.1 + 0.2)), `${0.1 + 0.2}`)
-      assert.strictEqual(
-        Amount.toString(yield* Amount.from(Number.MAX_SAFE_INTEGER + 1)),
-        `${Number.MAX_SAFE_INTEGER + 1}`,
-      )
     }),
   )
 
   it.effect(
     "validates decimal precision across public APIs",
     Effect.fn(function* () {
-      const amount = yield* Amount.from(1)
+      const amount = yield* Amount.from("1")
       const atomic = Atomic.Atomic.make("1")
       for (const decimals of [-1, 1.5, NaN, Infinity, Decimals.MAX_DECIMALS + 1, Number.MAX_SAFE_INTEGER]) {
         assert.isTrue(S.isSchemaError(yield* Effect.flip(Atomic.fromAmount(amount, decimals))))
@@ -155,7 +148,7 @@ describe(import.meta.url, () => {
   it.effect(
     "accepts decimals from 0 through MAX_DECIMALS",
     Effect.fn(function* () {
-      const amount = yield* Amount.from(1)
+      const amount = yield* Amount.from("1")
       const atomic = Atomic.Atomic.make("1")
 
       assert.strictEqual(yield* Atomic.fromAmount(amount, 0), "1")
@@ -197,10 +190,12 @@ describe(import.meta.url, () => {
         assert.strictEqual(yield* S.encodeEffect(codec)(decoded), "1500000")
         assert.isTrue(S.isSchemaError(yield* Effect.flip(S.decodeEffect(codec)("01"))))
         const overPrecise = yield* Amount.from("1.0000001")
-        const encoded = yield* S.encodeEffect(codec)(overPrecise)
-        assert.strictEqual(encoded, "1000000")
-        assertAmount(yield* S.decodeEffect(codec)(encoded), "1")
-        assert.strictEqual(yield* S.encodeEffect(Amount.AmountFromAtomic(0))(yield* Amount.from("1.1")), "1")
+        assert.isTrue(S.isSchemaError(yield* S.encodeEffect(codec)(overPrecise).pipe(Effect.flip)))
+        assert.isTrue(
+          S.isSchemaError(
+            yield* S.encodeEffect(Amount.AmountFromAtomic(0))(yield* Amount.from("1.1")).pipe(Effect.flip),
+          ),
+        )
         assert.isTrue(S.isSchemaError(yield* S.encodeEffect(codec)(yield* Amount.from("0.0000001")).pipe(Effect.flip)))
       }),
     )
@@ -225,7 +220,7 @@ describe(import.meta.url, () => {
         assertAmount(dust, "0.000000000000000001")
         assert.strictEqual(yield* S.encodeEffect(Amount.AmountFromString)(dust), "0.000000000000000001")
         const wei = yield* Amount.fromAtomic(Atomic.Atomic.make("1"), 18)
-        assert.strictEqual(yield* S.encodeEffect(S.toCodecJson(Amount.Amount))(wei), "1e-18")
+        assert.strictEqual(yield* S.encodeEffect(S.toCodecJson(Amount.Amount))(wei), "0.000000000000000001")
         assert.strictEqual(yield* S.encodeEffect(Amount.AmountFromString)(wei), "0.000000000000000001")
       }),
     )
@@ -246,10 +241,24 @@ describe(import.meta.url, () => {
   })
 
   describe("formatting", () => {
+    it.effect.each([
+      { amount: "1.239", decimals: 2 },
+      { amount: "1.9", decimals: 0 },
+      { amount: "0.001", decimals: 2 },
+      { amount: "1e-255", decimals: 254 },
+    ])(
+      "rejects lossy display of $amount with $decimals decimals",
+      Effect.fn(function* ({ amount, decimals }) {
+        const error = yield* Amount.display(yield* Amount.from(amount), decimals).pipe(Effect.flip)
+        assert.isTrue(S.isSchemaError(error))
+        assert.include(error.message, `exactly representable with ${decimals} decimal places`)
+      }),
+    )
+
     it.effect(
       "formats nominal amounts",
       Effect.fn(function* () {
-        assert.strictEqual(Amount.toString(yield* Amount.from(10)), "10")
+        assert.strictEqual(Amount.toString(yield* Amount.from("10")), "10")
         assert.strictEqual(Amount.toString(yield* Amount.from("1.50")), "1.5")
         assert.strictEqual(Amount.toString(yield* Amount.from("0.000001")), "0.000001")
         assert.strictEqual(
@@ -262,11 +271,17 @@ describe(import.meta.url, () => {
     )
 
     it.effect(
-      "uses normalized scale for JSON scientific notation",
+      "uses plain decimal JSON at scale boundaries",
       Effect.fn(function* () {
         const encodeJson = S.encodeEffect(S.toCodecJson(Amount.Amount))
         assert.strictEqual(yield* encodeJson(yield* Amount.from(BigDecimal.make(10n, 16))), "0.000000000000001")
-        assert.strictEqual(yield* encodeJson(yield* Amount.from(BigDecimal.make(1n, 16))), "1e-16")
+        assert.strictEqual(yield* encodeJson(yield* Amount.from(BigDecimal.make(1n, 16))), "0.0000000000000001")
+        for (const raw of [BigDecimal.make(10n, -255), BigDecimal.fromBigInt(10n ** 256n), BigDecimal.make(1n, 255)]) {
+          const amount = yield* Amount.from(raw)
+          const encoded = yield* encodeJson(amount)
+          assert.notMatch(encoded, /e/iu)
+          assert.isTrue(BigDecimal.equals(amount, yield* S.decodeEffect(S.toCodecJson(Amount.Amount))(encoded)))
+        }
       }),
     )
 
