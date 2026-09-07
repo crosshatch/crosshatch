@@ -2,7 +2,7 @@ import { type Effect, type Pipeable, Predicate, Schema as S, SchemaGetter, Funct
 
 import * as Proto from "./_Proto.ts"
 import { Accepts } from "./Accepts.ts"
-import { ExtensionsEnvelope } from "./Extension.ts"
+import { ExtensionsEnvelope } from "./ExtensionsEnvelope.ts"
 import { ResourceInfo } from "./ResourceInfo.ts"
 import { Version } from "./Version.ts"
 

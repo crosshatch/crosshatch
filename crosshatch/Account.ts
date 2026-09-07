@@ -1,28 +1,34 @@
-import { Schema as S, type Pipeable, Predicate, SchemaGetter } from "effect"
+import { Schema as S, SchemaGetter } from "effect"
 
 import * as Proto from "./_Proto.ts"
-import { AddressString } from "./Address.ts"
+import * as Address from "./Address.ts"
 import { ChainFromString } from "./Chain.ts"
 
 const TypeId = Proto.id("Account")
 
-export type AccountFields = typeof AccountFields.Type
-export const AccountFields = S.Struct({
+export const AccountPartsFromString = S.TemplateLiteralParser([ChainFromString, ":", AddressString])
+
+export class Account extends S.Class<Account>("Account")({
+  [TypeId]: S.tagDefaultOmit(TypeId),
   chain: ChainFromString,
-  address: AddressString,
-})
+  address: Address.AddressFromString,
+}) {}
 
-export interface Account extends AccountFields, Pipeable.Pipeable {
-  readonly [TypeId]: typeof TypeId
-}
-
-export const isAccount = (v: unknown): v is Account => Predicate.hasProperty(v, TypeId)
-
-export const make = (v: AccountFields): Account => ({ ...Proto.make(TypeId), ...v })
-
-export const AccountFromString = S.TemplateLiteralParser([ChainFromString, ":", AddressString]).pipe(
-  S.decodeTo(S.declare(isAccount), {
-    decode: SchemaGetter.transform(([chain, _1, address]) => make({ chain, address })),
-    encode: SchemaGetter.transform(({ chain, address }) => [chain, ":", address]),
+export const AccountFromString = AccountPartsFromString.pipe(
+  S.decodeTo(Account, {
+    decode: SchemaGetter.transform(([chain, _1, address]) =>
+      Account.make(
+        {
+          chain,
+          address: Address.make(address),
+        },
+        { disableChecks: true },
+      ),
+    ),
+    encode: SchemaGetter.transform(({ chain, address }) =>
+      AccountPartsFromString.make([chain as never, ":", address as never], { disableChecks: true }),
+    ),
   }),
 )
+
+type T = typeof AccountFromString.Encoded

@@ -21,17 +21,23 @@
   "exports": {
     ".": "./index.ts",
     "./*": "./*.ts",
-    "./package.json": "./package.json",
-    "./Crypto": "./Crypto/index.ts",
-    "./Crypto/*": "./Crypto/*.ts",
     "./coins": "./coins/index.ts",
     "./coins/*": "./coins/*.ts",
+    "./Crypto": "./Crypto/index.ts",
+    "./Crypto/*": "./Crypto/*.ts",
+    "./Dev": "./Dev/index.ts",
+    "./Dev/*": "./Dev/*.ts",
+    "./extensions/*": "./extensions/*/index.ts",
+    "./extensions/*/*": "./extensions/*/*.ts",
+    "./FacilitatorApi": "./FacilitatorApi/index.ts",
+    "./FacilitatorApi/*": "./FacilitatorApi/*.ts",
     "./namespaces/*": "./namespaces/*/index.ts",
     "./namespaces/*/*": "./namespaces/*/*.ts",
+    "./package.json": "./package.json",
+    "./Unified": "./Unified/index.ts",
+    "./Unified/*": "./Unified/*.ts",
     "./units": "./units/index.ts",
-    "./units/*": "./units/*.ts",
-    "./FacilitatorApi": "./FacilitatorApi/index.ts",
-    "./FacilitatorApi/*": "./FacilitatorApi/*.ts"
+    "./units/*": "./units/*.ts"
   },
   "publishConfig": {
     "bin": {
@@ -40,17 +46,23 @@
     "exports": {
       ".": "./dist/index.js",
       "./*": "./dist/*.js",
-      "./package.json": "./package.json",
-      "./Crypto": "./dist/Crypto/index.js",
-      "./Crypto/*": "./dist/Crypto/*.js",
       "./coins": "./dist/coins/index.js",
       "./coins/*": "./dist/coins/*.js",
+      "./Crypto": "./dist/Crypto/index.js",
+      "./Crypto/*": "./dist/Crypto/*.js",
+      "./Dev": "./dist/Dev/index.js",
+      "./Dev/*": "./dist/Dev/*.js",
+      "./extensions/*": "./dist/extensions/*/index.js",
+      "./extensions/*/*": "./dist/extensions/*/*.js",
+      "./FacilitatorApi": "./dist/FacilitatorApi/index.js",
+      "./FacilitatorApi/*": "./dist/FacilitatorApi/*.js",
       "./namespaces/*": "./dist/namespaces/*/index.js",
       "./namespaces/*/*": "./dist/namespaces/*/*.js",
+      "./package.json": "./package.json",
+      "./Unified": "./dist/Unified/index.js",
+      "./Unified/*": "./dist/Unified/*.js",
       "./units": "./dist/units/index.js",
-      "./units/*": "./dist/units/*.js",
-      "./FacilitatorApi": "./dist/FacilitatorApi/index.js",
-      "./FacilitatorApi/*": "./dist/FacilitatorApi/*.js"
+      "./units/*": "./dist/units/*.js"
     }
   },
   "scripts": {

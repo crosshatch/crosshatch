@@ -12,7 +12,7 @@ export type OnrampPayload = typeof OnrampPayload.Type
 export const OnrampPayload = S.Struct({
   provider: Provider,
   amount: Amount.AmountFromString.check(S.isGreaterThanBigDecimal(BigDecimal.fromBigInt(0n))),
-  recipient: Account.AccountFields,
+  recipient: Account.Account,
 })
 
 export class CirqueApi extends HttpApi.make("cirque")

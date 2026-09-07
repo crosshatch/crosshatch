@@ -1,30 +1,32 @@
-import { Facilitator, Required, Requirements, Payload } from "crosshatch"
-import { ChxBrowserRuntime } from "crosshatch/Browser"
-import { Eip155Address } from "crosshatch/Eip155"
-import * as Known from "crosshatch/Known"
-import { Config, Effect, Layer, Console } from "effect"
-import { FetchHttpClient } from "effect/unstable/http"
+export {}
 
-Effect.gen(function* () {
-  const recipient = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
-  const required = yield* Required.make`
-  |
-  | Description of the charge.
-  |
-  `.pipe(
-    Required.accept(
-      Requirements.denomination(Known.USD, {
-        amount: 0.01,
-        recipients: { eip155: { 8453: recipient } },
-        ttl: "1 minutes",
-      }),
-    ),
-  )
-  const { payload } = yield* Payload.make({ required })
-  const settlement = yield* Facilitator.settle({ payload })
-  yield* Console.log(settlement)
-}).pipe(
-  Effect.provide(Facilitator.layer().pipe(Layer.provide(FetchHttpClient.layer))),
-  Effect.onError(Effect.logError),
-  ChxBrowserRuntime.runFork,
-)
+// import { Facilitator, Required, Requirements, Payload } from "crosshatch"
+// import { ChxBrowserRuntime } from "crosshatch/Browser"
+// import { Eip155Address } from "crosshatch/Eip155"
+// import * as Known from "crosshatch/Known"
+// import { Config, Effect, Layer, Console } from "effect"
+// import { FetchHttpClient } from "effect/unstable/http"
+
+// Effect.gen(function* () {
+//   const recipient = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
+//   const required = yield* Required.make`
+//   |
+//   | Description of the charge.
+//   |
+//   `.pipe(
+//     Required.accept(
+//       Requirements.denomination(Known.USD, {
+//         amount: 0.01,
+//         recipients: { eip155: { 8453: recipient } },
+//         ttl: "1 minutes",
+//       }),
+//     ),
+//   )
+//   const { payload } = yield* Payload.make({ required })
+//   const settlement = yield* Facilitator.settle({ payload })
+//   yield* Console.log(settlement)
+// }).pipe(
+//   Effect.provide(Facilitator.layer().pipe(Layer.provide(FetchHttpClient.layer))),
+//   Effect.onError(Effect.logError),
+//   ChxBrowserRuntime.runFork,
+// )

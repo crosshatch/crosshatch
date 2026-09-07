@@ -4,6 +4,7 @@
     { "path": "./@crosshatch/alchemy" },
     { "path": "./@crosshatch/widget" },
     { "path": "./crosshatch" },
+    { "path": "./examples" },
     { "path": "./docs" },
     { "path": "./konfik" },
     { "path": "./scratchpad" },

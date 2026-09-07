@@ -12,7 +12,7 @@ const ResourceInfoFields = S.Struct({
   mimeType: S.String.pipe(S.optional),
   serviceName: PrintableAscii32.pipe(S.optional),
   tags: S.Array(PrintableAscii32).check(S.isMaxLength(5)).pipe(S.optional),
-  iconUrl: S.URLFromString.pipe(S.optional),
+  iconUrl: S.String.pipe(S.optional),
 })
 
 export interface ResourceInfo extends ResourceInfoFields, Pipeable.Pipeable {
@@ -40,7 +40,8 @@ export const ResourceInfo = Object.assign(
   ),
 )
 
-export const layer: (resource: ResourceInfo) => Layer.Layer<ResourceInfo, never, never> = Layer.succeed(ResourceInfo)
+export const layer = (resourceInfo: ResourceInfoFields): Layer.Layer<ResourceInfo, never, never> =>
+  Layer.succeed(ResourceInfo, make(resourceInfo))
 
 export const layerSetter: (
   settle: (info: ResourceInfo) => ResourceInfo,

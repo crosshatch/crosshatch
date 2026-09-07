@@ -1,25 +1,27 @@
-import { OpenAiClient, OpenAiLanguageModel } from "@effect/ai-openai-compat"
-import { ChxHttp } from "crosshatch"
-import { Console, Effect, Layer } from "effect"
-import { LanguageModel } from "effect/unstable/ai"
+export {}
 
-import { layerPrelude } from "./layerPrelude.ts"
+// import { OpenAiClient, OpenAiLanguageModel } from "@effect/ai-openai-compat"
+// import { ChxHttp } from "crosshatch"
+// import { Console, Effect, Layer } from "effect"
+// import { LanguageModel } from "effect/unstable/ai"
 
-const layerLanguageModelBlockrun = OpenAiLanguageModel.layer({
-  model: "deepseek/deepseek-chat",
-}).pipe(
-  Layer.provide(
-    OpenAiClient.layer({ apiUrl: "https://blockrun.ai/api/v1" }).pipe(
-      Layer.provide(ChxHttp.layerClient.pipe(Layer.provide(layerPrelude))),
-    ),
-  ),
-)
+// import { layerPrelude } from "./layerPrelude.ts"
 
-LanguageModel.generateText({
-  prompt: "Hello from Crosshatch.",
-}).pipe(
-  Effect.tap(({ text }) => Console.log(text)),
-  Effect.provide(layerLanguageModelBlockrun),
-  Effect.onError(Effect.logError),
-  Effect.runFork,
-)
+// const layerLanguageModelBlockrun = OpenAiLanguageModel.layer({
+//   model: "deepseek/deepseek-chat",
+// }).pipe(
+//   Layer.provide(
+//     OpenAiClient.layer({ apiUrl: "https://blockrun.ai/api/v1" }).pipe(
+//       Layer.provide(ChxHttp.layerClient.pipe(Layer.provide(layerPrelude))),
+//     ),
+//   ),
+// )
+
+// LanguageModel.generateText({
+//   prompt: "Hello from Crosshatch.",
+// }).pipe(
+//   Effect.tap(({ text }) => Console.log(text)),
+//   Effect.provide(layerLanguageModelBlockrun),
+//   Effect.onError(Effect.logError),
+//   Effect.runFork,
+// )
