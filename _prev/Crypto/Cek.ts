@@ -12,7 +12,6 @@ const GCM_TAG_BITS = 128
 type Cek_ = typeof Cek_.Type
 const Cek_ = CryptoKey.CryptoKey.pipe(S.brand("crosshatch/Crypto/Cek"))
 
-// oxlint-disable-next-line typescript/no-empty-interface
 export interface Cek extends Cek_ {}
 
 export const Cek = Object.assign(Context.Service<Cek, Ref.Ref<Cek | undefined>>()("crosshatch/Crypto/Cek"), Cek_)

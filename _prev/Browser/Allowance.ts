@@ -11,7 +11,6 @@ const Allowance_ = S.Struct({
   window: AllowanceWindow,
 })
 
-// oxlint-disable-next-line typescript/no-empty-interface
 export interface Allowance extends Allowance_ {}
 
 export const Allowance = Object.assign(

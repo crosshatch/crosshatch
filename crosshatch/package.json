@@ -21,23 +21,14 @@
   "exports": {
     ".": "./index.ts",
     "./*": "./*.ts",
-    "./coins": "./coins/index.ts",
-    "./coins/*": "./coins/*.ts",
-    "./Crypto": "./Crypto/index.ts",
-    "./Crypto/*": "./Crypto/*.ts",
-    "./Dev": "./Dev/index.ts",
-    "./Dev/*": "./Dev/*.ts",
-    "./extensions/*": "./extensions/*/index.ts",
-    "./extensions/*/*": "./extensions/*/*.ts",
-    "./FacilitatorApi": "./FacilitatorApi/index.ts",
-    "./FacilitatorApi/*": "./FacilitatorApi/*.ts",
-    "./namespaces/*": "./namespaces/*/index.ts",
-    "./namespaces/*/*": "./namespaces/*/*.ts",
-    "./package.json": "./package.json",
-    "./Unified": "./Unified/index.ts",
-    "./Unified/*": "./Unified/*.ts",
-    "./units": "./units/index.ts",
-    "./units/*": "./units/*.ts"
+    "./mechanisms/*": "./mechanisms/*/index.ts",
+    "./Cryptocurrency": "./Cryptocurrency/index.ts",
+    "./Cryptocurrency/*": "./Cryptocurrency/*.ts",
+    "./Cryptocurrency/tokens": "./Cryptocurrency/tokens/index.ts",
+    "./Cryptocurrency/references": "./Cryptocurrency/references/index.ts",
+    "./Cryptocurrency/namespaces": "./Cryptocurrency/namespaces/index.ts",
+    "./Cryptocurrency/token-deployments": "./Cryptocurrency/token-deployments/index.ts",
+    "./package.json": "./package.json"
   },
   "publishConfig": {
     "bin": {
@@ -46,23 +37,7 @@
     "exports": {
       ".": "./dist/index.js",
       "./*": "./dist/*.js",
-      "./coins": "./dist/coins/index.js",
-      "./coins/*": "./dist/coins/*.js",
-      "./Crypto": "./dist/Crypto/index.js",
-      "./Crypto/*": "./dist/Crypto/*.js",
-      "./Dev": "./dist/Dev/index.js",
-      "./Dev/*": "./dist/Dev/*.js",
-      "./extensions/*": "./dist/extensions/*/index.js",
-      "./extensions/*/*": "./dist/extensions/*/*.js",
-      "./FacilitatorApi": "./dist/FacilitatorApi/index.js",
-      "./FacilitatorApi/*": "./dist/FacilitatorApi/*.js",
-      "./namespaces/*": "./dist/namespaces/*/index.js",
-      "./namespaces/*/*": "./dist/namespaces/*/*.js",
-      "./package.json": "./package.json",
-      "./Unified": "./dist/Unified/index.js",
-      "./Unified/*": "./dist/Unified/*.js",
-      "./units": "./dist/units/index.js",
-      "./units/*": "./dist/units/*.js"
+      "./todo": "./dist/todo.js"
     }
   },
   "scripts": {

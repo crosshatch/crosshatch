@@ -1,12 +1,5 @@
-import { Pipeable } from "effect"
+export type key<K extends string> = `crosshatch/${K}`
+export const key = <K extends string>(label: K): key<K> => `crosshatch/${label}`
 
-export type id<K extends string> = `~crosshatch/${K}`
-export const id = <K extends string>(key: K): id<K> => `~crosshatch/${key}`
-
-export const make = <K extends string>(id: K): { [_ in K]: K } & Pipeable.Pipeable =>
-  ({
-    [id]: id,
-    pipe() {
-      return Pipeable.pipeArguments(this, arguments)
-    },
-  }) as never
+export type id<K extends string> = `~${key<K>}`
+export const id = <K extends string>(label: K): id<K> => `~${key(label)}`

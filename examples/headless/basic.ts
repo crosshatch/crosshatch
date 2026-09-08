@@ -1,33 +1,24 @@
-export {}
+import { Accepts } from "crosshatch"
+import { Address } from "crosshatch/Cryptocurrency"
+import { Eip155 } from "crosshatch/Cryptocurrency/namespaces/Eip155"
+import { USDC } from "crosshatch/Cryptocurrency/token-deployments"
+import { Config, Console, Effect } from "effect"
 
-// import { Required, Requirements, Payload, Facilitator } from "crosshatch"
-// import { Eip155Address } from "crosshatch/Eip155"
-// import { USD } from "crosshatch/Known"
-// import { Config, Effect, Layer, Console } from "effect"
-// import { FetchHttpClient } from "effect/unstable/http"
+import { layerPrelude } from "./layerPayer.ts"
 
-// import { layerPrelude } from "./layerPayer.ts"
-
-// Effect.gen(function* () {
-//   const recipient = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
-//   const required = yield* Required.make`
-//   |
-//   | Description of the charge.
-//   |
-//   `.pipe(
-//     Required.accept(
-//       Requirements.denomination(USD, {
-//         amount: 0.01,
-//         recipients: { eip155: { 8453: recipient } },
-//         ttl: "1 minutes",
-//       }),
-//     ),
-//   )
-//   const { payload } = yield* Payload.make({ required })
-//   const settlement = yield* Facilitator.settle({ payload })
-//   yield* Console.log(settlement)
-// }).pipe(
-//   Effect.provide([Facilitator.layer().pipe(Layer.provide(FetchHttpClient.layer)), layerPrelude]),
-//   Effect.onError(Effect.logError),
-//   Effect.runFork,
-// )
+Effect.gen(function* () {
+  const recipients = yield* Config.all({
+    eip155: Address.fromConfig(Eip155, "EIP155_RECIPIENT"),
+    solana: Address.fromConfig(Solana, "SOLANA_RECIPIENT"),
+  })
+  const accepts = Accepts.empty.pipe(
+    Accepts.add(USDC, { amount: "", recipients }),
+    Accepts.add(USDC.base_mainnet, { amount: "", recipients }),
+  )
+  const required = yield* Required.describe`
+  | Description of the charge
+  `(accepts)
+  const payload = yield* Payload.make(required)
+  const settlement = yield* Facilitator.settle({ payload })
+  yield* Console.log(settlement)
+}).pipe(Layer.provide(layerPrelude), Effect.runFork)

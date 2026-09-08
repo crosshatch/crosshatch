@@ -23,7 +23,6 @@ const UserConfig_ = S.Struct({
   mnemonics: S.Record(S.String, MnemonicConfig),
 })
 
-// oxlint-disable-next-line typescript/no-empty-interface
 export interface UserConfig extends UserConfig_ {}
 
 export const UserConfig = Object.assign(
