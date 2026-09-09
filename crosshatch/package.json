@@ -24,10 +24,14 @@
     "./mechanisms/*": "./mechanisms/*/index.ts",
     "./Cryptocurrency": "./Cryptocurrency/index.ts",
     "./Cryptocurrency/*": "./Cryptocurrency/*.ts",
+    "./Cryptocurrency/Eip155": "./Cryptocurrency/Eip155/index.ts",
+    "./Cryptocurrency/Solana": "./Cryptocurrency/Solana/index.ts",
     "./Cryptocurrency/tokens": "./Cryptocurrency/tokens/index.ts",
     "./Cryptocurrency/references": "./Cryptocurrency/references/index.ts",
     "./Cryptocurrency/namespaces": "./Cryptocurrency/namespaces/index.ts",
     "./Cryptocurrency/token-deployments": "./Cryptocurrency/token-deployments/index.ts",
+    "./FacilitatorApi": "./FacilitatorApi/index.ts",
+    "./FacilitatorApi/*": "./FacilitatorApi/*.ts",
     "./package.json": "./package.json"
   },
   "publishConfig": {

@@ -1,2 +1,1 @@
 export * from "./Eip155.ts"
-export * from "./Solana.ts"

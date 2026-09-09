@@ -1,15 +1,14 @@
-import { Schema as S, String } from "effect"
+import { Schema as S } from "effect"
 import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 
-import { ChainFromString } from "../Chain.ts"
+import { NetworkFromString } from "../Network.ts"
 import { Version } from "../Version.ts"
 
-// TODO: determine what to do about legacy chain IDs.
 export type SupportedKind = typeof SupportedKind.Type
 export const SupportedKind = S.Struct({
   x402Version: Version,
-  scheme: S.String,
-  network: S.Union([S.String.pipe(S.brand("crosshatch/LegacyChainId")), ChainFromString]),
+  scheme: S.NonEmptyString,
+  network: NetworkFromString,
   extra: S.JsonObject.pipe(S.optional),
 })
 
@@ -19,15 +18,11 @@ export const SupportedResponse = S.Struct({
   extensions: S.Array(S.String),
   signers: S.Record(S.String, S.Array(S.String)),
 })
-export const SupportedResponseJson = S.toCodecJson(SupportedResponse)
-export const SupportedResponseJsonString = S.fromJsonString(SupportedResponseJson)
+export const SupportedResponseFromJsonString = S.fromJsonString(S.toCodecJson(SupportedResponse))
 
 export class SupportedEndpoint extends HttpApiEndpoint.get("supported", "/supported", {
   success: SupportedResponse,
 }).annotate(
   OpenApi.Description,
-  String.stripMargin(`
-  | Returns the list of payment schemes, networks, and extensions supported by this facilitator,
-  | along with signer addresses keyed by CAIP-2 network family patterns.
-  `),
+  `Returns the list of payment schemes, networks, and extensions supported by this facilitator, along with signer identifiers grouped by network selector.`,
 ) {}

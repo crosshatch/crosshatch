@@ -1,7 +1,6 @@
-import { Schema as S, String, Tuple } from "effect"
+import { Schema as S, Tuple } from "effect"
 import { HttpApiEndpoint, OpenApi } from "effect/unstable/httpapi"
 
-import { AddressFromString } from "../Address.ts"
 import { Payload } from "../Payload.ts"
 import { Requirements } from "../Requirements.ts"
 import { Version } from "../Version.ts"
@@ -17,11 +16,11 @@ export type VerifyResponse = typeof VerifyResponse.Type
 export const VerifyResponse = S.Union([
   S.Struct({
     isValid: S.tag(true),
-    payer: AddressFromString.pipe(S.optional),
+    payer: S.NonEmptyString.pipe(S.optional),
   }),
   S.Struct({
     isValid: S.tag(false),
-    payer: AddressFromString.pipe(S.optional),
+    payer: S.NonEmptyString.pipe(S.optional),
     invalidReason: S.String.pipe(S.optional),
     invalidMessage: S.String.pipe(S.optional),
   }),
@@ -33,16 +32,12 @@ export const VerifyResponse = S.Union([
     }),
   ),
 )
-export const VerifyResponseJson = S.toCodecJson(VerifyResponse)
-export const VerifyResponseJsonString = S.fromJsonString(VerifyResponseJson)
+export const VerifyResponseFromJsonString = S.fromJsonString(S.toCodecJson(VerifyResponse))
 
 export class VerifyEndpoint extends HttpApiEndpoint.post("verify", "/verify", {
   payload: VerifyPayload,
   success: VerifyResponse,
 }).annotate(
   OpenApi.Description,
-  String.stripMargin(`
-  | Verifies a payment authorization without executing the transaction on the blockchain.
-  | Returns whether the payment is valid, along with any invalidity reasons.
-  `),
+  `Validates a payment authorization against the supplied requirements without settling the payment. Returns whether the payment is valid, along with any invalidity reasons.`,
 ) {}

@@ -1,4 +1,4 @@
-import { MechanismConfig, Instrument } from "../../index.ts"
+import { MechanismConfig } from "../../index.ts"
 import { Erc3009, Permit2 } from "../../mechanisms/Eip155/index.ts"
 import { TokenDeployment } from "../index.ts"
 import { BaseMainnet } from "../references/Eip155.ts"
@@ -23,4 +23,4 @@ export const base_mainnet = TokenDeployment.make({
   mechanismConfig: [erc3009Config, permit2Config],
 })
 
-export const instrument = Instrument.merge({ base_mainnet })
+export const accepts = TokenDeployment.merge({ base_mainnet })

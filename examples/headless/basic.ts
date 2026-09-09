@@ -1,24 +1,34 @@
-import { Accepts } from "crosshatch"
+import { Required, Payer } from "crosshatch"
 import { Address } from "crosshatch/Cryptocurrency"
-import { Eip155 } from "crosshatch/Cryptocurrency/namespaces/Eip155"
+import { Eip155 } from "crosshatch/Cryptocurrency/Eip155"
+import { Solana } from "crosshatch/Cryptocurrency/Solana"
 import { USDC } from "crosshatch/Cryptocurrency/token-deployments"
-import { Config, Console, Effect } from "effect"
+import { Config, Effect, Array, Console } from "effect"
 
-import { layerPrelude } from "./layerPayer.ts"
+// import { layerPrelude } from "./layerPayer.ts"
+
+const amount = ""
 
 Effect.gen(function* () {
   const recipients = yield* Config.all({
     eip155: Address.fromConfig(Eip155, "EIP155_RECIPIENT"),
     solana: Address.fromConfig(Solana, "SOLANA_RECIPIENT"),
   })
-  const accepts = Accepts.empty.pipe(
-    Accepts.add(USDC, { amount: "", recipients }),
-    Accepts.add(USDC.base_mainnet, { amount: "", recipients }),
-  )
+
+  const accepts = Array.flatten([
+    USDC.accepts({ amount, recipients }),
+    USDC.accepts({ amount, recipients }),
+    USDC.base_mainnet.accepts({ amount, recipients }),
+  ])
+
   const required = yield* Required.describe`
-  | Description of the charge
+  |
+  | Description of the charge.
+  |
   `(accepts)
-  const payload = yield* Payload.make(required)
-  const settlement = yield* Facilitator.settle({ payload })
-  yield* Console.log(settlement)
-}).pipe(Layer.provide(layerPrelude), Effect.runFork)
+
+  const payload = yield* Payer.make(required)
+
+  // const settlement = yield* Facilitator.settle({ payload })
+  yield* Console.log(payload)
+}).pipe(Effect.provide(Payer.layer), Effect.runFork)

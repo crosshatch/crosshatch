@@ -1,8 +1,7 @@
-import { Duration } from "effect"
+import { Duration, Array, Record } from "effect"
 
 import * as Proto from "../_Proto.ts"
 import type { Instrument, MechanismConfig } from "../index.ts"
-import type { Address } from "./Address.ts"
 import type * as Namespace from "./Namespace.ts"
 import type * as Reference from "./Reference.ts"
 import type * as Token from "./Token.ts"
@@ -24,21 +23,22 @@ export interface TokenDeploymentSpec<
   readonly mechanismConfig: MechanismConfigs_
 }
 
+export interface TokenDeploymentProps<Namespace_ extends Namespace.Any> {
+  readonly amount: string
+
+  readonly recipients: {
+    readonly [K in Namespace_["_tag"]]: Namespace_["Address"]["Type"]
+  }
+
+  readonly timeout?: Duration.Input | undefined
+}
+
 export interface TokenDeployment<
   Namespace_ extends Namespace.Any,
   Mechanism_,
   Reference_ extends string,
   Token_ extends Token.Any,
-> extends Instrument.InstrumentBearer<
-  Mechanism_,
-  {
-    readonly amount: string
-    readonly recipient: Address
-    readonly timeout?: Duration.Input | undefined
-  }
-> {
-  readonly mechanism: Mechanism_
-
+> extends Instrument.InstrumentBearer<Mechanism_, TokenDeploymentProps<Namespace_>> {
   readonly [TypeId]: typeof TypeId
 
   readonly reference: Reference.Reference<Namespace_, Reference_>
@@ -49,6 +49,8 @@ export interface TokenDeployment<
 
   readonly mechanismConfig: ReadonlyArray<MechanismConfig.Any>
 }
+
+export type Any = TokenDeployment<Namespace.Any, any, string, Token.Any>
 
 export const make = <
   Namespace_ extends Namespace.Any,
@@ -67,8 +69,7 @@ export const make = <
 > => ({
   [TypeId]: TypeId,
   ...spec,
-  mechanism: null!,
-  instrument: (v) =>
+  accepts: (v) =>
     spec.mechanismConfig.map((config) => ({
       scheme: "exact",
       network: {
@@ -77,8 +78,16 @@ export const make = <
       },
       asset: spec.address,
       amount: v.amount,
-      payTo: v.recipient,
+      payTo: (v.recipients as never)[spec.reference.namespace._tag],
       maxTimeoutSeconds: v.timeout ? Duration.toSeconds(v.timeout) : 0,
       ...(config.extra ? { extra: config.extra } : {}),
     })),
 })
+
+// TODO:
+export const merge =
+  <Mechanism_, T>(
+    v: Record<string, Instrument.InstrumentBearer<Mechanism_, T>>,
+  ): Instrument.Instrument<Mechanism_, T> =>
+  (config) =>
+    Array.flatMap(Record.values(v), (v) => v.accepts(config))
