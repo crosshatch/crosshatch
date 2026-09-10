@@ -1,3 +1,5 @@
+import { Effect } from "effect"
+
 import { MechanismConfig } from "../../index.ts"
 import { Erc3009, Permit2 } from "../../mechanisms/Eip155/index.ts"
 import { TokenDeployment, TokenDeploymentGroup } from "../index.ts"
@@ -21,6 +23,7 @@ export const base_mainnet = TokenDeployment.make({
   token: USDC,
   address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
   mechanismConfig: [erc3009Config, permit2Config],
+  decimals: Effect.succeed(18),
 })
 
 export const accepts = TokenDeploymentGroup.make({ base_mainnet })

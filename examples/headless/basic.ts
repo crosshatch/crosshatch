@@ -1,9 +1,9 @@
-import { Required, Payer, Facilitator } from "crosshatch"
+import { Required, Payer, Facilitator, Accepts } from "crosshatch"
 import { Address } from "crosshatch/Cryptocurrency"
 import { Eip155 } from "crosshatch/Cryptocurrency/Eip155"
 import { Solana } from "crosshatch/Cryptocurrency/Solana"
 import { USDC } from "crosshatch/Cryptocurrency/token-deployments"
-import { Config, Effect, Array, Console, Layer } from "effect"
+import { Config, Effect, Console, Layer } from "effect"
 import { FetchHttpClient } from "effect/unstable/http"
 
 const amount = ""
@@ -14,11 +14,11 @@ Effect.gen(function* () {
     solana: Address.fromConfig(Solana, "SOLANA_RECIPIENT"),
   })
 
-  const accepts = Array.flatten([
-    USDC.base_mainnet.accepts({ amount, recipients }),
-    USDC.accepts({ amount, recipients }),
-    USDC.accepts({ amount, recipients }),
-  ])
+  const accepts = Accepts.empty.pipe(
+    Accepts.add(USDC.base_mainnet, { amount, recipients }),
+    Accepts.add(USDC, { amount, recipients }),
+    Accepts.add(USDC, { amount, recipients }),
+  )
 
   const required = yield* Required.describe`
   |

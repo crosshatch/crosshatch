@@ -1,4 +1,4 @@
-import { Types, Duration } from "effect"
+import { Types, Duration, Effect } from "effect"
 
 import * as Proto from "../_Proto.ts"
 import type * as Instrument from "../Instrument.ts"
@@ -32,9 +32,11 @@ export interface TokenDeploymentGroupProps<Reference_ extends Reference.Any> {
   readonly ttl?: Duration.Input | undefined
 }
 
-export interface TokenDeploymentGroup<Reference_ extends Reference.Any, Mechanism_> extends Instrument.Instrument<
+export interface TokenDeploymentGroup<Reference_ extends Reference.Any, Mechanism_, E, R> extends Instrument.Instrument<
   Mechanism_,
-  TokenDeploymentGroupProps<Reference_>
+  TokenDeploymentGroupProps<Reference_>,
+  E,
+  R
 > {
   readonly [TypeId]: typeof TypeId
 
@@ -45,5 +47,7 @@ export declare const make: <L extends Record<string, TokenDeployment.Any>>(
   _record: L,
 ) => TokenDeploymentGroup<
   L[keyof L]["reference"],
-  { readonly [K in keyof L]: TokenDeployment.Mechanism<L[K]> }[keyof L]
+  { readonly [K in keyof L]: TokenDeployment.Mechanism<L[K]> }[keyof L],
+  Effect.Error<L[keyof L]>,
+  Effect.Services<L[keyof L]>
 >
