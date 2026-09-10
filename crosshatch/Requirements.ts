@@ -11,3 +11,5 @@ export class Requirements extends S.Class<Requirements>("Requirements")({
   maxTimeoutSeconds: S.Natural,
   extra: S.JsonObject.pipe(S.optional),
 }) {}
+
+export const equals = S.toEquivalence(Requirements)

@@ -1,22 +1,22 @@
 import type { Context, Schema as S, Effect, Scope, Layer } from "effect"
 
 import * as Proto from "./_Proto.ts"
+import type { Requirements } from "./Requirements.ts"
 
 const TypeId = Proto.id("Mechanism")
 
-export type MakePayload<Extra, A extends S.JsonObject, R> = (extra: Extra) => Effect.Effect<A, never, R>
-
-export type Service<Extra extends S.JsonObject, A extends S.JsonObject, R> = {
-  readonly makePayload: MakePayload<Extra, A, R>
-}
+export type MakePayload<Extra, A extends S.JsonObject, R> = (
+  accepted: Requirements,
+  extra: Extra,
+) => Effect.Effect<A, never, R>
 
 export interface Mechanism<
   Self,
   Id extends string,
   Extra extends S.JsonObject,
   A extends S.JsonObject,
-> extends Context.Service<Self, Service<Extra, A, never>> {
-  new (_: never): Context.ServiceClass.Shape<Id, Service<Extra, A, never>>
+> extends Context.Service<Self, MakePayload<Extra, A, never>> {
+  new (_: never): Context.ServiceClass.Shape<Id, MakePayload<Extra, A, never>>
 
   readonly [TypeId]: typeof TypeId
 

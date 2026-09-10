@@ -1,14 +1,15 @@
 import { type Effect, Schema as S } from "effect"
 
+import { Accepts } from "./Accepts.ts"
 import { ExtensionsEnvelope } from "./ExtensionsEnvelope.ts"
-import { Requirements } from "./Requirements.ts"
+import type { Requirements } from "./Requirements.ts"
 import { ResourceInfo } from "./ResourceInfo.ts"
 import { Version } from "./Version.ts"
 
 export class Required extends S.Class<Required>("Required")({
   x402Version: Version,
   resource: ResourceInfo,
-  accepts: S.Array(Requirements),
+  accepts: Accepts,
   error: S.String.pipe(S.optional),
   extensions: ExtensionsEnvelope.pipe(S.optional),
 }) {}

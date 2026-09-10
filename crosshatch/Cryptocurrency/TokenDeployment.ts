@@ -1,4 +1,4 @@
-import { Duration, Array, Record } from "effect"
+import { Duration } from "effect"
 
 import * as Proto from "../_Proto.ts"
 import type { Instrument, MechanismConfig } from "../index.ts"
@@ -10,9 +10,9 @@ const TypeId = Proto.id("TokenDeployment")
 
 export interface TokenDeploymentSpec<
   Namespace_ extends Namespace.Any,
-  MechanismConfigs_ extends ReadonlyArray<MechanismConfig.Any>,
   Reference_ extends string,
   Token_ extends Token.Any,
+  MechanismConfigs_ extends ReadonlyArray<MechanismConfig.Any>,
 > {
   readonly reference: Reference.Reference<Namespace_, Reference_>
 
@@ -35,9 +35,9 @@ export interface TokenDeploymentProps<Namespace_ extends Namespace.Any> {
 
 export interface TokenDeployment<
   Namespace_ extends Namespace.Any,
-  Mechanism_,
   Reference_ extends string,
   Token_ extends Token.Any,
+  Mechanism_,
 > extends Instrument.InstrumentBearer<Mechanism_, TokenDeploymentProps<Namespace_>> {
   readonly [TypeId]: typeof TypeId
 
@@ -50,22 +50,23 @@ export interface TokenDeployment<
   readonly mechanismConfig: ReadonlyArray<MechanismConfig.Any>
 }
 
-export type Any = TokenDeployment<Namespace.Any, any, string, Token.Any>
+export type Any = TokenDeployment<any, string, Token.Any, any>
+
+export type Mechanism<T extends Any> =
+  T extends TokenDeployment<any, string, Token.Any, infer Mechanism_> ? Mechanism_ : never
 
 export const make = <
   Namespace_ extends Namespace.Any,
-  MechanismConfigs_ extends ReadonlyArray<MechanismConfig.Any>,
   Reference_ extends string,
   Token_ extends Token.Any,
+  MechanismConfigs_ extends ReadonlyArray<MechanismConfig.Any>,
 >(
-  spec: TokenDeploymentSpec<Namespace_, MechanismConfigs_, Reference_, Token_>,
+  spec: TokenDeploymentSpec<Namespace_, Reference_, Token_, MechanismConfigs_>,
 ): TokenDeployment<
   Namespace_,
-  MechanismConfigs_[number] extends MechanismConfig.MechanismConfig<infer Mechanism_>
-    ? Mechanism_["Identifier"]
-    : never,
   Reference_,
-  Token_
+  Token_,
+  MechanismConfigs_[number] extends MechanismConfig.MechanismConfig<infer Mechanism_> ? Mechanism_["Identifier"] : never
 > => ({
   [TypeId]: TypeId,
   ...spec,
@@ -83,11 +84,3 @@ export const make = <
       ...(config.extra ? { extra: config.extra } : {}),
     })),
 })
-
-// TODO:
-export const merge =
-  <Mechanism_, T>(
-    v: Record<string, Instrument.InstrumentBearer<Mechanism_, T>>,
-  ): Instrument.Instrument<Mechanism_, T> =>
-  (config) =>
-    Array.flatMap(Record.values(v), (v) => v.accepts(config))
