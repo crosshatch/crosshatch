@@ -27,12 +27,10 @@ export interface TokenDeploymentSpec<
   readonly decimals: Effect.Effect<number, GDE, GDR>
 }
 
-export interface TokenDeploymentProps<Namespace_ extends Namespace.Any> {
+export interface TokenDeploymentProps<Recipients> {
   readonly amount: string
 
-  readonly recipients: {
-    readonly [K in Namespace_["_tag"]]: Namespace_["Address"]["Type"]
-  }
+  readonly recipients: Recipients
 
   readonly timeout?: Duration.Input | undefined
 }
@@ -44,7 +42,14 @@ export interface TokenDeployment<
   Mechanism_,
   GDE,
   GDR,
-> extends Instrument.InstrumentBearer<Mechanism_, TokenDeploymentProps<Namespace_>, GDE, GDR> {
+> extends Instrument.InstrumentBearer<
+  Mechanism_,
+  TokenDeploymentProps<{
+    readonly [K in Namespace_["_tag"]]: Namespace_["Address"]["Type"]
+  }>,
+  GDE,
+  GDR
+> {
   readonly [TypeId]: typeof TypeId
 
   readonly reference: Reference.Reference<Namespace_, Reference_>

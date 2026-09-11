@@ -1,5 +1,0 @@
-export * as Solana from "./Solana.ts"
-export * as SolanaAddress from "./SolanaAddress.ts"
-export * as SolanaScheme from "./SolanaScheme.ts"
-export * as SolanaSigner from "./SolanaSigner.ts"
-export * as SolanaClient from "./SolanaClient.ts"

@@ -1,17 +1,17 @@
 import { Effect } from "effect"
 
 import { MechanismConfig } from "../../index.ts"
-import { Erc3009, Permit2 } from "../../mechanisms/Eip155/index.ts"
+import { Erc3009Mechanism, Permit2Mechanism } from "../Eip155/index.ts"
 import { TokenDeployment, TokenDeploymentGroup } from "../index.ts"
 import { BaseMainnet } from "../references/Eip155.ts"
 import { USDC } from "../tokens/index.ts"
 
-const erc3009Config = MechanismConfig.make(Erc3009.Erc3009, {
+const erc3009Config = MechanismConfig.make(Erc3009Mechanism.Erc3009Mechanism, {
   name: "USD Coin",
   version: "2",
 })
 
-const permit2Config = MechanismConfig.make(Permit2.Permit2, {
+const permit2Config = MechanismConfig.make(Permit2Mechanism.Permit2Scheme, {
   name: "USD Coin",
   version: "2",
   assetTransferMethod: "permit2",

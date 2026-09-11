@@ -1,9 +1,9 @@
-import { Context, Layer, Effect, Data } from "effect"
+import { Context, Layer, Effect, Data, Redacted } from "effect"
 import { Address, Hash, type Hex, Mnemonic as OxMnemonic, Secp256k1, Signature, TypedData } from "ox"
 
-import { Mnemonic } from "../../index.ts"
+import { Mnemonic } from "../index.ts"
 
-export class Eip155SignerError extends Data.TaggedError("Eip155SignerError")<{ cause?: unknown }> {}
+export class Eip155SignerError extends Data.TaggedError("Eip155SignerError")<{ cause: unknown }> {}
 
 export class Eip155Signer extends Context.Service<
   Eip155Signer,
@@ -22,7 +22,7 @@ export const layerFromMnemonic = Layer.effect(
   Eip155Signer,
   Effect.gen(function* () {
     const mnemonic = yield* Mnemonic.Mnemonic
-    const privateKey = OxMnemonic.toPrivateKey(Mnemonic.value(mnemonic), { as: "Hex" })
+    const privateKey = OxMnemonic.toPrivateKey(Redacted.value(mnemonic), { as: "Hex" })
     const publicKey = Secp256k1.getPublicKey({ privateKey })
     return {
       address: Address.fromPublicKey(publicKey, { checksum: true }),

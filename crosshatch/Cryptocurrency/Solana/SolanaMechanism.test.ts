@@ -12,7 +12,7 @@ import type * as Index from "../../index.ts"
 import { make as makeRequirements, Requirements } from "../../Requirements.ts"
 import type * as Scheme from "../../Scheme.ts"
 import { SolanaClient } from "./SolanaClient.ts"
-import { SolanaScheme, type Extra } from "./SolanaScheme.ts"
+import { SolanaMechanism, type Extra } from "./SolanaScheme.ts"
 import { SolanaSigner } from "./SolanaSigner.ts"
 
 type AdaptBody = Adapt<
@@ -86,7 +86,7 @@ describe("solana adaptation", { concurrent: false }, () => {
   it.effect("uses fetched metadata and exact atomic amounts with a fresh late blockhash for every signing", () =>
     Effect.gen(function* () {
       assert.isDefined(captured.adapt)
-      assert.strictEqual(SolanaScheme.key, "crosshatch/namespaces/Solana/SolanaScheme")
+      assert.strictEqual(SolanaMechanism.key, "crosshatch/namespaces/Solana/SolanaScheme")
       const args = yield* input
       for (const tokenProgram of programs) {
         vi.clearAllMocks()

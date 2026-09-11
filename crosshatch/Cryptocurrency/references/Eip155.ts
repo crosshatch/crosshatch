@@ -1,5 +1,5 @@
+import { Eip155 } from "../Eip155/index.ts"
 import { Reference } from "../index.ts"
-import { Eip155 } from "../namespaces/Eip155.ts"
 
 export const BaseMainnet = Reference.make({
   namespace: Eip155,

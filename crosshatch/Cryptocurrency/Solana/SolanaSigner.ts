@@ -4,11 +4,11 @@ import { partiallySignTransaction } from "@solana/transactions"
 import { Context, Effect, Layer } from "effect"
 
 import { Ed25519Pair, Slip10 } from "../../Crypto/index.ts"
-import { Mnemonic } from "../../index.ts"
+import { Mnemonic } from "../index.ts"
 import * as SolanaAddress from "./SolanaAddress.ts"
 
 export class SolanaSigner extends Context.Service<SolanaSigner, TransactionPartialSigner>()(
-  "crosshatch/namespaces/Solana/SolanaSigner",
+  "crosshatch/Cryptocurrency/Solana/SolanaSigner",
 ) {}
 
 export const layerFromMnemonic = Layer.effect(
@@ -19,7 +19,7 @@ export const layerFromMnemonic = Layer.effect(
       Effect.flatMap(({ privateKeySeed }) => Ed25519Pair.fromSeed(privateKeySeed)),
     )
     const address = yield* SolanaAddress.fromPublicKey(keypair.publicKey).pipe(
-      Effect.map((v) => makeSolanaKitAddress(v.raw)),
+      Effect.map((v) => makeSolanaKitAddress(v)),
     )
     const signTransactions: TransactionPartialSigner["signTransactions"] = (transactions) =>
       Promise.all(

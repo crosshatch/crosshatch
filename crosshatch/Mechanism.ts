@@ -1,14 +1,16 @@
-import type { Context, Schema as S, Effect, Scope, Layer } from "effect"
+import { Data, Context, Schema as S, Effect, Scope, Layer } from "effect"
 
 import * as Proto from "./_Proto.ts"
 import type { Requirements } from "./Requirements.ts"
 
 const TypeId = Proto.id("Mechanism")
 
+export class MakePayloadError extends Data.TaggedError("MakePayloadError")<{ readonly cause: unknown }> {}
+
 export type MakePayload<Extra, A extends S.JsonObject, R> = (
   accepted: Requirements,
   extra: Extra,
-) => Effect.Effect<A, never, R>
+) => Effect.Effect<A, MakePayloadError, R>
 
 export interface Mechanism<
   Self,
