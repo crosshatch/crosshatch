@@ -1,3 +1,4 @@
 import { Schema as S } from "effect"
 
-export const Version = S.Literals([2])
+export type Version = typeof Version.Type
+export const Version = S.Literal(2)

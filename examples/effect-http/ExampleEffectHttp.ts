@@ -1,8 +1,9 @@
 import * as Cloudflare from "alchemy/Cloudflare"
-import { Required, Requirements, Payload, Facilitator, ChxHttp, PaymentId } from "crosshatch"
-import { Eip155Address } from "crosshatch/Eip155"
-import * as Known from "crosshatch/Known"
-import { Layer, Effect, Config } from "effect"
+import { Payload, Required, Facilitator, ResourceInfo, Address, Accepts, RequiredResponse } from "crosshatch"
+import { USDC, USDCE, USDT } from "crosshatch/coins"
+import { Eip155 } from "crosshatch/namespaces/Eip155"
+import { USD } from "crosshatch/units"
+import { Layer, Effect } from "effect"
 import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
 
 export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHttp>()(
@@ -23,52 +24,40 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
     },
   },
   Effect.gen(function* () {
-    const recipient = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
     const fetch = HttpRouter.add(
       "GET",
       "/paid",
       Effect.gen(function* () {
+        const eip155 = yield* Address.fromConfig(Eip155.Eip155, "PAY_TO_EIP155")
+        const accepts = Accepts.empty.pipe(
+          Accepts.addInstrument(USDC, "0.01"),
+          Accepts.addUnit(USD, [USDT, USDCE, USDT], "0.01"),
+          Accepts.address({ eip155 }),
+        )
         const payload = yield* Payload.Payload
-        const accepted = yield* Requirements.denomination(Known.USD, {
-          amount: 0.01,
-          recipients: { eip155: { 8453: recipient } },
-        })
-        if (!Payload.isAcceptable(accepted, payload)) {
-          const required = yield* Required.make`
-          |
-          | Description of the charge here.
-          |
-          | What is this charge for?
-          |
-          | How does it fit into the current flow?
-          |
-          `.pipe(
-            Required.extend(PaymentId.FromMerchant, {
-              required: true,
-              id: PaymentId.random(),
-            }),
-            Required.accept(accepted),
-          )
-          return yield* ChxHttp.require({ required })
+        if (Payload.match(payload, accepts)) {
+          const settlement = yield* Facilitator.settle(payload)
+          return HttpServerResponse.text("The paid resource.").pipe(Facilitator.withHeaders(settlement))
         }
-        const settlement = yield* Facilitator.settle({ payload })
-        return HttpServerResponse.text("The paid resource.").pipe(ChxHttp.addResponseHeader(settlement))
-      }),
+        const required = yield* Required.describe`
+        |
+        | Description of the charge here.
+        |
+        `(accepts)
+        return yield* RequiredResponse.make(required)
+      }).pipe(Effect.provide(Payload.layerFromRequest)),
     ).pipe(
       Layer.provide([
-        ChxHttp.layerMiddleware({
-          extensions: [PaymentId.FromMerchant],
-        }),
         HttpRouter.cors({
           allowedHeaders: ["*"],
           allowedMethods: ["*"],
           allowedOrigins: ["*"],
-          exposedHeaders: ChxHttp.exposedHeaders,
+          exposedHeaders: ["TODO"],
         }),
       ]),
       HttpRouter.toHttpEffect,
       Effect.flatten,
-      Effect.provide([Facilitator.layer()]),
+      Effect.provide([Facilitator.layer(""), ResourceInfo.layer({ url: "https://popeyes.dev" })]),
       Effect.orDie,
     )
     return { fetch }

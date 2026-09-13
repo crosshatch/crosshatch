@@ -1,90 +1,27 @@
-import { stringRaw } from "@crosshatch/util"
-import { Schema as S, Effect, Context } from "effect"
+import { type Effect, Schema as S } from "effect"
 
-import { type Extension, ExtensionEnvelopes } from "./Extension.ts"
-import { Requirements, type RequirementsLike } from "./Requirements.ts"
+import * as Accepts from "./Accepts.ts"
+import { ExtensionsEnvelope } from "./ExtensionsEnvelope.ts"
 import { ResourceInfo } from "./ResourceInfo.ts"
 import { Version } from "./Version.ts"
 
-export type Required = typeof Required.Type
-export const Required = S.Struct({
+export class Required extends S.Class<Required>("Required")({
   x402Version: Version,
   resource: ResourceInfo,
-  accepts: S.Array(Requirements),
+  accepts: Accepts.Accepts,
   error: S.String.pipe(S.optional),
-  extensions: ExtensionEnvelopes.pipe(S.optional),
-})
-
-export const RequiredJson = S.toCodecJson(Required)
-export const RequiredFromJsonString = S.fromJsonString(RequiredJson)
-export const RequiredFromBase64JsonString = S.StringFromBase64.pipe(S.decodeTo(RequiredFromJsonString))
-
-export class RequiredUrl extends Context.Reference<string | undefined>("crosshatch/RequiredUrl", {
-  defaultValue: () => undefined,
+  extensions: ExtensionsEnvelope.pipe(S.optional),
 }) {}
 
-export const make = Effect.fnUntraced(function* (
-  template?: TemplateStringsArray | string,
-  ...substitutions: ReadonlyArray<unknown>
-) {
-  const url = yield* RequiredUrl
-  return {
-    accepts: [],
-    x402Version: 2,
-    resource: {
-      url,
-      ...(template && {
-        description: stringRaw(template, substitutions),
-      }),
-    },
-  } satisfies Required
-})
-
-export const accept =
-  (...acceptsInputs: ReadonlyArray<RequirementsLike>) =>
-  <E, R>(effect: Effect.Effect<Required, E, R>): Effect.Effect<Required, E | S.SchemaError, R> =>
-    Effect.flatMap(
-      effect,
-      Effect.fnUntraced(function* ({ accepts, ...rest }) {
-        return {
-          ...rest,
-          accepts: yield* Effect.forEach(acceptsInputs ?? [], (v) => (Effect.isEffect(v) ? v : Effect.succeed(v))).pipe(
-            Effect.map((v) => v.flat()),
-          ),
-        }
-      }),
-    )
-
-export const extend =
-  <
-    Self,
-    K extends string,
-    Name extends string,
-    ExtensionPayload extends Extension.Info,
-    Enrichment extends Extension.Enrichment<ExtensionPayload>,
-  >(
-    extension: Extension<Self, K, Name, ExtensionPayload, Enrichment>,
-    payload: ExtensionPayload["Type"],
-  ) =>
-  <E, R>(
-    effect: Effect.Effect<Required, E, R>,
-  ): Effect.Effect<Required, E | S.SchemaError, R | ExtensionPayload["EncodingServices"]> =>
-    Effect.flatMap(
-      effect,
-      Effect.fnUntraced(function* ({ extensions, ...rest }) {
-        const envelope = yield* Effect.all(
-          {
-            schema: S.encodeUnknownEffect(S.Json)(S.toJsonSchemaDocument(extension.info)),
-            info: S.encodeEffect(S.toCodecJson(extension.info))(payload),
-          },
-          { concurrency: "unbounded" },
-        )
-        return {
-          ...rest,
-          extensions: {
-            ...extensions,
-            [extension.identifier]: envelope,
-          },
-        }
-      }),
-    )
+export declare const describe: {
+  <E = never, R = never>(
+    accepts: Accepts.Accepts | Effect.Effect<Accepts.Accepts, E, R>,
+    description?: string,
+  ): Effect.Effect<Required, E, R>
+  (
+    e0?: TemplateStringsArray | string,
+    ...substitutions: ReadonlyArray<unknown>
+  ): <E = never, R = never>(
+    accepts: Accepts.Accepts | Effect.Effect<Accepts.Accepts, E, R>,
+  ) => Effect.Effect<Required, E, R>
+}
