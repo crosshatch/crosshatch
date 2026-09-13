@@ -44,7 +44,7 @@ export class SolanaMechanism extends Mechanism.Service<
 export const layer = Mechanism.layer(
   SolanaMechanism,
   Effect.fnUntraced(
-    function* (accepted, { feePayer, memo }) {
+    function* ({ accepted, extra: { feePayer, memo } }) {
       const signer = yield* SolanaSigner
       const client = yield* SolanaClient
       const mint = address(accepted.asset)

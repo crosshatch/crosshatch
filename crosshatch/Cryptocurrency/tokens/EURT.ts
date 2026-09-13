@@ -2,7 +2,7 @@ import { Effect } from "effect"
 
 import { Permit2Mechanism } from "../Eip155/index.ts"
 import { EthereumMainnet } from "../Eip155/references.ts"
-import { EURT } from "../families/index.ts"
+import { EURT } from "../families.ts"
 import { Token } from "../index.ts"
 
 const permit2Config = Permit2Mechanism.Permit2Scheme.make({

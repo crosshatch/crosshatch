@@ -22,7 +22,7 @@ import {
   UnichainMainnet,
   XLayerMainnet,
 } from "../Eip155/references.ts"
-import { USDT0 } from "../families/index.ts"
+import { USDT0 } from "../families.ts"
 import { Token } from "../index.ts"
 
 const erc3009Config = Erc3009Mechanism.Erc3009Mechanism.make({

@@ -5,7 +5,6 @@ import { Address } from "ox"
 import { Mechanism } from "../../index.ts"
 import { MakePayloadError } from "../../Mechanism.ts"
 import { Eip155Signer } from "./Eip155Signer.ts"
-import { getDelegation, type Erc7710Delegator } from "./Erc7710Delegator.ts"
 
 const Extra = S.Struct({
   assetTransferMethod: S.Literal("eip3009").pipe(S.optionalKey),
@@ -16,26 +15,23 @@ const Extra = S.Struct({
 export class Erc3009Mechanism extends Mechanism.Service<
   Erc3009Mechanism,
   typeof Extra.Type,
-  | Erc7710Delegator["Service"]
-  | {
-      readonly signature: string
-      readonly authorization: {
-        readonly from: HexString
-        readonly to: HexString
-        readonly value: string
-        readonly validAfter: string
-        readonly validBefore: string
-        readonly nonce: HexString
-      }
+  {
+    readonly signature: string
+    readonly authorization: {
+      readonly from: HexString
+      readonly to: HexString
+      readonly value: string
+      readonly validAfter: string
+      readonly validBefore: string
+      readonly nonce: HexString
     }
+  }
 >()("crosshatch/Cryptocurrency/namespaces/Eip155/Erc3009Scheme") {}
 
 export const layer = Mechanism.layer(
   Erc3009Mechanism,
   Effect.fnUntraced(
-    function* (accepted, { name, version }) {
-      const delegation = yield* getDelegation
-      if (delegation) return delegation
+    function* ({ accepted, extra: { name, version } }) {
       const now = Math.floor(DateTime.toEpochMillis(yield* DateTime.now) / 1000)
       const chainId = parseInt(accepted.network.reference)
       const signer = yield* Eip155Signer

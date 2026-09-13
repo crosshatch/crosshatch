@@ -8,7 +8,7 @@ import {
   EthereumMainnet,
   PolygonMainnet,
 } from "../Eip155/references.ts"
-import { XSGD } from "../families/index.ts"
+import { XSGD } from "../families.ts"
 import { Token } from "../index.ts"
 
 const permit2Config = Permit2Mechanism.Permit2Scheme.make({

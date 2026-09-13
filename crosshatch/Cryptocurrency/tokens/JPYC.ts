@@ -2,7 +2,7 @@ import { Effect } from "effect"
 
 import { Permit2Mechanism } from "../Eip155/index.ts"
 import { AvalancheMainnet, EthereumMainnet, PolygonMainnet } from "../Eip155/references.ts"
-import { JPYC } from "../families/index.ts"
+import { JPYC } from "../families.ts"
 import { Token } from "../index.ts"
 
 const permit2Config = Permit2Mechanism.Permit2Scheme.make({

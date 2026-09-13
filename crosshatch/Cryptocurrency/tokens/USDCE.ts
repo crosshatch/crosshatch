@@ -2,7 +2,7 @@ import { Effect } from "effect"
 
 import { Erc3009Mechanism, Permit2Mechanism } from "../Eip155/index.ts"
 import { AdiMainnet, HppMainnet } from "../Eip155/references.ts"
-import { USDCE } from "../families/index.ts"
+import { USDCE } from "../families.ts"
 import { Token } from "../index.ts"
 
 const adiErc3009Config = Erc3009Mechanism.Erc3009Mechanism.make({

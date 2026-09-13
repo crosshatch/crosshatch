@@ -2,7 +2,7 @@ import { Effect } from "effect"
 
 import { Permit2Mechanism } from "../Eip155/index.ts"
 import { AvalancheMainnet, CeloMainnet, EthereumMainnet } from "../Eip155/references.ts"
-import { USDT } from "../families/index.ts"
+import { USDT } from "../families.ts"
 import { Token } from "../index.ts"
 
 const permit2Config = Permit2Mechanism.Permit2Scheme.make({

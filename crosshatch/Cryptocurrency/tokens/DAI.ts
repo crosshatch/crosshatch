@@ -9,7 +9,7 @@ import {
   OptimismMainnet,
   PolygonMainnet,
 } from "../Eip155/references.ts"
-import { DAI } from "../families/index.ts"
+import { DAI } from "../families.ts"
 import { Token } from "../index.ts"
 
 const permit2Config = Permit2Mechanism.Permit2Scheme.make({

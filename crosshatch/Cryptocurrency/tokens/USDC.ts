@@ -29,7 +29,7 @@ import {
   XLayerMainnet,
   ZkSyncMainnet,
 } from "../Eip155/references.ts"
-import { USDC } from "../families/index.ts"
+import { USDC } from "../families.ts"
 import { Token } from "../index.ts"
 
 const erc3009Config = Erc3009Mechanism.Erc3009Mechanism.make({

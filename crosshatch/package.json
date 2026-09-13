@@ -26,7 +26,6 @@
     "./Cryptocurrency": "./Cryptocurrency/index.ts",
     "./Cryptocurrency/*": "./Cryptocurrency/*.ts",
     "./Cryptocurrency/tokens": "./Cryptocurrency/tokens/index.ts",
-    "./Cryptocurrency/families": "./Cryptocurrency/families/index.ts",
     "./Cryptocurrency/Eip155": "./Cryptocurrency/Eip155/index.ts",
     "./Cryptocurrency/Solana": "./Cryptocurrency/Solana/index.ts",
     "./FacilitatorApi": "./FacilitatorApi/index.ts",

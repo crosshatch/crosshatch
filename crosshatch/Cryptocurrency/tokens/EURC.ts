@@ -9,7 +9,7 @@ import {
   PlasmaMainnet,
   WorldChainMainnet,
 } from "../Eip155/references.ts"
-import { EURC } from "../families/index.ts"
+import { EURC } from "../families.ts"
 import { Token } from "../index.ts"
 
 const euroCoinErc3009Config = Erc3009Mechanism.Erc3009Mechanism.make({

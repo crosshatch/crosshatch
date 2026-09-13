@@ -8,10 +8,10 @@ const TypeId = Proto.id("Mechanism")
 
 export class MakePayloadError extends Data.TaggedError("MakePayloadError")<{ readonly cause: unknown }> {}
 
-export type MakePayload<Extra, A extends S.JsonObject, R> = (
-  accepted: Requirements,
-  extra: Extra,
-) => Effect.Effect<A, MakePayloadError, R>
+export type MakePayload<Extra, A extends S.JsonObject, R> = (input: {
+  readonly accepted: Requirements
+  readonly extra: Extra
+}) => Effect.Effect<A, MakePayloadError, R>
 
 export interface Mechanism<
   Self,
