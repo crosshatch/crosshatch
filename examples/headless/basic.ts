@@ -2,7 +2,7 @@ import { Required, Payer, Facilitator, Accepts } from "crosshatch"
 import { Address } from "crosshatch/Cryptocurrency"
 import { Eip155 } from "crosshatch/Cryptocurrency/Eip155"
 import { Solana } from "crosshatch/Cryptocurrency/Solana"
-import { USDC } from "crosshatch/Cryptocurrency/token-deployments"
+import { USDC, EURT, DAI } from "crosshatch/Cryptocurrency/tokens"
 import { Config, Effect, Console, Layer } from "effect"
 import { FetchHttpClient } from "effect/unstable/http"
 
@@ -15,9 +15,9 @@ Effect.gen(function* () {
   })
 
   const accepts = Accepts.empty.pipe(
-    Accepts.add(USDC.base_mainnet, { amount, recipients }),
-    Accepts.add(USDC, { amount, recipients }),
-    Accepts.add(USDC, { amount, recipients }),
+    Accepts.add(EURT, { amount, recipients }),
+    Accepts.add(DAI, { amount, recipients }),
+    Accepts.addInstrument(USDC.zk_sync_mainnet, { amount, recipients }),
   )
 
   const required = yield* Required.describe`

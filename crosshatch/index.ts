@@ -1,7 +1,7 @@
 export * as Network from "./Network.ts"
 export * as Version from "./Version.ts"
 export * as Requirements from "./Requirements.ts"
-export type * as Instrument from "./Instrument.ts"
+export * as Instrument from "./Instrument.ts"
 export * as Required from "./Required.ts"
 export * as ResourceInfo from "./ResourceInfo.ts"
 export * as ExtensionsEnvelope from "./ExtensionsEnvelope.ts"

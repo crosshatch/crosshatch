@@ -46,9 +46,9 @@ export const layer = Mechanism.layer(
   Effect.fnUntraced(
     function* (accepted, { feePayer, memo }) {
       const signer = yield* SolanaSigner
-      const { getLatestBlockhash, getMintMetadata } = yield* SolanaClient
+      const client = yield* SolanaClient
       const mint = address(accepted.asset)
-      const { decimals, programAddress } = yield* getMintMetadata(mint, accepted.network.reference)
+      const { decimals, programAddress } = yield* client.getMintMetadata(mint, accepted.network.reference)
       const ata = (owner: SolanaAddress) =>
         Effect.tryPromise(() =>
           findAssociatedTokenPda({
@@ -78,7 +78,7 @@ export const layer = Mechanism.layer(
         accounts: [] as const,
         data: new TextEncoder().encode(memo ?? Encoding.encodeHex(yield* crypto.randomBytes(16))),
       }
-      const latestBlockhash = yield* getLatestBlockhash
+      const latestBlockhash = yield* client.getLatestBlockhash
       const message = solanaPipe(
         createTransactionMessage({ version: 0 }),
         (v) => setTransactionMessageComputeUnitPrice(COMPUTE_UNIT_PRICE_MICROLAMPORTS, v),

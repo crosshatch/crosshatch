@@ -4,7 +4,7 @@ import * as Proto from "../_Proto.ts"
 import type * as Namespace from "./Namespace.ts"
 
 export type Address = typeof Address.Type
-export const Address = S.String.check(S.isPattern(/^[-.%a-zA-Z0-9]{1,128}$/u)).pipe(S.brand(Proto.key("Address")))
+export const Address = S.String.check(S.isPattern(/^[-.%a-zA-Z0-9]{1,128}$/u)).pipe(S.brand(Proto.id("Address")))
 
 export const Namespaced = <Namespace_ extends Namespace.Any>(namespace: Namespace_): Namespace_["Address"] =>
   namespace.Address

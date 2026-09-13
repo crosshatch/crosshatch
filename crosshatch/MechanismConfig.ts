@@ -12,8 +12,3 @@ export interface MechanismConfig<Mechanism_ extends Mechanism.Any> {
 }
 
 export type Any = MechanismConfig<Mechanism.Any>
-
-export const make = <Mechanism_ extends Mechanism.Any>(
-  mechanism: Mechanism_,
-  extra: Mechanism.Extra<Mechanism_>,
-): MechanismConfig<Mechanism_> => ({ [TypeId]: TypeId, mechanism, extra })

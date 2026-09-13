@@ -62,10 +62,7 @@ export const layer = (url: string) =>
           Effect.tryPromise({
             try: (abortSignal) => rpc.getGenesisHash().send({ abortSignal }),
             catch: (cause) => new GetGenesisHashError({ cause }),
-          }).pipe(
-            Effect.map((v) => v.slice(0, 32)),
-            Effect.withSpan("SolanaClient.getGenesisHash"),
-          ),
+          }).pipe(Effect.map((v) => v.slice(0, 32))),
         { capacity: 1, timeToLive },
       )
 

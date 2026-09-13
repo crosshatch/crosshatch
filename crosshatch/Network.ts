@@ -2,7 +2,7 @@ import { Schema as S, SchemaGetter } from "effect"
 
 import * as Proto from "./_Proto.ts"
 
-export const NetworkPart = S.NonEmptyString.check(S.isPattern(/^[^:]+$/u)).pipe(S.brand(Proto.key("NetworkPart")))
+export const NetworkPart = S.NonEmptyString.check(S.isPattern(/^[^:]+$/u)).pipe(S.brand(Proto.id("NetworkPart")))
 
 export const NetworkPartsFromString = S.TemplateLiteralParser([NetworkPart, ":", NetworkPart])
 

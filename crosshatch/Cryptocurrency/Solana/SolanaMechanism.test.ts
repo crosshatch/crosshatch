@@ -2,39 +2,29 @@ import { assert, describe, it } from "@effect/vitest"
 import type * as Token from "@solana-program/token"
 import { findAssociatedTokenPda, getTransferCheckedInstruction } from "@solana-program/token"
 import { address, blockhash, type Base64EncodedWireTransaction, type TransactionPartialSigner } from "@solana/kit"
-import { Context, Crypto, Effect, Layer, Schema } from "effect"
+import { Crypto, Effect, Schema } from "effect"
 import { vi } from "vitest"
 
-import { AdaptError, type Adapt } from "../../Adapt.ts"
-import * as Address from "../../Address.ts"
-import { ChainFromString } from "../../Chain.ts"
 import type * as Index from "../../index.ts"
-import { make as makeRequirements, Requirements } from "../../Requirements.ts"
-import type * as Scheme from "../../Scheme.ts"
+import { MakePayloadError, type MakePayload } from "../../Mechanism.ts"
+import { Network } from "../../Network.ts"
+import { Requirements } from "../../Requirements.ts"
 import { SolanaClient } from "./SolanaClient.ts"
-import { SolanaMechanism, type Extra } from "./SolanaScheme.ts"
+import { SolanaMechanism, Extra } from "./SolanaMechanism.ts"
 import { SolanaSigner } from "./SolanaSigner.ts"
 
-type AdaptBody = Adapt<
+type MakePayloadBody = MakePayload<
   typeof Extra.Type,
   { readonly transaction: Base64EncodedWireTransaction },
   SolanaClient | SolanaSigner | Crypto.Crypto
 >
-const captured = vi.hoisted(() => ({ adapt: undefined as AdaptBody | undefined, events: [] as Array<string> }))
+const captured = vi.hoisted(() => ({
+  makePayload: undefined as MakePayloadBody | undefined,
+  events: [] as Array<string>,
+}))
 // Avoid evaluating unrelated unfinished modules re-exported by the package barrel.
 vi.mock<typeof Index>(import("../../index.ts"), async () => ({
-  Address: await import("../../Address.ts"),
-  Adapt: await import("../../Adapt.ts"),
-  Scheme: await import("../../Scheme.ts"),
-}))
-vi.mock<typeof Scheme>(import("../../Scheme.ts"), () => ({
-  Service: (() => (id: string) =>
-    class extends Context.Service<never, never>()(id) {
-      static layer(_extra: unknown, adapt: AdaptBody) {
-        captured.adapt = adapt
-        return Layer.empty
-      }
-    }) as unknown as typeof Scheme.Service,
+  Mechanism: await import("../../Mechanism.ts"),
 }))
 vi.mock<typeof Token>(import("@solana-program/token"), async (original) => {
   const token = await original()
@@ -62,15 +52,15 @@ const network = "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
 const amount = "9007199254740993"
 const input = Effect.gen(function* () {
   return {
-    accepted: yield* Schema.decodeEffect(Requirements)({
+    accepted: Requirements.make({
       amount,
       asset: mint,
       payTo,
-      network: `solana:${network}`,
+      network: yield* Schema.decodeEffect(Network)({ family: "solana", reference: network }),
       maxTimeoutSeconds: 60,
       scheme: "exact",
     }),
-    extra: { feePayer: yield* Address.make(authority) },
+    extra: yield* Schema.decodeEffect(Extra)({ feePayer: authority }),
   }
 })
 const crypto = Crypto.make({
@@ -82,11 +72,11 @@ const crypto = Crypto.make({
 })
 
 // oxlint-disable-next-line jest/valid-describe-callback -- Vitest supports options before the callback.
-describe("solana adaptation", { concurrent: false }, () => {
+describe("solana mechanism", { concurrent: false }, () => {
   it.effect("uses fetched metadata and exact atomic amounts with a fresh late blockhash for every signing", () =>
     Effect.gen(function* () {
-      assert.isDefined(captured.adapt)
-      assert.strictEqual(SolanaMechanism.key, "crosshatch/namespaces/Solana/SolanaScheme")
+      assert.isDefined(captured.makePayload)
+      assert.strictEqual(SolanaMechanism.key, "crosshatch/Cryptocurrency/Solana/SolanaMechanism")
       const args = yield* input
       for (const tokenProgram of programs) {
         vi.clearAllMocks()
@@ -107,7 +97,7 @@ describe("solana adaptation", { concurrent: false }, () => {
               captured.events.push("metadata")
               assert.strictEqual(requestedMint, mint)
               assert.strictEqual(reference, network)
-              return { decimals: 9, tokenProgram }
+              return { decimals: 9, programAddress: tokenProgram }
             }),
           getLatestBlockhash: Effect.sync(() => {
             captured.events.push("blockhash")
@@ -116,7 +106,7 @@ describe("solana adaptation", { concurrent: false }, () => {
         })
         for (let i = 0; i < 2; i++) {
           const result = yield* captured
-            .adapt(args)
+            .makePayload(args.accepted, args.extra)
             .pipe(
               Effect.provideService(SolanaClient, client),
               Effect.provideService(SolanaSigner, { address: authority, signTransactions }),
@@ -142,49 +132,22 @@ describe("solana adaptation", { concurrent: false }, () => {
     }).pipe(Effect.provideService(Crypto.Crypto, crypto)),
   )
 
-  it.effect("returns signing failures in the typed adaptation error channel", () =>
+  it.effect("returns signing failures in the typed payload error channel", () =>
     Effect.gen(function* () {
-      assert.isDefined(captured.adapt)
+      assert.isDefined(captured.makePayload)
       const cause = new Error("signing rejected")
       const args = yield* input
-      const failure = yield* captured.adapt(args).pipe(
+      const failure = yield* captured.makePayload(args.accepted, args.extra).pipe(
         Effect.provideService(SolanaClient, {
-          getMintMetadata: () => Effect.succeed({ decimals: 6, tokenProgram: programs[0]! }),
+          getMintMetadata: () => Effect.succeed({ decimals: 6, programAddress: programs[0]! }),
           getLatestBlockhash: Effect.succeed({ blockhash: blockhash(mint), lastValidBlockHeight: 123n }),
         }),
         Effect.provideService(SolanaSigner, { address: authority, signTransactions: () => Promise.reject(cause) }),
         Effect.flip,
       )
-      assert.instanceOf(failure, AdaptError)
-      assert.strictEqual(failure.cause, cause)
-    }).pipe(Effect.provideService(Crypto.Crypto, crypto)),
-  )
-
-  it.effect("rejects other namespaces before looking up metadata or signing", () =>
-    Effect.gen(function* () {
-      assert.isDefined(captured.adapt)
-      const args = yield* input
-      const wrongNetwork = yield* Schema.decodeEffect(ChainFromString)(`other:${network}`)
-      const metadata = vi.fn<() => Effect.Effect<{ readonly decimals: number; readonly tokenProgram: typeof mint }>>(
-        () => Effect.succeed({ decimals: 6, tokenProgram: programs[0]! }),
-      )
-      const signTransactions = vi.fn<TransactionPartialSigner["signTransactions"]>(() => Promise.resolve([]))
-      const failure = yield* captured
-        .adapt({
-          ...args,
-          accepted: makeRequirements({ ...args.accepted, network: wrongNetwork }),
-        })
-        .pipe(
-          Effect.provideService(SolanaClient, {
-            getMintMetadata: metadata,
-            getLatestBlockhash: Effect.succeed({ blockhash: blockhash(mint), lastValidBlockHeight: 123n }),
-          }),
-          Effect.provideService(SolanaSigner, { address: authority, signTransactions }),
-          Effect.flip,
-        )
-      assert.instanceOf(failure, AdaptError)
-      assert.strictEqual(metadata.mock.calls.length, 0)
-      assert.strictEqual(signTransactions.mock.calls.length, 0)
+      assert.instanceOf(failure, MakePayloadError)
+      assert.instanceOf(failure.cause, Error)
+      assert.strictEqual(failure.cause.cause, cause)
     }).pipe(Effect.provideService(Crypto.Crypto, crypto)),
   )
 })

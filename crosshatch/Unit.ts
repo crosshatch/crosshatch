@@ -9,3 +9,5 @@ export interface Unit<K extends string> {
 }
 
 export type Any = Unit<string>
+
+export const make = <K extends string>(name: K): Unit<K> => ({ [TypeId]: TypeId, name })

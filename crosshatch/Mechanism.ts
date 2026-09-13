@@ -1,6 +1,7 @@
-import { Data, Context, Schema as S, Effect, Scope, Layer } from "effect"
+import { Data, type Context, type Schema as S, type Effect, type Scope, type Layer } from "effect"
 
 import * as Proto from "./_Proto.ts"
+import type { MechanismConfig } from "./MechanismConfig.ts"
 import type { Requirements } from "./Requirements.ts"
 
 const TypeId = Proto.id("Mechanism")
@@ -22,7 +23,7 @@ export interface Mechanism<
 
   readonly [TypeId]: typeof TypeId
 
-  readonly extra: Extra
+  readonly make: <T extends Mechanism<Self, Id, Extra, A>>(this: T, extra: Extra) => MechanismConfig<T>
 }
 
 export type Any = Mechanism<any, string, any, S.JsonObject>

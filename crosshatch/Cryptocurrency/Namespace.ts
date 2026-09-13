@@ -25,7 +25,7 @@ export interface NamespaceSpec<K extends string, U extends boolean> {
 export interface Namespace<K extends string, U extends boolean> extends NamespaceSpec<K, U> {
   readonly [TypeId]: typeof TypeId
 
-  readonly Address: S.brand<typeof Address, Proto.key<`namespaces/${K}`>>
+  readonly Address: S.brand<typeof Address, Proto.id<`namespaces/${K}`>>
 }
 
 export type Any = Namespace<string, boolean>
@@ -33,7 +33,7 @@ export type Any = Namespace<string, boolean>
 export const make = <K extends string, U extends boolean>(fields: NamespaceSpec<K, U>): Namespace<K, U> => ({
   [TypeId]: TypeId,
   ...fields,
-  Address: Address.check(S.isPattern(fields.address.pattern)).pipe(S.brand(Proto.key(`namespaces/${fields._tag}`))),
+  Address: Address.check(S.isPattern(fields.address.pattern)).pipe(S.brand(Proto.id(`namespaces/${fields._tag}`))),
 })
 
-export type NamespaceBrand<K extends string> = Brand.Brand<Proto.key<`namespaces/${K}`>>
+export type NamespaceBrand<K extends string> = [Brand.Brand<Proto.id<`namespaces/${K}`>>][0]
