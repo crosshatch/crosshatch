@@ -52,7 +52,7 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
           return yield* ChxHttp.require({ required })
         }
         const settlement = yield* Facilitator.settle({ payload })
-        return HttpServerResponse.text("The paid resource.").pipe(ChxHttp.addResponseHeader(settlement))
+        return yield* HttpServerResponse.text("The paid resource.").pipe(ChxHttp.addResponseHeader(settlement))
       }),
     ).pipe(
       Layer.provide([

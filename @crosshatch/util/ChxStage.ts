@@ -17,7 +17,7 @@ export const layer = Layer.effect(
         readonly env?: undefined | { readonly VITE_PUBLIC_CHX_INTERNAL_STAGE?: string | undefined }
       }
     ).env?.VITE_PUBLIC_CHX_INTERNAL_STAGE
-    stage ??= yield* Config.string("CHX_INTERNAL_STAGE")
+    stage ??= yield* Config.String("CHX_INTERNAL_STAGE")
     return yield* S.decodeUnknownEffect(Stage)(stage)
   }).pipe(Effect.orElseSucceed(() => "prod" as const)),
 )

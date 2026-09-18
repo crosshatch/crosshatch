@@ -11,13 +11,13 @@ import * as Mnemonic from "../../Mnemonic.ts"
 import { Reference } from "../../Reference.ts"
 
 export const onramp = Command.make("onramp", {
-  mnemonic: Flag.string("mnemonic").pipe(Flag.withDefault(undefined), Flag.withDescription("Stored mnemonic name")),
-  chain: Flag.string("chain").pipe(
+  mnemonic: Flag.String("mnemonic").pipe(Flag.withDefault(undefined), Flag.withDescription("Stored mnemonic name")),
+  chain: Flag.String("chain").pipe(
     Flag.withDefault(undefined),
     Flag.withDescription("EIP-155 chain reference (e.g., 8453 for Base)"),
   ),
-  amount: Flag.integer("amount").pipe(Flag.withDescription("Positive integer fiat amount")),
-  provider: Flag.choice("provider", ["Coinbase"] /* TODO: use `Providers` from `Cirque` */).pipe(
+  amount: Flag.Int("amount").pipe(Flag.withDescription("Positive integer fiat amount")),
+  provider: Flag.Literals("provider", ["Coinbase"] /* TODO: use `Providers` from `Cirque` */).pipe(
     Flag.withDefault("Coinbase"),
   ),
 }).pipe(

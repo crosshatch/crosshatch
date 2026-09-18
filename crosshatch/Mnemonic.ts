@@ -26,7 +26,7 @@ export const fromConfig = (config: Config.Config<string>) => Config.map(config, 
 
 export const layerFromConfig = flow(fromConfig, Layer.effect(Mnemonic))
 
-export const fromEnv = fromConfig(Config.string("MNEMONIC"))
+export const fromEnv = fromConfig(Config.String("MNEMONIC"))
 
 export const layerFromEnv = Layer.effect(Mnemonic, fromEnv)
 

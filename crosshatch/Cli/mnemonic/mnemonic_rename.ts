@@ -4,14 +4,14 @@ import { Argument, Command, Flag, Prompt } from "effect/unstable/cli"
 import { MnemonicStore } from "../../MnemonicStore.ts"
 
 export const mnemonicRename = Command.make("rename", {
-  from: Argument.string("from"),
-  to: Argument.string("to"),
-  yes: Flag.boolean("yes").pipe(Flag.withAlias("y")),
+  from: Argument.String("from"),
+  to: Argument.String("to"),
+  yes: Flag.Boolean("yes").pipe(Flag.withAlias("y")),
 }).pipe(
   Command.withDescription("Rename a stored mnemonic"),
   Command.withHandler(
     Effect.fn(function* ({ from, to, yes }) {
-      if (!yes && !(yield* Prompt.confirm({ message: `Rename mnemonic "${from}" to "${to}"?` }))) {
+      if (!yes && !(yield* Prompt.Confirm({ message: `Rename mnemonic "${from}" to "${to}"?` }))) {
         yield* Console.log("Operation cancelled.")
         return
       }

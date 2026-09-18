@@ -78,7 +78,6 @@ export const denomination = <A extends Denomination>(
     readonly ttl?: Duration.Input | undefined
   },
 ) =>
-  Effect.all(
-    Record.toEntries(denomination).map(([_k, logicalAsset]) => logical(logicalAsset, config as never)),
-    { concurrency: "unbounded" },
-  ).pipe(Effect.map(Array.flatten))
+  Effect.forEach(Record.toEntries(denomination), ([_k, logicalAsset]) => logical(logicalAsset, config as never), {
+    concurrency: "unbounded",
+  }).pipe(Effect.map(Array.flatten))

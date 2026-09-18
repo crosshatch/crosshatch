@@ -70,9 +70,9 @@ export const serve = Effect.fnUntraced(function* (config?: DevConfig) {
     Layer.build,
   )
   const { address } = Context.get(context, HttpServer.HttpServer)
-  const { hostname, port } = yield* Effect.succeed(address).pipe(
-    Effect.filterOrElse((address) => address._tag === "TcpAddress", Effect.die),
-  )
+  if (address._tag === "UnixPathAddress") return yield* Effect.die(address)
+  const hostname = address.address.toString()
+  const { port } = address
   return {
     hostname,
     port,
