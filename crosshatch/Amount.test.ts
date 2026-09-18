@@ -91,11 +91,11 @@ describe(import.meta.url, () => {
   it.effect(
     "rejects invalid BigDecimal scales",
     Effect.fn(function* () {
-      assert.match((yield* Amount.from(BigDecimal.make(15n, 1.5)).pipe(Effect.flip)).message, /safe integer scale/u)
-      assert.match((yield* Amount.from(BigDecimal.make(15n, NaN)).pipe(Effect.flip)).message, /safe integer scale/u)
+      const withScale = (scale: number) => Object.assign(BigDecimal.make(15n, 0), { scale })
+      assert.match((yield* Amount.from(withScale(1.5)).pipe(Effect.flip)).message, /safe integer scale/u)
+      assert.match((yield* Amount.from(withScale(NaN)).pipe(Effect.flip)).message, /safe integer scale/u)
       assert.match(
-        (yield* Effect.flip(BigDecimal.make(15n, Number.MAX_SAFE_INTEGER + 1).pipe(S.decodeEffect(Amount.Amount))))
-          .message,
+        (yield* Effect.flip(withScale(Number.MAX_SAFE_INTEGER + 1).pipe(S.decodeEffect(Amount.Amount)))).message,
         /safe integer scale/u,
       )
     }),
