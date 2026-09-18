@@ -1,4 +1,4 @@
-import { Schema as S, Array, Effect } from "effect"
+import { Schema as S, Array, Effect, Data } from "effect"
 
 import type * as Instrument from "./Instrument.ts"
 import * as Requirements from "./Requirements.ts"
@@ -6,6 +6,12 @@ import type * as Unit from "./Unit.ts"
 
 export type Accepts = typeof Accepts.Type
 export const Accepts = S.Array(Requirements.Requirements)
+
+export class MakeAcceptsError extends Data.TaggedError("MakeAcceptsError")<{ readonly cause: unknown }> {}
+
+export type MakeAccepts<T, R> = (
+  config: T,
+) => Effect.Effect<ReadonlyArray<Requirements.Requirements>, MakeAcceptsError, R>
 
 export const isAcceptable = (accepts: Accepts, requirements: Requirements.Requirements): boolean =>
   Array.some(accepts, (v) => Requirements.equals(v, requirements))

@@ -35,13 +35,16 @@ export const Extra = S.Struct({
   ),
 })
 
-export class SolanaMechanism extends Mechanism.Service<
-  SolanaMechanism,
-  typeof Extra.Type,
-  { readonly transaction: Base64EncodedWireTransaction }
->()("crosshatch/Cryptocurrency/Solana/SolanaMechanism") {}
+export const SolanaPayload = S.Struct({
+  transaction: S.String,
+})
 
-export const layer = Mechanism.layer(
+export class SolanaMechanism extends Mechanism.Service<SolanaMechanism, typeof SolanaPayload.Type>()(
+  "crosshatch/Cryptocurrency/Solana/SolanaMechanism",
+  Extra,
+) {}
+
+export const make = Mechanism.layerClient(
   SolanaMechanism,
   Effect.fnUntraced(
     function* ({ accepted, extra: { feePayer, memo } }) {

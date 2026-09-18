@@ -14,7 +14,6 @@ const Extra = S.Struct({
 
 export class Permit2Scheme extends Mechanism.Service<
   Permit2Scheme,
-  typeof Extra.Type,
   {
     readonly signature: string
     readonly permit2Authorization: {
@@ -32,9 +31,9 @@ export class Permit2Scheme extends Mechanism.Service<
       }
     }
   }
->()("crosshatch/Cryptocurrency/namespaces/Eip155/Permit2Scheme") {}
+>()("crosshatch/Cryptocurrency/namespaces/Eip155/Permit2Scheme", Extra) {}
 
-export const layer = Mechanism.layer(
+export const make = Mechanism.layerClient(
   Permit2Scheme,
   Effect.fnUntraced(
     function* ({ accepted }) {

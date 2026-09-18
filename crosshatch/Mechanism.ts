@@ -1,43 +1,57 @@
-import { Data, type Context, type Schema as S, type Effect, type Scope, type Layer } from "effect"
+import { Data, Context, type Schema as S, type Effect } from "effect"
 
 import * as Proto from "./_Proto.ts"
-import type { MechanismConfig } from "./MechanismConfig.ts"
+import * as MechanismConfig from "./MechanismConfig.ts"
 import type { Requirements } from "./Requirements.ts"
 
 const TypeId = Proto.id("Mechanism")
 
 export class MakePayloadError extends Data.TaggedError("MakePayloadError")<{ readonly cause: unknown }> {}
 
-export type MakePayload<Extra, A extends S.JsonObject, R> = (input: {
+export type ExtraSchema = S.Top & { readonly Encoded: S.JsonObject }
+
+export type MakePayload<ExtraSchema_ extends ExtraSchema, A extends S.JsonObject, R> = (input: {
   readonly accepted: Requirements
-  readonly extra: Extra
+  readonly extra: ExtraSchema_["Type"]
 }) => Effect.Effect<A, MakePayloadError, R>
 
 export interface Mechanism<
   Self,
   Id extends string,
-  Extra extends S.JsonObject,
+  ExtraSchema_ extends ExtraSchema,
   A extends S.JsonObject,
-> extends Context.Service<Self, MakePayload<Extra, A, never>> {
-  new (_: never): Context.ServiceClass.Shape<Id, MakePayload<Extra, A, never>>
+> extends Context.Service<Self, MakePayload<ExtraSchema_, A, never>> {
+  new (_: never): Context.ServiceClass.Shape<Id, MakePayload<ExtraSchema_, A, never>>
 
   readonly [TypeId]: typeof TypeId
 
-  readonly make: <T extends Mechanism<Self, Id, Extra, A>>(this: T, extra: Extra) => MechanismConfig<T>
+  readonly extraSchema: ExtraSchema_
+
+  make<T extends Mechanism<Self, Id, ExtraSchema_, A>>(
+    this: T,
+    extra: ExtraSchema_["Type"],
+  ): MechanismConfig.MechanismConfig<T>
 }
 
 export type Any = Mechanism<any, string, any, S.JsonObject>
 
 export type Extra<Mechanism_ extends Any> =
-  Mechanism_ extends Mechanism<any, string, infer Extra_, S.JsonObject> ? Extra_ : never
+  Mechanism_ extends Mechanism<any, string, infer ExtraSchema_, S.JsonObject> ? ExtraSchema_["Type"] : never
 
-export declare const Service: <Self, Extra extends S.JsonObject, A extends S.JsonObject>() => <
-  Identifier extends string,
->(
-  identifier: Identifier,
-) => Mechanism<Self, Identifier, Extra, A>
+export const Service =
+  <Self, A extends S.JsonObject>() =>
+  <Identifier extends string, ExtraSchema_ extends ExtraSchema>(
+    identifier: Identifier,
+    extraSchema: ExtraSchema_,
+  ): Mechanism<Self, Identifier, ExtraSchema_, A> => {
+    const Service = Context.Service<Self, MakePayload<ExtraSchema_, A, never>>()(identifier)
+    function make<T extends Mechanism<Self, Identifier, ExtraSchema_, A>>(this: T, extra: Extra<T>) {
+      return MechanismConfig.make(this, extra)
+    }
+    return Object.assign(Service, { [TypeId]: TypeId, extraSchema, make })
+  }
 
-export declare const layer: <Self, Id extends string, Extra extends S.JsonObject, A extends S.JsonObject, R>(
-  mechanism: Mechanism<Self, Id, Extra, A>,
-  f: MakePayload<Extra, A, R>,
-) => Layer.Layer<Self, never, Exclude<R, Scope.Scope>>
+export const layerClient = <Self, Id extends string, ExtraSchema_ extends ExtraSchema, A extends S.JsonObject, R>(
+  _mechanism: Mechanism<Self, Id, ExtraSchema_, A>,
+  f: MakePayload<ExtraSchema_, A, R>,
+) => f

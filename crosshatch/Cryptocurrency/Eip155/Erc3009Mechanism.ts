@@ -1,4 +1,4 @@
-import type { HexString } from "@crosshatch/util"
+import { HexString } from "@crosshatch/util"
 import { DateTime, Effect, Schema as S, Encoding, Crypto } from "effect"
 import { Address } from "ox"
 
@@ -12,23 +12,24 @@ const Extra = S.Struct({
   version: S.String,
 })
 
-export class Erc3009Mechanism extends Mechanism.Service<
-  Erc3009Mechanism,
-  typeof Extra.Type,
-  {
-    readonly signature: string
-    readonly authorization: {
-      readonly from: HexString
-      readonly to: HexString
-      readonly value: string
-      readonly validAfter: string
-      readonly validBefore: string
-      readonly nonce: HexString
-    }
-  }
->()("crosshatch/Cryptocurrency/namespaces/Eip155/Erc3009Scheme") {}
+export class Erc3009Payload extends S.Class<Erc3009Payload>("Erc3009Payload")({
+  signature: S.String,
+  authorization: S.Struct({
+    from: HexString,
+    to: HexString,
+    value: S.String,
+    validAfter: S.String,
+    validBefore: S.String,
+    nonce: HexString,
+  }),
+}) {}
 
-export const layer = Mechanism.layer(
+export class Erc3009Mechanism extends Mechanism.Service<Erc3009Mechanism, Erc3009Payload>()(
+  "crosshatch/Cryptocurrency/namespaces/Eip155/Erc3009Scheme",
+  Extra,
+) {}
+
+export const make = Mechanism.layerClient(
   Erc3009Mechanism,
   Effect.fnUntraced(
     function* ({ accepted, extra: { name, version } }) {

@@ -1,0 +1,9 @@
+export const X402_ORG_FACILITATOR = "https://x402.org/facilitator" as const;
+export const CDP_FACILITATOR = "https://api.cdp.coinbase.com/platform/v2/x402" as const;
+export const DEXTER_FACILITATOR = "https://x402.dexter.cash" as const;
+export const FASTNEAR_BASE_FACILITATOR = "https://base.x402.mikedotexe.com" as const;
+export const MERIDIAN_FACILITATOR = "https://api.mrdn.finance/v1" as const;
+export const MOGAMI_V1_FACILITATOR = "https://v1.facilitator.mogami.tech" as const;
+export const MOGAMI_V2_FACILITATOR = "https://v2.facilitator.mogami.tech" as const;
+export const PAYAI_FACILITATOR = "https://facilitator.payai.network" as const;
+export const SOLVADOR_FACILITATOR = "https://api.solvador.com" as const;
