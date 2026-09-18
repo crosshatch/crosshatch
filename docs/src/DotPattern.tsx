@@ -98,7 +98,7 @@ export const DotPattern = ({
   }, [dotSize, gap])
 
   const draw = React.useCallback(
-    (timestamp: number) => {
+    function drawFrame(timestamp: number) {
       const canvas = canvasRef.current
       if (!canvas) return
 
@@ -110,8 +110,9 @@ export const DotPattern = ({
 
       const { x: mx, y: my } = mouseRef.current
       const proxSq = proximity * proximity
-      startTimeRef.current ??= timestamp
-      const time = (timestamp - startTimeRef.current) * 0.001 * waveSpeed
+      const startTime = startTimeRef.current ?? timestamp
+      startTimeRef.current = startTime
+      const time = (timestamp - startTime) * 0.001 * waveSpeed
 
       for (const dot of dotsRef.current) {
         const dx = dot.x - mx
@@ -160,9 +161,9 @@ export const DotPattern = ({
         ctx.fill()
       }
 
-      animationRef.current = requestAnimationFrame(draw)
+      animationRef.current = requestAnimationFrame(drawFrame)
     },
-    [proximity, baseRgb, glowRgb, dotSize, glowIntensity, waveSpeed],
+    [proximity, baseRgb.r, baseRgb.g, baseRgb.b, glowRgb.r, glowRgb.g, glowRgb.b, dotSize, glowIntensity, waveSpeed],
   )
 
   React.useEffect(() => {

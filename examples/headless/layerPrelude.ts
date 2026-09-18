@@ -8,7 +8,7 @@ export const layerPrelude = Payer.layerLocal(Accept.first(Known)).pipe(
   Layer.provide(
     UnifiedSchemes.layer.pipe(
       Layer.provide([
-        Config.string("SOLANA_RPC_URL").pipe(Effect.map(SolanaState.layer), Layer.unwrap),
+        Config.String("SOLANA_RPC_URL").pipe(Effect.map(SolanaState.layer), Layer.unwrap),
         Mnemonic.layerFromEnv,
       ]),
     ),

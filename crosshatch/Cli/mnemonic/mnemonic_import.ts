@@ -7,16 +7,16 @@ import { DerivedAddresses } from "../../Unified/index.ts"
 import * as Input from "./../Input.ts"
 
 export const mnemonicImport = Command.make("import", {
-  name: Argument.string("name").pipe(Argument.withDefault("default")),
-  stdin: Flag.boolean("stdin").pipe(Flag.withDescription("Read the mnemonic from standard input instead of prompting")),
-  description: Flag.string("description").pipe(Flag.withDefault(undefined)),
+  name: Argument.String("name").pipe(Argument.withDefault("default")),
+  stdin: Flag.Boolean("stdin").pipe(Flag.withDescription("Read the mnemonic from standard input instead of prompting")),
+  description: Flag.String("description").pipe(Flag.withDefault(undefined)),
 }).pipe(
   Command.withDescription("Import and store a mnemonic"),
   Command.withHandler(
     Effect.fn(function* ({ name, stdin, description }) {
       const mnemonic = stdin
         ? yield* Input.stdin.pipe(Effect.map(Mnemonic.fromText))
-        : yield* Prompt.password({ message: "Enter the mnemonic:" }).pipe(
+        : yield* Prompt.Password({ message: "Enter the mnemonic:" }).pipe(
             Effect.map(flow(Redacted.value, Mnemonic.fromText)),
           )
       const store = yield* MnemonicStore

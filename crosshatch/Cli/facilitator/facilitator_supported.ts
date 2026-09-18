@@ -5,7 +5,7 @@ import * as FacilitatorService from "../../Facilitator.ts"
 import { SupportedResponseJsonString } from "../../FacilitatorApi/index.ts"
 
 export const supported = Command.make("supported", {
-  baseUrl: Flag.string("url").pipe(Flag.withDefault(undefined), Flag.withDescription("Facilitator base URL")),
+  baseUrl: Flag.String("url").pipe(Flag.withDefault(undefined), Flag.withDescription("Facilitator base URL")),
 }).pipe(
   Command.withDescription("List payment kinds supported by a facilitator"),
   Command.withHandler(

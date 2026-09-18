@@ -32,7 +32,7 @@ export default class ExampleEffectRpc extends Cloudflare.RpcWorker<ExampleEffect
     },
   },
   Effect.gen(function* () {
-    const recipient = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
+    const recipient = yield* Config.schema(Eip155Address.Eip155Address, "EIP155_ADDRESS")
     return RpcServer.toHttpEffect(Api).pipe(
       Effect.provide([
         Api.toLayerHandler(

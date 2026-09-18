@@ -13,17 +13,17 @@ export class StdinConfirmationRequiredError extends Data.TaggedError("StdinConfi
 }
 
 export const settle = Command.make("settle", {
-  payload: Argument.string("payload").pipe(Argument.withDescription("Payment Payload JSON"), Argument.optional),
-  stdin: Flag.boolean("stdin").pipe(Flag.withDescription("Read Payment Payload JSON from standard input")),
-  baseUrl: Flag.string("url").pipe(Flag.withDefault(undefined), Flag.withDescription("Facilitator base URL")),
-  yes: Flag.boolean("yes").pipe(Flag.withAlias("y")),
+  payload: Argument.String("payload").pipe(Argument.withDescription("Payment Payload JSON"), Argument.optional),
+  stdin: Flag.Boolean("stdin").pipe(Flag.withDescription("Read Payment Payload JSON from standard input")),
+  baseUrl: Flag.String("url").pipe(Flag.withDefault(undefined), Flag.withDescription("Facilitator base URL")),
+  yes: Flag.Boolean("yes").pipe(Flag.withAlias("y")),
 }).pipe(
   Command.withDescription("Settle a payment payload"),
   Command.withHandler(
     Effect.fn(
       function* ({ payload, stdin, yes }) {
         if (stdin && !yes) return yield* new StdinConfirmationRequiredError()
-        if (!yes && !(yield* Prompt.confirm({ message: "Settle this payment?" }))) {
+        if (!yes && !(yield* Prompt.Confirm({ message: "Settle this payment?" }))) {
           yield* Console.error("Operation cancelled.")
           return
         }

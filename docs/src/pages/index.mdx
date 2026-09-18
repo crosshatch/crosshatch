@@ -164,7 +164,7 @@ const router = HttpRouter.add(
       return yield* ChxHttp.require({ required })
     }
     const settlement = yield* Facilitator.settle({ payload })
-    return HttpServerResponse.text("The paid resource.").pipe(
+    return yield* HttpServerResponse.text("The paid resource.").pipe(
       ChxHttp.addResponseHeader(settlement),
     )
   }),

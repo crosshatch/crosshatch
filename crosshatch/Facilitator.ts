@@ -19,8 +19,8 @@ export const layer = (config?: { readonly baseUrl?: string | undefined }) =>
       const baseUrl =
         config?.baseUrl ??
         (yield* Config.all({
-          host: Config.string("CROSSHATCH_DEV_HOST").pipe(Config.withDefault("localhost")),
-          port: Config.port("CROSSHATCH_DEV_PORT"),
+          host: Config.String("CROSSHATCH_DEV_HOST").pipe(Config.withDefault("localhost")),
+          port: Config.Port("CROSSHATCH_DEV_PORT"),
         }).pipe(
           Effect.option,
           Effect.map(

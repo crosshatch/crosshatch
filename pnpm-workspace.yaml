@@ -10,95 +10,95 @@ packages:
 blockExoticSubdeps: false
 
 catalog:
-  "@changesets/changelog-github": ^1.0.0
-  "@changesets/cli": ^3.0.0
-  "@effect/ai-openai-compat": ^4.0.0-rc.112
-  "@effect/atom-react": ^4.0.0-rc.112
-  "@effect/language-service": ^0.86.6
-  "@effect/platform-browser": ^4.0.0-rc.112
-  "@effect/platform-node": ^4.0.0-rc.112
-  "@effect/vitest": ^4.0.0-rc.112
-  "@icons-pack/react-simple-icons": ^13.13.0
-  "@kitlangton/motel": ^0.2.6
-  "@napi-rs/keyring": ^1.3.0
-  "@oxlint/plugins": ^1.75.0
-  "@playwright/test": ^1.58.2
-  "@scure/bip39": ^2.2.0
+  "@changesets/changelog-github": ^1.0.1
+  "@changesets/cli": ^3.0.3
+  "@effect/ai-openai-compat": ^4.0.0-rc.115
+  "@effect/atom-react": ^4.0.0-rc.115
+  "@effect/language-service": ^0.87.2
+  "@effect/platform-browser": ^4.0.0-rc.115
+  "@effect/platform-node": ^4.0.0-rc.115
+  "@effect/vitest": ^4.0.0-rc.115
+  "@icons-pack/react-simple-icons": ^13.15.1
+  "@kitlangton/motel": ^0.2.8
+  "@napi-rs/keyring": ^2.1.0
+  "@oxlint/plugins": ^1.82.0
+  "@playwright/test": ^1.63.0
+  "@scure/bip39": ^2.4.0
   "@standard-schema/spec": ^1.1.0
-  "@solana-program/memo": ^0.11.2
-  "@solana-program/compute-budget": ^0.16.0
-  "@solana-program/token": ^0.14.0
-  "@solana/addresses": ^6.5.0
-  "@solana/transactions": ^6.5.0
-  "@solana/kit": ^6.5.0
-  "@streamdown/cjk": ^1.0.1
-  "@streamdown/code": ^1.0.1
-  "@streamdown/math": ^1.0.1
-  "@streamdown/mermaid": ^1.0.1
-  "@tailwindcss/vite": ^4.3.2
-  "@tanstack/devtools-vite": ^0.4.1
-  "@tanstack/react-router": ^1.170.18
-  "@tanstack/react-router-devtools": ^1.159.4
-  "@tanstack/router-core": ^1.141.1
-  "@tanstack/router-plugin": ^1.168.20
-  "@types/node": ^26.1.1
-  "@types/react": ^19.2.17
-  "@types/react-dom": ^19.2.3
-  "@vitejs/plugin-react": ^6.0.3
-  "@vitest/browser": ^4.1.10
-  "@vitest/coverage-v8": ^4.1.10
-  "@vitest/expect": ^4.1.10
-  "@vitest/web-worker": ^4.1.10
-  "alchemy": https://pkg.ing/alchemy/6ffc7b7
-  "@alchemy.run/frontend-frameworks": https://pkg.ing/@alchemy.run/frontend-frameworks/6ffc7b7
-  "@effect/tsgo": 0.36.5
+  "@solana-program/memo": ^0.14.1
+  "@solana-program/compute-budget": ^0.18.1
+  "@solana-program/token": ^0.16.1
+  "@solana/addresses": ^8.3.0
+  "@solana/transactions": ^8.3.0
+  "@solana/kit": ^8.3.0
+  "@streamdown/cjk": ^1.0.3
+  "@streamdown/code": ^1.1.1
+  "@streamdown/math": ^1.0.2
+  "@streamdown/mermaid": ^1.0.2
+  "@tailwindcss/vite": ^4.3.3
+  "@tanstack/devtools-vite": ^0.8.5
+  "@tanstack/react-router": ^1.170.38
+  "@tanstack/react-router-devtools": ^1.167.2
+  "@tanstack/router-core": ^1.171.32
+  "@tanstack/router-plugin": ^1.168.40
+  "@types/node": ^26.6.1
+  "@types/react": ^19.3.0
+  "@types/react-dom": ^19.3.0
+  "@vitejs/plugin-react": ^6.1.1
+  "@vitest/browser": ^5.0.1
+  "@vitest/coverage-v8": ^5.0.1
+  "@vitest/expect": ^5.0.1
+  "@vitest/web-worker": ^5.0.1
+  "alchemy": ^2.0.0-beta.79
+  "@alchemy.run/frontend-frameworks": ^2.0.0-beta.79
+  "@effect/tsgo": 0.45.0
   babel-plugin-react-compiler: ^1.0.0
   class-variance-authority: ^0.7.1
   clsx: ^2.1.1
   cmdk: ^1.1.1
-  date-fns: ^4.1.0
+  date-fns: ^4.4.0
   drizzle-kit: ^1.0.0-rc.4
   drizzle-orm: ^1.0.0-rc.4
-  effect: ^4.0.0-rc.112
+  effect: ^4.0.0-rc.115
   fake-indexeddb: ^6.2.5
-  happy-dom: ^20.10.6
-  http-message-sig: ^0.2.0
-  hono: ^4.12.31
-  lucide-react: ^1.24.0
-  markdown-to-jsx: ^9.7.3
-  mermaid: ^11.16.0
-  micro-key-producer: ^0.8.2
+  happy-dom: ^20.14.5
+  http-message-sig: ^0.3.0
+  hono: ^4.13.8
+  lucide-react: ^1.47.0
+  markdown-to-jsx: ^9.10.3
+  mermaid: ^12.0.0
+  micro-key-producer: ^0.10.2
   next-themes: ^0.4.6
-  ox: ^0.10.5
-  oxfmt: ^0.58.0
-  oxlint: 1.77.0
+  ox: ^1.7.5
+  oxfmt: ^0.68.0
+  oxlint: 1.82.0
   oxlint-tsgolint: 7.0.2001
-  pkg-pr-new: ^0.0.78
-  pg: ^8.16.3
-  playwright: ^1.61.1
-  postgres: ^3.4.7
-  react: ^19.2.7
-  react-day-picker: ^9.13.2
-  react-dom: ^19.2.7
-  react-medium-image-zoom: ^5.4.1
-  recharts: ^3.7.0
-  shiki: ^3.22.0
-  sonner: ^2.0.7
-  streamdown: ^2.1.0
+  pkg-pr-new: ^0.0.88
+  pg: ^8.23.0
+  playwright: ^1.63.0
+  postgres: ^3.4.9
+  react: ^19.3.0
+  react-day-picker: ^10.0.1
+  react-dom: ^19.3.0
+  react-medium-image-zoom: ^5.4.9
+  recharts: ^3.10.1
+  shiki: ^4.4.3
+  sonner: ^2.0.8
+  streamdown: ^2.6.0
   swagger2openapi: ^7.0.8
-  tailwind-merge: ^3.4.0
-  tailwindcss: ^4.3.2
-  turbo: ^2.10.11
+  tailwind-merge: ^3.7.0
+  tailwindcss: ^4.3.3
+  turbo: ^2.10.13
   tw-animate-css: ^1.4.0
   typescript: ^7.0.2
   vaul: ^1.1.2
-  viem: ^2.55.1
-  vite: ^8.1.4
-  vite-bundle-analyzer: ^1.3.6
-  vitest: ^4.1.10
-  vocs: 2.8.5
-  waku: 1.0.0-beta.7
-  yaml: ^2.9.0
+  viem: ^2.56.8
+  vite: ^8.3.0
+  vite-bundle-analyzer: ^1.3.9
+  vitest: ^5.0.1
+  vocs: 2.9.0
+  waku: 1.0.0-rc.1
+  yaml: ^2.9.1
 
 packageExtensions:
   "vocs@*":
@@ -106,50 +106,62 @@ packageExtensions:
       typescript: 5.9.3
 
 overrides:
+  "@effect/platform-bun@4.0.0-beta.90>@effect/platform-node-shared": 4.0.0-beta.90
+  "@kitlangton/motel>@effect/platform-bun": 4.0.0-beta.90
+  "@kitlangton/motel>effect": 4.0.0-beta.90
   "vocs>@modelcontextprotocol/sdk": 1.30.0
   "crosshatch.dev>typescript": 5.9.3
-  "@effect/platform-bun": 4.0.0-rc.112
-  "@effect/platform-node": 4.0.0-rc.112
-  "@effect/platform-node-shared": 4.0.0-rc.112
-  "@types/react": ^19.2.14
-  "@types/react-dom": ^19.2.3
-  react: ^19.2.4
-  react-dom: ^19.2.4
-  effect: 4.0.0-rc.112
-  zod: 3.25.76
+  "@effect/platform-bun": 4.0.0-rc.115
+  "@effect/platform-node": 4.0.0-rc.115
+  "@effect/platform-node-shared": 4.0.0-rc.115
+  "@types/react": ^19.3.0
+  "@types/react-dom": ^19.3.0
+  react: ^19.3.0
+  react-dom: ^19.3.0
+  effect: 4.0.0-rc.115
+  waku: 1.0.0-rc.1
+  zod: 4.6.5
+
+patchedDependencies:
+  "@alchemy.run/frontend-frameworks@2.0.0-beta.79": patches/@alchemy.run__frontend-frameworks@2.0.0-beta.79.patch
 
 minimumReleaseAgeExclude:
   - "@aws-sdk/*"
   - "@distilled.cloud/*"
   - alchemy
-  - "@effect/ai-openai-compat@4.0.0-rc.112"
-  - "@effect/atom-react@4.0.0-rc.112"
-  - "@effect/openapi-generator@4.0.0-rc.112"
-  - "@effect/platform-browser@4.0.0-rc.112"
-  - "@effect/platform-node-shared@4.0.0-rc.112"
-  - "@effect/platform-node@4.0.0-rc.112"
-  - "@effect/sql-d1@4.0.0-rc.112"
-  - "@effect/vitest@4.0.0-rc.112"
-  - effect@4.0.0-rc.112
-  - "@effect/sql-pg@4.0.0-rc.112"
-  - "@turbo/darwin-64@2.9.18"
-  - "@turbo/darwin-arm64@2.9.18"
-  - "@turbo/linux-64@2.9.18"
-  - "@turbo/linux-arm64@2.9.18"
-  - "@turbo/windows-64@2.9.18"
-  - "@turbo/windows-arm64@2.9.18"
-  - turbo@2.9.18
-  - vite@8.1.2
-  - vocs@2.8.5
-  - "@effect/tsgo-darwin-arm64@0.36.5"
-  - "@effect/tsgo-darwin-x64@0.36.5"
-  - "@effect/tsgo-linux-arm64@0.36.5"
-  - "@effect/tsgo-linux-arm@0.36.5"
-  - "@effect/tsgo-linux-x64@0.36.5"
-  - "@effect/tsgo-win32-arm64@0.36.5"
-  - "@effect/tsgo-win32-x64@0.36.5"
-  - "@effect/tsgo@0.36.5"
-  - "@effect/platform-bun@4.0.0-rc.112"
+  - "@effect/ai-openai-compat@4.0.0-rc.115"
+  - "@effect/atom-react@4.0.0-rc.115"
+  - "@effect/openapi-generator@4.0.0-rc.115"
+  - "@effect/platform-browser@4.0.0-rc.115"
+  - "@effect/platform-node-shared@4.0.0-rc.115"
+  - "@effect/platform-node@4.0.0-rc.115"
+  - "@effect/sql-d1@4.0.0-rc.115"
+  - "@effect/vitest@4.0.0-rc.115"
+  - effect@4.0.0-rc.115
+  - "@effect/sql-pg@4.0.0-rc.115"
+  - "@turbo/darwin-64@2.10.13"
+  - "@turbo/darwin-arm64@2.10.13"
+  - "@turbo/linux-64@2.10.13"
+  - "@turbo/linux-arm64@2.10.13"
+  - "@turbo/windows-64@2.10.13"
+  - "@turbo/windows-arm64@2.10.13"
+  - turbo@2.10.13
+  - vite@8.3.0
+  - vocs@2.9.0
+  - "@effect/tsgo-darwin-arm64@0.45.0"
+  - "@effect/tsgo-darwin-x64@0.45.0"
+  - "@effect/tsgo-linux-arm64@0.45.0"
+  - "@effect/tsgo-linux-arm@0.45.0"
+  - "@effect/tsgo-linux-x64@0.45.0"
+  - "@effect/tsgo-win32-arm64@0.45.0"
+  - "@effect/tsgo-win32-x64@0.45.0"
+  - "@effect/tsgo@0.45.0"
+  - "@effect/platform-bun@4.0.0-rc.115"
+  - "@alchemy.run/cloudflare-runtime@2.0.0-beta.79"
+  - "@alchemy.run/floci@2.0.0-beta.79"
+  - "@alchemy.run/frontend-frameworks@2.0.0-beta.79"
+  - "@alchemy.run/node-utils@2.0.0-beta.79"
+  - waku@1.0.0-rc.1
 
 allowBuilds:
   bigint-buffer: false

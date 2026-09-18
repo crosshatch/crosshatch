@@ -6,7 +6,6 @@ import {
   Schema as S,
   Context,
   Data,
-  identity,
   pipe,
   flow,
   Layer,
@@ -14,7 +13,7 @@ import {
   SchemaIssue,
 } from "effect"
 import { HttpServerRequest, Headers, FetchHttpClient } from "effect/unstable/http"
-import { parseAcceptSignature, verify, signatureHeaders } from "http-message-sig"
+import { createSignature, verifySignature } from "http-message-sig"
 
 import * as CryptoKey from "./CryptoKey.ts"
 import * as Ed25519Pair from "./Ed25519Pair.ts"
@@ -53,8 +52,8 @@ export const layer = Layer.effect(
       Option.orElse(() => Headers.get(headers, "Host")),
       Option.getOrElse(() => new URL(request.originalUrl).host),
     )
-    const { parameters, components } = parseAcceptSignature(signatureHeaders[SignatureInputKey])
-    if (components.includes("digest")) {
+    const message = new Request(`https://${host}${pathname}`, { method, headers })
+    if (signatureHeaders[SignatureInputKey].includes('"digest"')) {
       const digest = yield* request.arrayBuffer.pipe(Effect.flatMap(calculateDigest))
       yield* Headers.get(headers, "digest").pipe(
         Option.match({
@@ -63,20 +62,34 @@ export const layer = Layer.effect(
         }),
       )
     }
-    const url = `https://${host}${pathname}`
-    const publicKey = yield* pipe(
-      parameters,
-      S.decodeUnknownEffect(S.Struct({ keyid: S.String })),
-      Effect.map(flow((v) => v.keyid, Encoding.decodeBase64Url)),
-      Effect.flatMap(Effect.fromResult),
-      Effect.flatMap(Ed25519PublicKey.fromBytes),
-    )
-    yield* Effect.promise(() =>
-      verify({ headers, method, url }, (data, signature) =>
-        Ed25519PublicKey.verify(publicKey, signature.slice(), new TextEncoder().encode(data)).pipe(Effect.runPromise),
-      ),
-    ).pipe(Effect.filterOrFail(identity, () => new SignatureError()))
-    return publicKey
+    const verified = yield* Effect.tryPromise({
+      try: () =>
+        verifySignature(message, {
+          policy: {
+            algorithms: ["ed25519"],
+            requiredComponents: [],
+            requiredParameters: ["keyid"],
+          },
+          resolveVerifier: async ({ parameters }) => {
+            const publicKey = await pipe(
+              parameters,
+              S.decodeUnknownEffect(S.Struct({ keyid: S.String })),
+              Effect.map(flow((v) => v.keyid, Encoding.decodeBase64Url)),
+              Effect.flatMap(Effect.fromResult),
+              Effect.flatMap(Ed25519PublicKey.fromBytes),
+              Effect.runPromise,
+            )
+            return {
+              algorithm: "ed25519",
+              verify: (data: Uint8Array, signature: Uint8Array) =>
+                Ed25519PublicKey.verify(publicKey, signature, data).pipe(Effect.runPromise),
+              publicKey,
+            }
+          },
+        }),
+      catch: () => new SignatureError(),
+    })
+    return verified.verifier.publicKey
   }),
 )
 
@@ -101,14 +114,13 @@ export const layerFetch = Layer.effect(
           ),
         )
         const keyid = yield* CryptoKey.toBytes(publicKey).pipe(Effect.map(Encoding.encodeBase64Url))
-        const { [SignatureKey]: signature, [SignatureInputKey]: signatureInput } = yield* Effect.promise(() =>
-          signatureHeaders(request, {
+        const { signature, signatureInput } = yield* Effect.promise(() =>
+          createSignature(request, {
             components: ["@authority", "@method", "@path", "@query", "content-type", "digest"],
+            parameters: { keyid },
             signer: {
-              alg: "ed25519",
-              keyid,
-              sign: (data) =>
-                Ed25519PrivateKey.sign(privateKey, new TextEncoder().encode(data)).pipe(Effect.runPromise),
+              algorithm: "ed25519",
+              sign: (data: Uint8Array) => Ed25519PrivateKey.sign(privateKey, data).pipe(Effect.runPromise),
             },
           }),
         )

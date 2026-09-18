@@ -11,12 +11,12 @@ import { SolanaState } from "../../Solana/index.ts"
 import { UnifiedSchemes } from "../../Unified/index.ts"
 import * as Input from "../Input.ts"
 
-const required = Argument.string("required").pipe(Argument.withDescription("Payment Required JSON"), Argument.optional)
+const required = Argument.String("required").pipe(Argument.withDescription("Payment Required JSON"), Argument.optional)
 
 export const payloadMake = Command.make("make", {
   required,
-  stdin: Flag.boolean("stdin").pipe(Flag.withDescription("Read Payment Required JSON from standard input")),
-  mnemonic: Flag.string("mnemonic").pipe(Flag.withDescription("Stored mnemonic name"), Flag.withDefault("default")),
+  stdin: Flag.Boolean("stdin").pipe(Flag.withDescription("Read Payment Required JSON from standard input")),
+  mnemonic: Flag.String("mnemonic").pipe(Flag.withDescription("Stored mnemonic name"), Flag.withDefault("default")),
 }).pipe(
   Command.withDescription("Create a Payment Payload from Payment Required JSON"),
   Command.withHandler(
@@ -38,7 +38,7 @@ export const payloadMake = Command.make("make", {
             Layer.provide(
               UnifiedSchemes.layer.pipe(
                 Layer.provide([
-                  Config.string("SOLANA_RPC_URL").pipe(
+                  Config.String("SOLANA_RPC_URL").pipe(
                     Config.withDefault(undefined),
                     Effect.map((v) => (v ? SolanaState.layer(v) : Layer.empty)),
                     Layer.unwrap,

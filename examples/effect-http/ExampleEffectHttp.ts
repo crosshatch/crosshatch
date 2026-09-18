@@ -23,7 +23,7 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
     },
   },
   Effect.gen(function* () {
-    const recipient = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
+    const recipient = yield* Config.schema(Eip155Address.Eip155Address, "EIP155_ADDRESS")
     const fetch = HttpRouter.add(
       "GET",
       "/paid",
@@ -52,7 +52,7 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
           return yield* ChxHttp.require({ required })
         }
         const settlement = yield* Facilitator.settle({ payload })
-        return HttpServerResponse.text("The paid resource.").pipe(ChxHttp.addResponseHeader(settlement))
+        return yield* HttpServerResponse.text("The paid resource.").pipe(ChxHttp.addResponseHeader(settlement))
       }),
     ).pipe(
       Layer.provide([

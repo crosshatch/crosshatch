@@ -8,7 +8,7 @@ import { layerPrelude } from "./layerPrelude.ts"
 
 // Merchants make the required with extension info.
 const makeRequired = Effect.gen(function* () {
-  const recipient = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
+  const recipient = yield* Config.schema(Eip155Address.Eip155Address, "EIP155_ADDRESS")
   return yield* Required.make`
   |
   | Description of the charge.

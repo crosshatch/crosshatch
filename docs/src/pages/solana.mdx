@@ -54,7 +54,7 @@ Provide `SolanaState` anywhere you provide `SolanaScheme.layer`.
 import { Config, Layer } from "effect"
 import { SolanaState } from "crosshatch/Solana"
 
-const layerSolanaStateFromConfig = Config.string("SOLANA_RPC_URL").pipe(
+const layerSolanaStateFromConfig = Config.String("SOLANA_RPC_URL").pipe(
   Config.map(SolanaState.layer),
   Layer.unwrap,
 )
@@ -73,7 +73,7 @@ include a memo.
 import { SolanaScheme, SolanaSigner, SolanaState } from "crosshatch/Solana"
 import { Config, Layer } from "effect"
 
-const layerSolanaStateFromConfig = Config.string("SOLANA_RPC_URL").pipe(
+const layerSolanaStateFromConfig = Config.String("SOLANA_RPC_URL").pipe(
   Config.map(SolanaState.layer),
   Layer.unwrap,
 )
@@ -101,7 +101,7 @@ import { Config, Effect, Layer } from "effect"
 const layerUnifiedSchemes = UnifiedSchemes.layer.pipe(
   Layer.provide([
     Mnemonic.layerFromEnv,
-    Config.string("SOLANA_RPC_URL").pipe(
+    Config.String("SOLANA_RPC_URL").pipe(
       Effect.map(SolanaState.layer),
       Layer.unwrap,
     ),

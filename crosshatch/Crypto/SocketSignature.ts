@@ -77,19 +77,17 @@ export const makeSocket = <Self, Id extends string, A extends S.Top>(
   options?:
     | undefined
     | {
-        readonly closeCodeIsError?: ((code: number) => boolean) | undefined
         readonly openTimeout?: Duration.Input | undefined
         readonly protocols?: string | Array<string> | undefined
       },
 ) =>
   Effect.gen(function* () {
-    const { closeCodeIsError, openTimeout, protocols } = options ?? {}
+    const { openTimeout, protocols } = options ?? {}
     const { privateKey, publicKey: signer } = yield* Ed25519Pair.Ed25519Pair.pipe(ensureRef)
     const input = yield* S.encodeEffect(S.fromJsonString(S.toCodecJson(signedPayload.payload)))(payload)
     const signature = yield* Ed25519PrivateKey.sign(privateKey, new TextEncoder().encode(input))
     const protocol = yield* S.encodeEffect(ProtocolFromBase64UrlJsonString)({ input, signature, signer })
     return yield* Socket.makeWebSocket(url, {
-      closeCodeIsError,
       openTimeout,
       protocols: [ProtocolKey, protocol, ...(protocols ? Array.ensure(protocols) : [])],
     })

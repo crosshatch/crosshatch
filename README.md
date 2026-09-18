@@ -133,7 +133,7 @@ export const layer = Payer.layerLocal(Accept.first(Known)).pipe(
   Layer.provide(
     UnifiedSchemes.layer.pipe(
       Layer.provide([
-        Config.string("SOLANA_RPC_URL").pipe(
+        Config.String("SOLANA_RPC_URL").pipe(
           Effect.map(SolanaState.layer),
           Layer.unwrap,
         ),

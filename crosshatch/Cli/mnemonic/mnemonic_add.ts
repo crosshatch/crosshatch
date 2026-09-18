@@ -6,8 +6,8 @@ import { MnemonicStore } from "../../MnemonicStore.ts"
 import { DerivedAddresses } from "../../Unified/index.ts"
 
 export const mnemonicAdd = Command.make("add", {
-  name: Argument.string("name").pipe(Argument.withDefault("default")),
-  description: Flag.string("description").pipe(Flag.withDefault(undefined)),
+  name: Argument.String("name").pipe(Argument.withDefault("default")),
+  description: Flag.String("description").pipe(Flag.withDefault(undefined)),
 }).pipe(
   Command.withDescription("Generate and store a mnemonic"),
   Command.withHandler(

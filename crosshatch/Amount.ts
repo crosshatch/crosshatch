@@ -87,8 +87,8 @@ export const fromAtomic = Effect.fnUntraced(function* (atomic: Atomic, unit: Ato
 export const atomic = (unit: AtomicUnit) =>
   Atomic.pipe(
     S.decodeTo(Amount, {
-      decode: SchemaGetter.transformOrFail((value) => fromAtomic(value, unit).pipe(Effect.mapError((v) => v.issue))),
-      encode: SchemaGetter.transformOrFail((value) =>
+      decode: SchemaGetter.transformEffect((value) => fromAtomic(value, unit).pipe(Effect.mapError((v) => v.issue))),
+      encode: SchemaGetter.transformEffect((value) =>
         toAtomic(Amount.make(value, { disableChecks: true }), unit).pipe(Effect.mapError((v) => v.issue)),
       ),
     }),
@@ -109,7 +109,7 @@ export const format = (amount: Amount): string => {
 /** Schema codec between decimal strings and {@link Amount}s. */
 export const AmountFromString = S.String.pipe(
   S.decodeTo(Amount, {
-    decode: SchemaGetter.transformOrFail((value) => from(value).pipe(Effect.mapError((v) => v.issue))),
+    decode: SchemaGetter.transformEffect((value) => from(value).pipe(Effect.mapError((v) => v.issue))),
     encode: SchemaGetter.transform((value) => format(Amount.make(value, { disableChecks: true }))),
   }),
 )
