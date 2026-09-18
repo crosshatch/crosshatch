@@ -1,5 +1,16 @@
 # crosshatch
 
+## 0.0.19
+
+### Patch Changes
+
+- [#173](https://github.com/crosshatch/crosshatch/pull/173)
+  [`7aaca9f`](https://github.com/crosshatch/crosshatch/commit/7aaca9f2c763579b41e63a44ceedb9b19001dbfb) -
+  Update dependencies and migrate to the latest Effect APIs.
+- Updated dependencies
+  [[`7aaca9f`](https://github.com/crosshatch/crosshatch/commit/7aaca9f2c763579b41e63a44ceedb9b19001dbfb)]:
+  - @crosshatch/util@0.0.6
+
 ## 0.0.18
 
 ### Patch Changes
