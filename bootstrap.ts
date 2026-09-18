@@ -3,6 +3,7 @@ import * as Alchemy from "alchemy"
 import * as Cloudflare from "alchemy/Cloudflare"
 import * as Github from "alchemy/GitHub"
 import { Eip155Address } from "crosshatch/Eip155"
+import { SolanaAddress } from "crosshatch/Solana"
 import { Layer, Effect, Config } from "effect"
 
 const owner = "crosshatch"
@@ -21,7 +22,8 @@ export default Alchemy.Stack(
       repository,
       variables: {
         CDP_API_KEY_ID: Config.String("CDP_API_KEY_ID"),
-        PAY_TO_EIP155: Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155"),
+        EIP155_ADDRESS: Config.schema(Eip155Address.Eip155Address, "EIP155_ADDRESS"),
+        SOLANA_ADDRESS: Config.schema(SolanaAddress.SolanaAddress, "SOLANA_ADDRESS"),
         OTEL_EXPORTER_OTLP_ENDPOINT: "https://ingest.us2.signoz.cloud",
       },
     })

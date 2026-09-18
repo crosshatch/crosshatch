@@ -23,7 +23,7 @@ export default class ExampleEffectHttp extends Cloudflare.Worker<ExampleEffectHt
     },
   },
   Effect.gen(function* () {
-    const recipient = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
+    const recipient = yield* Config.schema(Eip155Address.Eip155Address, "EIP155_ADDRESS")
     const fetch = HttpRouter.add(
       "GET",
       "/paid",

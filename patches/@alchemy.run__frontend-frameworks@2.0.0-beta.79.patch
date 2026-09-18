@@ -1,0 +1,44 @@
+diff --git a/dist/waku/adapter.js b/dist/waku/adapter.js
+index c77676c..75e4dd8 100644
+--- a/dist/waku/adapter.js
++++ b/dist/waku/adapter.js
+@@ -35,7 +35,7 @@ const cloudflareAdapter = unstable_createServerEntryAdapter(({ processRequest, p
+ * `createServerEntryAdapter` so the emitted declaration never references
+ * waku's non-exported `lib/types` module (TS2883).
+ */
+-const cloudflareAdapter = unstable_createServerEntryAdapter(({ processRequest, processBuild, setAllEnv, config, notFoundHtml }, options) => {
++const cloudflareAdapter = unstable_createServerEntryAdapter(({ processRequest, processBuild, unstable_setAllEnv, config, notFoundHtml }, options) => {
+ 	const { bodyLimit: bodyLimitOptions, middlewareFns = [], middlewareModules = {}, internalPathToBuildStaticFiles = "__waku_internal_build_static_files" } = options || {};
+ 	const app = new Hono();
+ 	app.notFound((c) => {
+@@ -113,7 +113,7 @@ const cloudflareAdapter = unstable_createServerEntryAdapter(({ processRequest, p
+ 		defaultExport: {
+ 			...options?.handlers,
+ 			fetch(req, env) {
+-				setAllEnv(env);
++				unstable_setAllEnv(env);
+ 				return fetchFn(req);
+ 			}
+ 		}
+diff --git a/src/waku/adapter.ts b/src/waku/adapter.ts
+index 69669d1..db22c64 100644
+--- a/src/waku/adapter.ts
++++ b/src/waku/adapter.ts
+@@ -98,7 +98,7 @@ const cloudflareAdapter: ReturnType<
+   typeof createServerEntryAdapter<CloudflareAdapterOptions | undefined>
+ > = createServerEntryAdapter(
+   (
+-    { processRequest, processBuild, setAllEnv, config, notFoundHtml },
++    { processRequest, processBuild, unstable_setAllEnv, config, notFoundHtml },
+     options?: CloudflareAdapterOptions,
+   ) => {
+     const {
+@@ -223,7 +223,7 @@ const cloudflareAdapter: ReturnType<
+       defaultExport: {
+         ...options?.handlers,
+         fetch(req: Request, env: Record<string, unknown>) {
+-          setAllEnv(env);
++          unstable_setAllEnv(env);
+           return fetchFn(req);
+         },
+       },

@@ -106,6 +106,9 @@ packageExtensions:
       typescript: 5.9.3
 
 overrides:
+  "@effect/platform-bun@4.0.0-beta.90>@effect/platform-node-shared": 4.0.0-beta.90
+  "@kitlangton/motel>@effect/platform-bun": 4.0.0-beta.90
+  "@kitlangton/motel>effect": 4.0.0-beta.90
   "vocs>@modelcontextprotocol/sdk": 1.30.0
   "crosshatch.dev>typescript": 5.9.3
   "@effect/platform-bun": 4.0.0-rc.115
@@ -116,7 +119,11 @@ overrides:
   react: ^19.3.0
   react-dom: ^19.3.0
   effect: 4.0.0-rc.115
+  waku: 1.0.0-rc.1
   zod: 4.6.5
+
+patchedDependencies:
+  "@alchemy.run/frontend-frameworks@2.0.0-beta.79": patches/@alchemy.run__frontend-frameworks@2.0.0-beta.79.patch
 
 minimumReleaseAgeExclude:
   - "@aws-sdk/*"

@@ -24,6 +24,7 @@
     "@effect/platform-node": "catalog:",
     "@effect/tsgo": "catalog:",
     "@effect/vitest": "catalog:",
+    "@kitlangton/motel": "catalog:",
     "@oxlint/plugins": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
