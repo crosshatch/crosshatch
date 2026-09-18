@@ -1,8 +1,0 @@
-import { Schema as S } from "effect"
-
-import { Address } from "./Address.ts"
-import { ChainId } from "./ChainId.ts"
-
-/** Encoded CAIP-10 account id — `chain_id:account_address`. */
-export type AccountId = typeof AccountId.Type
-export const AccountId = S.TemplateLiteral([ChainId, ":", Address]).pipe(S.brand("crosshatch/AccountId"))

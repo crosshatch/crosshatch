@@ -13,7 +13,6 @@ const Ed25519Pair_ = S.Struct({
   publicKey: Ed25519PublicKey.Ed25519PublicKey,
 })
 
-// oxlint-disable-next-line typescript/no-empty-interface
 export interface Ed25519Pair extends Ed25519Pair_ {}
 
 export const Ed25519Pair = Object.assign(

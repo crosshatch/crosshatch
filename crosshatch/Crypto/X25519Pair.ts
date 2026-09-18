@@ -13,7 +13,6 @@ const X25519Pair_ = S.Struct({
   publicKey: X25519PublicKey,
 })
 
-// oxlint-disable-next-line typescript/no-empty-interface
 export interface X25519Pair extends X25519Pair_ {}
 
 export const X25519Pair = Object.assign(Context.Service<X25519Pair, Ref.Ref<X25519Pair | undefined>>()(Id), X25519Pair_)

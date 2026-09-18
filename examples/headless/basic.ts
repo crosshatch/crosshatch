@@ -1,31 +1,40 @@
-import { Required, Requirements, Payload, Facilitator } from "crosshatch"
-import { Eip155Address } from "crosshatch/Eip155"
-import { USD } from "crosshatch/Known"
-import { Config, Effect, Layer, Console } from "effect"
+import { Required, Payer, Facilitator, Accepts } from "crosshatch"
+import { Address } from "crosshatch/Cryptocurrency"
+import { Eip155 } from "crosshatch/Cryptocurrency/Eip155"
+import { Solana } from "crosshatch/Cryptocurrency/Solana"
+import { USDC, EURT, DAI } from "crosshatch/Cryptocurrency/tokens"
+import { Config, Effect, Console, Layer } from "effect"
 import { FetchHttpClient } from "effect/unstable/http"
 
-import { layerPrelude } from "./layerPrelude.ts"
+const amount = ""
 
 Effect.gen(function* () {
-  const recipient = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
-  const required = yield* Required.make`
+  const recipients = yield* Config.all({
+    eip155: Address.fromConfig(Eip155, "EIP155_RECIPIENT"),
+    solana: Address.fromConfig(Solana, "SOLANA_RECIPIENT"),
+  })
+
+  const accepts = Accepts.empty.pipe(
+    Accepts.add(EURT, { amount, recipients }),
+    Accepts.add(DAI, { amount, recipients }),
+    Accepts.addInstrument(USDC.zk_sync_mainnet, { amount, recipients }),
+  )
+
+  const required = yield* Required.describe`
   |
   | Description of the charge.
   |
-  `.pipe(
-    Required.accept(
-      Requirements.denomination(USD, {
-        amount: 0.01,
-        recipients: { eip155: { 8453: recipient } },
-        ttl: "1 minutes",
-      }),
-    ),
-  )
-  const { payload } = yield* Payload.make({ required })
-  const settlement = yield* Facilitator.settle({ payload })
+  `(accepts)
+
+  const payload = yield* Payer.make(required)
+
+  const settlement = yield* Facilitator.settle(payload)
+
   yield* Console.log(settlement)
 }).pipe(
-  Effect.provide([Facilitator.layer().pipe(Layer.provide(FetchHttpClient.layer)), layerPrelude]),
-  Effect.onError(Effect.logError),
+  Effect.provide([
+    Facilitator.layerFromConfig("FACILITATOR_URL").pipe(Layer.provide(FetchHttpClient.layer)),
+    Payer.layer,
+  ]),
   Effect.runFork,
 )

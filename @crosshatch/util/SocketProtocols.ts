@@ -11,7 +11,6 @@ const SocketProtocols_ = S.String.pipe(
   }),
 )
 
-// oxlint-disable-next-line typescript/no-empty-interface
 export interface SocketProtocols extends SocketProtocols_ {}
 
 export const SocketProtocols = Object.assign(

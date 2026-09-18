@@ -1,53 +1,55 @@
-import { Required, Requirements, Payload, Extension, Facilitator, PaymentId } from "crosshatch"
-import { Eip155Address } from "crosshatch/Eip155"
-import * as Known from "crosshatch/Known"
-import { Config, Effect, Layer, Console } from "effect"
-import { FetchHttpClient } from "effect/unstable/http"
+export {}
 
-import { layerPrelude } from "./layerPrelude.ts"
+// import { Required, Requirements, Payload, Extension, Facilitator, PaymentId } from "crosshatch"
+// import { Eip155Address } from "crosshatch/Eip155"
+// import * as Known from "crosshatch/Known"
+// import { Config, Effect, Layer, Console } from "effect"
+// import { FetchHttpClient } from "effect/unstable/http"
 
-// Merchants make the required with extension info.
-const makeRequired = Effect.gen(function* () {
-  const recipient = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
-  return yield* Required.make`
-  |
-  | Description of the charge.
-  |
-  `.pipe(
-    Required.extend(PaymentId.FromClient, { required: true }),
-    Required.accept(
-      Requirements.denomination(Known.USD, {
-        amount: 0.01,
-        recipients: { eip155: { 8453: recipient } },
-        ttl: "1 minutes",
-      }),
-    ),
-  )
-})
+// import { layerPrelude } from "./layerPayer.ts"
 
-// Clients provide extension-specific handlers to the payer layer.
-Effect.gen(function* () {
-  const required = yield* makeRequired
-  const { payload } = yield* Payload.make({ required })
-  const settlement = yield* Facilitator.settle({ payload })
-  yield* Console.log(settlement)
-}).pipe(
-  Effect.provide([
-    Facilitator.layer().pipe(Layer.provideMerge(FetchHttpClient.layer)),
-    layerPrelude.pipe(
-      Layer.provide(
-        Extension.layerHandler(
-          PaymentId.FromMerchant,
-          Effect.fn(function* ({ info: { required } }) {
-            return {
-              required,
-              id: PaymentId.random(),
-            }
-          }),
-        ),
-      ),
-    ),
-  ]),
-  Effect.onError(Effect.logError),
-  Effect.runFork,
-)
+// // Merchants make the required with extension info.
+// const makeRequired = Effect.gen(function* () {
+//   const recipient = yield* Config.schema(Eip155Address.Eip155Address, "PAY_TO_EIP155")
+//   return yield* Required.make`
+//   |
+//   | Description of the charge.
+//   |
+//   `.pipe(
+//     Required.extend(PaymentId.FromClient, { required: true }),
+//     Required.accept(
+//       Requirements.denomination(Known.USD, {
+//         amount: 0.01,
+//         recipients: { eip155: { 8453: recipient } },
+//         ttl: "1 minutes",
+//       }),
+//     ),
+//   )
+// })
+
+// // Clients provide extension-specific handlers to the payer layer.
+// Effect.gen(function* () {
+//   const required = yield* makeRequired
+//   const { payload } = yield* Payload.make({ required })
+//   const settlement = yield* Facilitator.settle({ payload })
+//   yield* Console.log(settlement)
+// }).pipe(
+//   Effect.provide([
+//     Facilitator.layer().pipe(Layer.provideMerge(FetchHttpClient.layer)),
+//     layerPrelude.pipe(
+//       Layer.provide(
+//         Extension.layerHandler(
+//           PaymentId.FromMerchant,
+//           Effect.fn(function* ({ info: { required } }) {
+//             return {
+//               required,
+//               id: PaymentId.random(),
+//             }
+//           }),
+//         ),
+//       ),
+//     ),
+//   ]),
+//   Effect.onError(Effect.logError),
+//   Effect.runFork,
+// )
