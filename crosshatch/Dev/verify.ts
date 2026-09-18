@@ -1,6 +1,8 @@
-import { handler } from "@crosshatch/util"
 import { Effect } from "effect"
+import { HttpApiBuilder } from "effect/unstable/httpapi"
 
 import { FacilitatorApi } from "../FacilitatorApi/index.ts"
 
-export const verify = handler(FacilitatorApi, "facilitator", "verify", () => Effect.succeed({ isValid: true }))
+export const verify = HttpApiBuilder.handler(FacilitatorApi, "facilitator", "verify", () =>
+  Effect.succeed({ isValid: true }),
+)

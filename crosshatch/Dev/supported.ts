@@ -1,12 +1,12 @@
-import { handler } from "@crosshatch/util"
 import { Effect, Record, Struct } from "effect"
+import { HttpApiBuilder } from "effect/unstable/httpapi"
 
 import type { Denomination } from "../Asset.ts"
 import { ChainId } from "../ChainId.ts"
 import { FacilitatorApi } from "../FacilitatorApi/index.ts"
 import * as Known from "../Known/index.ts"
 
-export const supported = handler(FacilitatorApi, "facilitator", "supported", () =>
+export const supported = HttpApiBuilder.handler(FacilitatorApi, "facilitator", "supported", () =>
   Effect.succeed({
     kinds: Record.values(Known).flatMap((denomination: Denomination) =>
       Record.values(denomination).flatMap((logicalAsset) =>
