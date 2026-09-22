@@ -12,7 +12,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
   check:
     if: github.event_name == 'pull_request' && !github.event.pull_request.draft
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     outputs:
       has-permissions: ${{ steps.checkPermissions.outputs.require-result }}
     steps:
@@ -25,10 +25,10 @@ jobs:
   publish:
     needs: check
     if: needs.check.outputs.has-permissions == 'true' && !github.event.pull_request.draft
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v6
+      - uses: useblacksmith/checkout@v1
       - uses: ./.github/actions/checkout-crosshatch
       - uses: ./konfik/configure-environment
       - run: pnpm build
