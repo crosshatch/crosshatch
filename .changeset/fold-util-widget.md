@@ -1,5 +1,5 @@
 ---
-"crosshatch": minor
+"crosshatch": patch
 ---
 
 Fold the `@crosshatch/util` and `@crosshatch/widget` packages into `crosshatch`.
