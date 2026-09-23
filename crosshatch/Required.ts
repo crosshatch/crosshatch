@@ -1,9 +1,9 @@
-import { stringRaw } from "@crosshatch/util"
 import { Schema as S, Effect, Context } from "effect"
 
 import { type Extension, ExtensionEnvelopes } from "./Extension.ts"
 import { Requirements, type RequirementsLike } from "./Requirements.ts"
 import { ResourceInfo } from "./ResourceInfo.ts"
+import { stringRaw } from "./util/index.ts"
 import { Version } from "./Version.ts"
 
 export type Required = typeof Required.Type

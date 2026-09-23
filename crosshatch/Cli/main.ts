@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-import { ChxStage } from "@crosshatch/util"
 import { NodeRuntime, NodeServices, NodeHttpClient } from "@effect/platform-node"
 import { Effect, Layer } from "effect"
 import { Command } from "effect/unstable/cli"
@@ -8,6 +7,7 @@ import { Command } from "effect/unstable/cli"
 import * as ChxNodeServices from "../ChxNodeServices/index.ts"
 import { CirqueClient } from "../Cirque/index.ts"
 import PackageJson from "../package.json" with { type: "json" }
+import { ChxStage } from "../util/index.ts"
 import { dev } from "./dev/dev.ts"
 import { facilitator } from "./facilitator/facilitator.ts"
 import { mnemonic } from "./mnemonic/mnemonic.ts"

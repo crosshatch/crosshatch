@@ -1,4 +1,3 @@
-import { BrowserLauncher } from "@crosshatch/widget"
 import { Effect, Schema as S } from "effect"
 import { Command, Flag } from "effect/unstable/cli"
 
@@ -9,6 +8,7 @@ import { Eip155Address } from "../../Eip155/index.ts"
 import { MnemonicStore } from "../../index.ts"
 import * as Mnemonic from "../../Mnemonic.ts"
 import { Reference } from "../../Reference.ts"
+import { BrowserLauncher } from "../../widget/index.ts"
 
 export const onramp = Command.make("onramp", {
   mnemonic: Flag.String("mnemonic").pipe(Flag.withDefault(undefined), Flag.withDescription("Stored mnemonic name")),

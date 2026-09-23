@@ -1,8 +1,8 @@
-import { ensureRef, SocketProtocols } from "@crosshatch/util"
 import { Array, Context, Effect, Schema as S, Layer, type Duration, Data } from "effect"
 import { HttpApiError } from "effect/unstable/httpapi"
 import { Socket } from "effect/unstable/socket"
 
+import { ensureRef, SocketProtocols } from "../util/index.ts"
 import * as Ed25519Pair from "./Ed25519Pair.ts"
 import * as Ed25519PrivateKey from "./Ed25519PrivateKey.ts"
 import * as Ed25519PublicKey from "./Ed25519PublicKey.ts"

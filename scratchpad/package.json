@@ -3,8 +3,6 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@crosshatch/util": "workspace:*",
-    "@crosshatch/widget": "workspace:*",
     "@effect/platform-node": "catalog:",
     "crosshatch": "workspace:*",
     "effect": "catalog:"

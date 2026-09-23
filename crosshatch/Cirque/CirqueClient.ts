@@ -1,7 +1,7 @@
-import { ChxDomain } from "@crosshatch/util"
 import { Context, Effect, Layer } from "effect"
 import { HttpApiClient } from "effect/unstable/httpapi"
 
+import { ChxDomain } from "../util/index.ts"
 import { CirqueApi } from "./CirqueApi.ts"
 
 export class CirqueClient extends Context.Service<CirqueClient, HttpApiClient.ForApi<typeof CirqueApi>>()(

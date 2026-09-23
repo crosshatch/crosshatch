@@ -2,7 +2,7 @@ import type { StandardSchemaV1 } from "@standard-schema/spec"
 import { Schema as S, Pipeable, Effect } from "effect"
 import { Url, UrlParams } from "effect/unstable/http"
 
-const TypeId = "~@crosshatch/widget/Widget" as const
+const TypeId = "~crosshatch/widget/Widget" as const
 
 export type WidgetPayload = S.Constraint & {
   readonly DecodingServices: never

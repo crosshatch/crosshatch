@@ -6,6 +6,7 @@
 .planning
 .tanstack
 .turbo/
+.worktrees
 dist/
 node_modules/
 repos

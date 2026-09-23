@@ -8,7 +8,6 @@
   "dependencies": {
     "@alchemy.run/frontend-frameworks": "catalog:",
     "@crosshatch/alchemy": "workspace:*",
-    "@crosshatch/util": "workspace:*",
     "@effect/ai-openai-compat": "catalog:",
     "@effect/atom-react": "catalog:",
     "@icons-pack/react-simple-icons": "catalog:",

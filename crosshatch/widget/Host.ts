@@ -3,7 +3,7 @@ import { Exit, Schema as S, Context, Stream, Effect, Scope, Deferred, Layer } fr
 
 import { parent } from "./Self.ts"
 
-export class Host extends Context.Service<Host, string>()("@crosshatch/widget/Host") {}
+export class Host extends Context.Service<Host, string>()("crosshatch/widget/Host") {}
 
 export const RequestHostIntroduction = S.TaggedStruct("RequestHostIntroduction", {})
 

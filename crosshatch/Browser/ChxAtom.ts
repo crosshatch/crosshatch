@@ -1,9 +1,9 @@
-import { Launcher } from "@crosshatch/widget"
 import { Effect, Stream, Option, Match, SubscriptionRef } from "effect"
 import { Atom } from "effect/unstable/reactivity"
 
 import * as Amount from "../Amount.ts"
 import type { Bridge } from "../index.ts"
+import { Launcher } from "../widget/index.ts"
 import { Allowance } from "./Allowance.ts"
 import { memoMap } from "./ChxBrowserRuntime.ts"
 import * as BrowserServices from "./ChxBrowserServices.ts"

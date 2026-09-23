@@ -1,5 +1,5 @@
 {
   "extends": "../konfik/tsconfig.base",
   "include": ["."],
-  "references": [{ "path": "../@crosshatch/widget" }, { "path": "../@crosshatch/util" }, { "path": "../crosshatch" }]
+  "references": [{ "path": "../crosshatch" }]
 }

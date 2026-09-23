@@ -1,6 +1,6 @@
-import { Widget } from "@crosshatch/widget"
 import { Schema as S } from "effect"
 
+import { Widget } from "../widget/index.ts"
 import { Allowance } from "./Allowance.ts"
 import { LinkChallengeId } from "./LinkChallengeId.ts"
 import { Prerequisites } from "./Prerequisite.ts"
