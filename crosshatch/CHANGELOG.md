@@ -1,5 +1,17 @@
 # crosshatch
 
+## 0.0.20
+
+### Patch Changes
+
+- [#185](https://github.com/crosshatch/crosshatch/pull/185)
+  [`bf65390`](https://github.com/crosshatch/crosshatch/commit/bf65390a9ea4ab85657864b3eebf5960c429b0fe) -
+  Fold the `@crosshatch/util` and `@crosshatch/widget` packages into
+  `crosshatch`. Their contents are now available as the `crosshatch/util` and
+  `crosshatch/widget` subpaths, and the two standalone packages are no longer
+  published. Docs-only assets (the vocs theme, config helper, and Manrope fonts)
+  moved into the docs site and are no longer exported.
+
 ## 0.0.19
 
 ### Patch Changes
