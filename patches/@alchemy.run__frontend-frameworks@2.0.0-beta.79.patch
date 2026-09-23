@@ -1,8 +1,8 @@
 diff --git a/dist/waku/adapter.js b/dist/waku/adapter.js
-index c77676c..75e4dd8 100644
+index 702d55f..8c70e09 100644
 --- a/dist/waku/adapter.js
 +++ b/dist/waku/adapter.js
-@@ -35,7 +35,7 @@ const cloudflareAdapter = unstable_createServerEntryAdapter(({ processRequest, p
+@@ -35,7 +35,7 @@ function removeGzipEncoding(res) {
  * `createServerEntryAdapter` so the emitted declaration never references
  * waku's non-exported `lib/types` module (TS2883).
  */
@@ -20,8 +20,30 @@ index c77676c..75e4dd8 100644
  				return fetchFn(req);
  			}
  		}
+diff --git a/dist/waku/source.js b/dist/waku/source.js
+index 36795bf..55b69b1 100644
+--- a/dist/waku/source.js
++++ b/dist/waku/source.js
+@@ -365,13 +365,16 @@ const makeWakuSourceProvider = (options, integration = {
+ 		}),
+ 		hash: Effect.fn(function* (_ctx, previous) {
+ 			const path = yield* Path.Path;
++			const fs = yield* FileSystem.FileSystem;
+ 			const rootDir = rootDirOf(path);
++			const previousWorkspaces = (previous?.additionalWorkspaces ?? []).map((workspace) => path.resolve(rootDir, workspace));
++			const workspaces = yield* Effect.filter(previousWorkspaces, (workspace) => fs.exists(workspace));
+ 			const input = yield* hashWakuInput({
+ 				rootDir,
+ 				distDir,
+ 				memo: options.memo,
+ 				options,
+-				workspaces: (previous?.additionalWorkspaces ?? []).map((workspace) => path.resolve(rootDir, workspace))
++				workspaces
+ 			});
+ 			return {
+ 				input: input.hash,
 diff --git a/src/waku/adapter.ts b/src/waku/adapter.ts
-index 69669d1..db22c64 100644
+index facf2d5..c309042 100644
 --- a/src/waku/adapter.ts
 +++ b/src/waku/adapter.ts
 @@ -98,7 +98,7 @@ const cloudflareAdapter: ReturnType<
@@ -42,3 +64,35 @@ index 69669d1..db22c64 100644
            return fetchFn(req);
          },
        },
+diff --git a/src/waku/source.ts b/src/waku/source.ts
+index 1cd52dd..a6404b9 100644
+--- a/src/waku/source.ts
++++ b/src/waku/source.ts
+@@ -818,15 +818,24 @@ export const makeWakuSourceProvider = (
+     // only used for the auxiliary workspace list, never to skip recomputation.
+     hash: Effect.fn(function* (_ctx, previous) {
+       const path = yield* Path.Path;
++      const fs = yield* FileSystem.FileSystem;
+       const rootDir = rootDirOf(path);
++      // A previously-discovered workspace may have been removed or renamed
++      // since the last build. Skip it rather than failing planning: dropping
++      // it changes the input hash, which forces the rebuild that re-discovers
++      // the current workspace set.
++      const previousWorkspaces = (previous?.additionalWorkspaces ?? []).map(
++        (workspace) => path.resolve(rootDir, workspace),
++      );
++      const workspaces = yield* Effect.filter(previousWorkspaces, (workspace) =>
++        fs.exists(workspace),
++      );
+       const input = yield* hashWakuInput({
+         rootDir,
+         distDir,
+         memo: options.memo,
+         options,
+-        workspaces: (previous?.additionalWorkspaces ?? []).map((workspace) =>
+-          path.resolve(rootDir, workspace),
+-        ),
++        workspaces,
+       });
+       return { input: input.hash, additionalWorkspaces: input.workspaces };
+     }),

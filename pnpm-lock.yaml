@@ -156,7 +156,7 @@ overrides:
 packageExtensionsChecksum: sha256-aeav3D6cmx9BbBoCbwxaFwj4IxDLXhQrWBt4CbiYXkI=
 
 patchedDependencies:
-  '@alchemy.run/frontend-frameworks@2.0.0-beta.79': 6ca79fefa1a23e9130c3bb917ed5508c2d016e73d19b21561cacbc3eb7076fa8
+  '@alchemy.run/frontend-frameworks@2.0.0-beta.79': 4af5f49701469983cea48a831bd16d8eacaad25beea751bba15490db6d45f791
 
 importers:
 
@@ -212,7 +212,7 @@ importers:
         version: 5.0.1(vitest@5.0.1)
       alchemy:
         specifier: 'catalog:'
-        version: 2.0.0-beta.79(@alchemy.run/frontend-frameworks@2.0.0-beta.79(patch_hash=6ca79fefa1a23e9130c3bb917ed5508c2d016e73d19b21561cacbc3eb7076fa8)(92d190b823497bda0297a30d6f7fc25e))(@effect/platform-bun@4.0.0-rc.115(effect@4.0.0-rc.115))(@effect/platform-node@4.0.0-rc.115(effect@4.0.0-rc.115)(redis@6.2.1(@opentelemetry/api@1.9.1)))(@types/node@26.6.1)(@types/react@19.3.0)(@vercel/nft@1.10.2(rollup@4.62.2)(supports-color@8.1.1))(effect@4.0.0-rc.115)(mongodb@6.21.0(@aws-sdk/credential-providers@3.1093.0)(socks@2.8.9))(pg@8.22.0)(react-devtools-core@7.0.1)(typescript@7.0.2)(vite@8.3.0(@types/node@26.6.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))(vitest@5.0.1)(ws@8.21.3)
+        version: 2.0.0-beta.79(@alchemy.run/frontend-frameworks@2.0.0-beta.79(patch_hash=4af5f49701469983cea48a831bd16d8eacaad25beea751bba15490db6d45f791)(92d190b823497bda0297a30d6f7fc25e))(@effect/platform-bun@4.0.0-rc.115(effect@4.0.0-rc.115))(@effect/platform-node@4.0.0-rc.115(effect@4.0.0-rc.115)(redis@6.2.1(@opentelemetry/api@1.9.1)))(@types/node@26.6.1)(@types/react@19.3.0)(@vercel/nft@1.10.2(rollup@4.62.2)(supports-color@8.1.1))(effect@4.0.0-rc.115)(mongodb@6.21.0(@aws-sdk/credential-providers@3.1093.0)(socks@2.8.9))(pg@8.22.0)(react-devtools-core@7.0.1)(typescript@7.0.2)(vite@8.3.0(@types/node@26.6.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))(vitest@5.0.1)(ws@8.21.3)
       crosshatch:
         specifier: workspace:*
         version: link:crosshatch
@@ -254,7 +254,7 @@ importers:
     dependencies:
       alchemy:
         specifier: 'catalog:'
-        version: 2.0.0-beta.79(@alchemy.run/frontend-frameworks@2.0.0-beta.79(patch_hash=6ca79fefa1a23e9130c3bb917ed5508c2d016e73d19b21561cacbc3eb7076fa8)(103c8af671560ab0afcd67f01a92567d))(@effect/platform-bun@4.0.0-rc.115(effect@4.0.0-rc.115))(@effect/platform-node@4.0.0-rc.115(effect@4.0.0-rc.115)(redis@6.2.1(@opentelemetry/api@1.9.1)))(@types/node@26.6.1)(@types/react@19.3.0)(@vercel/nft@1.10.2(rollup@4.62.2)(supports-color@8.1.1))(effect@4.0.0-rc.115)(mongodb@6.21.0(@aws-sdk/credential-providers@3.1093.0)(socks@2.8.9))(pg@8.22.0)(react-devtools-core@7.0.1)(typescript@7.0.2)(vite@8.3.0(@types/node@26.6.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))(vitest@5.0.1)(ws@8.21.3)
+        version: 2.0.0-beta.79(@alchemy.run/frontend-frameworks@2.0.0-beta.79(patch_hash=4af5f49701469983cea48a831bd16d8eacaad25beea751bba15490db6d45f791)(103c8af671560ab0afcd67f01a92567d))(@effect/platform-bun@4.0.0-rc.115(effect@4.0.0-rc.115))(@effect/platform-node@4.0.0-rc.115(effect@4.0.0-rc.115)(redis@6.2.1(@opentelemetry/api@1.9.1)))(@types/node@26.6.1)(@types/react@19.3.0)(@vercel/nft@1.10.2(rollup@4.62.2)(supports-color@8.1.1))(effect@4.0.0-rc.115)(mongodb@6.21.0(@aws-sdk/credential-providers@3.1093.0)(socks@2.8.9))(pg@8.22.0)(react-devtools-core@7.0.1)(typescript@7.0.2)(vite@8.3.0(@types/node@26.6.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))(vitest@5.0.1)(ws@8.21.3)
       crosshatch:
         specifier: workspace:*
         version: link:../../crosshatch
@@ -308,7 +308,7 @@ importers:
     dependencies:
       '@alchemy.run/frontend-frameworks':
         specifier: 'catalog:'
-        version: 2.0.0-beta.79(patch_hash=6ca79fefa1a23e9130c3bb917ed5508c2d016e73d19b21561cacbc3eb7076fa8)(7359f1d86bbafbf380b3a58bd7248edd)
+        version: 2.0.0-beta.79(patch_hash=4af5f49701469983cea48a831bd16d8eacaad25beea751bba15490db6d45f791)(7359f1d86bbafbf380b3a58bd7248edd)
       '@crosshatch/alchemy':
         specifier: workspace:*
         version: link:../@crosshatch/alchemy
@@ -326,7 +326,7 @@ importers:
         version: 19.3.0
       alchemy:
         specifier: 'catalog:'
-        version: 2.0.0-beta.79(@alchemy.run/frontend-frameworks@2.0.0-beta.79(patch_hash=6ca79fefa1a23e9130c3bb917ed5508c2d016e73d19b21561cacbc3eb7076fa8)(7359f1d86bbafbf380b3a58bd7248edd))(@effect/platform-bun@4.0.0-rc.115(effect@4.0.0-rc.115))(@effect/platform-node@4.0.0-rc.115(effect@4.0.0-rc.115)(redis@6.2.1(@opentelemetry/api@1.9.1)))(@types/node@26.6.1)(@types/react@19.3.0)(@vercel/nft@1.10.2(rollup@4.62.2)(supports-color@8.1.1))(effect@4.0.0-rc.115)(mongodb@6.21.0(@aws-sdk/credential-providers@3.1093.0)(socks@2.8.9))(pg@8.22.0)(react-devtools-core@7.0.1)(typescript@5.9.3)(vite@8.3.0(@types/node@26.6.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))(vitest@5.0.1)(ws@8.21.3)
+        version: 2.0.0-beta.79(@alchemy.run/frontend-frameworks@2.0.0-beta.79(patch_hash=4af5f49701469983cea48a831bd16d8eacaad25beea751bba15490db6d45f791)(7359f1d86bbafbf380b3a58bd7248edd))(@effect/platform-bun@4.0.0-rc.115(effect@4.0.0-rc.115))(@effect/platform-node@4.0.0-rc.115(effect@4.0.0-rc.115)(redis@6.2.1(@opentelemetry/api@1.9.1)))(@types/node@26.6.1)(@types/react@19.3.0)(@vercel/nft@1.10.2(rollup@4.62.2)(supports-color@8.1.1))(effect@4.0.0-rc.115)(mongodb@6.21.0(@aws-sdk/credential-providers@3.1093.0)(socks@2.8.9))(pg@8.22.0)(react-devtools-core@7.0.1)(typescript@5.9.3)(vite@8.3.0(@types/node@26.6.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))(vitest@5.0.1)(ws@8.21.3)
       crosshatch:
         specifier: workspace:*
         version: link:../crosshatch
@@ -365,7 +365,7 @@ importers:
     dependencies:
       alchemy:
         specifier: 'catalog:'
-        version: 2.0.0-beta.79(@alchemy.run/frontend-frameworks@2.0.0-beta.79(patch_hash=6ca79fefa1a23e9130c3bb917ed5508c2d016e73d19b21561cacbc3eb7076fa8)(103c8af671560ab0afcd67f01a92567d))(@effect/platform-bun@4.0.0-rc.115(effect@4.0.0-rc.115))(@effect/platform-node@4.0.0-rc.115(effect@4.0.0-rc.115)(redis@6.2.1(@opentelemetry/api@1.9.1)))(@types/node@26.6.1)(@types/react@19.3.0)(@vercel/nft@1.10.2(rollup@4.62.2)(supports-color@8.1.1))(effect@4.0.0-rc.115)(mongodb@6.21.0(@aws-sdk/credential-providers@3.1093.0)(socks@2.8.9))(pg@8.22.0)(react-devtools-core@7.0.1)(typescript@7.0.2)(vite@8.3.0(@types/node@26.6.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))(vitest@5.0.1)(ws@8.21.3)
+        version: 2.0.0-beta.79(@alchemy.run/frontend-frameworks@2.0.0-beta.79(patch_hash=4af5f49701469983cea48a831bd16d8eacaad25beea751bba15490db6d45f791)(103c8af671560ab0afcd67f01a92567d))(@effect/platform-bun@4.0.0-rc.115(effect@4.0.0-rc.115))(@effect/platform-node@4.0.0-rc.115(effect@4.0.0-rc.115)(redis@6.2.1(@opentelemetry/api@1.9.1)))(@types/node@26.6.1)(@types/react@19.3.0)(@vercel/nft@1.10.2(rollup@4.62.2)(supports-color@8.1.1))(effect@4.0.0-rc.115)(mongodb@6.21.0(@aws-sdk/credential-providers@3.1093.0)(socks@2.8.9))(pg@8.22.0)(react-devtools-core@7.0.1)(typescript@7.0.2)(vite@8.3.0(@types/node@26.6.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))(vitest@5.0.1)(ws@8.21.3)
       crosshatch:
         specifier: workspace:*
         version: link:../../crosshatch
@@ -377,7 +377,7 @@ importers:
     dependencies:
       alchemy:
         specifier: 'catalog:'
-        version: 2.0.0-beta.79(@alchemy.run/frontend-frameworks@2.0.0-beta.79(patch_hash=6ca79fefa1a23e9130c3bb917ed5508c2d016e73d19b21561cacbc3eb7076fa8)(103c8af671560ab0afcd67f01a92567d))(@effect/platform-bun@4.0.0-rc.115(effect@4.0.0-rc.115))(@effect/platform-node@4.0.0-rc.115(effect@4.0.0-rc.115)(redis@6.2.1(@opentelemetry/api@1.9.1)))(@types/node@26.6.1)(@types/react@19.3.0)(@vercel/nft@1.10.2(rollup@4.62.2)(supports-color@8.1.1))(effect@4.0.0-rc.115)(mongodb@6.21.0(@aws-sdk/credential-providers@3.1093.0)(socks@2.8.9))(pg@8.22.0)(react-devtools-core@7.0.1)(typescript@7.0.2)(vite@8.3.0(@types/node@26.6.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))(vitest@5.0.1)(ws@8.21.3)
+        version: 2.0.0-beta.79(@alchemy.run/frontend-frameworks@2.0.0-beta.79(patch_hash=4af5f49701469983cea48a831bd16d8eacaad25beea751bba15490db6d45f791)(103c8af671560ab0afcd67f01a92567d))(@effect/platform-bun@4.0.0-rc.115(effect@4.0.0-rc.115))(@effect/platform-node@4.0.0-rc.115(effect@4.0.0-rc.115)(redis@6.2.1(@opentelemetry/api@1.9.1)))(@types/node@26.6.1)(@types/react@19.3.0)(@vercel/nft@1.10.2(rollup@4.62.2)(supports-color@8.1.1))(effect@4.0.0-rc.115)(mongodb@6.21.0(@aws-sdk/credential-providers@3.1093.0)(socks@2.8.9))(pg@8.22.0)(react-devtools-core@7.0.1)(typescript@7.0.2)(vite@8.3.0(@types/node@26.6.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))(vitest@5.0.1)(ws@8.21.3)
       crosshatch:
         specifier: workspace:*
         version: link:../../crosshatch
@@ -7303,7 +7303,7 @@ snapshots:
     dependencies:
       effect: 4.0.0-rc.115
 
-  '@alchemy.run/frontend-frameworks@2.0.0-beta.79(patch_hash=6ca79fefa1a23e9130c3bb917ed5508c2d016e73d19b21561cacbc3eb7076fa8)(103c8af671560ab0afcd67f01a92567d)':
+  '@alchemy.run/frontend-frameworks@2.0.0-beta.79(patch_hash=4af5f49701469983cea48a831bd16d8eacaad25beea751bba15490db6d45f791)(103c8af671560ab0afcd67f01a92567d)':
     dependencies:
       '@alchemy.run/cloudflare-runtime': 2.0.0-beta.79(@distilled.cloud/cloudflare@1.0.0-rc.12(effect@4.0.0-rc.115))(@effect/platform-bun@4.0.0-rc.115(effect@4.0.0-rc.115))(@effect/platform-node@4.0.0-rc.115(effect@4.0.0-rc.115)(redis@6.2.1(@opentelemetry/api@1.9.1)))(@types/node@26.6.1)(effect@4.0.0-rc.115)(rolldown@1.2.5)(typescript@7.0.2)(vite@8.3.0(@types/node@26.6.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))
       '@distilled.cloud/cloudflare': 1.0.0-rc.12(effect@4.0.0-rc.115)
@@ -7325,7 +7325,7 @@ snapshots:
       - typescript
     optional: true
 
-  '@alchemy.run/frontend-frameworks@2.0.0-beta.79(patch_hash=6ca79fefa1a23e9130c3bb917ed5508c2d016e73d19b21561cacbc3eb7076fa8)(7359f1d86bbafbf380b3a58bd7248edd)':
+  '@alchemy.run/frontend-frameworks@2.0.0-beta.79(patch_hash=4af5f49701469983cea48a831bd16d8eacaad25beea751bba15490db6d45f791)(7359f1d86bbafbf380b3a58bd7248edd)':
     dependencies:
       '@alchemy.run/cloudflare-runtime': 2.0.0-beta.79(@distilled.cloud/cloudflare@1.0.0-rc.12(effect@4.0.0-rc.115))(@effect/platform-bun@4.0.0-rc.115(effect@4.0.0-rc.115))(@effect/platform-node@4.0.0-rc.115(effect@4.0.0-rc.115)(redis@6.2.1(@opentelemetry/api@1.9.1)))(@types/node@26.6.1)(effect@4.0.0-rc.115)(rolldown@1.2.5)(typescript@5.9.3)(vite@8.3.0(@types/node@26.6.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))
       '@distilled.cloud/cloudflare': 1.0.0-rc.12(effect@4.0.0-rc.115)
@@ -7346,7 +7346,7 @@ snapshots:
       - proxy-agent
       - typescript
 
-  '@alchemy.run/frontend-frameworks@2.0.0-beta.79(patch_hash=6ca79fefa1a23e9130c3bb917ed5508c2d016e73d19b21561cacbc3eb7076fa8)(92d190b823497bda0297a30d6f7fc25e)':
+  '@alchemy.run/frontend-frameworks@2.0.0-beta.79(patch_hash=4af5f49701469983cea48a831bd16d8eacaad25beea751bba15490db6d45f791)(92d190b823497bda0297a30d6f7fc25e)':
     dependencies:
       '@alchemy.run/cloudflare-runtime': 2.0.0-beta.79(@distilled.cloud/cloudflare@1.0.0-rc.12(effect@4.0.0-rc.115))(@effect/platform-bun@4.0.0-rc.115(effect@4.0.0-rc.115))(@effect/platform-node@4.0.0-rc.115(effect@4.0.0-rc.115)(redis@6.2.1(@opentelemetry/api@1.9.1)))(@types/node@26.6.1)(effect@4.0.0-rc.115)(rolldown@1.2.5)(typescript@7.0.2)(vite@8.3.0(@types/node@26.6.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))
       '@distilled.cloud/cloudflare': 1.0.0-rc.12(effect@4.0.0-rc.115)
@@ -11367,7 +11367,7 @@ snapshots:
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
 
-  alchemy@2.0.0-beta.79(@alchemy.run/frontend-frameworks@2.0.0-beta.79(patch_hash=6ca79fefa1a23e9130c3bb917ed5508c2d016e73d19b21561cacbc3eb7076fa8)(103c8af671560ab0afcd67f01a92567d))(@effect/platform-bun@4.0.0-rc.115(effect@4.0.0-rc.115))(@effect/platform-node@4.0.0-rc.115(effect@4.0.0-rc.115)(redis@6.2.1(@opentelemetry/api@1.9.1)))(@types/node@26.6.1)(@types/react@19.3.0)(@vercel/nft@1.10.2(rollup@4.62.2)(supports-color@8.1.1))(effect@4.0.0-rc.115)(mongodb@6.21.0(@aws-sdk/credential-providers@3.1093.0)(socks@2.8.9))(pg@8.22.0)(react-devtools-core@7.0.1)(typescript@7.0.2)(vite@8.3.0(@types/node@26.6.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))(vitest@5.0.1)(ws@8.21.3):
+  alchemy@2.0.0-beta.79(@alchemy.run/frontend-frameworks@2.0.0-beta.79(patch_hash=4af5f49701469983cea48a831bd16d8eacaad25beea751bba15490db6d45f791)(103c8af671560ab0afcd67f01a92567d))(@effect/platform-bun@4.0.0-rc.115(effect@4.0.0-rc.115))(@effect/platform-node@4.0.0-rc.115(effect@4.0.0-rc.115)(redis@6.2.1(@opentelemetry/api@1.9.1)))(@types/node@26.6.1)(@types/react@19.3.0)(@vercel/nft@1.10.2(rollup@4.62.2)(supports-color@8.1.1))(effect@4.0.0-rc.115)(mongodb@6.21.0(@aws-sdk/credential-providers@3.1093.0)(socks@2.8.9))(pg@8.22.0)(react-devtools-core@7.0.1)(typescript@7.0.2)(vite@8.3.0(@types/node@26.6.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))(vitest@5.0.1)(ws@8.21.3):
     dependencies:
       '@alchemy.run/cloudflare-runtime': 2.0.0-beta.79(@distilled.cloud/cloudflare@1.0.0-rc.12(effect@4.0.0-rc.115))(@effect/platform-bun@4.0.0-rc.115(effect@4.0.0-rc.115))(@effect/platform-node@4.0.0-rc.115(effect@4.0.0-rc.115)(redis@6.2.1(@opentelemetry/api@1.9.1)))(@types/node@26.6.1)(effect@4.0.0-rc.115)(rolldown@1.2.5)(typescript@7.0.2)(vite@8.3.0(@types/node@26.6.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))
       '@alchemy.run/floci': 2.0.0-beta.79(effect@4.0.0-rc.115)
@@ -11405,7 +11405,7 @@ snapshots:
       undici: 7.28.0
       yaml: 2.9.0
     optionalDependencies:
-      '@alchemy.run/frontend-frameworks': 2.0.0-beta.79(patch_hash=6ca79fefa1a23e9130c3bb917ed5508c2d016e73d19b21561cacbc3eb7076fa8)(103c8af671560ab0afcd67f01a92567d)
+      '@alchemy.run/frontend-frameworks': 2.0.0-beta.79(patch_hash=4af5f49701469983cea48a831bd16d8eacaad25beea751bba15490db6d45f791)(103c8af671560ab0afcd67f01a92567d)
       '@effect/platform-bun': 4.0.0-rc.115(effect@4.0.0-rc.115)
       '@effect/platform-node': 4.0.0-rc.115(effect@4.0.0-rc.115)(redis@6.2.1(@opentelemetry/api@1.9.1))
       '@vercel/nft': 1.10.2(rollup@4.62.2)(supports-color@8.1.1)
@@ -11423,7 +11423,7 @@ snapshots:
       - utf-8-validate
       - vitest
 
-  alchemy@2.0.0-beta.79(@alchemy.run/frontend-frameworks@2.0.0-beta.79(patch_hash=6ca79fefa1a23e9130c3bb917ed5508c2d016e73d19b21561cacbc3eb7076fa8)(7359f1d86bbafbf380b3a58bd7248edd))(@effect/platform-bun@4.0.0-rc.115(effect@4.0.0-rc.115))(@effect/platform-node@4.0.0-rc.115(effect@4.0.0-rc.115)(redis@6.2.1(@opentelemetry/api@1.9.1)))(@types/node@26.6.1)(@types/react@19.3.0)(@vercel/nft@1.10.2(rollup@4.62.2)(supports-color@8.1.1))(effect@4.0.0-rc.115)(mongodb@6.21.0(@aws-sdk/credential-providers@3.1093.0)(socks@2.8.9))(pg@8.22.0)(react-devtools-core@7.0.1)(typescript@5.9.3)(vite@8.3.0(@types/node@26.6.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))(vitest@5.0.1)(ws@8.21.3):
+  alchemy@2.0.0-beta.79(@alchemy.run/frontend-frameworks@2.0.0-beta.79(patch_hash=4af5f49701469983cea48a831bd16d8eacaad25beea751bba15490db6d45f791)(7359f1d86bbafbf380b3a58bd7248edd))(@effect/platform-bun@4.0.0-rc.115(effect@4.0.0-rc.115))(@effect/platform-node@4.0.0-rc.115(effect@4.0.0-rc.115)(redis@6.2.1(@opentelemetry/api@1.9.1)))(@types/node@26.6.1)(@types/react@19.3.0)(@vercel/nft@1.10.2(rollup@4.62.2)(supports-color@8.1.1))(effect@4.0.0-rc.115)(mongodb@6.21.0(@aws-sdk/credential-providers@3.1093.0)(socks@2.8.9))(pg@8.22.0)(react-devtools-core@7.0.1)(typescript@5.9.3)(vite@8.3.0(@types/node@26.6.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))(vitest@5.0.1)(ws@8.21.3):
     dependencies:
       '@alchemy.run/cloudflare-runtime': 2.0.0-beta.79(@distilled.cloud/cloudflare@1.0.0-rc.12(effect@4.0.0-rc.115))(@effect/platform-bun@4.0.0-rc.115(effect@4.0.0-rc.115))(@effect/platform-node@4.0.0-rc.115(effect@4.0.0-rc.115)(redis@6.2.1(@opentelemetry/api@1.9.1)))(@types/node@26.6.1)(effect@4.0.0-rc.115)(rolldown@1.2.5)(typescript@5.9.3)(vite@8.3.0(@types/node@26.6.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))
       '@alchemy.run/floci': 2.0.0-beta.79(effect@4.0.0-rc.115)
@@ -11461,7 +11461,7 @@ snapshots:
       undici: 7.28.0
       yaml: 2.9.0
     optionalDependencies:
-      '@alchemy.run/frontend-frameworks': 2.0.0-beta.79(patch_hash=6ca79fefa1a23e9130c3bb917ed5508c2d016e73d19b21561cacbc3eb7076fa8)(7359f1d86bbafbf380b3a58bd7248edd)
+      '@alchemy.run/frontend-frameworks': 2.0.0-beta.79(patch_hash=4af5f49701469983cea48a831bd16d8eacaad25beea751bba15490db6d45f791)(7359f1d86bbafbf380b3a58bd7248edd)
       '@effect/platform-bun': 4.0.0-rc.115(effect@4.0.0-rc.115)
       '@effect/platform-node': 4.0.0-rc.115(effect@4.0.0-rc.115)(redis@6.2.1(@opentelemetry/api@1.9.1))
       '@vercel/nft': 1.10.2(rollup@4.62.2)(supports-color@8.1.1)
@@ -11479,7 +11479,7 @@ snapshots:
       - utf-8-validate
       - vitest
 
-  alchemy@2.0.0-beta.79(@alchemy.run/frontend-frameworks@2.0.0-beta.79(patch_hash=6ca79fefa1a23e9130c3bb917ed5508c2d016e73d19b21561cacbc3eb7076fa8)(92d190b823497bda0297a30d6f7fc25e))(@effect/platform-bun@4.0.0-rc.115(effect@4.0.0-rc.115))(@effect/platform-node@4.0.0-rc.115(effect@4.0.0-rc.115)(redis@6.2.1(@opentelemetry/api@1.9.1)))(@types/node@26.6.1)(@types/react@19.3.0)(@vercel/nft@1.10.2(rollup@4.62.2)(supports-color@8.1.1))(effect@4.0.0-rc.115)(mongodb@6.21.0(@aws-sdk/credential-providers@3.1093.0)(socks@2.8.9))(pg@8.22.0)(react-devtools-core@7.0.1)(typescript@7.0.2)(vite@8.3.0(@types/node@26.6.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))(vitest@5.0.1)(ws@8.21.3):
+  alchemy@2.0.0-beta.79(@alchemy.run/frontend-frameworks@2.0.0-beta.79(patch_hash=4af5f49701469983cea48a831bd16d8eacaad25beea751bba15490db6d45f791)(92d190b823497bda0297a30d6f7fc25e))(@effect/platform-bun@4.0.0-rc.115(effect@4.0.0-rc.115))(@effect/platform-node@4.0.0-rc.115(effect@4.0.0-rc.115)(redis@6.2.1(@opentelemetry/api@1.9.1)))(@types/node@26.6.1)(@types/react@19.3.0)(@vercel/nft@1.10.2(rollup@4.62.2)(supports-color@8.1.1))(effect@4.0.0-rc.115)(mongodb@6.21.0(@aws-sdk/credential-providers@3.1093.0)(socks@2.8.9))(pg@8.22.0)(react-devtools-core@7.0.1)(typescript@7.0.2)(vite@8.3.0(@types/node@26.6.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))(vitest@5.0.1)(ws@8.21.3):
     dependencies:
       '@alchemy.run/cloudflare-runtime': 2.0.0-beta.79(@distilled.cloud/cloudflare@1.0.0-rc.12(effect@4.0.0-rc.115))(@effect/platform-bun@4.0.0-rc.115(effect@4.0.0-rc.115))(@effect/platform-node@4.0.0-rc.115(effect@4.0.0-rc.115)(redis@6.2.1(@opentelemetry/api@1.9.1)))(@types/node@26.6.1)(effect@4.0.0-rc.115)(rolldown@1.2.5)(typescript@7.0.2)(vite@8.3.0(@types/node@26.6.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))
       '@alchemy.run/floci': 2.0.0-beta.79(effect@4.0.0-rc.115)
@@ -11517,7 +11517,7 @@ snapshots:
       undici: 7.28.0
       yaml: 2.9.0
     optionalDependencies:
-      '@alchemy.run/frontend-frameworks': 2.0.0-beta.79(patch_hash=6ca79fefa1a23e9130c3bb917ed5508c2d016e73d19b21561cacbc3eb7076fa8)(92d190b823497bda0297a30d6f7fc25e)
+      '@alchemy.run/frontend-frameworks': 2.0.0-beta.79(patch_hash=4af5f49701469983cea48a831bd16d8eacaad25beea751bba15490db6d45f791)(92d190b823497bda0297a30d6f7fc25e)
       '@effect/platform-bun': 4.0.0-rc.115(effect@4.0.0-rc.115)
       '@effect/platform-node': 4.0.0-rc.115(effect@4.0.0-rc.115)(redis@6.2.1(@opentelemetry/api@1.9.1))
       '@vercel/nft': 1.10.2(rollup@4.62.2)(supports-color@8.1.1)
