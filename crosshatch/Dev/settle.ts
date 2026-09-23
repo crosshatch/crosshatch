@@ -1,7 +1,7 @@
-import { handler } from "@crosshatch/util"
 import { Effect } from "effect"
 
 import { FacilitatorApi } from "../FacilitatorApi/index.ts"
+import { handler } from "../util/index.ts"
 
 export const settle = handler(FacilitatorApi, "facilitator", "settle", ({ payload: { paymentRequirements } }) =>
   Effect.succeed({

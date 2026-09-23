@@ -1,10 +1,10 @@
-import { handler } from "@crosshatch/util"
 import { Effect, Record, Struct } from "effect"
 
 import type { Denomination } from "../Asset.ts"
 import { ChainId } from "../ChainId.ts"
 import { FacilitatorApi } from "../FacilitatorApi/index.ts"
 import * as Known from "../Known/index.ts"
+import { handler } from "../util/index.ts"
 
 export const supported = handler(FacilitatorApi, "facilitator", "supported", () =>
   Effect.succeed({

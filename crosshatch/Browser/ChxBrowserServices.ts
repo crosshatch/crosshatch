@@ -1,8 +1,8 @@
-import { ChxStage, ChxDomain } from "@crosshatch/util"
-import { Launcher, EmbedLauncher } from "@crosshatch/widget"
 import { Stream, Effect, Layer, flow } from "effect"
 
 import { Bridge, Payer } from "../index.ts"
+import { ChxStage, ChxDomain } from "../util/index.ts"
+import { Launcher, EmbedLauncher } from "../widget/index.ts"
 import { FacadeClient } from "./FacadeClient.ts"
 import { FacadeStateRef } from "./FacadeStateRef.ts"
 import { PrerequisitesWidget } from "./Widgets.ts"

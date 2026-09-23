@@ -1,5 +1,6 @@
-import { PrintableAscii32 } from "@crosshatch/util"
 import { Schema as S } from "effect"
+
+import { PrintableAscii32 } from "./util/index.ts"
 
 export type ResourceInfo = typeof ResourceInfo.Type
 export const ResourceInfo = S.Struct({

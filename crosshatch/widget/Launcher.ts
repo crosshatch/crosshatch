@@ -19,7 +19,7 @@ export class Launcher extends Context.Service<
       payload: Payload["Type"],
     ) => Stream.Stream<A["Type"], Launcher.Error<E>, Payload["EncodingServices"]>
   }
->()("@crosshatch/widget/Launcher") {}
+>()("crosshatch/widget/Launcher") {}
 
 export declare namespace Launcher {
   export type Error<E extends S.Top> = LaunchError | Url.UrlError | S.SchemaError | E["Type"]

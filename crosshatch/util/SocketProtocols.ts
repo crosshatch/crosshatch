@@ -15,7 +15,7 @@ const SocketProtocols_ = S.String.pipe(
 export interface SocketProtocols extends SocketProtocols_ {}
 
 export const SocketProtocols = Object.assign(
-  Context.Service<SocketProtocols>()("@crosshatch/util/SocketProtocols", {
+  Context.Service<SocketProtocols>()("crosshatch/util/SocketProtocols", {
     make: HttpServerRequest.HttpServerRequest.pipe(
       Effect.flatMap(
         flow(

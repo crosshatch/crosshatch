@@ -1,8 +1,8 @@
-import { ChxDomain } from "@crosshatch/util"
-import { Host } from "@crosshatch/widget"
 import { BrowserWorker, BrowserStream } from "@effect/platform-browser"
 import { type Cause, Effect, Fiber, Layer, Stream, Schema as S, Schedule, Data, Record } from "effect"
 
+import { ChxDomain } from "../util/index.ts"
+import { Host } from "../widget/index.ts"
 import { FacadeIntroduction, RequestFacadeIntroduction } from "./handshake.ts"
 
 export class FacadeWorkerError extends Data.TaggedError("FacadeWorkerError")<{

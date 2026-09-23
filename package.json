@@ -18,7 +18,6 @@
     "@changesets/changelog-github": "catalog:",
     "@changesets/cli": "catalog:",
     "@crosshatch/alchemy": "workspace:*",
-    "@crosshatch/util": "workspace:*",
     "@effect/language-service": "catalog:",
     "@effect/platform-node": "catalog:",
     "@effect/tsgo": "catalog:",

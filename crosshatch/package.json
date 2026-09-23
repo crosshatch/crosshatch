@@ -30,7 +30,9 @@
     "./Known": "./Known/index.ts",
     "./package.json": "./package.json",
     "./Solana": "./Solana/index.ts",
-    "./Unified": "./Unified/index.ts"
+    "./Unified": "./Unified/index.ts",
+    "./util": "./util/index.ts",
+    "./widget": "./widget/index.ts"
   },
   "publishConfig": {
     "bin": {
@@ -48,15 +50,15 @@
       "./Known": "./dist/Known/index.js",
       "./package.json": "./package.json",
       "./Solana": "./dist/Solana/index.js",
-      "./Unified": "./dist/Unified/index.js"
+      "./Unified": "./dist/Unified/index.js",
+      "./util": "./dist/util/index.js",
+      "./widget": "./dist/widget/index.js"
     }
   },
   "scripts": {
     "dev": "node --watch ./Cli/main.ts dev --port 4647 --otel-endpoint http://127.0.0.1:27686"
   },
   "peerDependencies": {
-    "@crosshatch/util": "workspace:*",
-    "@crosshatch/widget": "workspace:*",
     "@effect/platform-browser": "catalog:",
     "@effect/platform-node": "catalog:",
     "@napi-rs/keyring": "catalog:",
@@ -66,6 +68,7 @@
     "@solana/addresses": "catalog:",
     "@solana/kit": "catalog:",
     "@solana/transactions": "catalog:",
+    "@standard-schema/spec": "catalog:",
     "effect": "catalog:",
     "http-message-sig": "catalog:",
     "ox": "catalog:"

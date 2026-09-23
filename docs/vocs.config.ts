@@ -1,12 +1,30 @@
-import { VocsConfig } from "@crosshatch/util/vocs"
 import PackageJson from "crosshatch/package.json" with { type: "json" }
-import { defineConfig } from "vocs/config"
+import { Changelog, defineConfig, McpSource } from "vocs/config"
 
 export default defineConfig({
-  ...VocsConfig({
-    title: "Crosshatch",
-    repo: "crosshatch",
+  title: "Crosshatch",
+  titleTemplate: "%s ⋅ Crosshatch",
+  accentColor: "light-dark(#6D5BD0, #A99BFF)",
+  codeHighlight: {
+    themes: {
+      light: "github-light",
+      dark: "tokyo-night",
+    },
+  },
+  checkDeadlinks: true,
+  changelog: Changelog.github({
+    repo: "crosshatch/crosshatch",
+    prereleases: true,
   }),
+  editLink: {
+    link: "https://github.com/crosshatch/crosshatch/edit/main/docs/src/pages/:path",
+    text: "Edit on GitHub",
+  },
+  renderStrategy: "full-static",
+  mcp: {
+    enabled: true,
+    sources: [McpSource.github({ repo: "crosshatch/crosshatch" })],
+  },
   description: PackageJson.description,
   twoslash: { explicitTrigger: false },
   topNav: [

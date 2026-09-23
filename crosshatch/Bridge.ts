@@ -1,8 +1,8 @@
-import { stringRaw } from "@crosshatch/util"
 import { Schema as S, Context, Option, Data, Effect, flow, Struct } from "effect"
 
 import type { Payload } from "./Payload.ts"
 import { Required } from "./Required.ts"
+import { stringRaw } from "./util/index.ts"
 
 export class CreateTraceError extends S.TaggedError<CreateTraceError>()("CreateTraceError", {
   cause: S.Unknown.pipe(S.optional),

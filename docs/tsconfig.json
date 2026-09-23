@@ -5,5 +5,5 @@
     "declaration": false
   },
   "include": ["."],
-  "references": [{ "path": "../crosshatch" }, { "path": "../@crosshatch/util" }]
+  "references": [{ "path": "../crosshatch" }]
 }

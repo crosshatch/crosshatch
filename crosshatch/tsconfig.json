@@ -5,6 +5,5 @@
     "outDir": "dist"
   },
   "include": [".", "package.json"],
-  "exclude": ["dist", "vitest.config.ts"],
-  "references": [{ "path": "../@crosshatch/widget" }, { "path": "../@crosshatch/util" }]
+  "exclude": ["dist", "vitest.config.ts"]
 }
